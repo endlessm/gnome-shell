@@ -235,6 +235,8 @@ const ViewSelector = new Lang.Class({
                 Main.overview.show();
         }));
         global.stage.add_action(gesture);
+
+        Main.overview.connect('show-apps-request', Lang.bind(this, this._toggleAppsPage));
     },
 
     _toggleAppsPage: function() {

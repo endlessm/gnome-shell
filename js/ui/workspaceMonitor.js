@@ -32,8 +32,12 @@ const WorkspaceMonitor = new Lang.Class({
 
     _updateOverview: function() {
         let visibleApps = this._getVisibleApps();
-        if (visibleApps.length != 0 && this._inFullscreen)
+        if (visibleApps.length == 0) {
+            Main.overview.showApps();
+        } else if (this._inFullscreen) {
+            // Hide in fullscreen mode
             Main.overview.hide();
+        }
     },
 
     _getVisibleApps: function() {

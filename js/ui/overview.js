@@ -445,6 +445,10 @@ const Overview = new Lang.Class({
         this._searchEntry.grab_key_focus();
     },
 
+    showApps : function() {
+        this.emit('show-apps-request');
+    },
+
     fadeInDesktop: function() {
             this._desktopFade.opacity = 0;
             this._desktopFade.show();
