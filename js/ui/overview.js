@@ -662,10 +662,15 @@ const Overview = new Lang.Class({
         if (this.isDummy)
             return;
 
-        if (this.visible)
-            this.hide();
-        else
+        if (this.visible) {
+            if (Main.workspaceMonitor.visibleWindows == 0) {
+                this.showApps();
+            } else {
+                this.hide();
+            }
+        } else {
             this.show();
+        }
     },
 
     getShowAppsButton: function() {
