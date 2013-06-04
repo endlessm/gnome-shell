@@ -388,12 +388,11 @@ const ViewSelector = new Lang.Class({
         let symbol = event.get_key_symbol();
 
         if (symbol == Clutter.Escape) {
-            if (this._searchActive)
+            if (this._searchActive) {
                 this.reset();
-            else if (this._showAppsButton.checked)
-                this._showAppsButton.checked = false;
-            else
-                Main.overview.hide();
+            } else {
+                return true;
+            }
             return Clutter.EVENT_STOP;
         } else if (this._shouldTriggerSearch(symbol)) {
             this.startSearch(event);
