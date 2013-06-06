@@ -72,6 +72,8 @@ void shell_app_update_app_menu       (ShellApp *app, MetaWindow *window);
 
 gboolean shell_app_get_busy          (ShellApp *app);
 
+gboolean shell_app_create_custom_launcher_with_name (ShellApp *app, const char *label);
+
 G_END_DECLS
 
 #endif /* __SHELL_APP_H__ */
