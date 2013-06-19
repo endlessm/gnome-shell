@@ -162,13 +162,22 @@ const Overview = new Lang.Class({
 
         this._overviewCreated = true;
 
+        // this._allMonitorsGroup is a simple actor that covers all monitors,
+        // used to install actions that apply to all monitors
+        this._allMonitorsGroup = new Clutter.Actor({ reactive: true });
+        this._allMonitorsGroup.add_constraint(
+            new Clutter.BindConstraint({ source: Main.layoutManager.overviewGroup,
+                                         coordinate: Clutter.BindCoordinate.ALL }));
+
         /* Translators: This is the main view to select
            activities. See also note for "Activities" string. */
         this._overview = new St.BoxLayout({ name: 'overview',
                                             accessible_name: _("Overview"),
+                                            reactive: true,
                                             vertical: true });
         this._overview.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
         this._overview._delegate = this;
+        this._allMonitorsGroup.add_actor(this._overview);
 
         // The main Background actors are inside global.window_group which are
         // hidden when displaying the overview, so we create a new
@@ -200,7 +209,7 @@ const Overview = new Lang.Class({
         Main.layoutManager.overviewGroup.add_child(this._coverPane);
         this._coverPane.connect('event', Lang.bind(this, function (actor, event) { return Clutter.EVENT_STOP; }));
 
-        Main.layoutManager.overviewGroup.add_child(this._overview);
+        Main.layoutManager.overviewGroup.add_child(this._allMonitorsGroup);
 
         this._coverPane.hide();
 
@@ -387,11 +396,14 @@ const Overview = new Lang.Class({
         return Clutter.EVENT_PROPAGATE;
     },
 
-    addAction: function(action) {
+    addAction: function(action, isPrimary) {
         if (this.isDummy)
             return;
 
-        this._backgroundGroup.add_action(action);
+        if (isPrimary)
+            this._overview.add_action(action);
+        else
+            this._allMonitorsGroup.add_action(action);
     },
 
     _getDesktopClone: function() {
