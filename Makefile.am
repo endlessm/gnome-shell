@@ -24,7 +24,8 @@ DIST_EXCLUDE =					\
 	gnome-shell.doap			\
 	HACKING					\
 	MAINTAINERS				\
-	tools/build/*
+	tools/build/*				\
+	.tx/config
 
 distcheck-hook:
 	@echo "Checking disted files against files in git"
