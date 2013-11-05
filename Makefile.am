@@ -25,7 +25,8 @@ DIST_EXCLUDE =					\
 	HACKING					\
 	MAINTAINERS				\
 	tools/build/*				\
-	tools/password-unlocker.js
+	tools/password-unlocker.js		\
+	.tx/config
 
 distcheck-hook:
 	@echo "Checking disted files against files in git"
