@@ -29,6 +29,7 @@
  * Copyright Red Hat, Inc. 2006-2008
  */
 
+#define SIDE_COMPONENT_ROLE "eos-side-component"
 #define SPEEDWAGON_ROLE "eos-speedwagon"
 
 #define BUILDER_WINDOW "org.gnome.Builder"
@@ -884,6 +885,9 @@ shell_window_tracker_get_startup_sequences (ShellWindowTracker *self)
 gboolean
 shell_window_tracker_is_window_interesting (MetaWindow *window)
 {
+  if (g_strcmp0 (meta_window_get_role (window), SIDE_COMPONENT_ROLE) == 0)
+    return TRUE;
+
   if (meta_window_is_skip_taskbar (window))
     return FALSE;
 
