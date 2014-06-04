@@ -388,6 +388,10 @@ get_app_for_window (ShellWindowTracker    *tracker,
   MetaWindow *transient_for;
   const char *startup_id;
 
+  /* Side components don't have an associated app */
+  if (g_strcmp0 (meta_window_get_role (window), SIDE_COMPONENT_ROLE) == 0)
+    return NULL;
+
   /* We do want to associate the GNOME Builder window with
    * an open app of a coding session */
   if (g_strcmp0 (meta_window_get_flatpak_id (window), BUILDER_WINDOW) == 0 &&
