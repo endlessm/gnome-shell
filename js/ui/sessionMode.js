@@ -59,7 +59,7 @@ const _modes = {
         isLocked: true,
         isGreeter: undefined,
         unlockDialog: undefined,
-        components: ['polkitAgent', 'telepathyClient'],
+        components: ['polkitAgent'],
         panel: {
             left: [],
             center: [],
@@ -71,7 +71,7 @@ const _modes = {
     'unlock-dialog': {
         isLocked: true,
         unlockDialog: undefined,
-        components: ['polkitAgent', 'telepathyClient'],
+        components: ['polkitAgent'],
         panel: {
             left: [],
             center: [],
@@ -94,9 +94,9 @@ const _modes = {
         isPrimary: true,
         unlockDialog: imports.ui.unlockDialog.UnlockDialog,
         components: Config.HAVE_NETWORKMANAGER ?
-                    ['networkAgent', 'polkitAgent', 'telepathyClient',
+                    ['networkAgent', 'polkitAgent',
                      'keyring', 'autorunManager', 'automountManager'] :
-                    ['polkitAgent', 'telepathyClient',
+                    ['polkitAgent',
                      'keyring', 'autorunManager', 'automountManager'],
 
         panel: {

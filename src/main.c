@@ -20,8 +20,6 @@
 #include <meta/meta-plugin.h>
 #include <meta/prefs.h>
 #include <atk-bridge.h>
-#include <telepathy-glib/debug.h>
-#include <telepathy-glib/debug-sender.h>
 
 #include "shell-global.h"
 #include "shell-global-private.h"
@@ -292,36 +290,6 @@ shell_init_debug (const char *debug_env)
 }
 
 static void
-default_log_handler (const char     *log_domain,
-                     GLogLevelFlags  log_level,
-                     const char     *message,
-                     gpointer        data)
-{
-  TpDebugSender *sender = data;
-  GTimeVal now;
-
-  g_get_current_time (&now);
-
-  /* Send telepathy debug through DBus */
-  if (log_domain != NULL && g_str_has_prefix (log_domain, "tp-glib"))
-    tp_debug_sender_add_message (sender, &now, log_domain, log_level, message);
-
-  /* Filter out telepathy-glib logs, we don't want to flood Shell's output
-   * with those. */
-  if (!log_domain || !g_str_has_prefix (log_domain, "tp-glib"))
-    g_log_default_handler (log_domain, log_level, message, data);
-
-  /* Filter out Gjs logs, those already have the stack */
-  if (log_domain && strcmp (log_domain, "Gjs") == 0)
-    return;
-
-  if ((_shell_debug & SHELL_DEBUG_BACKTRACE_WARNINGS) &&
-      ((log_level & G_LOG_LEVEL_CRITICAL) ||
-       (log_level & G_LOG_LEVEL_WARNING)))
-    gjs_dumpstack ();
-}
-
-static void
 shut_up (const char     *domain,
          GLogLevelFlags  level,
          const char     *message,
@@ -407,7 +375,6 @@ main (int argc, char **argv)
   GOptionContext *ctx;
   GError *error = NULL;
   int ecode;
-  TpDebugSender *sender;
 
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -450,15 +417,6 @@ main (int argc, char **argv)
   shell_introspection_init ();
   shell_fonts_init ();
 
-  /* Turn on telepathy-glib debugging but filter it out in
-   * default_log_handler. This handler also exposes all the logs over D-Bus
-   * using TpDebugSender. */
-  tp_debug_set_flags ("all");
-
-  sender = tp_debug_sender_dup ();
-
-  g_log_set_default_handler (default_log_handler, sender);
-
   /* Initialize the global object */
   if (session_mode == NULL)
     session_mode = is_gdm_mode ? (char *)"gdm" : (char *)"user";
@@ -474,8 +432,6 @@ main (int argc, char **argv)
       g_printerr ("Doing final cleanup...\n");
       g_object_unref (shell_global_get ());
     }
-
-  g_object_unref (sender);
 
   return ecode;
 }
