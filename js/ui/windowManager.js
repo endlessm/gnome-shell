@@ -31,7 +31,6 @@ const DIM_BRIGHTNESS = -0.3;
 const DIM_TIME = 0.500;
 const UNDIM_TIME = 0.250;
 
-const DISPLAY_REVERT_TIMEOUT = 20; // in seconds - keep in sync with mutter
 const ONE_SECOND = 1000; // in ms
 
 const GSD_WACOM_BUS_NAME = 'org.gnome.SettingsDaemon.Wacom';
@@ -86,7 +85,7 @@ const DisplayChangeDialog = new Lang.Class({
                        { y_fill:  false,
                          y_align: St.Align.START });
 
-        this._countDown = DISPLAY_REVERT_TIMEOUT;
+        this._countDown = Meta.MonitorManager.get_display_configuration_timeout();
         let message = this._formatCountDown();
         this._descriptionLabel = new St.Label({ style_class: 'prompt-dialog-description',
                                                 text: this._formatCountDown() });
