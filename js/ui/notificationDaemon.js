@@ -773,6 +773,10 @@ const GtkNotificationDaemonAppSource = new Lang.Class({
         }
         return [this._appId, notifications];
     },
+
+    get app() {
+        return this._app;
+    }
 });
 
 const GtkNotificationsIface = '<node> \
