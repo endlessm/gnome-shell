@@ -887,6 +887,8 @@ const ControlsBoxLayout = Lang.Class({
 const ViewStackLayout = new Lang.Class({
     Name: 'ViewStackLayout',
     Extends: Clutter.BinLayout,
+    Signals: { 'allocated-size-changed': { param_types: [GObject.TYPE_INT,
+                                                         GObject.TYPE_INT] } },
 
     vfunc_allocate: function (actor, box, flags) {
         let availWidth = box.x2 - box.x1;
@@ -897,7 +899,6 @@ const ViewStackLayout = new Lang.Class({
         this.parent(actor, box, flags);
     }
 });
-Signals.addSignalMethods(ViewStackLayout.prototype);
 
 const AppDisplay = new Lang.Class({
     Name: 'AppDisplay',
