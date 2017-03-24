@@ -800,7 +800,7 @@ const NetworkAgent = new Lang.Class({
 
                     let path = binary;
                     if (!GLib.path_is_absolute(path)) {
-                        path = GLib.build_filenamev([Config.LIBEXECDIR, path]);
+                        path = GLib.build_filenamev(['/usr/lib/NetworkManager', path]);
                     }
 
                     if (GLib.file_test(path, GLib.FileTest.IS_EXECUTABLE)) {
