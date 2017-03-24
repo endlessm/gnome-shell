@@ -93,7 +93,7 @@ let _loginManager = null;
  */
 function getLoginManager() {
     if (_loginManager == null) {
-        if (haveSystemd())
+        if (haveSystemd() && GLib.getenv('XDG_SESSION_ID'))
             _loginManager = new LoginManagerSystemd();
         else
             _loginManager = new LoginManagerDummy();
