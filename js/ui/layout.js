@@ -76,6 +76,7 @@ const LayoutManager = new Lang.Class({
         this._topActors = [];
         this._isPopupWindowVisible = false;
         this._startingUp = true;
+        this._pendingLoadBackground = false;
 
         // We don't want to paint the stage background color because either
         // the SystemBackground we create or the MetaBackgroundActor inside
@@ -219,7 +220,9 @@ const LayoutManager = new Lang.Class({
         for (let i = 0; i < nMonitors; i++)
             this.monitors.push(new Monitor.Monitor(i, screen.get_monitor_geometry(i)));
 
-        if (nMonitors == 1) {
+        if (nMonitors == 0) {
+            this.primaryIndex = this.bottomIndex = -1;
+        } else if (nMonitors == 1) {
             this.primaryIndex = this.bottomIndex = 0;
         } else {
             // If there are monitors below the primary, then we need
@@ -233,8 +236,16 @@ const LayoutManager = new Lang.Class({
                 }
             }
         }
-        this.primaryMonitor = this.monitors[this.primaryIndex];
-        this.bottomMonitor = this.monitors[this.bottomIndex];
+
+        if (this.primaryIndex != -1) {
+            this.primaryMonitor = this.monitors[this.primaryIndex];
+            this.bottomMonitor = this.monitors[this.bottomIndex];
+
+            if (this._pendingLoadBackground) {
+                this._loadBackground();
+                this._pendingLoadBackground = false;
+            }
+        }
     },
 
     _updateHotCorners: function() {
@@ -392,6 +403,9 @@ const LayoutManager = new Lang.Class({
         this.screenShieldGroup.set_position(0, 0);
         this.screenShieldGroup.set_size(global.screen_width, global.screen_height);
 
+        if (!this.primaryMonitor)
+            return;
+
         this.panelBox.set_position(this.primaryMonitor.x, this.primaryMonitor.y + this.primaryMonitor.height - this.panelBox.height);
         this.panelBox.set_size(this.primaryMonitor.width, -1);
 
@@ -413,6 +427,9 @@ const LayoutManager = new Lang.Class({
             this._rightPanelBarrier.destroy();
             this._rightPanelBarrier = null;
         }
+
+        if (!this.primaryMonitor)
+            return;
 
         if (this.panelBox.height) {
             let primary = this.primaryMonitor;
@@ -485,6 +502,11 @@ const LayoutManager = new Lang.Class({
     },
 
     _loadBackground: function() {
+        if (!this.primaryMonitor) {
+            this._pendingLoadBackground = true;
+            return;
+        }
+
         this._systemBackground = new Background.SystemBackground();
         this._systemBackground.actor.hide();
 

@@ -100,6 +100,9 @@ const MonitorConstraint = new Lang.Class({
         if (!this._primary && this._index < 0)
             return;
 
+        if (!Main.layoutManager.primaryMonitor)
+            return;
+
         let index;
         if (this._primary)
             index = Main.layoutManager.primaryIndex;
