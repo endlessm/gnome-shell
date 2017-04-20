@@ -225,13 +225,6 @@ const Overview = new Lang.Class({
 
         this._shellInfo = new ShellInfo();
 
-        // Add a clone of the panel to the overview so spacing and such is
-        // automatic
-        this._panelGhost = new St.Bin({ child: new Clutter.Clone({ source: Main.panel.actor }),
-                                        reactive: false,
-                                        opacity: 0 });
-        this._overview.add_actor(this._panelGhost);
-
         this._searchEntry = new St.Entry({ style_class: 'search-entry',
                                            /* Translators: this is the text displayed
                                               in the search entry when no search is
@@ -251,6 +244,14 @@ const Overview = new Lang.Class({
 
         // Add our same-line elements after the search entry
         this._overview.add(this._controls.actor, { y_fill: true, expand: true });
+
+        // Add a clone of the panel to the overview so spacing and such is
+        // automatic
+        this._panelGhost = new St.Bin({ child: new Clutter.Clone({ source: Main.panel.actor }),
+                                        reactive: false,
+                                        opacity: 0 });
+
+        this._overview.add_actor(this._panelGhost);
 
         // TODO - recalculate everything when desktop size changes
         this.dashIconSize = this._dash.iconSize;
