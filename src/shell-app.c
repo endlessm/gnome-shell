@@ -44,6 +44,7 @@ typedef struct {
   GSList *windows;
 
   guint interesting_windows;
+  guint speedwagon_windows;
 
   /* Whether or not we need to resort the windows; this is done on demand */
   guint window_sort_stale : 1;
@@ -895,9 +896,16 @@ shell_app_sync_running_state (ShellApp *app)
   g_return_if_fail (app->running_state != NULL);
 
   if (app->running_state->interesting_windows > 0)
-    shell_app_state_transition (app, SHELL_APP_STATE_RUNNING);
+    {
+      shell_app_state_transition (app, SHELL_APP_STATE_RUNNING);
+    }
   else if (app->state != SHELL_APP_STATE_STARTING)
-    shell_app_state_transition (app, SHELL_APP_STATE_STOPPED);
+    {
+      if (app->running_state->speedwagon_windows > 0)
+        shell_app_state_transition (app, SHELL_APP_STATE_STARTING);
+      else
+        shell_app_state_transition (app, SHELL_APP_STATE_STOPPED);
+    }
 }
 
 static void
@@ -1018,6 +1026,15 @@ shell_app_ensure_busy_watch (ShellApp *app)
                                        g_object_ref (app));
 }
 
+static gboolean
+shell_app_is_interesting_window (MetaWindow *window)
+{
+  if (shell_window_tracker_is_speedwagon_window (window))
+    return FALSE;
+
+  return shell_window_tracker_is_window_interesting (window);
+}
+
 void
 _shell_app_add_window (ShellApp        *app,
                        MetaWindow      *window)
@@ -1039,8 +1056,11 @@ _shell_app_add_window (ShellApp        *app,
   shell_app_update_app_menu (app, window);
   shell_app_ensure_busy_watch (app);
 
-  if (!meta_window_is_skip_taskbar (window))
+  if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows++;
+  else if (shell_window_tracker_is_speedwagon_window (window))
+    app->running_state->speedwagon_windows++;
+
   shell_app_sync_running_state (app);
 
   g_object_thaw_notify (G_OBJECT (app));
@@ -1063,8 +1083,10 @@ _shell_app_remove_window (ShellApp   *app,
   g_object_unref (window);
   app->running_state->windows = g_slist_remove (app->running_state->windows, window);
 
-  if (!meta_window_is_skip_taskbar (window))
+  if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows--;
+  else if (shell_window_tracker_is_speedwagon_window (window))
+    app->running_state->speedwagon_windows--;
 
   if (app->running_state->windows == NULL)
     g_clear_pointer (&app->running_state, unref_running_state);
@@ -1161,7 +1183,7 @@ shell_app_request_quit (ShellApp   *app)
     {
       MetaWindow *win = iter->data;
 
-      if (meta_window_is_skip_taskbar (win))
+      if (!shell_window_tracker_is_window_interesting (win))
         continue;
 
       meta_window_delete (win, shell_global_get_current_time (shell_global_get ()));
