@@ -12,6 +12,7 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const AccessDialog = imports.ui.accessDialog;
+const AppActivation = imports.ui.appActivation;
 const AudioDeviceSelection = imports.ui.audioDeviceSelection;
 const Components = imports.ui.components;
 const CtrlAltTab = imports.ui.ctrlAltTab;
@@ -80,6 +81,7 @@ let magnifier = null;
 let xdndHandler = null;
 let keyboard = null;
 let layoutManager = null;
+let desktopAppClient = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
@@ -176,6 +178,7 @@ function _initializeUI() {
     notificationDaemon = new NotificationDaemon.NotificationDaemon();
     windowAttentionHandler = new WindowAttentionHandler.WindowAttentionHandler();
     componentManager = new Components.ComponentManager();
+    desktopAppClient = new AppActivation.DesktopAppClient();
 
     layoutManager.init();
     overview.init();
