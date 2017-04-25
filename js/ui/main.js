@@ -4,6 +4,7 @@ const { Clutter, Gio, GLib, Meta, Shell, St } = imports.gi;
 const Mainloop = imports.mainloop;
 
 const AccessDialog = imports.ui.accessDialog;
+const AppActivation = imports.ui.appActivation;
 const AudioDeviceSelection = imports.ui.audioDeviceSelection;
 const Components = imports.ui.components;
 const CtrlAltTab = imports.ui.ctrlAltTab;
@@ -80,6 +81,7 @@ let _cssStylesheet = null;
 let _a11ySettings = null;
 let _themeResource = null;
 let _oskResource = null;
+let _desktopAppClient = null;
 
 function _sessionUpdated() {
     if (sessionMode.isPrimary)
@@ -179,6 +181,9 @@ function _initializeUI() {
     componentManager = new Components.ComponentManager();
 
     introspectService = new Introspect.IntrospectService();
+
+    // The DesktopAppClient needs to be initialized before the layout manager.
+    _desktopAppClient = new AppActivation.DesktopAppClient();
 
     layoutManager.init();
     overview.init();
