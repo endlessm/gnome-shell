@@ -44,6 +44,7 @@ typedef struct {
   GSList *windows;
 
   guint interesting_windows;
+  guint speedwagon_windows;
 
   /* Whether or not we need to resort the windows; this is done on demand */
   guint window_sort_stale : 1;
@@ -892,12 +893,19 @@ shell_app_sync_running_state (ShellApp *app)
 {
   g_return_if_fail (app->running_state != NULL);
 
-  if (app->state != SHELL_APP_STATE_STARTING)
+  if (app->running_state->interesting_windows == 0)
     {
-      if (app->running_state->interesting_windows == 0)
-        shell_app_state_transition (app, SHELL_APP_STATE_STOPPED);
-      else
-        shell_app_state_transition (app, SHELL_APP_STATE_RUNNING);
+      if (app->state != SHELL_APP_STATE_STARTING)
+        {
+          if (app->running_state->speedwagon_windows > 0)
+            shell_app_state_transition (app, SHELL_APP_STATE_STARTING);
+          else
+            shell_app_state_transition (app, SHELL_APP_STATE_STOPPED);
+        }
+    }
+  else
+    {
+      shell_app_state_transition (app, SHELL_APP_STATE_RUNNING);
     }
 }
 
@@ -1043,6 +1051,9 @@ _shell_app_add_window (ShellApp        *app,
 
   if (!meta_window_is_skip_taskbar (window))
     app->running_state->interesting_windows++;
+  else if (shell_window_tracker_is_speedwagon_window (window))
+    app->running_state->speedwagon_windows++;
+
   shell_app_sync_running_state (app);
 
   g_object_thaw_notify (G_OBJECT (app));
@@ -1067,6 +1078,8 @@ _shell_app_remove_window (ShellApp   *app,
 
   if (!meta_window_is_skip_taskbar (window))
     app->running_state->interesting_windows--;
+  else if (shell_window_tracker_is_speedwagon_window (window))
+    app->running_state->speedwagon_windows--;
 
   if (app->running_state->windows == NULL)
     {
