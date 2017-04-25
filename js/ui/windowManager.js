@@ -19,6 +19,7 @@ const Tweener = imports.ui.tweener;
 const WindowMenu = imports.ui.windowMenu;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
+const NO_DEFAULT_MAXIMIZE_KEY = 'no-default-maximize';
 const MINIMIZE_WINDOW_ANIMATION_TIME = 0.2;
 const SHOW_WINDOW_ANIMATION_TIME = 0.15;
 const DIALOG_SHOW_WINDOW_ANIMATION_TIME = 0.1;
