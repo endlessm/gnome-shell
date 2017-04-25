@@ -12,6 +12,7 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const AccessDialog = imports.ui.accessDialog;
+const AppActivation = imports.ui.appActivation;
 const AudioDeviceSelection = imports.ui.audioDeviceSelection;
 const Components = imports.ui.components;
 const CtrlAltTab = imports.ui.ctrlAltTab;
@@ -83,6 +84,7 @@ let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
 let _a11ySettings = null;
 let _themeResource = null;
+let _desktopAppClient = null;
 
 function _sessionUpdated() {
     if (sessionMode.isPrimary)
@@ -174,6 +176,9 @@ function _initializeUI() {
     notificationDaemon = new NotificationDaemon.NotificationDaemon();
     windowAttentionHandler = new WindowAttentionHandler.WindowAttentionHandler();
     componentManager = new Components.ComponentManager();
+
+    // The DesktopAppClient needs to be initialized before the layout manager.
+    _desktopAppClient = new AppActivation.DesktopAppClient();
 
     layoutManager.init();
     overview.init();
