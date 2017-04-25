@@ -2,7 +2,7 @@ CLEANFILES =
 NULL =
 
 desktopdir=$(datadir)/applications
-desktop_DATA = org.gnome.Shell.desktop gnome-shell-extension-prefs.desktop
+desktop_DATA = org.gnome.Shell.desktop gnome-shell-extension-prefs.desktop eos-launch.desktop
 
 if HAVE_NETWORKMANAGER
 desktop_DATA += org.gnome.Shell.PortalHelper.desktop
@@ -29,6 +29,7 @@ endif
 # file when built in a non-system prefix
 %.desktop.in:%.desktop.in.in
 	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|" \
+	    -e "s|@pkgdatadir[@]|$(pkgdatadir)|" \
 	    -e "s|@VERSION[@]|$(VERSION)|" \
 	    $< > $@ || rm $@
 
@@ -123,6 +124,7 @@ EXTRA_DIST =						\
 	org.gnome.shell.gschema.xml.in			\
 	gnome-shell-theme.gresource.xml 		\
 	$(resource_files)				\
+	eos-launch.desktop.in.in			\
 	$(NULL)
 
 CLEANFILES +=						\
@@ -134,4 +136,5 @@ CLEANFILES +=						\
 	gschemas.compiled				\
 	org.gnome.shell.gschema.valid			\
 	gnome-shell-theme.gresource			\
+	eos-launch.desktop.in				\
 	$(NULL)

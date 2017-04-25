@@ -28,10 +28,14 @@ all-local: $(js_built_sources)
 
 js_resource_dist_files = $(filter-out misc/config.js, $(js_resource_files))
 
+eoslaunchdir = $(pkgdatadir)
+dist_eoslaunch_DATA = misc/eos-launch.js
+
 EXTRA_DIST = \
 	$(js_resource_dist_files) \
 	js-resources.gresource.xml \
 	misc/config.js.in \
+	misc/eos-launch.js \
 	$(NULL)
 
 CLEANFILES = \
