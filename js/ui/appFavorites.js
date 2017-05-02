@@ -139,17 +139,7 @@ const AppFavorites = new Lang.Class({
     },
 
     addFavoriteAtPos: function(appId, pos) {
-        if (!this._addFavorite(appId, pos))
-            return;
-
-        let app = Shell.AppSystem.get_default().lookup_app(appId);
-
-        Main.overview.setMessage(_("%s has been added to your favorites.").format(app.get_name()),
-                                 { forFeedback: true,
-                                   undoCallback: Lang.bind(this, function () {
-                                                               this._removeFavorite(appId);
-                                                           })
-                                 });
+        this._addFavorite(appId, pos);
     },
 
     addFavorite: function(appId) {
@@ -171,19 +161,7 @@ const AppFavorites = new Lang.Class({
     },
 
     removeFavorite: function(appId) {
-        let ids = this._getIds();
-        let pos = ids.indexOf(appId);
-
-        let app = this._favorites[appId];
-        if (!this._removeFavorite(appId))
-            return;
-
-        Main.overview.setMessage(_("%s has been removed from your favorites.").format(app.get_name()),
-                                 { forFeedback: true,
-                                   undoCallback: Lang.bind(this, function () {
-                                                               this._addFavorite(appId, pos);
-                                                           })
-                                 });
+        this._removeFavorite(appId);
     }
 });
 Signals.addSignalMethods(AppFavorites.prototype);
