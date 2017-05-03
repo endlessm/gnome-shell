@@ -29,6 +29,8 @@
  * Copyright Red Hat, Inc. 2006-2008
  */
 
+#define SPEEDWAGON_ROLE "eos-speedwagon"
+
 /**
  * SECTION:shell-window-tracker
  * @short_description: Associate windows with applications
@@ -797,6 +799,19 @@ shell_window_tracker_get_startup_sequences (ShellWindowTracker *self)
   ShellGlobal *global = shell_global_get ();
   MetaScreen *screen = shell_global_get_screen (global);
   return meta_screen_get_startup_sequences (screen);
+}
+
+/**
+ * shell_window_tracker_is_speedwagon_window:
+ *
+ * A speedwagon window is shown while an application is being launched.
+ *
+ * Returns: %TRUE if a window is a speedwagon
+ */
+gboolean
+shell_window_tracker_is_speedwagon_window (MetaWindow *window)
+{
+  return g_strcmp0 (meta_window_get_role (window), SPEEDWAGON_ROLE) == 0;
 }
 
 /* sn_startup_sequence_ref returns void, so make a
