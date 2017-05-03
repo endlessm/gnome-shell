@@ -1254,11 +1254,6 @@ const PopupMenuManager = new Lang.Class({
         }
     },
 
-    _changeMenu: function(newMenu) {
-        newMenu.open(this.activeMenu ? BoxPointer.PopupAnimation.FADE
-                                     : BoxPointer.PopupAnimation.FULL);
-    },
-
     _onMenuSourceEnter: function(menu) {
         if (!this._grabHelper.grabbed)
             return Clutter.EVENT_PROPAGATE;
@@ -1266,7 +1261,6 @@ const PopupMenuManager = new Lang.Class({
         if (this._grabHelper.isActorGrabbed(menu.actor))
             return Clutter.EVENT_PROPAGATE;
 
-        this._changeMenu(menu);
         return Clutter.EVENT_PROPAGATE;
     },
 
