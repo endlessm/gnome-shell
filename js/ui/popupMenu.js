@@ -1224,18 +1224,12 @@ const PopupMenuManager = new Lang.Class({
         let menudata = {
             menu:              menu,
             openStateChangeId: menu.connect('open-state-changed', Lang.bind(this, this._onMenuOpenState)),
-            destroyId:         menu.connect('destroy', Lang.bind(this, this._onMenuDestroy)),
-            enterId:           0,
-            focusInId:         0
+            destroyId:         menu.connect('destroy', Lang.bind(this, this._onMenuDestroy))
         };
 
         let source = menu.sourceActor;
-        if (source) {
-            if (!menu.blockSourceEvents)
-                this._grabHelper.addActor(source);
-            menudata.enterId = source.connect('enter-event', Lang.bind(this, function() { return this._onMenuSourceEnter(menu); }));
-            menudata.focusInId = source.connect('key-focus-in', Lang.bind(this, function() { this._onMenuSourceEnter(menu); }));
-        }
+        if (source && !menu.blockSourceEvents)
+            this._grabHelper.addActor(source);
 
         if (position == undefined)
             this._menus.push(menudata);
@@ -1254,11 +1248,6 @@ const PopupMenuManager = new Lang.Class({
         let menudata = this._menus[position];
         menu.disconnect(menudata.openStateChangeId);
         menu.disconnect(menudata.destroyId);
-
-        if (menudata.enterId)
-            menu.sourceActor.disconnect(menudata.enterId);
-        if (menudata.focusInId)
-            menu.sourceActor.disconnect(menudata.focusInId);
 
         if (menu.sourceActor)
             this._grabHelper.removeActor(menu.sourceActor);
@@ -1286,22 +1275,6 @@ const PopupMenuManager = new Lang.Class({
         } else {
             this._grabHelper.ungrab({ actor: menu.actor });
         }
-    },
-
-    _changeMenu: function(newMenu) {
-        newMenu.open(this.activeMenu ? BoxPointer.PopupAnimation.FADE
-                                     : BoxPointer.PopupAnimation.FULL);
-    },
-
-    _onMenuSourceEnter: function(menu) {
-        if (!this._grabHelper.grabbed)
-            return Clutter.EVENT_PROPAGATE;
-
-        if (this._grabHelper.isActorGrabbed(menu.actor))
-            return Clutter.EVENT_PROPAGATE;
-
-        this._changeMenu(menu);
-        return Clutter.EVENT_PROPAGATE;
     },
 
     _onMenuDestroy: function(menu) {
