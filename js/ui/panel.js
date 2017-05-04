@@ -15,6 +15,8 @@ const Signals = imports.signals;
 const Atk = imports.gi.Atk;
 
 const Animation = imports.ui.animation;
+const AppActivation = imports.ui.appActivation;
+const BoxPointer = imports.ui.boxpointer;
 const Config = imports.misc.config;
 const CtrlAltTab = imports.ui.ctrlAltTab;
 const DND = imports.ui.dnd;
@@ -32,6 +34,9 @@ const APP_MENU_ICON_MARGIN = 0;
 const BUTTON_DND_ACTIVATION_TIMEOUT = 250;
 
 const SPINNER_ANIMATION_TIME = 1.0;
+
+const SETTINGS_TEXT = _("All Settings…");
+const CONTROL_CENTER_LAUNCHER = "gnome-control-center.desktop";
 
 // To make sure the panel corners blend nicely with the panel,
 // we draw background and borders the same way, e.g. drawing
@@ -717,7 +722,6 @@ const AggregateMenu = new Lang.Class({
         this._rfkill = new imports.ui.status.rfkill.Indicator();
         this._volume = new imports.ui.status.volume.Indicator();
         this._brightness = new imports.ui.status.brightness.Indicator();
-        this._system = new imports.ui.status.system.Indicator();
         this._screencast = new imports.ui.status.screencast.Indicator();
         this._location = new imports.ui.status.location.Indicator();
         this._nightLight = new imports.ui.status.nightLight.Indicator();
@@ -736,9 +740,18 @@ const AggregateMenu = new Lang.Class({
         this._indicators.add_child(this._power.indicators);
         this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
-        this.menu.addMenuItem(this._volume.menu);
-        this.menu.addMenuItem(this._brightness.menu);
+        let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
+        this.menu.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
+            this.menu.close(BoxPointer.PopupAnimation.NONE);
+            Main.overview.hide();
+
+            let app = Shell.AppSystem.get_default().lookup_app(CONTROL_CENTER_LAUNCHER);
+            let context = new AppActivation.AppActivationContext(app);
+            context.activate();
+        }), gicon);
+
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
         if (this._network) {
             this.menu.addMenuItem(this._network.menu);
         }
@@ -749,13 +762,16 @@ const AggregateMenu = new Lang.Class({
         this.menu.addMenuItem(this._rfkill.menu);
         this.menu.addMenuItem(this._power.menu);
         this.menu.addMenuItem(this._nightLight.menu);
-        this.menu.addMenuItem(this._system.menu);
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        this.menu.addMenuItem(this._volume.menu);
+        this.menu.addMenuItem(this._brightness.menu);
 
         menuLayout.addSizeChild(this._location.menu.actor);
         menuLayout.addSizeChild(this._rfkill.menu.actor);
         menuLayout.addSizeChild(this._power.menu.actor);
-        menuLayout.addSizeChild(this._system.menu.actor);
-    },
+    }
 });
 
 const PowerMenu = new Lang.Class({
