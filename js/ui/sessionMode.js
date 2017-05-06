@@ -100,7 +100,7 @@ const _modes = {
                      'keyring', 'autorunManager', 'automountManager'],
 
         panel: {
-            left: ['activities', 'appMenu'],
+            left: [],
             center: ['dateMenu'],
             right: ['a11y', 'keyboard', 'aggregateMenu']
         }
