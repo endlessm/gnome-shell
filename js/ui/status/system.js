@@ -186,8 +186,7 @@ const Indicator = new Lang.Class({
     },
 
     _updateActionsVisibility: function() {
-        let visible = (this._settingsAction.visible ||
-                       this._orientationLockAction.visible ||
+        let visible = (this._orientationLockAction.visible ||
                        this._lockScreenAction.visible ||
                        this._altSwitcher.actor.visible);
 
@@ -199,7 +198,6 @@ const Indicator = new Lang.Class({
         this._updatePowerOff();
         this._updateSuspend();
         this._updateMultiUser();
-        this._settingsAction.visible = Main.sessionMode.allowSettings;
         this._updateActionsVisibility();
     },
 
@@ -323,14 +321,28 @@ const Indicator = new Lang.Class({
         this._updateActionsVisibility();
     },
 
-    _createActionButton: function(iconName, accessibleName) {
-        let icon = new St.Button({ reactive: true,
-                                   can_focus: true,
-                                   track_hover: true,
-                                   accessible_name: accessibleName,
-                                   style_class: 'system-menu-action' });
-        icon.child = new St.Icon({ icon_name: iconName });
-        return icon;
+    _createActionButton: function(accessibleName) {
+        let button = new St.Button({ reactive: true,
+                                     can_focus: true,
+                                     track_hover: true,
+                                     accessible_name: accessibleName,
+                                     style_class: 'system-menu-action' });
+        return button;
+    },
+
+    _createActionButtonForIconName: function(iconName, accessibleName) {
+        let button = this._createActionButton(accessibleName);
+        button.child = new St.Icon({ icon_name: iconName });
+        return button;
+    },
+
+    _createActionButtonForIconPath: function(iconPath, accessibleName) {
+        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell' + iconPath);
+        let gicon = new Gio.FileIcon({ file: iconFile });
+
+        let button = this._createActionButton(accessibleName);
+        button.child = new St.Icon({ gicon: gicon });
+        return button;
     },
 
     _createSubMenu: function() {
@@ -369,22 +381,22 @@ const Indicator = new Lang.Class({
         item = new PopupMenu.PopupBaseMenuItem({ reactive: false,
                                                  can_focus: false });
 
-        this._settingsAction = this._createActionButton('preferences-system-symbolic', _("Settings"));
-        this._settingsAction.connect('clicked', Lang.bind(this, this._onSettingsClicked));
-        item.actor.add(this._settingsAction, { expand: true, x_fill: false });
+        this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png', _("Log Out"));
+        this._logoutAction.connect('clicked', Lang.bind(this, this._onQuitSessionActivate));
+        item.actor.add(this._logoutAction, { expand: true, x_fill: false });
 
-        this._orientationLockAction = this._createActionButton('', _("Orientation Lock"));
+        this._orientationLockAction = this._createActionButtonForIconName('', _("Orientation Lock"));
         this._orientationLockAction.connect('clicked', Lang.bind(this, this._onOrientationLockClicked));
         item.actor.add(this._orientationLockAction, { expand: true, x_fill: false });
 
-        this._lockScreenAction = this._createActionButton('changes-prevent-symbolic', _("Lock"));
+        this._lockScreenAction = this._createActionButtonForIconName('changes-prevent-symbolic', _("Lock"));
         this._lockScreenAction.connect('clicked', Lang.bind(this, this._onLockScreenClicked));
         item.actor.add(this._lockScreenAction, { expand: true, x_fill: false });
 
-        this._suspendAction = this._createActionButton('media-playback-pause-symbolic', _("Suspend"));
+        this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic', _("Suspend"));
         this._suspendAction.connect('clicked', Lang.bind(this, this._onSuspendClicked));
 
-        this._powerOffAction = this._createActionButton('system-shutdown-symbolic', _("Power Off"));
+        this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic', _("Power Off"));
         this._powerOffAction.connect('clicked', Lang.bind(this, this._onPowerOffClicked));
 
         this._altSwitcher = new AltSwitcher(this._powerOffAction, this._suspendAction);
@@ -427,6 +439,7 @@ const Indicator = new Lang.Class({
     },
 
     _onQuitSessionActivate: function() {
+        this.menu.itemActivated();
         Main.overview.hide();
         this._session.LogoutRemote(0);
     },
