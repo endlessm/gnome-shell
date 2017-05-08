@@ -14,9 +14,9 @@ const Atk = imports.gi.Atk;
 
 const Params = imports.misc.params;
 
-const Layout = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const Tweener = imports.ui.tweener;
 
 const OPEN_AND_CLOSE_TIME = 0.1;
@@ -69,7 +69,7 @@ const ModalDialog = new Lang.Class({
         this.backgroundStack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
         this._backgroundBin = new St.Bin({ child: this.backgroundStack,
                                            x_fill: true, y_fill: true });
-        this._monitorConstraint = new Layout.MonitorConstraint();
+        this._monitorConstraint = new Monitor.MonitorConstraint();
         this._backgroundBin.add_constraint(this._monitorConstraint);
         this._group.add_actor(this._backgroundBin);
 

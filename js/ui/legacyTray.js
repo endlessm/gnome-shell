@@ -9,6 +9,7 @@ const CtrlAltTab = imports.ui.ctrlAltTab;
 const Lang = imports.lang;
 const Layout = imports.ui.layout;
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
 const Tweener = imports.ui.tweener;
@@ -42,8 +43,8 @@ const LegacyTray = new Lang.Class({
     _init: function() {
         this.actor = new St.Widget({ clip_to_allocation: true,
                                      layout_manager: new Clutter.BinLayout() });
-        let constraint = new Layout.MonitorConstraint({ primary: true,
-                                                        work_area: true });
+        let constraint = new Monitor.MonitorConstraint({ primary: true,
+                                                         work_area: true });
         this.actor.add_constraint(constraint);
 
         this._slideLayout = new OverviewControls.SlideLayout();
