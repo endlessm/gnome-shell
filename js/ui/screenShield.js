@@ -9,11 +9,11 @@ const TweenerEquations = imports.tweener.equations;
 
 const Background = imports.ui.background;
 const GnomeSession = imports.misc.gnomeSession;
-const Layout = imports.ui.layout;
 const OVirt = imports.gdm.oVirt;
 const LoginManager = imports.misc.loginManager;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const Overview = imports.ui.overview;
 const MessageTray = imports.ui.messageTray;
 const ShellDBus = imports.ui.shellDBus;
@@ -450,7 +450,7 @@ var ScreenShield = class {
 
         this._lockScreenContents = new St.Widget({ layout_manager: new Clutter.BinLayout(),
                                                    name: 'lockScreenContents' });
-        this._lockScreenContents.add_constraint(new Layout.MonitorConstraint({ primary: true }));
+        this._lockScreenContents.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
 
         this._lockScreenGroup.add_actor(this._lockScreenContents);
 

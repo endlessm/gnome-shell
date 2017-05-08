@@ -6,6 +6,7 @@ const Mainloop = imports.mainloop;
 const BarLevel = imports.ui.barLevel;
 const Layout = imports.ui.layout;
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const Tweener = imports.ui.tweener;
 
 var HIDE_TIMEOUT = 1500;
@@ -83,7 +84,7 @@ var OsdWindow = class {
                                      y_align: Clutter.ActorAlign.CENTER });
 
         this._monitorIndex = monitorIndex;
-        let constraint = new Layout.MonitorConstraint({ index: monitorIndex });
+        let constraint = new Monitor.MonitorConstraint({ index: monitorIndex });
         this.actor.add_constraint(constraint);
 
         this._boxConstraint = new OsdWindowConstraint();
