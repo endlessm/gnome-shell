@@ -16,8 +16,8 @@ const Cairo = imports.cairo;
 const Signals = imports.signals;
 
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const PopupMenu = imports.ui.popupMenu;
-const Layout = imports.ui.layout;
 
 const ACTIVE_COLOR = "#729fcf";
 
@@ -668,7 +668,7 @@ var PadOsd = new Lang.Class({
         Main.uiGroup.add_actor(this.actor);
 
         this._monitorIndex = monitorIndex;
-        let constraint = new Layout.MonitorConstraint({ index: monitorIndex });
+        let constraint = new Monitor.MonitorConstraint({ index: monitorIndex });
         this.actor.add_constraint(constraint);
 
         this._titleBox = new St.BoxLayout({ style_class: 'pad-osd-title-box',

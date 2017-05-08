@@ -17,6 +17,7 @@ const LayoutManager = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const Monitor = imports.ui.monitor;
 const OverviewControls = imports.ui.overviewControls;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
@@ -112,7 +113,7 @@ var Overview = new Lang.Class({
                                                activities. See also note for "Activities" string. */
                                             accessible_name: _("Overview"),
                                             vertical: true });
-        this._overview.add_constraint(new LayoutManager.MonitorConstraint({ primary: true }));
+        this._overview.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
         this._overview._delegate = this;
 
         // The main Background actors are inside global.window_group which are
