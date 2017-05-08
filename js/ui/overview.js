@@ -13,7 +13,7 @@ const Gdk = imports.gi.Gdk;
 
 const Background = imports.ui.background;
 const DND = imports.ui.dnd;
-const LayoutManager = imports.ui.layout;
+const Monitor = imports.ui.monitor;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -112,7 +112,7 @@ const Overview = new Lang.Class({
                                                activities. See also note for "Activities" string. */
                                             accessible_name: _("Overview"),
                                             vertical: true });
-        this._overview.add_constraint(new LayoutManager.MonitorConstraint({ primary: true }));
+        this._overview.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
         this._overview._delegate = this;
 
         // The main Background actors are inside global.window_group which are

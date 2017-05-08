@@ -5,9 +5,9 @@ const GLib = imports.gi.GLib;
 const St = imports.gi.St;
 
 const Lang = imports.lang;
-const Layout = imports.ui.layout;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
+const Monitor = imports.ui.monitor;
 const Tweener = imports.ui.tweener;
 const Meta = imports.gi.Meta;
 
@@ -87,7 +87,7 @@ const OsdWindow = new Lang.Class({
                                      y_align: Clutter.ActorAlign.CENTER });
 
         this._monitorIndex = monitorIndex;
-        let constraint = new Layout.MonitorConstraint({ index: monitorIndex });
+        let constraint = new Monitor.MonitorConstraint({ index: monitorIndex });
         this.actor.add_constraint(constraint);
 
         this._boxConstraint = new OsdWindowConstraint();
