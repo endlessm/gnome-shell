@@ -98,6 +98,7 @@ shell_public_headers_h =		\
 	shell-glsl-quad.h		\
 	shell-gtk-embed.h		\
 	shell-global.h			\
+	shell-grid-desaturate-effect.h  \
 	shell-invert-lightness-effect.h	\
 	shell-action-modes.h		\
 	shell-mount-operation.h		\
@@ -165,6 +166,7 @@ libgnome_shell_sources =		\
 	shell-app-system.c		\
 	shell-app-usage.c		\
 	shell-global.c			\
+	shell-grid-desaturate-effect.c  \
 	shell-gtk-embed.c		\
 	shell-screenshot.c		\
 	shell-tray-icon.c		\
