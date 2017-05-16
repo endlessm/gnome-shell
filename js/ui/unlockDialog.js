@@ -14,8 +14,8 @@ const Signals = imports.signals;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
-const Layout = imports.ui.layout;
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const Panel = imports.ui.panel;
 const Tweener = imports.ui.tweener;
 const UserWidget = imports.ui.userWidget;
@@ -37,7 +37,7 @@ const UnlockDialog = new Lang.Class({
                                      layout_manager: new Clutter.BoxLayout(),
                                      visible: false });
 
-        this.actor.add_constraint(new Layout.MonitorConstraint({ primary: true }));
+        this.actor.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
         parentActor.add_child(this.actor);
 
         this._userManager = AccountsService.UserManager.get_default();
