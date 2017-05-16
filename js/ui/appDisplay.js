@@ -862,8 +862,7 @@ const FrequentView = new Lang.Class({
 });
 
 const Views = {
-    FREQUENT: 0,
-    ALL: 1
+    ALL: 0
 };
 
 const ControlsBoxLayout = Lang.Class({
@@ -912,151 +911,29 @@ const AppDisplay = new Lang.Class({
 
     _init: function() {
         this._privacySettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.privacy' });
-        this._privacySettings.connect('changed::remember-app-usage',
-                                      Lang.bind(this, this._updateFrequentVisibility));
 
-        this._views = [];
+        this._allView = new AllView();
 
-        let view, button;
-        view = new FrequentView();
-        button = new St.Button({ label: _("Frequent"),
-                                 style_class: 'app-view-control button',
-                                 can_focus: true,
-                                 x_expand: true });
-        this._views[Views.FREQUENT] = { 'view': view, 'control': button };
+        let viewStackLayout = new ViewStackLayout();
+        this.actor = new St.Widget({ x_expand: true, y_expand: true,
+                                     layout_manager: viewStackLayout });
+        viewStackLayout.connect('allocated-size-changed', Lang.bind(this, this._onAllocatedSizeChanged));
 
-        view = new AllView();
-        button = new St.Button({ label: _("All"),
-                                 style_class: 'app-view-control button',
-                                 can_focus: true,
-                                 x_expand: true });
-        this._views[Views.ALL] = { 'view': view, 'control': button };
-
-        this.actor = new St.BoxLayout ({ style_class: 'app-display',
-                                         x_expand: true, y_expand: true,
-                                         vertical: true });
-        this._viewStackLayout = new ViewStackLayout();
-        this._viewStack = new St.Widget({ x_expand: true, y_expand: true,
-                                          layout_manager: this._viewStackLayout });
-        this._viewStackLayout.connect('allocated-size-changed', Lang.bind(this, this._onAllocatedSizeChanged));
-        this.actor.add_actor(this._viewStack);
-        let layout = new ControlsBoxLayout({ homogeneous: true });
-        this._controls = new St.Widget({ style_class: 'app-view-controls',
-                                         layout_manager: layout });
-        this._controls.connect('notify::mapped', Lang.bind(this,
-            function() {
-                // controls are faded either with their parent or
-                // explicitly in animate(); we can't know how they'll be
-                // shown next, so make sure to restore their opacity
-                // when they are hidden
-                if (this._controls.mapped)
-                  return;
-
-                Tweener.removeTweens(this._controls);
-                this._controls.opacity = 255;
-            }));
-
-        layout.hookup_style(this._controls);
-        this.actor.add_actor(new St.Bin({ child: this._controls }));
-
-        for (let i = 0; i < this._views.length; i++) {
-            this._viewStack.add_actor(this._views[i].view.actor);
-            this._controls.add_actor(this._views[i].control);
-
-            let viewIndex = i;
-            this._views[i].control.connect('clicked', Lang.bind(this,
-                function(actor) {
-                    this._showView(viewIndex);
-                    global.settings.set_uint('app-picker-view', viewIndex);
-                }));
-        }
-        let initialView = Math.min(global.settings.get_uint('app-picker-view'),
-                                   this._views.length - 1);
-        let frequentUseful = this._views[Views.FREQUENT].view.hasUsefulData();
-        if (initialView == Views.FREQUENT && !frequentUseful)
-            initialView = Views.ALL;
-        this._showView(initialView);
-        this._updateFrequentVisibility();
-
-        Gio.DBus.system.watch_name(SWITCHEROO_BUS_NAME,
-                                   Gio.BusNameWatcherFlags.NONE,
-                                   Lang.bind(this, this._switcherooProxyAppeared),
-                                   Lang.bind(this, function() {
-                                       this._switcherooProxy = null;
-                                       this._updateDiscreteGpuAvailable();
-                                   }));
-    },
-
-    _updateDiscreteGpuAvailable: function() {
-        if (!this._switcherooProxy)
-            discreteGpuAvailable = false;
-        else
-            discreteGpuAvailable = this._switcherooProxy.HasDualGpu;
-    },
-
-    _switcherooProxyAppeared: function() {
-        this._switcherooProxy = new SwitcherooProxy(Gio.DBus.system, SWITCHEROO_BUS_NAME, SWITCHEROO_OBJECT_PATH,
-            Lang.bind(this, function(proxy, error) {
-                if (error) {
-                    log(error.message);
-                    return;
-                }
-                this._updateDiscreteGpuAvailable();
-            }));
+        this.actor.add_actor(this._allView.actor);
+        this._showView();
     },
 
     animate: function(animationDirection, onComplete) {
-        let currentView = this._views.filter(v => v.control.has_style_pseudo_class('checked')).pop().view;
-
-        // Animate controls opacity using iconGrid animation time, since
-        // it will be the time the AllView or FrequentView takes to show
-        // it entirely.
-        let finalOpacity;
-        if (animationDirection == IconGrid.AnimationDirection.IN) {
-            this._controls.opacity = 0;
-            finalOpacity = 255;
-        } else {
-            finalOpacity = 0
-        }
-
-        Tweener.addTween(this._controls,
-                         { time: IconGrid.ANIMATION_TIME_IN,
-                           transition: 'easeInOutQuad',
-                           opacity: finalOpacity,
-                          });
-
-        currentView.animate(animationDirection, onComplete);
+        this._allView.animate(animationDirection, onComplete);
     },
 
-    _showView: function(activeIndex) {
-        for (let i = 0; i < this._views.length; i++) {
-            if (i == activeIndex)
-                this._views[i].control.add_style_pseudo_class('checked');
-            else
-                this._views[i].control.remove_style_pseudo_class('checked');
-
-            let animationDirection = i == activeIndex ? IconGrid.AnimationDirection.IN :
-                                                        IconGrid.AnimationDirection.OUT;
-            this._views[i].view.animateSwitch(animationDirection);
-        }
-    },
-
-    _updateFrequentVisibility: function() {
-        let enabled = this._privacySettings.get_boolean('remember-app-usage');
-        this._views[Views.FREQUENT].control.visible = enabled;
-
-        let visibleViews = this._views.filter(function(v) {
-            return v.control.visible;
-        });
-        this._controls.visible = visibleViews.length > 1;
-
-        if (!enabled && this._views[Views.FREQUENT].view.actor.visible)
-            this._showView(Views.ALL);
+    _showView: function() {
+        this._allView.animateSwitch(IconGrid.AnimationDirection.IN);
     },
 
     selectApp: function(id) {
-        this._showView(Views.ALL);
-        this._views[Views.ALL].view.selectApp(id);
+        this._showView();
+        this._allView.selectApp(id);
     },
 
     _onAllocatedSizeChanged: function(actor, width, height) {
@@ -1064,11 +941,11 @@ const AppDisplay = new Lang.Class({
         box.x1 = box.y1 =0;
         box.x2 = width;
         box.y2 = height;
-        box = this._viewStack.get_theme_node().get_content_box(box);
+        box = this.actor.get_theme_node().get_content_box(box);
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
-        for (let i = 0; i < this._views.length; i++)
-            this._views[i].view.adaptToSize(availWidth, availHeight);
+
+        this._allView.adaptToSize(availWidth, availHeight);
     }
 })
 
