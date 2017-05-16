@@ -2,6 +2,8 @@
 
 const Clutter = imports.gi.Clutter;
 const Gtk = imports.gi.Gtk;
+const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
@@ -389,20 +391,24 @@ const PopupImageMenuItem = new Lang.Class({
     Name: 'PopupImageMenuItem',
     Extends: PopupBaseMenuItem,
 
-    _init: function (text, iconName, params) {
+    _init: function (text, icon, params) {
         this.parent(params);
 
-        this.label = new St.Label({ text: text });
-        this.actor.add_child(this.label);
         this._icon = new St.Icon({ style_class: 'popup-menu-icon' });
         this.actor.add_child(this._icon, { align: St.Align.END });
+        this.label = new St.Label({ text: text });
+        this.actor.add_child(this.label);
         this.actor.label_actor = this.label;
 
-        this.setIcon(iconName);
+        this.setIcon(icon);
     },
 
-    setIcon: function(name) {
-        this._icon.icon_name = name;
+    setIcon: function(icon) {
+        // The 'icon' parameter can be either a Gio.Icon or a string.
+        if (GObject.type_is_a(icon, Gio.Icon))
+            this._icon.gicon = icon;
+        else
+            this._icon.icon_name = icon;
     }
 });
 
@@ -461,8 +467,13 @@ const PopupMenuBase = new Lang.Class({
         this._setSettingsVisibility(Main.sessionMode.allowSettings);
     },
 
-    addAction: function(title, callback) {
-        let menuItem = new PopupMenuItem(title);
+    addAction: function(title, callback, icon) {
+        let menuItem;
+        if (icon != undefined)
+            menuItem = new PopupImageMenuItem(title, icon);
+        else
+            menuItem = new PopupMenuItem(title);
+
         this.addMenuItem(menuItem);
         menuItem.connect('activate', Lang.bind(this, function (menuItem, event) {
             callback(event);
@@ -1254,11 +1265,6 @@ const PopupMenuManager = new Lang.Class({
         }
     },
 
-    _changeMenu: function(newMenu) {
-        newMenu.open(this.activeMenu ? BoxPointer.PopupAnimation.FADE
-                                     : BoxPointer.PopupAnimation.FULL);
-    },
-
     _onMenuSourceEnter: function(menu) {
         if (!this._grabHelper.grabbed)
             return Clutter.EVENT_PROPAGATE;
@@ -1266,7 +1272,6 @@ const PopupMenuManager = new Lang.Class({
         if (this._grabHelper.isActorGrabbed(menu.actor))
             return Clutter.EVENT_PROPAGATE;
 
-        this._changeMenu(menu);
         return Clutter.EVENT_PROPAGATE;
     },
 

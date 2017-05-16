@@ -15,6 +15,8 @@ const Signals = imports.signals;
 const Atk = imports.gi.Atk;
 
 const Animation = imports.ui.animation;
+const AppActivation = imports.ui.appActivation;
+const BoxPointer = imports.ui.boxpointer;
 const Config = imports.misc.config;
 const CtrlAltTab = imports.ui.ctrlAltTab;
 const DND = imports.ui.dnd;
@@ -31,6 +33,9 @@ const APP_MENU_ICON_MARGIN = 0;
 const BUTTON_DND_ACTIVATION_TIMEOUT = 250;
 
 const SPINNER_ANIMATION_TIME = 1.0;
+
+const SETTINGS_TEXT = _("All Settings...");
+const CONTROL_CENTER_LAUNCHER = "gnome-control-center.desktop";
 
 // To make sure the panel corners blend nicely with the panel,
 // we draw background and borders the same way, e.g. drawing
@@ -716,7 +721,6 @@ const AggregateMenu = new Lang.Class({
         this._rfkill = new imports.ui.status.rfkill.Indicator();
         this._volume = new imports.ui.status.volume.Indicator();
         this._brightness = new imports.ui.status.brightness.Indicator();
-        this._system = new imports.ui.status.system.Indicator();
         this._screencast = new imports.ui.status.screencast.Indicator();
         this._location = new imports.ui.status.location.Indicator();
 
@@ -733,9 +737,22 @@ const AggregateMenu = new Lang.Class({
         this._indicators.add_child(this._power.indicators);
         this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
-        this.menu.addMenuItem(this._volume.menu);
-        this.menu.addMenuItem(this._brightness.menu);
+        let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
+        this._settingsItem = this.menu.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
+            this.menu.close(BoxPointer.PopupAnimation.NONE);
+            Main.overview.hide();
+
+            let app = Shell.AppSystem.get_default().lookup_app(CONTROL_CENTER_LAUNCHER);
+            let context = new AppActivation.AppActivationContext(app);
+            context.activate();
+        }), gicon);
+
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        // We need to monitor the session to know when to show/hide the settings item
+        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
+        this._sessionUpdated();
+
         if (this._network) {
             this.menu.addMenuItem(this._network.menu);
         }
@@ -745,23 +762,67 @@ const AggregateMenu = new Lang.Class({
         this.menu.addMenuItem(this._location.menu);
         this.menu.addMenuItem(this._rfkill.menu);
         this.menu.addMenuItem(this._power.menu);
-        this.menu.addMenuItem(this._system.menu);
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        this.menu.addMenuItem(this._volume.menu);
+        this.menu.addMenuItem(this._brightness.menu);
 
         menuLayout.addSizeChild(this._location.menu.actor);
         menuLayout.addSizeChild(this._rfkill.menu.actor);
         menuLayout.addSizeChild(this._power.menu.actor);
-        menuLayout.addSizeChild(this._system.menu.actor);
     },
+
+    _sessionUpdated: function() {
+        this._settingsItem.actor.visible = Main.sessionMode.allowSettings;
+    }
+});
+
+const UserMenu = new Lang.Class({
+    Name: 'UserMenu',
+    Extends: PanelMenu.Button,
+
+    _init: function() {
+        this.parent(0.0, C_("User menu", "User Menu"), false);
+
+        this.actor.accessible_role = Atk.Role.MENU;
+
+        let menuLayout = new AggregateLayout();
+        this.menu.box.set_layout_manager(menuLayout);
+        this.menu.actor.add_style_class_name('aggregate-menu');
+
+        this._userMenu = new imports.ui.userMenu.UserMenu();
+        this.actor.add_child(this._userMenu.panelBox);
+        this.menu.addMenuItem(this._userMenu.menu);
+
+        let systemIndicator = new imports.ui.status.system.Indicator();
+        this.menu.addMenuItem(systemIndicator.menu);
+
+        menuLayout.addSizeChild(systemIndicator.menu.actor);
+
+        // We need to monitor the session to know when to show the button
+        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
+        this._sessionUpdated();
+    },
+
+    _sessionUpdated: function() {
+        this.actor.visible = !Main.sessionMode.isGreeter;
+        this.setSensitive(!Main.sessionMode.isLocked);
+    }
 });
 
 const PANEL_ITEM_IMPLEMENTATIONS = {
+    'endlessButton': imports.ui.endlessButton.EndlessButton,
     'activities': ActivitiesButton,
     'aggregateMenu': AggregateMenu,
+    'appIcons': imports.ui.appIconBar.AppIconBar,
     'appMenu': AppMenuButton,
     'dateMenu': imports.ui.dateMenu.DateMenuButton,
     'a11y': imports.ui.status.accessibility.ATIndicator,
     'a11yGreeter': imports.ui.status.accessibility.ATGreeterIndicator,
     'keyboard': imports.ui.status.keyboard.InputSourceIndicator,
+    'hotCorner': imports.ui.hotCorner.HotCorner,
+    'userMenu': UserMenu,
 };
 
 const Panel = new Lang.Class({

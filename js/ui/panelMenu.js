@@ -222,3 +222,32 @@ const SystemIndicator = new Lang.Class({
     }
 });
 Signals.addSignalMethods(SystemIndicator.prototype);
+
+/* SingleIconButton:
+ *
+ * This class simplifies the process of creating an independent button
+ * with a single icon and a popup menu associated to it.
+ */
+const SingleIconButton = new Lang.Class({
+    Name: 'SingleIconButton',
+    Extends: Button,
+
+    _init: function(nameText, x_align, y_align) {
+        this.parent(0.0, nameText);
+
+        this.mainIcon = new St.Icon({ style_class: 'single-icon-button' });
+
+        if (x_align != undefined)
+            this.mainIcon.x_align = x_align;
+
+        if (y_align != undefined)
+            this.mainIcon.y_align = y_align;
+
+        this.actor.add_actor(this.mainIcon);
+    },
+
+    setIcon: function(icon) {
+        this.mainIcon.gicon = icon;
+        this.emit('icons-changed');
+    }
+});
