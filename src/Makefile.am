@@ -93,6 +93,8 @@ shell_public_headers_h =		\
 	shell-app.h			\
 	shell-app-system.h		\
 	shell-app-usage.h		\
+	shell-desktop-dir-info.h	\
+	shell-dir-info.h		\
 	shell-embedded-window.h		\
 	shell-generic-container.h	\
 	shell-glsl-quad.h		\
@@ -165,6 +167,8 @@ libgnome_shell_sources =		\
 	shell-app.c			\
 	shell-app-system.c		\
 	shell-app-usage.c		\
+	shell-desktop-dir-info.c	\
+	shell-dir-info.c		\
 	shell-global.c			\
 	shell-grid-desaturate-effect.c  \
 	shell-gtk-embed.c		\
