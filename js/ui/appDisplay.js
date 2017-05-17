@@ -164,7 +164,6 @@ const BaseAppView = new Lang.Class({
     },
 
     loadGrid: function() {
-        this._allItems.sort(this._compareItems);
         this._allItems.forEach(Lang.bind(this, function(item) {
             this._grid.addItem(item);
         }));
@@ -468,10 +467,12 @@ const AllView = new Lang.Class({
         Shell.AppSystem.get_default().connect('installed-changed', Lang.bind(this, function() {
             Main.queueDeferredWork(this._redisplayWorkId);
         }));
-        this._folderSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.app-folders' });
-        this._folderSettings.connect('changed::folder-children', Lang.bind(this, function() {
+
+        IconGridLayout.layout.connect('changed', Lang.bind(this, function() {
             Main.queueDeferredWork(this._redisplayWorkId);
         }));
+
+        this._loadApps();
     },
 
     removeAll: function() {
@@ -490,44 +491,22 @@ const AllView = new Lang.Class({
         this._grid.addItem(item, newIdx);
     },
 
-    _refilterApps: function() {
-        this._allItems.forEach(function(icon) {
-            if (icon instanceof AppIcon)
-                icon.actor.visible = true;
-        });
-
-        this.folderIcons.forEach(Lang.bind(this, function(folder) {
-            let folderApps = folder.getAppIds();
-            folderApps.forEach(Lang.bind(this, function(appId) {
-                let appIcon = this._items[appId];
-                appIcon.actor.visible = false;
-            }));
-        }));
-    },
-
     _loadApps: function() {
-        let apps = Gio.AppInfo.get_all().filter(function(appInfo) {
-            try {
-                let id = appInfo.get_id(); // catch invalid file encodings
-            } catch(e) {
-                return false;
-            }
-            return appInfo.should_show();
-        }).map(function(app) {
-            return app.get_id();
-        });
+        let gridLayout = IconGridLayout.layout;
+        let desktopIds = gridLayout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+
+        let apps = [];
+        let folders = [];
+        for (let idx in desktopIds) {
+            let itemId = desktopIds[idx];
+            if (gridLayout.iconIsFolder(itemId))
+                folders.push(itemId);
+            else
+                apps.push(itemId);
+        }
 
         let appSys = Shell.AppSystem.get_default();
 
-        let folders = this._folderSettings.get_strv('folder-children');
-        folders.forEach(Lang.bind(this, function(id) {
-            let path = this._folderSettings.path + 'folders/' + id + '/';
-            let icon = new FolderIcon(id, path, this);
-            icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
-            icon.connect('apps-changed', Lang.bind(this, this._refilterApps));
-            this.addItem(icon);
-            this.folderIcons.push(icon);
-        }));
 
         // Allow dragging of the icon only if the Dash would accept a drop to
         // change favorite-apps. There are no other possible drop targets from
@@ -540,13 +519,21 @@ const AllView = new Lang.Class({
         apps.forEach(Lang.bind(this, function(appId) {
             let app = appSys.lookup_app(appId);
 
-            let icon = new AppIcon(app,
-                                   { isDraggable: favoritesWritable });
+            // Some apps defined by the icon grid layout might not be installed
+            if (app) {
+                let icon = new AppIcon(app, { isDraggable: favoritesWritable });
+                this.addItem(icon);
+            }
+        }));
+
+        folders.forEach(Lang.bind(this, function(id) {
+            let icon = new FolderIcon(id, this);
+            icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
             this.addItem(icon);
+            this.folderIcons.push(icon);
         }));
 
         this.loadGrid();
-        this._refilterApps();
     },
 
     // Overriden from BaseAppView
@@ -1130,8 +1117,11 @@ const FolderView = new Lang.Class({
     Name: 'FolderView',
     Extends: BaseAppView,
 
-    _init: function() {
+    _init: function(dirInfo) {
         this.parent(null, null);
+
+        this._dirInfo = dirInfo;
+
         // If it not expand, the parent doesn't take into account its preferred_width when allocating
         // the second time it allocates, so we apply the "Standard hack for ClutterBinLayout"
         this._grid.actor.x_expand = true;
@@ -1157,26 +1147,8 @@ const FolderView = new Lang.Class({
     },
 
     createFolderIcon: function(size) {
-        let layout = new Clutter.GridLayout();
-        let icon = new St.Widget({ layout_manager: layout,
-                                   style_class: 'app-folder-icon' });
-        layout.hookup_style(icon);
-        let subSize = Math.floor(FOLDER_SUBICON_FRACTION * size);
-
-        let numItems = this._allItems.length;
-        let rtl = icon.get_text_direction() == Clutter.TextDirection.RTL;
-        for (let i = 0; i < 4; i++) {
-            let bin;
-            if (i < numItems) {
-                let texture = this._allItems[i].app.create_icon_texture(subSize);
-                bin = new St.Bin({ child: texture });
-            } else {
-                bin = new St.Bin({ width: subSize, height: subSize });
-            }
-            layout.attach(bin, rtl ? (i + 1) % 2 : i % 2, Math.floor(i / 2), 1, 1);
-        }
-
-        return icon;
+        let icon = this._dirInfo.get_icon();
+        return new St.Icon({ gicon: icon });
     },
 
     _onPan: function(action) {
@@ -1245,12 +1217,12 @@ const FolderView = new Lang.Class({
 const FolderIcon = new Lang.Class({
     Name: 'FolderIcon',
 
-    _init: function(id, path, parentView) {
+    _init: function(id, parentView) {
         this.id = id;
         this._parentView = parentView;
 
-        this._folder = new Gio.Settings({ schema_id: 'org.gnome.desktop.app-folders.folder',
-                                          path: path });
+        this._dirInfo = Shell.DesktopDirInfo.new(id);
+
         this.actor = new St.Button({ style_class: 'app-well-app app-folder',
                                      button_mask: St.ButtonMask.ONE,
                                      toggle_mode: true,
@@ -1265,7 +1237,7 @@ const FolderIcon = new Lang.Class({
         this.actor.set_child(this.icon.actor);
         this.actor.label_actor = this.icon.label;
 
-        this.view = new FolderView();
+        this.view = new FolderView(this._dirInfo);
 
         this.actor.connect('clicked', Lang.bind(this,
             function() {
@@ -1279,7 +1251,6 @@ const FolderIcon = new Lang.Class({
                     this._popup.popdown();
             }));
 
-        this._folder.connect('changed', Lang.bind(this, this._redisplay));
         this._redisplay();
     },
 
@@ -1290,7 +1261,7 @@ const FolderIcon = new Lang.Class({
     },
 
     _updateName: function() {
-        let name = _getFolderName(this._folder);
+        let name = this._dirInfo.get_name();
         if (this.name == name)
             return;
 
@@ -1304,12 +1275,8 @@ const FolderIcon = new Lang.Class({
 
         this.view.removeAll();
 
-        let excludedApps = this._folder.get_strv('excluded-apps');
         let appSys = Shell.AppSystem.get_default();
         let addAppId = (function addAppId(appId) {
-            if (excludedApps.indexOf(appId) >= 0)
-                return;
-
             let app = appSys.lookup_app(appId);
             if (!app)
                 return;
@@ -1321,20 +1288,8 @@ const FolderIcon = new Lang.Class({
             this.view.addItem(icon);
         }).bind(this);
 
-        let folderApps = this._folder.get_strv('apps');
+        let folderApps = IconGridLayout.layout.getIcons(this.id);
         folderApps.forEach(addAppId);
-
-        let folderCategories = this._folder.get_strv('categories');
-        Gio.AppInfo.get_all().forEach(function(appInfo) {
-            let appCategories = _getCategories(appInfo);
-            if (!_listsIntersect(folderCategories, appCategories))
-                return;
-
-            try {
-                addAppId(appInfo.get_id()); // catch invalid file encodings
-            } catch(e) {
-            }
-        });
 
         this.actor.visible = this.view.getAllItems().length > 0;
         this.view.loadGrid();
