@@ -416,6 +416,7 @@ const SearchResults = new Lang.Class({
 
         this._terms = [];
         this._results = {};
+        this._isAnimating = false;
 
         this._providers = [];
 
@@ -613,25 +614,50 @@ const SearchResults = new Lang.Class({
         });
     },
 
+    get isAnimating() {
+        return this._isAnimating;
+    },
+
+    set isAnimating (v) {
+        if (this._isAnimating == v)
+            return;
+
+        this._isAnimating = v;
+        this._updateSearchProgress();
+        if (!this._isAnimating) {
+            this._providers.forEach(Lang.bind(this, function (provider) {
+                let results = this._results[provider.id];
+                if (results)
+                    this._updateResults(provider, results);
+            }));
+        }
+    },
+
     _updateSearchProgress: function () {
         let haveResults = this._providers.some(function(provider) {
             let display = provider.display;
             return (display.getFirstResult() != null);
         });
+        let showStatus = !haveResults && !this.isAnimating;
 
         this._scrollView.visible = haveResults;
-        this._statusBin.visible = !haveResults;
+        this._statusBin.visible = showStatus;
 
-        if (!haveResults) {
+        if (showStatus) {
             if (this.searchInProgress) {
                 this._statusText.set_text(_("Searching…"));
             } else {
                 this._statusText.set_text(_("No results."));
             }
         }
+
+        this.emit('search-progress-updated');
     },
 
     _updateResults: function(provider, results) {
+        if (this.isAnimating)
+            return;
+
         let terms = this._terms;
         let display = provider.display;
 
@@ -644,6 +670,10 @@ const SearchResults = new Lang.Class({
     },
 
     activateDefault: function() {
+        // If we are about to activate a result, we are done animating and need
+        // to update the display immediately.
+        this.isAnimating = false;
+
         // If we have a search queued up, force the search now.
         if (this._searchTimeoutId > 0)
             this._doSearch();
@@ -683,6 +713,7 @@ const SearchResults = new Lang.Class({
         }
     }
 });
+Signals.addSignalMethods(SearchResults.prototype);
 
 const ProviderIcon = new Lang.Class({
     Name: 'ProviderIcon',
