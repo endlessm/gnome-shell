@@ -1,6 +1,8 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
+const Cairo = imports.cairo;
 const Clutter = imports.gi.Clutter;
+const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
@@ -16,6 +18,8 @@ const ForceAppExitDialog = imports.ui.forceAppExitDialog;
 const WorkspaceSwitcherPopup = imports.ui.workspaceSwitcherPopup;
 const Main = imports.ui.main;
 const ModalDialog = imports.ui.modalDialog;
+const SideComponent = imports.ui.sideComponent;
+const BackgroundMenu = imports.ui.backgroundMenu;
 const Tweener = imports.ui.tweener;
 const WindowMenu = imports.ui.windowMenu;
 const PadOsd = imports.ui.padOsd;
@@ -690,6 +694,261 @@ const ResizePopup = new Lang.Class({
     },
 });
 
+const DesktopOverlay = new Lang.Class({
+    Name: 'DesktopOverlay',
+    Extends: St.Widget,
+
+    Signals: {
+        'clicked': {},
+    },
+
+    _init: function() {
+        this.parent({ reactive: true });
+
+        this._shellwm = global.window_manager;
+
+        this._actorDestroyId = 0;
+        this._allocationId = 0;
+        this._destroyId = 0;
+        this._mapId = 0;
+        this._visibleId = 0;
+        this._showing = false;
+
+        this._overlayActor = null;
+        this._transientActors = [];
+
+        let action = new Clutter.ClickAction();
+        action.connect('clicked', Lang.bind(this, function(action) {
+            if (action.get_button() != Gdk.BUTTON_PRIMARY)
+                return;
+
+            if (this._showing && this._overlayActor)
+                this.emit('clicked');
+        }));
+        this.add_action(action);
+        BackgroundMenu.addBackgroundMenu(this, Main.layoutManager);
+
+        Main.overview.connect('showing', Lang.bind(this, function() {
+            // hide the overlay so it doesn't conflict with the desktop
+            if (this._showing)
+                this.hide();
+        }));
+        Main.overview.connect('hiding', Lang.bind(this, function() {
+            // show the overlay if needed
+            if (this._showing)
+                this.show();
+        }));
+
+        Main.uiGroup.add_actor(this);
+        if (Main.uiGroup.contains(global.top_window_group))
+            Main.uiGroup.set_child_below_sibling(this, global.top_window_group);
+    },
+
+    _rebuildRegion: function() {
+        if (!this._overlayActor.get_paint_visibility()) {
+            Main.layoutManager.setOverlayRegion(null);
+            return;
+        }
+
+        let overlayWindow = this._overlayActor.meta_window;
+        let monitorIdx = overlayWindow.get_monitor();
+        let monitor = Main.layoutManager.monitors[monitorIdx];
+        if (!monitor)
+            return;
+
+        let workArea = Main.layoutManager.getWorkAreaForMonitor(overlayWindow.get_monitor());
+        let region = new Cairo.Region();
+        region.unionRectangle(workArea);
+
+        let [x, y] = this._overlayActor.get_transformed_position();
+        let [width, height] = this._overlayActor.get_transformed_size();
+        let rect = { x: Math.round(x), y: Math.round(y),
+                     width: Math.round(width), height: Math.round(height) };
+
+        region.subtractRectangle(rect);
+
+        this._transientActors.forEach(Lang.bind(this, function(actorData) {
+            let transientActor = actorData.actor;
+
+            let [x, y] = transientActor.get_transformed_position();
+            let [width, height] = transientActor.get_transformed_size();
+            let rect = { x: Math.round(x), y: Math.round(y),
+                         width: Math.round(width), height: Math.round(height) };
+
+            region.subtractRectangle(rect);
+        }));
+
+        Main.layoutManager.setOverlayRegion(region);
+    },
+
+    _repositionOverlay: function() {
+        let overlayWindow = this._overlayActor.meta_window;
+        let monitorIdx = overlayWindow.get_monitor();
+        let monitor = Main.layoutManager.monitors[monitorIdx];
+        if (!monitor)
+            return;
+
+        // The width and height of the overlay need to be the width and height
+        // of the workArea. We already capture inputs correctly
+        // outside the overlay window by setting the region of the
+        // layoutManager overlay, so it is safe to just take up the
+        // entire workArea.
+        let workArea = Main.layoutManager.getWorkAreaForMonitor(monitorIdx);
+        this.width = workArea.width;
+        this.height = workArea.height;
+        this.y = this._overlayActor.y;
+
+        if (this._overlayActor.x <= monitor.x)
+            this.x = monitor.x + monitor.width - this.width;
+        else
+            this.x = monitor.x;
+    },
+
+    _recalculateOverlay: function() {
+        this._repositionOverlay();
+        this._rebuildRegion();
+    },
+
+    _findTransientActor: function(actor) {
+        for (let i = 0; i < this._transientActors.length; i++) {
+            let actorData = this._transientActors[i];
+            if (actorData.actor == actor)
+                return i;
+        }
+        return -1;
+    },
+
+    _untrackTransientActor: function(actor) {
+        let idx = this._findTransientActor(actor);
+        if (idx == -1) {
+            log('Trying to untrack a non-tracked transient actor!');
+            return;
+        }
+
+        let actorData = this._transientActors[idx];
+        this._transientActors.splice(idx, 1);
+
+        actor.disconnect(actorData.visibleId);
+        actor.disconnect(actorData.allocationId);
+        actor.disconnect(actorData.destroyId);
+
+        this._rebuildRegion();
+    },
+
+    _trackTransientActor: function(actor) {
+        if (this._findTransientActor(actor) != -1) {
+            log('Trying to track twice the same transient actor!');
+            return;
+        }
+
+        let actorData = {};
+        actorData.actor = actor;
+        actorData.visibleId = actor.connect('notify::visible',
+                                            Lang.bind(this, this._recalculateOverlay));
+        actorData.allocationId = actor.connect('notify::allocation',
+                                               Lang.bind(this, this._recalculateOverlay));
+        actorData.destroyId = actor.connect('destroy',
+                                            Lang.bind(this, this._untrackTransientActor));
+
+        this._transientActors.push(actorData);
+        this._recalculateOverlay();
+    },
+
+    _untrackActor: function() {
+        this._transientActors.forEach(Lang.bind(this, function(actorData) {
+            this._untrackTransientActor(actorData.actor);
+        }));
+        this._transientActors = [];
+
+        if (this._visibleId > 0) {
+            this._overlayActor.disconnect(this._visibleId);
+            this._visibleId = 0;
+        }
+
+        if (this._allocationId > 0) {
+            this._overlayActor.disconnect(this._allocationId);
+            this._allocationId = 0;
+        }
+
+        if (this._actorDestroyId > 0) {
+            this._overlayActor.disconnect(this._actorDestroyId);
+            this._actorDestroyId = 0;
+        }
+
+        if (this._destroyId > 0) {
+            this._shellwm.disconnect(this._destroyId);
+            this._destroyId = 0;
+        }
+
+        if (this._mapId > 0) {
+            this._shellwm.disconnect(this._mapId);
+            this._mapId = 0;
+        }
+
+        Main.layoutManager.setOverlayRegion(null);
+    },
+
+    _trackActor: function() {
+        let overlayWindow = this._overlayActor.meta_window;
+
+        this._visibleId = this._overlayActor.connect('notify::visible',
+                                                     Lang.bind(this, this._recalculateOverlay));
+        this._allocationId = this._overlayActor.connect('notify::allocation',
+                                                        Lang.bind(this, this._recalculateOverlay));
+        this._actorDestroyId = this._overlayActor.connect('destroy',
+                                                          Lang.bind(this, this._untrackActor));
+
+        this._mapId = this._shellwm.connect('map', Lang.bind(this, function(shellwm, actor) {
+            let newWindow = actor.meta_window;
+            if (overlayWindow.is_ancestor_of_transient(newWindow))
+                this._trackTransientActor(actor);
+        }));
+        this._destroyId = this._shellwm.connect('destroy', Lang.bind(this, function(shellwm, actor) {
+            let destroyedWindow = actor.meta_window;
+            if (overlayWindow.is_ancestor_of_transient(destroyedWindow))
+                this._untrackTransientActor(actor);
+        }));
+
+        // seed the transient actors
+        overlayWindow.foreach_transient(Lang.bind(this, function(transientWindow) {
+            let transientActor = overlayWindow.get_compositor_private();
+            if (transientActor != null)
+                this._trackTransientActor(transientActor);
+        }));
+
+        this._recalculateOverlay();
+    },
+
+    _setOverlayActor: function(actor) {
+        if (actor == this._overlayActor)
+            return;
+
+        this._untrackActor();
+        this._overlayActor = actor;
+
+        if (this._overlayActor)
+            this._trackActor();
+    },
+
+    get overlayActor() {
+        return this._overlayActor;
+    },
+
+    showOverlay: function(actor) {
+        this._setOverlayActor(actor);
+
+        this._showing = true;
+        this.show();
+    },
+
+    hideOverlay: function() {
+        this._setOverlayActor(null);
+
+        this._showing = false;
+        this.hide();
+    }
+});
+
 const WindowManager = new Lang.Class({
     Name: 'WindowManager',
 
@@ -708,6 +967,19 @@ const WindowManager = new Lang.Class({
         this._skippedActors = [];
 
         this._allowedKeybindings = {};
+
+        this._desktopOverlay = new DesktopOverlay();
+        this._showDesktopOnDestroyDone = false;
+
+        // The desktop overlay needs to replicate the background's functionality;
+        // when clicked, we animate the side component out before emitting "background-clicked".
+        this._desktopOverlay.connect('clicked', Lang.bind(this, function() {
+            Main.layoutManager.prepareForOverview();
+            this._slideSideComponentOut(this._shellwm,
+                                        this._desktopOverlay.overlayActor,
+                                        function () { Main.layoutManager.emit('background-clicked'); },
+                                        function () { Main.layoutManager.emit('background-clicked'); });
+        }));
 
         this._isWorkspacePrepended = false;
 
@@ -1141,6 +1413,11 @@ const WindowManager = new Lang.Class({
         if (this._removeEffect(this._skippedActors, actor))
             return false;
 
+        // We should always animate side component windows in, even
+        // if the overview is visible
+        if (SideComponent.isSideComponentWindow(actor.meta_window))
+            return true;
+
         if (!this._shouldAnimate())
             return false;
 
@@ -1158,6 +1435,50 @@ const WindowManager = new Lang.Class({
             return true;
         }
         return false;
+    },
+
+    _slideSideComponentOut : function(shellwm, actor, onComplete, onOverwrite) {
+        let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+        if (!monitor) {
+            onComplete.apply(this, [shellwm, actor]);
+            return;
+        }
+
+        actor.opacity = 255;
+        actor.show();
+
+        if (SideComponent.isDiscoveryFeedWindow(actor.meta_window)) {
+            let endY = monitor.y - actor.height;
+            Tweener.addTween(actor,
+                             { y: endY,
+                               time: WINDOW_ANIMATION_TIME,
+                               transition: "easeOutQuad",
+                               onComplete: onComplete,
+                               onCompleteScope: this,
+                               onCompleteParams: [shellwm, actor],
+                               onOverwrite: onOverwrite,
+                               onOverwriteScope: this,
+                               onOverwriteParams: [shellwm, actor]
+                             });
+        } else {
+            let endX;
+            if (actor.x <= monitor.x)
+                endX = monitor.x - actor.width;
+            else
+                endX = monitor.x + monitor.width;
+
+            Tweener.addTween(actor,
+                             { x: endX,
+                               time: WINDOW_ANIMATION_TIME,
+                               transition: "easeOutQuad",
+                               onComplete: onComplete,
+                               onCompleteScope: this,
+                               onCompleteParams: [shellwm, actor],
+                               onOverwrite: onOverwrite,
+                               onOverwriteScope: this,
+                               onOverwriteParams: [shellwm, actor]
+                             });
+        }
     },
 
     _minimizeWindow : function(shellwm, actor) {
@@ -1497,6 +1818,115 @@ const WindowManager = new Lang.Class({
             dimmer.dimFactor = 0.0;
     },
 
+    _hideOtherWindows: function(actor, animate) {
+        let winActors = global.get_window_actors();
+        for (let i = 0; i < winActors.length; i++) {
+            if (!winActors[i].get_meta_window().showing_on_its_workspace())
+                continue;
+
+            if (SideComponent.isSideComponentWindow(winActors[i].meta_window))
+                continue;
+
+            if (animate) {
+                Tweener.addTween(winActors[i],
+                                 { opacity: 0,
+                                   time: WINDOW_ANIMATION_TIME,
+                                   transition: 'easeOutQuad',
+                                   onComplete: function(winActor) { winActor.hide(); },
+                                   onCompleteParams: [winActors[i]],
+                                   onOverwrite: function(winActor) { winActor.hide(); },
+                                   onOverwriteParams: [winActors[i]]
+                                 });
+            } else {
+                winActors[i].opacity = 0;
+                winActors[i].hide();
+            }
+        }
+
+        this._desktopOverlay.showOverlay(actor);
+    },
+
+    _showOtherWindows: function(actor, animate) {
+        let winActors = global.get_window_actors();
+        for (let i = 0; i < winActors.length; i++) {
+            if (!winActors[i].get_meta_window().showing_on_its_workspace())
+                continue;
+
+            if (SideComponent.isSideComponentWindow(winActors[i].meta_window))
+                continue;
+
+            if (animate && winActors[i].opacity != 255) {
+                winActors[i].show();
+                Tweener.addTween(winActors[i],
+                                 { opacity: 255,
+                                   time: WINDOW_ANIMATION_TIME,
+                                   transition: 'easeOutQuad',
+                                   onOverwrite: function(winActor) { winActor.opacity = 255; },
+                                   onOverwriteParams: [winActors[i]]
+                                 });
+            } else {
+                winActors[i].opacity = 255;
+                winActors[i].show();
+            }
+        }
+
+        this._desktopOverlay.hideOverlay();
+    },
+
+    _mapSideComponent : function (shellwm, actor, animateFade) {
+        let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+        if (!monitor) {
+            this._mapWindowDone(shellwm, actor);
+            return;
+        }
+
+        if (SideComponent.isDiscoveryFeedWindow(actor.meta_window)) {
+            // the DiscoveryFeed window will appear from the top center
+            let origY = actor.y;
+            actor.set_position(actor.x, monitor.y - actor.height);
+
+            Tweener.addTween(actor,
+                             { y: origY,
+                               time: WINDOW_ANIMATION_TIME,
+                               transition: "easeOutQuad",
+                               onComplete: this._mapWindowDone,
+                               onCompleteScope: this,
+                               onCompleteParams: [shellwm, actor],
+                               onOverwrite: this._mapWindowOverwrite,
+                               onOverwriteScope: this,
+                               onOverwriteParams: [shellwm, actor]
+                             });
+        }
+        else {
+            let origX = actor.x;
+            if (origX == monitor.x) {
+                // the side bar will appear from the left side
+                actor.set_position(monitor.x - actor.width, actor.y);
+            } else {
+                // ... from the right side
+                actor.set_position(monitor.x + monitor.width, actor.y);
+            }
+
+            Tweener.addTween(actor,
+                             { x: origX,
+                               time: WINDOW_ANIMATION_TIME,
+                               transition: "easeOutQuad",
+                               onComplete: this._mapWindowDone,
+                               onCompleteScope: this,
+                               onCompleteParams: [shellwm, actor],
+                               onOverwrite: this._mapWindowOverwrite,
+                               onOverwriteScope: this,
+                               onOverwriteParams: [shellwm, actor]
+                             });
+        }
+
+        actor.opacity = 255;
+        actor.show();
+
+        if (SideComponent.shouldHideOtherWindows(actor.meta_window))
+            this._hideOtherWindows(actor, animateFade);
+    },
+
     _mapWindow : function(shellwm, actor) {
         actor._windowType = actor.meta_window.get_window_type();
         actor._notifyWindowTypeSignalId = actor.meta_window.connect('notify::window-type', Lang.bind(this, function () {
@@ -1541,7 +1971,25 @@ const WindowManager = new Lang.Class({
                      Meta.WindowType.DIALOG,
                      Meta.WindowType.MODAL_DIALOG];
         if (!this._shouldAnimateActor(actor, types)) {
+            if (SideComponent.shouldHideOtherWindows(actor.meta_window))
+                this._showOtherWindows(actor, false);
+
             shellwm.completed_map(actor);
+            return;
+        }
+
+        if (SideComponent.isSideComponentWindow(actor.meta_window)) {
+            this._mapping.push(actor);
+
+            if (Main.overview.visible) {
+                let overviewHiddenId = Main.overview.connect('hidden', Lang.bind(this, function() {
+                    Main.overview.disconnect(overviewHiddenId);
+                    this._mapSideComponent(shellwm, actor, false);
+                }));
+                Main.overview.hide();
+            } else {
+                this._mapSideComponent(shellwm, actor, true);
+            }
             return;
         }
 
@@ -1638,6 +2086,28 @@ const WindowManager = new Lang.Class({
             return;
         }
 
+        if (SideComponent.isSideComponentWindow(actor.meta_window)) {
+            this._destroying.push(actor);
+            this._slideSideComponentOut(shellwm, actor,
+                                        this._destroyWindowDone,
+                                        this._destroyWindowDone);
+
+            // if the side component does not have the focus at this point,
+            // that means that it is closing because another window has gotten it
+            // and therefore we should not try to show the desktop
+            this._showDesktopOnDestroyDone = actor.meta_window.has_focus() &&
+                                             SideComponent.launchedFromDesktop(actor.meta_window);
+
+            if (!this._showDesktopOnDestroyDone && SideComponent.shouldHideOtherWindows(actor.meta_window)) {
+                // reveal other windows while we slide out the side component
+                this._showOtherWindows(actor, true);
+            } else if (this._showDesktopOnDestroyDone) {
+                Main.layoutManager.prepareForOverview();
+            }
+
+            return;
+        }
+
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
             actor.set_pivot_point(0.5, 0.5);
@@ -1695,6 +2165,14 @@ const WindowManager = new Lang.Class({
                 parent.disconnect(actor._parentDestroyId);
                 actor._parentDestroyId = 0;
             }
+
+            if (SideComponent.isSideComponentWindow(actor.meta_window) && this._showDesktopOnDestroyDone) {
+                Main.overview.showApps();
+
+                if (SideComponent.shouldHideOtherWindows(actor.meta_window))
+                    this._showOtherWindows(actor, false);
+            }
+
             shellwm.completed_destroy(actor);
         }
     },
