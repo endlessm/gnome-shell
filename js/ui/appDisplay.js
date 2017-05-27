@@ -10,6 +10,7 @@ const BoxPointer = imports.ui.boxpointer;
 const DND = imports.ui.dnd;
 const GrabHelper = imports.ui.grabHelper;
 const IconGrid = imports.ui.iconGrid;
+const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const PageIndicators = imports.ui.pageIndicators;
 const PopupMenu = imports.ui.popupMenu;
@@ -60,6 +61,12 @@ const SWITCHEROO_OBJECT_PATH = '/net/hadess/SwitcherooControl';
 const SwitcherooProxyInterface = loadInterfaceXML('net.hadess.SwitcherooControl');
 const SwitcherooProxy = Gio.DBusProxy.makeProxyWrapper(SwitcherooProxyInterface);
 let discreteGpuAvailable = false;
+
+// Endless-specific definitions below this point
+
+const EOS_LINK_PREFIX = 'eos-link-';
+
+const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -972,6 +979,13 @@ var AppSearchProvider = class AppSearchProvider {
         groups.forEach(group => {
             group = group.filter(appID => {
                 let app = Gio.DesktopAppInfo.new(appID);
+                let isLink = appID.startsWith(EOS_LINK_PREFIX);
+                let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
+
+                // exclude links that are not part of the desktop grid
+                if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
+                    return false;
+
                 return app && app.should_show();
             });
             results = results.concat(group.sort(
@@ -981,6 +995,13 @@ var AppSearchProvider = class AppSearchProvider {
 
         results = results.concat(this._systemActions.getMatchingActions(terms));
 
+        // resort to keep results on the desktop grid before the others
+        results = results.sort(function(a, b) {
+            let hasA = a === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(a);
+            let hasB = b === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(b);
+
+            return hasB - hasA;
+        });
         callback(results);
     }
 
