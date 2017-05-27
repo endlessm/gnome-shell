@@ -405,7 +405,7 @@ const ControlsLayout = new Lang.Class({
 const ControlsManager = new Lang.Class({
     Name: 'ControlsManager',
 
-    _init: function(searchEntry) {
+    _init: function() {
         this.dash = new Dash.Dash();
         this._dashSlider = new DashSlider(this.dash);
         this._dashSpacer = new DashSpacer();
@@ -414,8 +414,7 @@ const ControlsManager = new Lang.Class({
         this._thumbnailsBox = new WorkspaceThumbnail.ThumbnailsBox();
         this._thumbnailsSlider = new ThumbnailsSlider(this._thumbnailsBox);
 
-        this.viewSelector = new ViewSelector.ViewSelector(searchEntry,
-                                                          this.dash.showAppsButton);
+        this.viewSelector = new ViewSelector.ViewSelector(this.dash.showAppsButton);
         this.viewSelector.connect('page-changed', Lang.bind(this, this._setVisibility));
         this.viewSelector.connect('page-empty', Lang.bind(this, this._onPageEmpty));
 
