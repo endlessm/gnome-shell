@@ -207,14 +207,6 @@ app_is_stale (ShellApp *app)
   return !is_unchanged;
 }
 
-static gboolean
-stale_app_remove_func (gpointer key,
-                       gpointer value,
-                       gpointer user_data)
-{
-  return app_is_stale (value);
-}
-
 static GDesktopAppInfo *
 get_new_desktop_app_info_from_app (ShellApp *app)
 {
