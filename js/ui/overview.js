@@ -246,6 +246,7 @@ var Overview = class {
             this.dashIconSize = this._dash.iconSize;
         });
 
+        this.viewSelector.connect('page-changed', this._onPageChanged.bind(this));
         Main.layoutManager.connect('monitors-changed', this._relayout.bind(this));
         this._relayout();
     }
@@ -268,6 +269,13 @@ var Overview = class {
             return;
 
         this._shellInfo.setMessage(text, options);
+    }
+
+    _onPageChanged() {
+        // SideComponent hooks on this signal but can't connect directly to
+        // viewSelector since it won't be created at the time the component
+        // is enabled, so rely on the overview and re-issue it from here.
+        this.emit('page-changed');
     }
 
     _onDragBegin() {
@@ -636,6 +644,10 @@ var Overview = class {
             this.hide();
         else
             this.show();
+    }
+
+    getActivePage() {
+        return this.viewSelector.getActivePage();
     }
 
     getShowAppsButton() {
