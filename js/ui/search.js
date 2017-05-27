@@ -69,11 +69,36 @@ const SearchResult = new Lang.Class({
 });
 Signals.addSignalMethods(SearchResult.prototype);
 
+const ListDescriptionBox = new Lang.Class({
+    Name: 'ListDescriptionBox',
+    Extends: St.BoxLayout,
+
+    _init: function(params) {
+        this.parent(params);
+    },
+
+    vfunc_get_preferred_height: function(forWidth) {
+        // This container requests space for the title and description
+        // regardless of visibility, but allocates normally to visible actors.
+        // This allows us have a constant sized box, but still center the title
+        // label when the description is not present.
+        let min = 0, nat = 0;
+        let children = this.get_children();
+        for (let i = 0; i < children.length; i++) {
+            let child = children[i];
+            let [childMin, childNat] = child.get_preferred_height(forWidth);
+            min += childMin;
+            nat += childNat;
+        }
+        return [min, nat];
+    }
+});
+
 const ListSearchResult = new Lang.Class({
     Name: 'ListSearchResult',
     Extends: SearchResult,
 
-    ICON_SIZE: 64,
+    ICON_SIZE: 32,
 
     _init: function(provider, metaInfo) {
         this.parent(provider, metaInfo);
@@ -91,7 +116,7 @@ const ListSearchResult = new Lang.Class({
             content.add(icon);
         }
 
-        let details = new St.BoxLayout({ vertical: true });
+        let details = new ListDescriptionBox({ vertical: true });
         content.add(details, { x_fill: true,
                                y_fill: false,
                                x_align: St.Align.START,
@@ -113,6 +138,12 @@ const ListSearchResult = new Lang.Class({
                                        x_align: St.Align.START,
                                        y_align: St.Align.END });
         }
+
+        let hoverIcon = new St.Icon({ style_class: 'list-search-result-arrow-icon',
+                                      icon_name: 'go-next-symbolic' });
+        content.add(hoverIcon,  { x_fill: false,
+                                  x_align: St.Align.END,
+                                  expand: true });
     }
 });
 
@@ -367,14 +398,58 @@ const GridSearchResults = new Lang.Class({
 });
 Signals.addSignalMethods(GridSearchResults.prototype);
 
+const SearchResultsBin = new Lang.Class({
+    Name: 'SearchResultsBin',
+    Extends: St.BoxLayout,
+
+    vfunc_get_preferred_height: function(forHeight) {
+        let themeNode = this.get_theme_node();
+        let marginBottom = themeNode.get_length('-margin-bottom');
+
+        let [min, nat] = this.parent(forHeight);
+        return [min + marginBottom, nat + marginBottom];
+    },
+
+    vfunc_get_preferred_width: function(forHeight) {
+        let themeNode = this.get_theme_node();
+        let maxWidth = themeNode.get_max_width();
+        let marginHorizontal = themeNode.get_length('-margin-horizontal');
+
+        let [min, nat] = this.parent(forHeight);
+        return [Math.min(maxWidth, min) + marginHorizontal,
+                Math.min(maxWidth, nat) + marginHorizontal];
+    },
+
+    vfunc_allocate: function(box, flags) {
+        let themeNode = this.get_theme_node();
+        let maxWidth = themeNode.get_max_width();
+        let marginBottom = themeNode.get_length('-margin-bottom');
+        let marginHorizontal = themeNode.get_length('-margin-horizontal');
+
+        box.x1 += marginHorizontal;
+        box.x2 -= marginHorizontal;
+        box.y2 -= marginBottom;
+
+        let availWidth = box.x2 - box.x1;
+        if (availWidth > maxWidth) {
+            let excessWidth = availWidth - maxWidth;
+            box.x1 += Math.floor(excessWidth / 2);
+            box.x2 -= Math.floor(excessWidth / 2);
+        }
+
+        this.parent(box, flags);
+    }
+});
+
 const SearchResults = new Lang.Class({
     Name: 'SearchResults',
 
     _init: function() {
-        this.actor = new St.BoxLayout({ name: 'searchResults',
-                                        vertical: true });
+        this.actor = new SearchResultsBin({ name: 'searchResults',
+                                            vertical: true });
+        Util.blockClickEventsOnActor(this.actor);
 
-        this._content = new St.BoxLayout({ name: 'searchResultsContent',
+        this._content = new St.BoxLayout({ name: 'searchResultsBox',
                                            vertical: true });
         this._contentBin = new MaxWidthBin({ name: 'searchResultsBin',
                                              x_fill: true,
