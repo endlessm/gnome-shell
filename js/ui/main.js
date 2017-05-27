@@ -46,6 +46,7 @@ const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
 const Watermark = imports.ui.watermark;
+const WorkspaceMonitor = imports.ui.workspaceMonitor;
 
 const A11Y_SCHEMA = 'org.gnome.desktop.a11y.keyboard';
 const STICKY_KEYS_ENABLE = 'stickykeys-enable';
@@ -82,6 +83,7 @@ var xdndHandler = null;
 var keyboard = null;
 var layoutManager = null;
 var trayArea = null;
+var workspaceMonitor = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
@@ -186,6 +188,9 @@ function _initializeUI() {
 
     layoutManager.init();
     overview.init();
+
+    // WorkspaceMonitor expects layoutManager to be ready, initialize it here.
+    workspaceMonitor = new WorkspaceMonitor.WorkspaceMonitor();
 
     _a11ySettings = new Gio.Settings({ schema_id: A11Y_SCHEMA });
 
