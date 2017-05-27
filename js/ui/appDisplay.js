@@ -18,6 +18,7 @@ const BoxPointer = imports.ui.boxpointer;
 const DND = imports.ui.dnd;
 const GrabHelper = imports.ui.grabHelper;
 const IconGrid = imports.ui.iconGrid;
+const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
@@ -59,6 +60,12 @@ const PAGE_SWITCH_TIME = 0.3;
 
 const VIEWS_SWITCH_TIME = 0.4;
 const VIEWS_SWITCH_ANIMATION_DELAY = 0.1;
+
+
+// Endless-specific definitions below this point
+
+const EOS_LINK_PREFIX = 'eos-link-';
+
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -1073,11 +1080,31 @@ const AppSearchProvider = new Lang.Class({
         groups.forEach(function(group) {
             group = group.filter(function(appID) {
                 let app = Gio.DesktopAppInfo.new(appID);
+                let isLink = appID.startsWith(EOS_LINK_PREFIX);
+                let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
+
+                // exclude links that are not part of the desktop grid
+                if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
+                    return false;
+
                 return app && app.should_show();
             });
             results = results.concat(group.sort(function(a, b) {
                 return usage.compare('', a, b);
             }));
+        });
+
+        // resort to keep results on the desktop grid before the others
+        results = results.sort(function(a, b) {
+            let hasA = IconGridLayout.layout.hasIcon(a);
+            let hasB = IconGridLayout.layout.hasIcon(b);
+
+            if (hasA)
+                return -1;
+            if (hasB)
+                return 1;
+
+            return 0;
         });
         callback(results);
     },
@@ -1089,6 +1116,13 @@ const AppSearchProvider = new Lang.Class({
     createResultObject: function (resultMeta) {
         let app = this._appSys.lookup_app(resultMeta['id']);
         return new AppIcon(app);
+    },
+
+    activateResult: function(appId) {
+        let event = Clutter.get_current_event();
+        let app = this._appSys.lookup_app(appId);
+        let activationContext = new AppActivation.AppActivationContext(app);
+        activationContext.activate(event);
     }
 });
 
