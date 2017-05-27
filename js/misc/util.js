@@ -7,11 +7,15 @@ const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
+const Json = imports.gi.Json;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Params = imports.misc.params;
 
 const SCROLL_TIME = 0.1;
+
+const FALLBACK_BROWSER_ID = 'chromium-browser.desktop';
+const GOOGLE_CHROME_ID = 'google-chrome.desktop';
 
 // http://daringfireball.net/2010/07/improved_regex_for_matching_urls
 const _balancedParens = '\\((?:[^\\s()<>]+|(?:\\(?:[^\\s()<>]+\\)))*\\)';
@@ -54,6 +58,28 @@ function findUrls(str) {
     let res = [], match;
     while ((match = _urlRegexp.exec(str)))
         res.push({ url: match[2], pos: match.index + match[1].length });
+    return res;
+}
+
+// http://stackoverflow.com/questions/4691070/validate-url-without-www-or-http
+const _searchUrlRegexp = new RegExp(
+    '^([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+.*)\\.+[A-Za-z0-9\.\/%&=\?\-_]+$',
+    'gi');
+
+// findSearchUrls:
+// @terms: list of searchbar terms to find URLs in
+//
+// Similar to "findUrls", but for use only with terms from the searchbar.
+// The regex for these URLs matches strings such as "google.com" (note the
+// lack of preceding scheme).
+//
+// Return value: the list of URLs found in the string
+function findSearchUrls(terms) {
+    let res = [], match;
+    for (let i in terms) {
+        while ((match = _searchUrlRegexp.exec(terms[i])))
+            res.push(match[0]);
+    }
     return res;
 }
 
@@ -397,4 +423,80 @@ function ensureActorVisibleInScrollView(scrollView, actor) {
                      { value: value,
                        time: SCROLL_TIME,
                        transition: 'easeOutQuad' });
+}
+
+function getBrowserId() {
+    let id = FALLBACK_BROWSER_ID;
+    let app = Gio.app_info_get_default_for_type('x-scheme-handler/http', true);
+    if (app != null)
+        id = app.get_id();
+    return id;
+}
+
+function getBrowserApp() {
+    let id = getBrowserId();
+    let appSystem = Shell.AppSystem.get_default();
+    let browserApp = appSystem.lookup_app(id);
+    return browserApp;
+}
+
+function _getJsonSearchEngine(folder) {
+    let path = GLib.build_filenamev([GLib.get_user_config_dir(), folder, 'Default', 'Preferences']);
+    let parser = new Json.Parser();
+
+    /*
+     * Translators: this is the name of the search engine that shows in the
+     * Shell's desktop search entry.
+     */
+    let default_string = _("Google");
+
+    try {
+        parser.load_from_file(path);
+    } catch(e if e.matches(GLib.FileError, GLib.FileError.NOENT)) {
+        // User has not run Chromium yet.
+        return default_string;
+    } catch (e) {
+        logError(e, 'error while parsing Chromium preferences');
+        return null;
+    }
+
+    let root = parser.get_root().get_object();
+
+    let searchProviderDataNode = root.get_member('default_search_provider_data');
+    if (!searchProviderDataNode || searchProviderDataNode.get_node_type() != Json.NodeType.OBJECT)
+        return default_string;
+
+    let searchProviderData = searchProviderDataNode.get_object();
+    if (!searchProviderData)
+        return default_string;
+
+    let templateUrlDataNode = searchProviderData.get_member('template_url_data');
+    if (!templateUrlDataNode || templateUrlDataNode.get_node_type() != Json.NodeType.OBJECT)
+        return default_string;
+
+    let templateUrlData = templateUrlDataNode.get_object();
+    if (!templateUrlData)
+        return default_string;
+
+    let shortNameNode = templateUrlData.get_member('short_name');
+    if (!shortNameNode || shortNameNode.get_node_type() != Json.NodeType.VALUE)
+        return default_string;
+
+    return shortNameNode.get_string();
+}
+
+// getSearchEngineName:
+//
+// Retrieves the current search engine from
+// the default browser.
+function getSearchEngineName() {
+    let browser = getBrowserId();
+
+    if (browser === FALLBACK_BROWSER_ID)
+        return _getJsonSearchEngine('chromium');
+
+    if (browser === GOOGLE_CHROME_ID)
+        return _getJsonSearchEngine('google-chrome');
+
+    return null;
 }
