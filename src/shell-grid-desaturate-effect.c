@@ -39,8 +39,6 @@
 #define SHELL_IS_GRID_DESATURATE_EFFECT_CLASS(klass)     (G_TYPE_CHECK_CLASS_TYPE ((klass), SHELL_TYPE_GRID_DESATURATE_EFFECT))
 #define SHELL_GRID_DESATURATE_EFFECT_GET_CLASS(obj)      (G_TYPE_INSTANCE_GET_CLASS ((obj), SHELL_TYPE_GRID_DESATURATE_EFFECT, ShellGridDesaturateEffectClass))
 
-#define CLUTTER_ENABLE_EXPERIMENTAL_API
-
 #include <math.h>
 
 #include "shell-grid-desaturate-effect.h"
