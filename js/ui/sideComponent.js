@@ -26,7 +26,8 @@ function isSideComponentWindow (metaWindow) {
  * @return: whether other windows should be hidden while this one is open
  */
 function shouldHideOtherWindows (metaWindow) {
-    return isSideComponentWindow(metaWindow);
+    return isSideComponentWindow(metaWindow) &&
+        Main.discoveryFeed.launchedFromDesktop;
 };
 
 /**
