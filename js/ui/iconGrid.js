@@ -39,6 +39,7 @@ const BaseIcon = new Lang.Class({
 
     _init : function(label, params) {
         params = Params.parse(params, { createIcon: null,
+                                        createExtraIcons: null,
                                         setSizeManually: false,
                                         showLabel: true });
 
@@ -68,8 +69,23 @@ const BaseIcon = new Lang.Class({
         this.iconSize = ICON_SIZE;
         this._iconBin = new St.Bin({ x_align: St.Align.MIDDLE,
                                      y_align: St.Align.MIDDLE });
+        this._iconBin.add_style_class_name('icon-button');
 
         box.add_actor(this._iconBin);
+
+        this._layeredIcon = new St.Widget({ layout_manager: new Clutter.BinLayout(),
+                                            visible: true,
+                                            x_expand: true,
+                                            y_expand: true,
+                                            width: this.iconSize,
+                                            height: this.iconSize });
+        this._iconBin.add_actor(this._layeredIcon);
+
+        let shadow = new St.Widget({ style_class: 'shadow-icon',
+                                     visible: true,
+                                     x_expand: true,
+                                     y_expand: true });
+        this._layeredIcon.add_actor(shadow);
 
         if (params.showLabel) {
             this.label = new St.Label({ text: label });
@@ -80,9 +96,12 @@ const BaseIcon = new Lang.Class({
 
         if (params.createIcon)
             this.createIcon = params.createIcon;
+        if (params.createExtraIcons)
+            this.createExtraIcons = params.createExtraIcons;
         this._setSizeManually = params.setSizeManually;
 
         this.icon = null;
+        this.extraIcons = [];
 
         let cache = St.TextureCache.get_default();
         this._iconThemeChangedId = cache.connect('icon-theme-changed', Lang.bind(this, this._onIconThemeChanged));
@@ -144,6 +163,12 @@ const BaseIcon = new Lang.Class({
         throw new Error('no implementation of createIcon in ' + this);
     },
 
+    // This can be overridden by a subclass, or by the createExtraIcons
+    // parameter to _init()
+    createExtraIcons: function(size) {
+        return [];
+    },
+
     setIconSize: function(size) {
         if (!this._setSizeManually)
             throw new Error('setSizeManually has to be set to use setIconsize');
@@ -157,10 +182,25 @@ const BaseIcon = new Lang.Class({
     _createIconTexture: function(size) {
         if (this.icon)
             this.icon.destroy();
+        this.extraIcons.forEach(function (i) {
+            i.destroy();
+        });
         this.iconSize = size;
         this.icon = this.createIcon(this.iconSize);
+        this.extraIcons = this.createExtraIcons(this.iconSize);
 
-        this._iconBin.child = this.icon;
+        this._layeredIcon.add_actor(this.icon);
+        if (this._shadowAbove)
+            this._layeredIcon.set_child_below_sibling(this.icon, null);
+
+        this.extraIcons.forEach(Lang.bind(this, function (i) {
+            this._layeredIcon.add_actor(i);
+        }));
+
+        // The icon returned by createIcon() might actually be smaller than
+        // the requested icon size (for instance StTextureCache does this
+        // for fallback icons), so set the size explicitly.
+        this._layeredIcon.set_size(this.iconSize, this.iconSize);
     },
 
     _onStyleChanged: function() {
@@ -175,7 +215,7 @@ const BaseIcon = new Lang.Class({
             size = found ? len : ICON_SIZE;
         }
 
-        if (this.iconSize == size && this._iconBin.child)
+        if (this.iconSize == size && this.icon !== null)
             return;
 
         this._createIconTexture(size);
@@ -190,6 +230,10 @@ const BaseIcon = new Lang.Class({
     },
 
     _onIconThemeChanged: function() {
+        this._createIconTexture(this.iconSize);
+    },
+
+    reloadIcon: function() {
         this._createIconTexture(this.iconSize);
     },
 

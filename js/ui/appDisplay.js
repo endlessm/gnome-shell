@@ -1471,6 +1471,7 @@ const AppIcon = new Lang.Class({
         delete iconParams['isDraggable'];
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
+        iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
         iconParams['setSizeManually'] = true;
         this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
         this._iconContainer.add_child(this.icon.actor);
@@ -1522,6 +1523,27 @@ const AppIcon = new Lang.Class({
 
     _createIcon: function(iconSize) {
         return this.app.create_icon_texture(iconSize);
+    },
+
+    _createExtraIcons: function(iconSize) {
+        if (!this._notificationSource)
+            return [];
+
+        let sourceActor = new AppIconSourceActor(this._notificationSource, iconSize);
+        return [sourceActor.actor];
+    },
+
+    _onNewGtkNotificationSource: function(daemon, source) {
+        if (source.app != this.app)
+            return;
+
+        this._notificationSource = source;
+        this._notificationSource.connect('destroy', Lang.bind(this, function() {
+            this._notificationSource = null;
+            this.icon.reloadIcon();
+        }));
+
+        this.icon.reloadIcon();
     },
 
     _removeMenuTimeout: function() {
