@@ -51,6 +51,12 @@ gnome-shell-extension-tool: gnome-shell-extension-tool.in Makefile
 gnome-shell-perf-tool: gnome-shell-perf-tool.in Makefile
 	$(AM_V_GEN) sed $(generated_script_substitutions) $< > $@.tmp && mv $@.tmp $@ && chmod a+x $@
 
+# Nothing here, no files to cover, but we need to set this so that
+# EOS_COVERAGE_RULES doesn't complain
+EOS_JS_COVERAGE_FILES =
+
+@EOS_COVERAGE_RULES@
+
 org-gtk-application.c org-gtk-application.h: org.gtk.Application.xml Makefile
 	$(AM_V_GEN) $(GDBUS_CODEGEN) \
 			--generate-c-code org-gtk-application \
@@ -67,6 +73,7 @@ include Makefile-hotplug-sniffer.am
 
 gnome_shell_cflags =				\
 	$(GNOME_SHELL_CFLAGS)			\
+	@EOS_C_COVERAGE_CFLAGS@			\
 	-I$(srcdir)/tray			\
 	-DCLUTTER_ENABLE_EXPERIMENTAL_API	\
 	-DCOGL_ENABLE_EXPERIMENTAL_API		\
@@ -205,7 +212,7 @@ gnome_shell_CPPFLAGS = \
 # Here, and after, we repeat mutter and bluetooth libraries just for the rpath
 # The dependency is already pulled in by libtool
 gnome_shell_LDADD = libgnome-shell.la $(GNOME_SHELL_LIBS) $(MUTTER_LIBS)
-gnome_shell_LDFLAGS = -rpath $(MUTTER_TYPELIB_DIR)
+gnome_shell_LDFLAGS = @EOS_C_COVERAGE_LDFLAGS@ -rpath $(MUTTER_TYPELIB_DIR)
 gnome_shell_DEPENDENCIES = libgnome-shell.la
 
 gnome_shell_extension_prefs_SOURCES = \
@@ -217,7 +224,7 @@ nodist_gnome_shell_extension_prefs_SOURCES = \
 	$(NULL)
 gnome_shell_extension_prefs_CPPFLAGS = $(gnome_shell_cflags)
 gnome_shell_extension_prefs_LDADD = $(GNOME_SHELL_LIBS)
-gnome_shell_extension_prefs_LDFLAGS = -rpath $(MUTTER_TYPELIB_DIR)
+gnome_shell_extension_prefs_LDFLAGS = @EOS_C_COVERAGE_LDFLAGS@ -rpath $(MUTTER_TYPELIB_DIR)
 
 if HAVE_NETWORKMANAGER
 
@@ -231,7 +238,7 @@ nodist_gnome_shell_portal_helper_SOURCES = \
 	$(NULL)
 gnome_shell_portal_helper_CPPFLAGS = $(gnome_shell_cflags)
 gnome_shell_portal_helper_LDADD = $(GNOME_SHELL_LIBS)
-gnome_shell_portal_helper_LDFLAGS = -rpath $(MUTTER_TYPELIB_DIR)
+gnome_shell_portal_helper_LDFLAGS = @EOS_C_COVERAGE_LDFLAGS@ -rpath $(MUTTER_TYPELIB_DIR)
 
 endif
 
@@ -249,6 +256,7 @@ libeos_shell_fx_la_LIBADD =	\
 
 libeos_shell_fx_la_LDFLAGS =	\
 	-avoid-version		\
+	@EOS_C_COVERAGE_LDFLAGS@ \
 	$(NULL)
 
 libeos_shell_fx_la_CPPFLAGS =	\
@@ -283,6 +291,8 @@ libexec_PROGRAMS += gnome-shell-perf-helper
 gnome_shell_perf_helper_SOURCES = shell-perf-helper.c
 gnome_shell_perf_helper_CPPFLAGS = $(SHELL_PERF_HELPER_CFLAGS)
 gnome_shell_perf_helper_LDADD = $(SHELL_PERF_HELPER_LIBS) -lm
+
+gnome_shell_perf_helper_LDFLAGS = @EOS_C_COVERAGE_LDFLAGS@
 
 ########################################
 
@@ -319,14 +329,14 @@ shell-enum-types.c: $(srcdir)/shell-enum-types.c.in stamp-shell-enum-types.h
 	rm -f $(@F).tmp
 EXTRA_DIST += shell-enum-types.c.in
 
-libgnome_shell_ldflags = -avoid-version
-libgnome_shell_libadd =		\
-	-lm			\
-	$(GNOME_SHELL_LIBS)	\
-	libgnome-shell-menu.la	\
-	libst-1.0.la       	\
-	libtray.la		\
-	gvc/libgvc.la		\
+libgnome_shell_ldflags = @EOS_C_COVERAGE_LDFLAGS@  -avoid-version
+libgnome_shell_libadd =			\
+	-lm				\
+	$(GNOME_SHELL_LIBS)		\
+	libgnome-shell-menu.la		\
+	libst-1.0.la       		\
+	libtray.la			\
+	gvc/libgvc.la			\
 	$(NULL)
 
 libgnome_shell_menu_la_LDFLAGS = $(libgnome_shell_ldflags)
@@ -335,6 +345,7 @@ libgnome_shell_menu_la_CPPFLAGS = $(GNOME_SHELL_CFLAGS)
 
 libgnome_shell_base_la_LIBADD = $(libgnome_shell_libadd)
 libgnome_shell_base_la_CPPFLAGS = $(gnome_shell_cflags)
+libgnome_shell_base_la_LDFLAGS = $(libgnome_shell_ldflags)
 
 libgnome_shell_la_LDFLAGS = $(libgnome_shell_ldflags)
 libgnome_shell_la_LIBADD = $(GNOME_SHELL_LIBS) $(MUTTER_LIBS) libgnome-shell-base.la

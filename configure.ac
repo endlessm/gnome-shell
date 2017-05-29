@@ -248,6 +248,9 @@ fi
 
 AC_PATH_PROG([SASS],[sass],[])
 
+# Enable coverage reporting
+EOS_COVERAGE_REPORT([c js])
+
 AC_CONFIG_FILES([
   Makefile
   data/Makefile
