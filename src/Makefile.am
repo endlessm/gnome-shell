@@ -78,7 +78,7 @@ gnome_shell_cflags =				\
 	-DGNOME_SHELL_PKGLIBDIR=\"$(pkglibdir)\"
 
 privlibdir = $(pkglibdir)
-privlib_LTLIBRARIES = libgnome-shell-menu.la libgnome-shell.la
+privlib_LTLIBRARIES = libgnome-shell-menu.la libgnome-shell.la libeos-shell-fx.la
 noinst_LTLIBRARIES += libgnome-shell-base.la
 
 shell_built_sources = \
@@ -231,6 +231,28 @@ endif
 
 ########################################
 
+# Set up the libeos-shell-fx target
+libeos_shell_fx_la_SOURCES =	\
+	wobbly-effect.cpp	\
+	wobbly-effect.h		\
+	$(NULL)
+
+libeos_shell_fx_la_LIBADD =	\
+	$(EOS_SHELL_FX_LIBS)	\
+	$(NULL)
+
+libeos_shell_fx_la_LDFLAGS =	\
+	-avoid-version		\
+	-R $(MUTTER_TYPELIB_DIR) \
+	$(NULL)
+
+libeos_shell_fx_la_CPPFLAGS =	\
+	$(EOS_SHELL_FX_CFLAGS)	\
+	-std=c++11		\
+	$(NULL)
+
+########################################
+
 shell_recorder_sources =        \
 	shell-recorder.c	\
 	shell-recorder.h
@@ -359,3 +381,12 @@ St_1_0_gir_FILES = $(filter-out %-private.h $(st_non_gir_sources), $(addprefix $
 	$(addprefix $(srcdir)/,$(st_source_c))
 INTROSPECTION_GIRS += St-1.0.gir
 CLEANFILES += St-1.0.gir
+
+EndlessShellFX-1.0.gir: libeos-shell-fx.la
+EndlessShellFX_1_0_gir_INCLUDES = Clutter-$(LIBMUTTER_API_VERSION)
+EndlessShellFX_1_0_gir_CFLAGS = $(EOS_SHELL_FX_CFLAGS) -I $(srcdir)
+EndlessShellFX_1_0_gir_LIBS = libeos-shell-fx.la
+EndlessShellFX_1_0_gir_FILES = $(libeos_shell_fx_la_SOURCES)
+EndlessShellFX_1_0_gir_SCANNERFLAGS = --warn-all
+INTROSPECTION_GIRS += EndlessShellFX-1.0.gir
+CLEANFILES += EndlessShellFX-1.0.gir

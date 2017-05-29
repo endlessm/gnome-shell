@@ -2,6 +2,7 @@
 
 const Cairo = imports.cairo;
 const Clutter = imports.gi.Clutter;
+const EndlessShellFX = imports.gi.EndlessShellFX;
 const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
@@ -155,6 +156,58 @@ const DisplayChangeDialog = new Lang.Class({
         this._wm.complete_display_change(true);
         this.close();
     },
+});
+
+const EOSShellWobbly = new Lang.Class({
+    Name: 'EOSShellWobbly',
+    Extends: EndlessShellFX.Wobbly,
+
+    _init: function(params) {
+        this.parent(params);
+
+        let binder = Lang.bind(this, function(key, prop) {
+            global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+        });
+
+        // Bind to effect properties
+        binder('wobbly-spring-k', 'spring-k');
+        binder('wobbly-spring-friction', 'friction');
+        binder('wobbly-slowdown-factor', 'slowdown-factor');
+        binder('wobbly-object-movement-range', 'object-movement-range');
+    },
+
+    grabbedByMouse: function() {
+        if (!global.settings.get_boolean('wobbly-effect'))
+            return;
+
+        let position = global.get_pointer();
+        let actor = this.get_actor();
+        this.grab(position[0], position[1]);
+
+        this._lastPosition = actor.get_position();
+        this._positionChangedId =
+            actor.connect('allocation-changed', Lang.bind(this, function (actor) {
+                let position = actor.get_position();
+                let dx = position[0] - this._lastPosition[0];
+                let dy = position[1] - this._lastPosition[1];
+
+                this.move_by(dx, dy);
+                this._lastPosition = position;
+            }));
+    },
+
+    ungrabbedByMouse: function() {
+        // Only continue if we have an active grab and change notification
+        // on movement
+        if (!this._positionChangedId)
+            return;
+
+        let actor = this.get_actor();
+        this.ungrab();
+
+        actor.disconnect(this._positionChangedId);
+        this._positionChangedId = null;
+    }
 });
 
 const WindowDimmer = new Lang.Class({
@@ -1284,6 +1337,9 @@ const WindowManager = new Lang.Class({
             Main.keyboard.show(Main.layoutManager.bottomIndex);
         }));
         global.stage.add_action(gesture);
+
+        global.display.connect('grab-op-begin', Lang.bind(this, this._windowGrabbed));
+        global.display.connect('grab-op-end', Lang.bind(this, this._windowUngrabbed));
     },
 
     _showPadOsd: function (display, device, settings, imagePath, editionMode, monitorIndex) {
@@ -2524,5 +2580,49 @@ const WindowManager = new Lang.Class({
                 this._resizePopup = null;
             }
         }
+    },
+
+    _windowCanWobble: function(window, op) {
+        if (window.is_override_redirect() ||
+            op != Meta.GrabOp.MOVING)
+            return false;
+
+        return true;
+    },
+
+    _windowGrabbed: function(display, screen, window, op) {
+        // Occassionally, window can be null, in cases where grab-op-begin
+        // was emitted on a window from shell-toolkit. Ignore these grabs.
+        if (!window)
+            return;
+
+        if (!this._windowCanWobble(window, op))
+            return;
+
+        let actor = window.get_compositor_private();
+
+        let effect = actor.get_effect('endless-wobbly');
+        if (!effect) {
+            effect = new EOSShellWobbly();
+            actor.add_effect_with_name('endless-wobbly', effect);
+        }
+
+        effect.grabbedByMouse();
+    },
+
+    _windowUngrabbed: function(display, op, window) {
+        // Occassionally, window can be null, in cases where grab-op-end
+        // was emitted on a window from shell-toolkit. Ignore these grabs.
+        if (!window)
+            return;
+
+        let actor = window.get_compositor_private();
+        let effect = actor.get_effect('endless-wobbly');
+
+        // Lots of different grab ops can end here, so we just let
+        // EOSShellWobbly.ungrabbedByMouse figure out what to do based on its
+        // own state
+        if (effect)
+            effect.ungrabbedByMouse();
     },
 });
