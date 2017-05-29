@@ -115,6 +115,7 @@ PKG_CHECK_MODULES(MUTTER, libmutter >= $MUTTER_MIN_VERSION)
 
 PKG_CHECK_MODULES(GNOME_SHELL_JS, gio-2.0 gjs-1.0 >= $GJS_MIN_VERSION)
 PKG_CHECK_MODULES(ST, mutter-clutter-1.0 gtk+-3.0 libcroco-0.6 >= 0.6.8 x11)
+PKG_CHECK_MODULES(EOS_SHELL_FX, mutter-clutter-1.0 >= 1.16 glib-2.0 >= 2.38 gdk-pixbuf-2.0 libwindowfx_wobbly)
 PKG_CHECK_MODULES(SHELL_PERF_HELPER, gtk+-3.0 gio-2.0)
 PKG_CHECK_MODULES(SHELL_HOTPLUG_SNIFFER, gio-2.0 gdk-pixbuf-2.0)
 PKG_CHECK_MODULES(TRAY, mutter-clutter-1.0 gtk+-3.0)
