@@ -82,6 +82,7 @@ var magnifier = null;
 var xdndHandler = null;
 var keyboard = null;
 var layoutManager = null;
+var codingManager = null;
 var workspaceMonitor = null;
 let _startDate;
 let _defaultCssStylesheet = null;
