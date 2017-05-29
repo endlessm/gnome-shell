@@ -84,6 +84,7 @@ let keyboard = null;
 let layoutManager = null;
 let desktopAppClient = null;
 let workspaceMonitor = null;
+let codingManager = null;
 let discoveryFeed = null;
 let _startDate;
 let _defaultCssStylesheet = null;
