@@ -21,6 +21,7 @@ const GrabHelper = imports.ui.grabHelper;
 const IconGrid = imports.ui.iconGrid;
 const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
 const PopupMenu = imports.ui.popupMenu;
@@ -1463,6 +1464,21 @@ const AppFolderPopup = new Lang.Class({
 });
 Signals.addSignalMethods(AppFolderPopup.prototype);
 
+const AppIconSourceActor = new Lang.Class({
+    Name: 'AppIconSourceActor',
+    Extends: MessageTray.SourceActor,
+
+    _init: function(source, size) {
+        this.parent(source, size);
+        this.setIcon(new St.Bin());
+    },
+
+    _shouldShowCount: function() {
+        // Always show the counter when there's at least one notification
+        return this.source.count > 0;
+    }
+});
+
 const AppIcon = new Lang.Class({
     Name: 'AppIcon',
 
@@ -1501,6 +1517,7 @@ const AppIcon = new Lang.Class({
         delete iconParams['isDraggable'];
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
+        iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
         iconParams['setSizeManually'] = true;
         this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
         this._iconContainer.add_child(this.icon.actor);
@@ -1552,6 +1569,14 @@ const AppIcon = new Lang.Class({
 
     _createIcon: function(iconSize) {
         return this.app.create_icon_texture(iconSize);
+    },
+
+    _createExtraIcons: function(iconSize) {
+        if (!this._notificationSource)
+            return [];
+
+        let sourceActor = new AppIconSourceActor(this._notificationSource, iconSize);
+        return [sourceActor.actor];
     },
 
     _removeMenuTimeout: function() {
