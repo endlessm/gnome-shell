@@ -1512,12 +1512,21 @@ const AppIcon = new Lang.Class({
                 this._updateRunningStyle();
             }));
         this._updateRunningStyle();
+
+        if (app.get_id() === 'com.endlessm.Coding.Chatbox.desktop')
+            this._newGtkNotificationSourceId = Main.notificationDaemon.gtk.connect('new-gtk-notification-source',
+                                                                                   Lang.bind(this, this._onNewGtkNotificationSource));
     },
 
     _onDestroy: function() {
         if (this._stateChangedId > 0)
             this.app.disconnect(this._stateChangedId);
         this._stateChangedId = 0;
+
+        if (this._newGtkNotificationSourceId > 0)
+            Main.notificationDaemon.gtk.disconnect(this._newGtkNotificationSourceId);
+        this._newGtkNotificationSourceId = 0;
+
         this._removeMenuTimeout();
     },
 
