@@ -27,6 +27,10 @@ GSList *shell_window_tracker_get_startup_sequences (ShellWindowTracker *tracker)
 
 gboolean shell_window_tracker_is_speedwagon_window (MetaWindow *window);
 
+void shell_window_tracker_track_coding_app_window (ShellWindowTracker *tracker, MetaWindow *app_window);
+
+void shell_window_tracker_untrack_coding_app_window (ShellWindowTracker *tracker);
+
 /* Hidden typedef for SnStartupSequence */
 typedef struct _ShellStartupSequence ShellStartupSequence;
 #define SHELL_TYPE_STARTUP_SEQUENCE (shell_startup_sequence_get_type ())
