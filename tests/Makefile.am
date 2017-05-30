@@ -1,6 +1,13 @@
 noinst_SCRIPTS = run-test.sh
 EXTRA_DIST = run-test.sh.in
 
+JS_TESTS = \
+	unit/format_test.js				\
+	unit/insertSorted_test.js			\
+	unit/markup_test.js				\
+	unit/jsParse_test.js				\
+	unit/url_test.js
+
 TEST_JS =					\
 	interactive/background-repeat.js	\
 	interactive/background-size.js		\
@@ -25,21 +32,42 @@ TEST_JS =					\
 	testcommon/200-200.svg			\
 	testcommon/border-image.png		\
 	testcommon/face-plain.png		\
-	testcommon/ui.js                        \
-	unit/insertSorted.js			\
-	unit/markup.js				\
-	unit/jsParse.js				\
-	unit/url.js
+	testcommon/ui.js			\
+	$(JS_TESTS)				\
+	$(NULL)
+
 EXTRA_DIST += $(TEST_JS)
 
 TEST_MISC =					\
 	testcommon/test.css
 EXTRA_DIST += $(TEST_MISC)
 
-run-test.sh: run-test.sh.in
-	$(AM_V_GEN) sed \
-	    -e "s|@MUTTER_TYPELIB_DIR[@]|$(MUTTER_TYPELIB_DIR)|" \
-	    -e "s|@srcdir[@]|$(srcdir)|" \
-	    $< > $@ && chmod a+x $@
+TESTS = \
+  $(JS_TESTS) \
+  $(NULL)
+TEST_EXTENSIONS = .js
 
-CLEANFILES = run-test.sh
+JS_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/config/tap-driver.sh
+JS_LOG_DRIVER_FLAGS = --comments
+# run-js-test is a binary that is linked to libeos-shell and runs a GJS script;
+# libst isn't built as a shared library, so it's impossible to import the St-1.0
+# typelib directly from GJS. Unfortunately, this means we can't run tests by
+# just typing "jasmine" - we need the ./jasmine script.
+JS_LOG_COMPILER = $(top_builddir)/src/run-js-test
+AM_JS_LOG_FLAGS = \
+	$(JASMINE) \
+	--tap \
+	@JASMINE_REPORT_ARGUMENT@
+
+LOG_COMPILER = gtester
+AM_LOG_FLAGS = -k --verbose
+
+# Use locally built versions of Shell-1.0 and libraries; this may need to
+# be changed to AM_TESTS_ENVIRONMENT in a future version of Automake
+TESTS_ENVIRONMENT = \
+	export GJS_PATH='$(top_srcdir):$(top_srcdir)/js:$(top_srcdir)/tests/unit'; \
+	export GI_TYPELIB_PATH='$(top_builddir)/src:$(top_builddir)/src/gvc:$(MUTTER_TYPELIB_DIR):${GI_TYPELIB_PATH}'; \
+	export LD_LIBRARY_PATH='$(top_builddir)/src/:${GI_TYPELIB_PATH}'; \
+	export GSETTINGS_SCHEMA_DIR='$(top_builddir)/data'; \
+	$(NULL)
+

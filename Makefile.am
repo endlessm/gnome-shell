@@ -14,6 +14,8 @@ endif
 EXTRA_DIST =		\
 	.project	\
 	.settings	\
+	jasmine		\
+	jasmine.json	\
 	autogen.sh	\
 	tools/check-for-missing.py
 
