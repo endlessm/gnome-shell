@@ -6,6 +6,7 @@ const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const MessageListMarkup = imports.misc.messageListMarkup;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Signals = imports.signals;
@@ -18,26 +19,6 @@ const Util = imports.misc.util;
 const MESSAGE_ANIMATION_TIME = 0.1;
 
 const DEFAULT_EXPAND_LINES = 6;
-
-function _fixMarkup(text, allowMarkup) {
-    if (allowMarkup) {
-        // Support &amp;, &quot;, &apos;, &lt; and &gt;, escape all other
-        // occurrences of '&'.
-        let _text = text.replace(/&(?!amp;|quot;|apos;|lt;|gt;)/g, '&amp;');
-
-        // Support <b>, <i>, and <u>, escape anything else
-        // so it displays as raw markup.
-        _text = _text.replace(/<(?!\/?[biu]>)/g, '&lt;');
-
-        try {
-            Pango.parse_markup(_text, -1, '');
-            return _text;
-        } catch (e) {}
-    }
-
-    // !allowMarkup, or invalid markup
-    return GLib.markup_escape_text(text, -1);
-}
 
 const URLHighlighter = new Lang.Class({
     Name: 'URLHighlighter',
@@ -116,7 +97,7 @@ const URLHighlighter = new Lang.Class({
     },
 
     setMarkup: function(text, allowMarkup) {
-        text = text ? _fixMarkup(text, allowMarkup) : '';
+        text = text ? MessageListMarkup.fixMarkup(text, allowMarkup) : '';
         this._text = text;
 
         this.actor.clutter_text.set_markup(text);
@@ -375,7 +356,7 @@ const Message = new Lang.Class({
     },
 
     setTitle: function(text) {
-        let title = text ? _fixMarkup(text.replace(/\n/g, ' '), false) : '';
+        let title = text ? MessageListMarkup.fixMarkup(text.replace(/\n/g, ' '), false) : '';
         this.titleLabel.clutter_text.set_markup(title);
     },
 
