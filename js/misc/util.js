@@ -8,7 +8,6 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Json = imports.gi.Json;
-const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Params = imports.misc.params;
 
@@ -88,11 +87,11 @@ function findSearchUrls(terms) {
 //
 // Runs @argv in the background, handling any errors that occur
 // when trying to start the program.
-function spawn(argv) {
+function spawn(argv, errorNotifier) {
     try {
         trySpawn(argv);
     } catch (err) {
-        _handleSpawnError(argv[0], err);
+        _handleSpawnError(argv[0], err, errorNotifier);
     }
 }
 
@@ -101,12 +100,12 @@ function spawn(argv) {
 //
 // Runs @command_line in the background, handling any errors that
 // occur when trying to parse or start the program.
-function spawnCommandLine(command_line) {
+function spawnCommandLine(command_line, errorNotifier) {
     try {
         let [success, argv] = GLib.shell_parse_argv(command_line);
         trySpawn(argv);
     } catch (err) {
-        _handleSpawnError(command_line, err);
+        _handleSpawnError(command_line, err, errorNotifier);
     }
 }
 
@@ -114,7 +113,7 @@ function spawnCommandLine(command_line) {
 // @argv: an argv array
 //
 // Runs @argv as if it was an application, handling startup notification
-function spawnApp(argv) {
+function spawnApp(argv, errorNotifier) {
     try {
         let app = Gio.AppInfo.create_from_commandline(argv.join(' '), null,
                                                       Gio.AppInfoCreateFlags.SUPPORTS_STARTUP_NOTIFICATION);
@@ -122,7 +121,7 @@ function spawnApp(argv) {
         let context = global.create_app_launch_context(0, -1);
         app.launch([], context);
     } catch(err) {
-        _handleSpawnError(argv[0], err);
+        _handleSpawnError(argv[0], err, errorNotifier);
     }
 }
 
@@ -182,9 +181,9 @@ function trySpawnCommandLine(command_line) {
     trySpawn(argv);
 }
 
-function _handleSpawnError(command, err) {
+function _handleSpawnError(command, err, errorNotifier) {
     let title = _("Execution of “%s” failed:").format(command);
-    Main.notifyError(title, err.message);
+    errorNotifier(title, err.message);
 }
 
 function formatTime(time, params) {
