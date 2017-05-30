@@ -8,7 +8,8 @@ imports.gi.versions.Gtk = '3.0';
 imports.gi.versions.TelepathyGLib = '0.12';
 imports.gi.versions.TelepathyLogger = '0.2';
 
-const Clutter = imports.gi.Clutter;;
+const Clutter = imports.gi.Clutter;
+const CoreEnvironment = imports.misc.coreEnvironment;
 const Gettext = imports.gettext;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
@@ -61,23 +62,12 @@ function _patchLayoutClass(layoutClass, styleProps) {
     };
 }
 
-function _makeLoggingFunc(func) {
-    return function() {
-        return func([].join.call(arguments, ', '));
-    };
-}
-
 function init() {
+    CoreEnvironment.coreInit();
+
     // Add some bindings to the global JS namespace; (gjs keeps the web
     // browser convention of having that namespace be called 'window'.)
     window.global = Shell.Global.get();
-
-    window.log = _makeLoggingFunc(window.log);
-
-    window._ = Gettext.gettext;
-    window.C_ = Gettext.pgettext;
-    window.ngettext = Gettext.ngettext;
-    window.N_ = function(s) { return s; };
 
     // Miscellaneous monkeypatching
     _patchContainerClass(St.BoxLayout);
@@ -118,9 +108,7 @@ function init() {
     }
 
     // OK, now things are initialized enough that we can import shell JS
-    const Format = imports.format;
     const Tweener = imports.ui.tweener;
 
     Tweener.init();
-    String.prototype.format = Format.format;
 }
