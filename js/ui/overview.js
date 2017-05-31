@@ -21,6 +21,7 @@ const OverviewControls = imports.ui.overviewControls;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
+const ViewSelector = imports.ui.viewSelector;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
 
 // Time for initial animation going into Overview mode
@@ -259,6 +260,7 @@ const Overview = new Lang.Class({
                                this.dashIconSize = this._dash.iconSize;
                            }));
 
+        Main.layoutManager.connect('startup-prepared', Lang.bind(this, this._onStartupPrepared));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
         this._relayout();
     },
@@ -443,6 +445,22 @@ const Overview = new Lang.Class({
     focusSearch: function() {
         this.show();
         this._searchEntry.grab_key_focus();
+    },
+
+    _showOrSwitchPage: function(page) {
+        if (this.visible) {
+            this._viewSelector.setActivePage(page);
+        } else {
+            this._targetPage = page;
+            this.show();
+        }
+    },
+
+    _onStartupPrepared: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
     },
 
     showApps : function() {
