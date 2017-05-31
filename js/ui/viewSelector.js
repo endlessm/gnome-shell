@@ -22,8 +22,6 @@ const WorkspacesView = imports.ui.workspacesView;
 const EdgeDragAction = imports.ui.edgeDragAction;
 const IconGrid = imports.ui.iconGrid;
 
-const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
-
 const ViewPage = {
     WINDOWS: 1,
     APPS: 2,
@@ -199,20 +197,6 @@ const ViewSelector = new Lang.Class({
                     this._workspacesPage.hide();
                 }
             }));
-
-        Main.wm.addKeybinding('toggle-application-view',
-                              new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
-                              Meta.KeyBindingFlags.NONE,
-                              Shell.ActionMode.NORMAL |
-                              Shell.ActionMode.OVERVIEW,
-                              Lang.bind(this, this._toggleAppsPage));
-
-        Main.wm.addKeybinding('toggle-overview',
-                              new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
-                              Meta.KeyBindingFlags.NONE,
-                              Shell.ActionMode.NORMAL |
-                              Shell.ActionMode.OVERVIEW,
-                              Lang.bind(Main.overview, Main.overview.toggle));
 
         let side;
         if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
