@@ -285,12 +285,9 @@ var ViewSelector = new Lang.Class({
 
     show: function() {
         this.reset();
-        this._workspacesDisplay.show(this._showAppsButton.checked);
+        this._workspacesDisplay.show(true);
         this._activePage = null;
-        if (this._showAppsButton.checked)
-            this._showPage(this._appsPage);
-        else
-            this._showPage(this._workspacesPage);
+        this._showPage(this._appsPage);
 
         if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
             Main.overview.fadeOutDesktop();
