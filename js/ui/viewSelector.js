@@ -249,15 +249,9 @@ const ViewSelector = new Lang.Class({
 
     show: function() {
         this.reset();
-        this._workspacesDisplay.show(this._showAppsButton.checked);
         this._activePage = null;
-        if (this._showAppsButton.checked)
-            this._showPage(this._appsPage);
-        else
-            this._showPage(this._workspacesPage);
-
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeOutDesktop();
+        this._showPage(this._appsPage);
+        this._workspacesDisplay.show(this._showAppsButton.checked);
     },
 
     animateFromOverview: function() {
@@ -278,7 +272,7 @@ const ViewSelector = new Lang.Class({
     },
 
     hide: function() {
-        this._workspacesDisplay.hide();
+        // Nothing to do, since we always show the app selector
     },
 
     _addPage: function(actor, name, a11yIcon, params) {
@@ -414,8 +408,7 @@ const ViewSelector = new Lang.Class({
     },
 
     _searchCancelled: function() {
-        this._showPage(this._showAppsButton.checked ? this._appsPage
-                                                    : this._workspacesPage);
+        this._showPage(this._appsPage);
 
         // Leave the entry focused when it doesn't have any text;
         // when replacing a selected search term, Clutter emits
