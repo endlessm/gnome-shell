@@ -233,13 +233,9 @@ const ViewSelector = new Lang.Class({
 
     show: function() {
         this.reset();
-        this._workspacesDisplay.show(true);
         this._activePage = null;
-
         this._showPage(this._appsPage);
-
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeOutDesktop();
+        this._workspacesDisplay.show(true);
     },
 
     animateFromOverview: function() {
@@ -260,7 +256,7 @@ const ViewSelector = new Lang.Class({
     },
 
     hide: function() {
-        this._workspacesDisplay.hide();
+        // Nothing to do, since we always show the app selector
     },
 
     _addPage: function(actor, name, a11yIcon, params) {
