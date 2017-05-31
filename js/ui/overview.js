@@ -217,6 +217,7 @@ const Overview = new Lang.Class({
 
         this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
 
+        Main.layoutManager.connect('startup-prepared', Lang.bind(this, this._onStartupPrepared));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
         this._relayout();
     },
@@ -414,6 +415,13 @@ const Overview = new Lang.Class({
             this.viewSelector.setActivePage(page);
         else
             this.show();
+    },
+
+    _onStartupPrepared: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
     },
 
     showApps: function() {
