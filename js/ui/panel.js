@@ -20,6 +20,7 @@ const BoxPointer = imports.ui.boxpointer;
 const Config = imports.misc.config;
 const CtrlAltTab = imports.ui.ctrlAltTab;
 const DND = imports.ui.dnd;
+const GnomeSession = imports.misc.gnomeSession;
 const Overview = imports.ui.overview;
 const PopupMenu = imports.ui.popupMenu;
 const PanelMenu = imports.ui.panelMenu;
@@ -811,6 +812,35 @@ const UserMenu = new Lang.Class({
     }
 });
 
+const PowerMenu = new Lang.Class({
+    Name: 'PowerMenuButton',
+    Extends: PanelMenu.SingleIconButton,
+
+    _init: function() {
+        this.parent(0.0, C_("Power menu", "Power"), false);
+
+        this.actor.accessible_role = Atk.Role.PUSH_BUTTON;
+
+        this._session = new GnomeSession.SessionManager();
+
+        let icon = new Gio.ThemedIcon({ name: 'system-shutdown-symbolic' });
+        this.setIcon(icon);
+        this.mainIcon.set_icon_size(PANEL_ICON_SIZE);
+
+        this.actor.add_style_class_name('powermenu');
+    },
+
+    _onEvent: function(actor, event) {
+        if (this.menu &&
+            (event.type() == Clutter.EventType.TOUCH_BEGIN ||
+             event.type() == Clutter.EventType.BUTTON_PRESS)) {
+            this._session.ShutdownRemote(0);
+        }
+
+        return Clutter.EVENT_PROPAGATE;
+    }
+});
+
 const PANEL_ITEM_IMPLEMENTATIONS = {
     'endlessButton': imports.ui.endlessButton.EndlessButton,
     'activities': ActivitiesButton,
@@ -823,6 +853,7 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'keyboard': imports.ui.status.keyboard.InputSourceIndicator,
     'hotCorner': imports.ui.hotCorner.HotCorner,
     'userMenu': UserMenu,
+    'powerMenu': PowerMenu,
 };
 
 const Panel = new Lang.Class({
