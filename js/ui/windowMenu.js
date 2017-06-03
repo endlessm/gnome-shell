@@ -199,6 +199,9 @@ const WindowMenuManager = new Lang.Class({
     },
 
     showWindowMenuForWindow: function(window, type, rect) {
+	if (!Main.sessionMode.hasWmMenus)
+	    return;
+
         let menuType = (type == Meta.WindowMenuType.WM) ? WindowMenu : AppMenu;
         let menu = new menuType(window, this._sourceActor);
 
