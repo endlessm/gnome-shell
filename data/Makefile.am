@@ -2,7 +2,7 @@ CLEANFILES =
 NULL =
 
 desktopdir=$(datadir)/applications
-desktop_DATA = org.gnome.Shell.desktop gnome-shell-extension-prefs.desktop eos-launch.desktop
+desktop_DATA = org.gnome.Shell.desktop gnome-shell-extension-prefs.desktop eos-launch.desktop eos-link-feedback.desktop
 
 if HAVE_NETWORKMANAGER
 desktop_DATA += org.gnome.Shell.PortalHelper.desktop
@@ -123,6 +123,7 @@ EXTRA_DIST =						\
 	gnome-shell-theme.gresource.xml 		\
 	$(resource_files)				\
 	eos-launch.desktop.in.in			\
+	eos-link-feedback.desktop.in.in			\
 	$(NULL)
 
 CLEANFILES +=						\
@@ -135,4 +136,5 @@ CLEANFILES +=						\
 	org.gnome.shell.gschema.valid			\
 	gnome-shell-theme.gresource			\
 	eos-launch.desktop.in				\
+	eos-link-feedback.desktop.in			\
 	$(NULL)
