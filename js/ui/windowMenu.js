@@ -183,6 +183,9 @@ var WindowMenuManager = class {
     }
 
     showWindowMenuForWindow(window, type, rect) {
+        if (!Main.sessionMode.hasWmMenus)
+    	      return;
+
         if (type != Meta.WindowMenuType.WM)
             throw new Error('Unsupported window menu type');
         let menu = new WindowMenu(window, this._sourceActor);
