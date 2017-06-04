@@ -45,6 +45,7 @@ const WindowManager = imports.ui.windowManager;
 const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
+const Watermark = imports.ui.watermark;
 
 const A11Y_SCHEMA = 'org.gnome.desktop.a11y.keyboard';
 const STICKY_KEYS_ENABLE = 'stickykeys-enable';
@@ -86,6 +87,7 @@ let _cssStylesheet = null;
 let _a11ySettings = null;
 let _themeResource = null;
 let _desktopAppClient = null;
+let _watermarkManager = null;
 
 function _sessionUpdated() {
     if (sessionMode.isPrimary)
@@ -241,6 +243,10 @@ function _initializeUI() {
                                         ['MESSAGE_ID=' + GNOMESHELL_STARTED_MESSAGE_ID]);
         }
     });
+
+    /* Initialize watermarks */
+    _watermarkManager = new Watermark.WatermarkManager();
+    _watermarkManager.init();
 }
 
 function _getStylesheet(name) {
