@@ -10,6 +10,7 @@ misc/config.js: misc/config.js.in Makefile
 	    -e "s|[@]GETTEXT_PACKAGE@|$(GETTEXT_PACKAGE)|g" \
 	    -e "s|[@]datadir@|$(datadir)|g" \
 	    -e "s|[@]libexecdir@|$(libexecdir)|g" \
+	    -e "s|[@]localstatedir@|$(localstatedir)|g" \
 	    -e "s|[@]sysconfdir@|$(sysconfdir)|g" \
 	    -e "s|[@]LIBMUTTER_API_VERSION@|$(LIBMUTTER_API_VERSION)|g" \
                $< > $@
