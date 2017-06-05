@@ -1342,11 +1342,11 @@ st_entry_get_input_hints (StEntry *entry)
 }
 
 static gboolean
-_st_entry_icon_press_cb (ClutterActor       *actor,
-                         ClutterButtonEvent *event,
-                         StEntry            *entry)
+_st_entry_icon_release_cb (ClutterActor       *actor,
+                           ClutterButtonEvent *event,
+                           StEntry            *entry)
 {
-  StEntryPrivate *priv = ST_ENTRY_PRIV (actor);
+  StEntryPrivate *priv = ST_ENTRY_PRIV (entry);
 
   if (actor == priv->primary_icon)
     g_signal_emit (entry, entry_signals[PRIMARY_ICON_CLICKED], 0);
@@ -1354,6 +1354,17 @@ _st_entry_icon_press_cb (ClutterActor       *actor,
     g_signal_emit (entry, entry_signals[SECONDARY_ICON_CLICKED], 0);
 
   return FALSE;
+}
+
+static gboolean
+_st_entry_icon_press_cb (ClutterActor       *actor,
+                         ClutterButtonEvent *event,
+                         StEntry            *entry)
+{
+  /* Block press events on icons, since we handle internally
+   * clicks on release and emit our own signal.
+   */
+  return TRUE;
 }
 
 static void
@@ -1366,6 +1377,9 @@ _st_entry_set_icon (StEntry       *entry,
       g_signal_handlers_disconnect_by_func (*icon,
                                             _st_entry_icon_press_cb,
                                             entry);
+      g_signal_handlers_disconnect_by_func (*icon,
+                                            _st_entry_icon_release_cb,
+                                            entry);
       clutter_actor_remove_child (CLUTTER_ACTOR (entry), *icon);
       *icon = NULL;
     }
@@ -1376,8 +1390,10 @@ _st_entry_set_icon (StEntry       *entry,
 
       clutter_actor_set_reactive (*icon, TRUE);
       clutter_actor_add_child (CLUTTER_ACTOR (entry), *icon);
-      g_signal_connect (*icon, "button-release-event",
+      g_signal_connect (*icon, "button-press-event",
                         G_CALLBACK (_st_entry_icon_press_cb), entry);
+      g_signal_connect (*icon, "button-release-event",
+                        G_CALLBACK (_st_entry_icon_release_cb), entry);
     }
 
   clutter_actor_queue_relayout (CLUTTER_ACTOR (entry));
