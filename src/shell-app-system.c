@@ -64,6 +64,7 @@ struct _ShellAppSystem
 
 struct _ShellAppSystemPrivate {
   GHashTable *running_apps;
+  GHashTable *starting_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
   GHashTable *alias_to_id;
@@ -228,6 +229,7 @@ shell_app_system_init (ShellAppSystem *self)
   self->priv = priv = shell_app_system_get_instance_private (self);
 
   priv->running_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
+  priv->starting_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
   priv->id_to_app = g_hash_table_new_full (g_str_hash, g_str_equal,
                                            NULL,
                                            (GDestroyNotify)g_object_unref);
@@ -247,6 +249,7 @@ shell_app_system_finalize (GObject *object)
   ShellAppSystemPrivate *priv = self->priv;
 
   g_hash_table_destroy (priv->running_apps);
+  g_hash_table_destroy (priv->starting_apps);
   g_hash_table_destroy (priv->id_to_app);
   g_hash_table_destroy (priv->startup_wm_class_to_id);
   g_hash_table_destroy (priv->alias_to_id);
@@ -478,8 +481,10 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
                                           g_variant_new ("s", app_info_id));
       }
       g_hash_table_insert (self->priv->running_apps, g_object_ref (app), NULL);
+      g_hash_table_remove (self->priv->starting_apps, app);
       break;
     case SHELL_APP_STATE_STARTING:
+      g_hash_table_insert (self->priv->starting_apps, g_object_ref (app), NULL);
       break;
     case SHELL_APP_STATE_STOPPED:
       if (g_hash_table_remove (self->priv->running_apps, app) && app_info_id != NULL)
@@ -513,12 +518,20 @@ GSList *
 shell_app_system_get_running (ShellAppSystem *self)
 {
   gpointer key, value;
-  GSList *ret;
+  GSList *ret = NULL;
   GHashTableIter iter;
 
   g_hash_table_iter_init (&iter, self->priv->running_apps);
 
   ret = NULL;
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      ShellApp *app = key;
+
+      ret = g_slist_prepend (ret, app);
+    }
+
+  g_hash_table_iter_init (&iter, self->priv->starting_apps);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
       ShellApp *app = key;
@@ -554,4 +567,10 @@ shell_app_system_search (const char *search_string)
         **ids = '\0';
 
   return results;
+}
+
+gboolean
+shell_app_system_has_starting_apps (ShellAppSystem *self)
+{
+  return g_hash_table_size (self->priv->starting_apps) > 0;
 }
