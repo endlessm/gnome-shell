@@ -102,6 +102,9 @@ if enable_recorder
   recorder_deps += [gst_dep, gst_base_dep, gtk_dep, x11_dep]
 endif
 
+# Endless-specific: Metrics
+eosmetrics_dep = dependency('eosmetrics-0')
+
 nm_deps = []
 enable_networkmanager = get_option('enable-networkmanager')
 if enable_networkmanager != 'no'
