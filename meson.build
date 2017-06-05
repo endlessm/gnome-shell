@@ -89,6 +89,9 @@ schemas_dep = dependency('gsettings-desktop-schemas', version: schemas_req)
 gnome_desktop_dep = dependency('gnome-desktop-4', version: gnome_desktop_req)
 pango_dep = dependency('pango', version: pango_req)
 
+# Endless-specific: Metrics
+eosmetrics_dep = dependency('eosmetrics-0')
+
 have_fonts = mutter_dep.get_variable('have_fonts') == 'true'
 have_xwayland = mutter_dep.get_variable('have_xwayland') == 'true'
 if have_xwayland
