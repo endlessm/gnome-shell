@@ -216,6 +216,9 @@ const WatermarkManager = new Lang.Class({
 });
 
 function _forEachBackgroundManager(func) {
-    Main.overview._bgManagers.forEach(func);
-    Main.layoutManager._bgManagers.forEach(func);
+    if (Main.overview._bgManagers)
+        Main.overview._bgManagers.forEach(func);
+
+    if (Main.layoutManager._bgManagers)
+        Main.layoutManager._bgManagers.forEach(func);
 }
