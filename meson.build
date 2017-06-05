@@ -107,6 +107,9 @@ if enable_recorder
   recorder_deps += [gst_dep, gst_base_dep, gtk_dep, x11_dep]
 endif
 
+# Endless-specific: Metrics
+eosmetrics_dep = dependency('eosmetrics-0')
+
 # Endless-specific: Required for keyboard layout switcher in password entries
 xkbcommon_dep = dependency('xkbcommon')
 
