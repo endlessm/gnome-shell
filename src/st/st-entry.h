@@ -61,6 +61,8 @@ void            st_entry_set_primary_icon   (StEntry        *entry,
                                              ClutterActor   *icon);
 void            st_entry_set_secondary_icon (StEntry        *entry,
                                              ClutterActor   *icon);
+void            st_entry_set_hint_actor    (StEntry      *entry,
+                                            ClutterActor *hint_actor);
 
 typedef void (*StEntryCursorFunc) (StEntry *entry, gboolean use_ibeam, gpointer data);
 void            st_entry_set_cursor_func    (StEntryCursorFunc func,
