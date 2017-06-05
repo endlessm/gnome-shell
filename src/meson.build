@@ -75,6 +75,7 @@ gnome_shell_deps = [
   libsystemd_dep,
   libpipewire_dep,
   pango_dep,
+  eosmetrics_dep,
 ]
 
 if have_x11_client
