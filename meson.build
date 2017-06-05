@@ -93,6 +93,9 @@ x11_dep = dependency('x11')
 schemas_dep = dependency('gsettings-desktop-schemas', version: schemas_req)
 gnome_desktop_dep = dependency('gnome-desktop-3.0', version: gnome_desktop_req)
 
+# Endless-specific: Metrics
+eosmetrics_dep = dependency('eosmetrics-0')
+
 nm_deps = []
 if get_option('networkmanager')
   nm_deps += dependency('libnm', version: nm_req)

@@ -8,6 +8,7 @@
 
 #include <gio/gio.h>
 #include <glib/gi18n.h>
+#include <eosmetrics/eosmetrics.h>
 
 #include "shell-app-cache-private.h"
 #include "shell-app-private.h"
@@ -23,6 +24,11 @@
  */
 #define RESCAN_TIMEOUT_MS 2500
 #define MAX_RESCAN_RETRIES 6
+
+/* The event id for starting an aggregate timer for each app. The payload is
+ * the app id.
+ */
+#define DAILY_APP_USAGE_EVENT "49d0451a-f706-4f50-81d2-70cc0ec923a4"
 
 /* Vendor prefixes are something that can be preprended to a .desktop
  * file name.  Undo this.
@@ -59,6 +65,7 @@ struct _ShellAppSystemPrivate {
   GHashTable *running_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
+  GHashTable *aggregate_timers;
   GList *installed_apps;
 
   guint rescan_icons_timeout_id;
@@ -314,6 +321,7 @@ shell_app_system_init (ShellAppSystem *self)
                                            (GDestroyNotify)g_object_unref);
 
   priv->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  priv->aggregate_timers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   cache = shell_app_cache_get_default ();
   g_signal_connect (cache, "changed", G_CALLBACK (installed_changed), self);
@@ -329,6 +337,7 @@ shell_app_system_finalize (GObject *object)
   g_hash_table_destroy (priv->running_apps);
   g_hash_table_destroy (priv->id_to_app);
   g_hash_table_destroy (priv->startup_wm_class_to_id);
+  g_hash_table_destroy (priv->aggregate_timers);
   g_list_free_full (priv->installed_apps, g_object_unref);
   g_clear_handle_id (&priv->rescan_icons_timeout_id, g_source_remove);
 
@@ -496,15 +505,34 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
 {
   ShellAppState state = shell_app_get_state (app);
 
+  GDesktopAppInfo *app_info = shell_app_get_app_info (app);
+  const gchar *app_info_id = NULL;
+  if (app_info != NULL)
+    app_info_id = g_app_info_get_id (G_APP_INFO (app_info));
+
   switch (state)
     {
     case SHELL_APP_STATE_RUNNING:
+      if (app_info_id != NULL &&
+          !g_hash_table_contains (self->priv->aggregate_timers, app_info_id))
+        {
+          g_autoptr(EmtrAggregateTimer) aggregate_timer = NULL;
+
+          aggregate_timer =
+            emtr_event_recorder_start_aggregate_timer (emtr_event_recorder_get_default (),
+                                                       DAILY_APP_USAGE_EVENT,
+                                                       g_variant_new_string (app_info_id));
+          g_hash_table_insert (self->priv->aggregate_timers,
+                               g_strdup (app_info_id),
+                               g_steal_pointer (&aggregate_timer));
+        }
       g_hash_table_insert (self->priv->running_apps, g_object_ref (app), NULL);
       break;
     case SHELL_APP_STATE_STARTING:
       break;
     case SHELL_APP_STATE_STOPPED:
-      g_hash_table_remove (self->priv->running_apps, app);
+      if (g_hash_table_remove (self->priv->running_apps, app) && app_info_id != NULL)
+        g_hash_table_remove (self->priv->aggregate_timers, app_info_id);
       break;
     default:
       g_warn_if_reached();
