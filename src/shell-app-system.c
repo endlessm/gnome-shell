@@ -507,6 +507,13 @@ shell_app_system_lookup_desktop_wmclass (ShellAppSystem *system,
    * Note g_strdelimit is modify-in-place. */
   g_strdelimit (canonicalized, " ", '-');
 
+    /* HACK: Handle GIMP here as a special case. */
+  if (g_strcmp0 (canonicalized, "gimp-2.8") == 0)
+    {
+      g_free (canonicalized);
+      canonicalized = g_strdup ("gimp");
+    }
+
   desktop_file = g_strconcat (canonicalized, ".desktop", NULL);
 
   app = shell_app_system_lookup_heuristic_basename (system, desktop_file);
