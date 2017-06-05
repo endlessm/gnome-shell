@@ -29,9 +29,7 @@ const EndlessButton = new Lang.Class({
             (event.type() == Clutter.EventType.TOUCH_BEGIN ||
              event.type() == Clutter.EventType.BUTTON_PRESS)) {
 
-            // TODO: This should toggle between the desktop and the currently opened
-            // application, or show a dialog (pending design) if no applications are open.
-            Main.notifyError('Function currently not available');
+            Main.overview.toggle();
         }
 
         return Clutter.EVENT_PROPAGATE;
