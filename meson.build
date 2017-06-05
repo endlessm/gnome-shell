@@ -94,6 +94,9 @@ pango_dep = dependency('pango', version: pango_req)
 json_glib_dep = dependency('json-glib-1.0', version: json_glib_req)
 rsvg_dep = dependency('librsvg-2.0', version: rsvg_req)
 
+# Endless-specific: Metrics
+eosmetrics_dep = dependency('eosmetrics-0')
+
 have_fonts = mutter_dep.get_variable('have_fonts') == 'true'
 have_xwayland = mutter_dep.get_variable('have_xwayland') == 'true'
 if have_xwayland
