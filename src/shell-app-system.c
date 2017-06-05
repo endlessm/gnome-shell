@@ -25,6 +25,12 @@
  */
 #define SHELL_APP_IS_OPEN_EVENT "b5e11a3d-13f8-4219-84fd-c9ba0bf3d1f0"
 
+/* Additional key used to map a renamed desktop file to its previous name;
+ * for instance, org.gnome.Totem.desktop would use this key to point to
+ * 'totem.desktop'
+ */
+#define X_ENDLESS_ALIAS_KEY     "X-Endless-Alias"
+
 /* Vendor prefixes are something that can be preprended to a .desktop
  * file name.  Undo this.
  */
@@ -60,6 +66,7 @@ struct _ShellAppSystemPrivate {
   GHashTable *running_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
+  GHashTable *alias_to_id;
 };
 
 static void shell_app_system_finalize (GObject *object);
@@ -86,6 +93,37 @@ static void shell_app_system_class_init(ShellAppSystemClass *klass)
                   0,
                   NULL, NULL, NULL,
 		  G_TYPE_NONE, 0);
+}
+
+
+static void
+scan_alias_to_id (ShellAppSystem *self)
+{
+  ShellAppSystemPrivate *priv = self->priv;
+  GList *apps, *l;
+
+  g_hash_table_remove_all (priv->alias_to_id);
+
+  apps = g_app_info_get_all ();
+  for (l = apps; l != NULL; l = l->next)
+    {
+      GAppInfo *info = l->data;
+      const char *alias, *id;
+      char *desktop_alias;
+
+      id = g_app_info_get_id (info);
+      alias = g_desktop_app_info_get_string (G_DESKTOP_APP_INFO (info), X_ENDLESS_ALIAS_KEY);
+      if (alias == NULL)
+        continue;
+
+      desktop_alias = g_strconcat (alias, ".desktop", NULL);
+
+      g_hash_table_insert (priv->alias_to_id, g_strdup (desktop_alias), g_strdup (id));
+
+      g_free (desktop_alias);
+    }
+
+  g_list_free_full (apps, g_object_unref);
 }
 
 static void
@@ -172,6 +210,8 @@ installed_changed (GAppInfoMonitor *monitor,
 {
   ShellAppSystem *self = user_data;
 
+  scan_alias_to_id (self);
+
   scan_startup_wm_class_to_id (self);
 
   g_hash_table_foreach_remove (self->priv->id_to_app, stale_app_remove_func, NULL);
@@ -193,6 +233,7 @@ shell_app_system_init (ShellAppSystem *self)
                                            (GDestroyNotify)g_object_unref);
 
   priv->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  priv->alias_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
   monitor = g_app_info_monitor_get ();
   g_signal_connect (monitor, "changed", G_CALLBACK (installed_changed), self);
@@ -208,6 +249,7 @@ shell_app_system_finalize (GObject *object)
   g_hash_table_destroy (priv->running_apps);
   g_hash_table_destroy (priv->id_to_app);
   g_hash_table_destroy (priv->startup_wm_class_to_id);
+  g_hash_table_destroy (priv->alias_to_id);
 
   G_OBJECT_CLASS (shell_app_system_parent_class)->finalize (object);
 }
@@ -242,6 +284,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
   ShellAppSystemPrivate *priv = self->priv;
   ShellApp *app;
   GDesktopAppInfo *info;
+  char *alias;
 
   app = g_hash_table_lookup (priv->id_to_app, id);
   if (app)
@@ -253,7 +296,20 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 
   app = _shell_app_new (info);
   g_hash_table_insert (priv->id_to_app, (char *) shell_app_get_id (app), app);
+
+  alias = g_desktop_app_info_get_string (info, X_ENDLESS_ALIAS_KEY);
+  if (alias != NULL && g_hash_table_lookup (priv->alias_to_id, alias) == NULL)
+    {
+      char *desktop_alias = g_strconcat (alias, ".desktop", NULL);
+
+      g_hash_table_insert (priv->alias_to_id, g_strdup (desktop_alias), g_strdup (id));
+
+      g_free (desktop_alias);
+    }
+
   g_object_unref (info);
+  g_free (alias);
+
   return app;
 }
 
@@ -289,6 +345,38 @@ shell_app_system_lookup_heuristic_basename (ShellAppSystem *system,
     }
 
   return NULL;
+}
+
+/**
+ * shell_app_system_lookup_alias:
+ * @system: a #ShellAppSystem
+ * @alias: alternative application id
+ *
+ * Find a valid application corresponding to a given
+ * alias string, or %NULL if none.
+ *
+ * Returns: (transfer none): A #ShellApp for @alias
+ */
+ShellApp *
+shell_app_system_lookup_alias (ShellAppSystem *system,
+                               const char     *alias)
+{
+  ShellApp *result;
+  const char *id;
+
+  g_return_val_if_fail (alias != NULL, NULL);
+
+  result = shell_app_system_lookup_app (system, alias);
+  if (result != NULL)
+    return result;
+
+  id = g_hash_table_lookup (system->priv->alias_to_id, alias);
+  if (id == NULL)
+    return NULL;
+
+  result = shell_app_system_lookup_app (system, id);
+
+  return result;
 }
 
 /**
