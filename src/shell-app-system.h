@@ -29,4 +29,6 @@ ShellApp       *shell_app_system_lookup_alias                 (ShellAppSystem  *
 GSList         *shell_app_system_get_running               (ShellAppSystem  *self);
 char         ***shell_app_system_search                    (const char *search_string);
 
+gboolean        shell_app_system_has_starting_apps         (ShellAppSystem  *self);
+
 #endif /* __SHELL_APP_SYSTEM_H__ */
