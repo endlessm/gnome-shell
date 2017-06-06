@@ -42,6 +42,7 @@ const SessionMode = imports.ui.sessionMode;
 const ShellDBus = imports.ui.shellDBus;
 const ShellMountOperation = imports.ui.shellMountOperation;
 const WindowManager = imports.ui.windowManager;
+const WorkspaceMonitor = imports.ui.workspaceMonitor;
 const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
@@ -81,6 +82,8 @@ let xdndHandler = null;
 let keyboard = null;
 let layoutManager = null;
 let desktopAppClient = null;
+let workspaceMonitor = null;
+let discoveryFeed = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
@@ -179,8 +182,14 @@ function _initializeUI() {
     componentManager = new Components.ComponentManager();
     desktopAppClient = new AppActivation.DesktopAppClient();
 
+    /*
+     * Since workspaceMonitor expects layoutManager to be ready, initialize it
+     * before workspaceMonitor
+     */
     layoutManager.init();
     overview.init();
+
+    workspaceMonitor = new WorkspaceMonitor.WorkspaceMonitor();
 
     _a11ySettings = new Gio.Settings({ schema_id: A11Y_SCHEMA });
 

@@ -3,6 +3,7 @@
 #include "config.h"
 
 #include <string.h>
+#include <errno.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -466,14 +467,16 @@ shell_app_update_window_actions (ShellApp *app, MetaWindow *window)
 /**
  * shell_app_activate:
  * @app: a #ShellApp
+ * @error: a #GError
  *
  * Like shell_app_activate_full(), but using the default workspace and
  * event timestamp.
  */
 void
-shell_app_activate (ShellApp      *app)
+shell_app_activate (ShellApp      *app,
+                    GError       **error)
 {
-  return shell_app_activate_full (app, -1, 0);
+  return shell_app_activate_full (app, -1, 0, error);
 }
 
 /**
@@ -482,6 +485,7 @@ shell_app_activate (ShellApp      *app)
  * @workspace: launch on this workspace, or -1 for default. Ignored if
  *   activating an existing window
  * @timestamp: Event timestamp
+ * @error: a #GError
  *
  * Perform an appropriate default action for operating on this application,
  * dependent on its current state.  For example, if the application is not
@@ -492,7 +496,8 @@ shell_app_activate (ShellApp      *app)
 void
 shell_app_activate_full (ShellApp      *app,
                          int            workspace,
-                         guint32        timestamp)
+                         guint32        timestamp,
+                         GError       **error)
 {
   ShellGlobal *global;
 
@@ -505,16 +510,16 @@ shell_app_activate_full (ShellApp      *app,
     {
       case SHELL_APP_STATE_STOPPED:
         {
-          GError *error = NULL;
-          if (!shell_app_launch (app, timestamp, workspace, &error))
+          GError *my_error = NULL;
+          if (!shell_app_launch (app, timestamp, workspace, &my_error))
             {
               char *msg;
               msg = g_strdup_printf (_("Failed to launch “%s”"), shell_app_get_name (app));
               shell_global_notify_error (global,
                                          msg,
-                                         error->message);
+                                         my_error->message);
               g_free (msg);
-              g_clear_error (&error);
+              g_propagate_error (error, my_error);
             }
         }
         break;
@@ -1292,6 +1297,94 @@ GDesktopAppInfo *
 shell_app_get_app_info (ShellApp *app)
 {
   return app->info;
+}
+
+gboolean
+shell_app_create_custom_launcher_with_name (ShellApp *app,
+                                            const char *label)
+{
+  GError *internal_error;
+  const char *filename;
+  char *new_path, *buf;
+  GKeyFile *keyfile;
+  gsize len;
+
+  if (app->info == NULL)
+    return FALSE;
+
+  filename = g_desktop_app_info_get_filename (app->info);
+  if (filename == NULL || *filename == '\0')
+    return FALSE;
+
+  keyfile = g_key_file_new ();
+
+  internal_error = NULL;
+
+  /* we ignore comments and translations */
+  g_key_file_load_from_file (keyfile, filename, 0, &internal_error);
+  if (internal_error != NULL)
+    {
+      g_warning ("Unable to load desktop file '%s': %s", filename, internal_error->message);
+
+      g_error_free (internal_error);
+      g_key_file_unref (keyfile);
+
+      return FALSE;
+    }
+
+  /* replace the 'Name' key with the new one */
+  g_key_file_set_string (keyfile,
+                         G_KEY_FILE_DESKTOP_GROUP,
+                         G_KEY_FILE_DESKTOP_KEY_NAME,
+                         label);
+
+  buf = g_key_file_to_data (keyfile, &len, &internal_error);
+  if (internal_error != NULL)
+    {
+      g_warning ("Unable to save desktop file: %s", internal_error->message);
+
+      g_error_free (internal_error);
+      g_key_file_unref (keyfile);
+
+      return FALSE;
+    }
+
+  g_key_file_unref (keyfile);
+
+  new_path = g_build_filename (g_get_user_data_dir (), "applications", NULL);
+
+  if (g_mkdir_with_parents (new_path, 0755) < 0)
+    {
+      int saved_errno = errno;
+
+      g_warning ("Unable to create '%s': %s", new_path, g_strerror (saved_errno));
+
+      g_free (new_path);
+      g_free (buf);
+
+      return FALSE;
+    }
+
+  g_free (new_path);
+
+  new_path = g_build_filename (g_get_user_data_dir (), "applications", shell_app_get_id (app), NULL);
+
+  g_file_set_contents (new_path, buf, len, &internal_error);
+  if (internal_error != NULL)
+    {
+      g_warning ("Unable to write desktop file '%s': %s", new_path, internal_error->message);
+
+      g_error_free (internal_error);
+      g_free (new_path);
+      g_free (buf);
+
+      return FALSE;
+    }
+
+  g_free (new_path);
+  g_free (buf);
+
+  return TRUE;
 }
 
 static void
