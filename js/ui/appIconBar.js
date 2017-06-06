@@ -105,6 +105,7 @@ const ScrollMenuItem = new Lang.Class({
         this.actor.remove_style_class_name('popup-menu-item');
 
         // remove all the stock actors
+        this.actor.remove_all_children();
         this.menu.destroy();
 
         this.label = null;
