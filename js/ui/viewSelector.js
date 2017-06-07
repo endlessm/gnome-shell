@@ -125,6 +125,7 @@ const ViewSelector = new Lang.Class({
         this._activePage = null;
 
         this._workspacesDisplay = new WorkspacesView.WorkspacesDisplay();
+        this._workspacesDisplay.connect('empty-space-clicked', Lang.bind(this, this._onEmptySpaceClicked));
         this._workspacesPage = this._addPage(this._workspacesDisplay.actor,
                                              _("Windows"), 'focus-windows-symbolic');
 
@@ -193,6 +194,10 @@ const ViewSelector = new Lang.Class({
                 Main.overview.show();
         }));
         global.stage.add_action(gesture);
+    },
+
+    _onEmptySpaceClicked: function() {
+        this.setActivePage(ViewPage.APPS);
     },
 
     _toggleAppsPage: function() {
