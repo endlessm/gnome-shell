@@ -207,7 +207,7 @@ const ViewSelector = new Lang.Class({
 
     show: function(viewPage) {
         this._activePage = null;
-        this._showPage(this._pageFromViewPage(viewPage));
+        this._showPage(this._pageFromViewPage(viewPage), true);
         this._workspacesDisplay.show(this._showAppsButton.checked);
     },
 
