@@ -373,7 +373,7 @@ const AllView = new Lang.Class({
 
     _init: function() {
         this.parent({ usePagination: true }, null);
-        this._scrollView = new St.ScrollView({ style_class: 'all-apps',
+        this._scrollView = new St.ScrollView({ style_class: 'all-apps vfade',
                                                x_expand: true,
                                                y_expand: true,
                                                x_fill: true,
