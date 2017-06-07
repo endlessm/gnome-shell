@@ -1200,34 +1200,44 @@ const WindowManager = new Lang.Class({
                                         Shell.ActionMode.NORMAL,
                                         Lang.bind(this, this._showWorkspaceSwitcher));
         this.setCustomKeybindingHandler('switch-applications',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('switch-group',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('switch-applications-backward',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('switch-group-backward',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('switch-windows',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('switch-windows-backward',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('cycle-windows',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('cycle-windows-backward',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('cycle-group',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('cycle-group-backward',
-                                        Shell.ActionMode.NORMAL,
+                                        Shell.ActionMode.NORMAL |
+                                        Shell.ActionMode.OVERVIEW,
                                         Lang.bind(this, this._startSwitcher));
         this.setCustomKeybindingHandler('switch-panels',
                                         Shell.ActionMode.NORMAL |
