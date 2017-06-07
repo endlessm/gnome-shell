@@ -132,6 +132,7 @@ const Overview = new Lang.Class({
 
         this.visible = false;           // animating to overview, in overview, animating out
         this._shown = false;            // show() and not hide()
+        this._targetPage = null;        // do we have a target page to animate to?
         this._modal = false;            // have a modal grab
         this.animationInProgress = false;
         this.visibleTarget = false;
@@ -445,6 +446,7 @@ const Overview = new Lang.Class({
         if (this.visible) {
             this.viewSelector.setActivePage(page);
         } else {
+            this._targetPage = page;
             this.show();
         }
     },
@@ -526,6 +528,43 @@ const Overview = new Lang.Class({
         this.hide();
     },
 
+    toggleWindows: function() {
+        if (this.isDummy)
+            return;
+
+        if (!this.visible) {
+            this.showWindows();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasActiveWindows) {
+            // FIXME: Do we want to do anything in this case now
+            // that we don't even have the dash?
+            log("No active windows available");
+            return;
+        }
+
+        if (this.viewSelector.getActivePage() !== ViewSelector.ViewPage.WINDOWS) {
+            this.showWindows();
+            return;
+        }
+
+        if (!this._toggleToHidden) {
+            this.showApps();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasVisibleWindows) {
+            // There are active windows but all of them are
+            // hidden, so we get back to show the icons grid.
+            this.showApps();
+            return;
+        }
+
+        // Toggle to the currently open window
+        this.hide();
+    },
+
     // Checks if the Activities button is currently sensitive to
     // clicks. The first call to this function within the
     // OVERVIEW_ACTIVATION_TIMEOUT time of the hot corner being
@@ -599,7 +638,13 @@ const Overview = new Lang.Class({
         this._activationTime = Date.now() / 1000;
 
         Meta.disable_unredirect_for_screen(global.screen);
-        this.viewSelector.show();
+
+        if (!this._targetPage) {
+            this._targetPage = ViewSelector.ViewPage.WINDOWS;
+        }
+
+        this.viewSelector.show(this._targetPage);
+        this._targetPage = null;
 
         this._overview.opacity = 0;
         Tweener.addTween(this._overview,
