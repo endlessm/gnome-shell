@@ -106,7 +106,7 @@ const Button = new Lang.Class({
         if (dontCreateMenu)
             this.menu = new PopupMenu.PopupDummyMenu(this.actor);
         else
-            this.setMenu(new PopupMenu.PopupMenu(this.actor, menuAlignment, St.Side.TOP, 0));
+            this.setMenu(new PopupMenu.PopupMenu(this.actor, menuAlignment, St.Side.BOTTOM, 0));
     },
 
     setSensitive: function(sensitive) {
@@ -174,8 +174,14 @@ const Button = new Lang.Class({
         // menu is higher then the screen; it's useful if part of the menu is
         // scrollable so the minimum height is smaller than the natural height
         let workArea = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         let verticalMargins = this.menu.actor.margin_top + this.menu.actor.margin_bottom;
-        this.menu.actor.style = ('max-height: ' + Math.round(workArea.height - verticalMargins) + 'px;');
+
+        // The workarea and margin dimensions are in physical pixels, but CSS
+        // measures are in logical pixels, so make sure to consider the scale
+        // factor when computing max-height
+        let maxHeight = Math.round((workArea.height - verticalMargins) / scaleFactor);
+        this.menu.actor.style = ('max-height: %spx;').format(maxHeight);
     },
 
     destroy: function() {
