@@ -430,6 +430,8 @@ const WorkspacesDisplay = new Lang.Class({
             if ((action.get_button() == 1 || action.get_button() == 0) &&
                 this._workspacesViews[index].getActiveWorkspace().isEmpty())
                 Main.overview.hide();
+
+            this.emit('empty-space-clicked');
         }));
         Main.overview.addAction(clickAction);
         this.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
