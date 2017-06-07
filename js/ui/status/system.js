@@ -7,6 +7,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
+const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
@@ -264,6 +265,17 @@ const Indicator = new Lang.Class({
         }
     },
 
+    _updateActionsSubMenu: function() {
+        let width = this._logoutAction.get_size()[0];
+
+        // Keep all the buttons' widths synchronized forcefully,
+        // since using Clutter.BindConstraints won't work.
+        this._orientationLockAction.set_size(width, -1);
+        this._lockScreenAction.set_size(width, -1);
+        this._powerOffAction.set_size(width, -1);
+        this._suspendAction.set_size(width, -1);
+    },
+
     _updateOrientationLock: function() {
         if (this._sensorProxy)
             this._orientationLockAction.visible = this._sensorProxy.HasAccelerometer &&
@@ -272,7 +284,7 @@ const Indicator = new Lang.Class({
             this._orientationLockAction.visible = false;
 
         let locked = this._orientationSettings.get_boolean('orientation-lock');
-        let icon = this._orientationLockAction.child;
+        let icon = this._orientationLockAction._button.child;
         icon.icon_name = locked ? 'rotation-locked-symbolic' : 'rotation-allowed-symbolic';
 
         this._updateActionsVisibility();
@@ -322,27 +334,49 @@ const Indicator = new Lang.Class({
     },
 
     _createActionButton: function(accessibleName) {
+        let box = new St.BoxLayout({ vertical: true });
         let button = new St.Button({ reactive: true,
                                      can_focus: true,
                                      track_hover: true,
+                                     x_expand: false,
+                                     x_align: Clutter.ActorAlign.CENTER,
                                      accessible_name: accessibleName,
                                      style_class: 'system-menu-action' });
-        return button;
+        box.add(button, { expand: true, x_fill: false });
+
+        let label = new St.Label({ text: accessibleName,
+                                    x_align: Clutter.ActorAlign.CENTER });
+        box.add(label);
+
+        box._button = button;
+        box._label = label;
+
+        return box;
     },
 
-    _createActionButtonForIconName: function(iconName, accessibleName) {
-        let button = this._createActionButton(accessibleName);
-        button.child = new St.Icon({ icon_name: iconName });
-        return button;
+    _createActionButtonForIconName: function(iconName, accessibleName, callback) {
+        let box = this._createActionButton(accessibleName);
+        let button = box._button
+        button.child = new St.Icon({ icon_name: iconName, x_expand: false });
+
+        if (callback)
+            button.connect('clicked', Lang.bind(this, callback));
+
+        return box;
     },
 
-    _createActionButtonForIconPath: function(iconPath, accessibleName) {
+    _createActionButtonForIconPath: function(iconPath, accessibleName, callback) {
         let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell' + iconPath);
         let gicon = new Gio.FileIcon({ file: iconFile });
 
-        let button = this._createActionButton(accessibleName);
-        button.child = new St.Icon({ gicon: gicon });
-        return button;
+        let box = this._createActionButton(accessibleName);
+        let button = box._button;
+        button.child = new St.Icon({ gicon: gicon, x_expand: false });
+
+        if (callback)
+            button.connect('clicked', Lang.bind(this, callback));
+
+        return box;
     },
 
     _createSubMenu: function() {
@@ -358,6 +392,7 @@ const Indicator = new Lang.Class({
         this.menu.connect('open-state-changed', Lang.bind(this, function(menu, isOpen) {
             if (isOpen)
                 this._updateSwitchUserSubMenu();
+                this._updateActionsSubMenu();
         }));
 
         item = new PopupMenu.PopupMenuItem(_("Switch User"));
@@ -381,23 +416,28 @@ const Indicator = new Lang.Class({
         item = new PopupMenu.PopupBaseMenuItem({ reactive: false,
                                                  can_focus: false });
 
-        this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png', _("Log Out"));
-        this._logoutAction.connect('clicked', Lang.bind(this, this._onQuitSessionActivate));
+        this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png',
+                                                                 _("Log Out"),
+                                                                 this._onQuitSessionActivate);
         item.actor.add(this._logoutAction, { expand: true, x_fill: false });
 
-        this._orientationLockAction = this._createActionButtonForIconName('', _("Orientation Lock"));
-        this._orientationLockAction.connect('clicked', Lang.bind(this, this._onOrientationLockClicked));
+        this._orientationLockAction = this._createActionButtonForIconName('',
+                                                                          _("Orientation Lock"),
+                                                                          this._onOrientationLockClicked);
         item.actor.add(this._orientationLockAction, { expand: true, x_fill: false });
 
-        this._lockScreenAction = this._createActionButtonForIconName('changes-prevent-symbolic', _("Lock"));
-        this._lockScreenAction.connect('clicked', Lang.bind(this, this._onLockScreenClicked));
+        this._lockScreenAction = this._createActionButtonForIconName('changes-prevent-symbolic',
+                                                                     _("Lock"),
+                                                                     this._onLockScreenClicked);
         item.actor.add(this._lockScreenAction, { expand: true, x_fill: false });
 
-        this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic', _("Suspend"));
-        this._suspendAction.connect('clicked', Lang.bind(this, this._onSuspendClicked));
+        this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic',
+                                                                  _("Suspend"),
+                                                                  this._onSuspendClicked);
 
-        this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic', _("Power Off"));
-        this._powerOffAction.connect('clicked', Lang.bind(this, this._onPowerOffClicked));
+        this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic',
+                                                                   _("Power Off"),
+                                                                   this._onPowerOffClicked);
 
         this._altSwitcher = new AltSwitcher(this._powerOffAction, this._suspendAction);
         item.actor.add(this._altSwitcher.actor, { expand: true, x_fill: false });

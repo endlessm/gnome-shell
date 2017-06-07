@@ -35,7 +35,7 @@ const BUTTON_DND_ACTIVATION_TIMEOUT = 250;
 
 const SPINNER_ANIMATION_TIME = 1.0;
 
-const SETTINGS_TEXT = _("All Settings...");
+const SETTINGS_TEXT = _("All Settings…");
 const CONTROL_CENTER_LAUNCHER = "gnome-control-center.desktop";
 
 // To make sure the panel corners blend nicely with the panel,
