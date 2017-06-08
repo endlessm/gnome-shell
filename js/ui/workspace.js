@@ -1556,6 +1556,10 @@ const Workspace = new Lang.Class({
 
     _windowRemoved : function(metaWorkspace, metaWin) {
         this._doRemoveWindow(metaWin);
+
+        // Make sure to show the icon grid if we removed the last window
+        if (!Main.workspaceMonitor.hasActiveWindows)
+            Main.overview.showApps();
     },
 
     _windowEnteredMonitor : function(metaScreen, monitorIndex, metaWin) {
