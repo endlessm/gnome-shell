@@ -97,6 +97,24 @@ const AltSwitcher = new Lang.Class({
 
         return Clutter.EVENT_PROPAGATE;
     },
+
+    getWidth: function() {
+        let standardVisible = this._standard.visible;
+        let alternateVisible = this._alternate.visible;
+
+        this._standard.visible = true;
+        this._alternate.visible = false;
+        let width = this._standard.get_size()[0];
+
+        this._standard.visible = false;
+        this._alternate.visible = true;
+        width = Math.max(width, this._alternate.get_size()[0]);
+
+        this._standard.visible = standardVisible;
+        this._alternate.visible = alternateVisible;
+
+        return width;
+    }
 });
 
 const Indicator = new Lang.Class({
