@@ -312,7 +312,8 @@ const Indicator = new Lang.Class({
     },
 
     _createActionButton: function(accessibleName) {
-        let box = new St.BoxLayout({ vertical: true });
+        let box = new St.BoxLayout({ vertical: true,
+                                     style_class: 'system-menu-action-container' });
         let button = new St.Button({ reactive: true,
                                      can_focus: true,
                                      track_hover: true,
