@@ -395,9 +395,10 @@ const Indicator = new Lang.Class({
         // or notify::width without creating layout cycles, simply update the
         // label whenever the menu is opened.
         this.menu.connect('open-state-changed', Lang.bind(this, function(menu, isOpen) {
-            if (isOpen)
+            if (isOpen) {
                 this._updateSwitchUserSubMenu();
                 this._updateActionsSubMenu();
+            }
         }));
 
         item = new PopupMenu.PopupMenuItem(_("Switch User"));
