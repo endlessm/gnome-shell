@@ -324,7 +324,8 @@ const Indicator = new Lang.Class({
         box.add(button, { expand: true, x_fill: false });
 
         let label = new St.Label({ text: accessibleName,
-                                    x_align: Clutter.ActorAlign.CENTER });
+                                   x_align: Clutter.ActorAlign.CENTER,
+                                   style_class: 'system-menu-action-desc' });
         box.add(label);
 
         box._button = button;
