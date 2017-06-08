@@ -266,7 +266,11 @@ const Indicator = new Lang.Class({
     },
 
     _updateActionsSubMenu: function() {
-        let width = this._logoutAction.get_size()[0];
+        let width = Math.max (this._logoutAction.get_size()[0],
+                              this._orientationLockAction.get_size()[0]);
+        width = Math.max (width, this._lockScreenAction.get_size()[0]);
+        width = Math.max (width, this._powerOffAction.get_size()[0]);
+        width = Math.max (width, this._altSwitcher.actor.get_size()[0]);
 
         // Keep all the buttons' widths synchronized forcefully,
         // since using Clutter.BindConstraints won't work.
@@ -274,6 +278,7 @@ const Indicator = new Lang.Class({
         this._lockScreenAction.set_size(width, -1);
         this._powerOffAction.set_size(width, -1);
         this._suspendAction.set_size(width, -1);
+        this._logoutAction.set_size(width, -1);
     },
 
     _updateOrientationLock: function() {
