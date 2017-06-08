@@ -424,49 +424,8 @@ const IconGrid = new Lang.Class({
 
         this._animating = true;
 
-        let actors = this._getChildrenToAnimate();
-        if (actors.length == 0) {
-            this._animationDone();
-            return;
-        }
-
-        // For few items the animation can be slow, so use a smaller
-        // delay when there are less than 4 items
-        // (ANIMATION_BASE_DELAY_FOR_ITEM = 1/4 *
-        // ANIMATION_MAX_DELAY_FOR_ITEM)
-        let maxDelay = Math.min(ANIMATION_BASE_DELAY_FOR_ITEM * actors.length,
-                                ANIMATION_MAX_DELAY_FOR_ITEM);
-
-        for (let index = 0; index < actors.length; index++) {
-            let actor = actors[index];
-            actor.reactive = false;
-            actor.set_scale(0, 0);
-            actor.set_pivot_point(0.5, 0.5);
-
-            let delay = index / actors.length * maxDelay;
-            let bounceUpTime = ANIMATION_TIME_IN / 4;
-            let isLastItem = index == actors.length - 1;
-            Tweener.addTween(actor,
-                            { time: bounceUpTime,
-                              transition: 'easeInOutQuad',
-                              delay: delay,
-                              scale_x: ANIMATION_BOUNCE_ICON_SCALE,
-                              scale_y: ANIMATION_BOUNCE_ICON_SCALE,
-                              onComplete: Lang.bind(this, function() {
-                                  Tweener.addTween(actor,
-                                                   { time: ANIMATION_TIME_IN - bounceUpTime,
-                                                     transition: 'easeInOutQuad',
-                                                     scale_x: 1,
-                                                     scale_y: 1,
-                                                     onComplete: Lang.bind(this, function() {
-                                                        if (isLastItem)
-                                                            this._animationDone();
-                                                        actor.reactive = true;
-                                                    })
-                                                   });
-                              })
-                            });
-        }
+        // We don't do the icon grid animations on Endless
+        this._animationDone();
     },
 
     animateSpring: function(animationDirection, sourceActor) {
@@ -475,108 +434,8 @@ const IconGrid = new Lang.Class({
 
         this._animating = true;
 
-        let actors = this._getChildrenToAnimate();
-        if (actors.length == 0) {
-            this._animationDone();
-            return;
-        }
-
-        let [sourceX, sourceY] = sourceActor.get_transformed_position();
-        let [sourceWidth, sourceHeight] = sourceActor.get_size();
-        // Get the center
-        let [sourceCenterX, sourceCenterY] = [sourceX + sourceWidth / 2, sourceY + sourceHeight / 2];
-        // Design decision, 1/2 of the source actor size.
-        let [sourceScaledWidth, sourceScaledHeight] = [sourceWidth / 2, sourceHeight / 2];
-
-        actors.forEach(function(actor) {
-            let [actorX, actorY] = actor._transformedPosition = actor.get_transformed_position();
-            let [x, y] = [actorX - sourceX, actorY - sourceY];
-            actor._distance = Math.sqrt(x * x + y * y);
-        });
-        let maxDist = actors.reduce(function(prev, cur) {
-            return Math.max(prev, cur._distance);
-        }, 0);
-        let minDist = actors.reduce(function(prev, cur) {
-            return Math.min(prev, cur._distance);
-        }, Infinity);
-        let normalization = maxDist - minDist;
-
-        for (let index = 0; index < actors.length; index++) {
-            let actor = actors[index];
-            actor.opacity = 0;
-            actor.reactive = false;
-
-            let actorClone = new Clutter.Clone({ source: actor });
-            Main.uiGroup.add_actor(actorClone);
-
-            let [width, height,,] = this._getAllocatedChildSizeAndSpacing(actor);
-            actorClone.set_size(width, height);
-            let scaleX = sourceScaledWidth / width;
-            let scaleY = sourceScaledHeight / height;
-            let [adjustedSourcePositionX, adjustedSourcePositionY] = [sourceCenterX - sourceScaledWidth / 2, sourceCenterY - sourceScaledHeight / 2];
-
-            let movementParams, fadeParams;
-            if (animationDirection == AnimationDirection.IN) {
-                let isLastItem = actor._distance == minDist;
-
-                actorClone.opacity = 0;
-                actorClone.set_scale(scaleX, scaleY);
-
-                actorClone.set_position(adjustedSourcePositionX, adjustedSourcePositionY);
-
-                let delay = (1 - (actor._distance - minDist) / normalization) * ANIMATION_MAX_DELAY_FOR_ITEM;
-                let [finalX, finalY]  = actor._transformedPosition;
-                movementParams = { time: ANIMATION_TIME_IN,
-                                   transition: 'easeInOutQuad',
-                                   delay: delay,
-                                   x: finalX,
-                                   y: finalY,
-                                   scale_x: 1,
-                                   scale_y: 1,
-                                   onComplete: Lang.bind(this, function() {
-                                       if (isLastItem)
-                                           this._animationDone();
-
-                                       actor.opacity = 255;
-                                       actor.reactive = true;
-                                       actorClone.destroy();
-                                   })};
-                fadeParams = { time: ANIMATION_FADE_IN_TIME_FOR_ITEM,
-                               transition: 'easeInOutQuad',
-                               delay: delay,
-                               opacity: 255 };
-            } else {
-                let isLastItem = actor._distance == maxDist;
-
-                let [startX, startY]  = actor._transformedPosition;
-                actorClone.set_position(startX, startY);
-
-                let delay = (actor._distance - minDist) / normalization * ANIMATION_MAX_DELAY_OUT_FOR_ITEM;
-                movementParams = { time: ANIMATION_TIME_OUT,
-                                   transition: 'easeInOutQuad',
-                                   delay: delay,
-                                   x: adjustedSourcePositionX,
-                                   y: adjustedSourcePositionY,
-                                   scale_x: scaleX,
-                                   scale_y: scaleY,
-                                   onComplete: Lang.bind(this, function() {
-                                       if (isLastItem) {
-                                           this._animationDone();
-                                           this._restoreItemsOpacity();
-                                       }
-                                       actor.reactive = true;
-                                       actorClone.destroy();
-                                   })};
-                fadeParams = { time: ANIMATION_FADE_IN_TIME_FOR_ITEM,
-                               transition: 'easeInOutQuad',
-                               delay: ANIMATION_TIME_OUT + delay - ANIMATION_FADE_IN_TIME_FOR_ITEM,
-                               opacity: 0 };
-            }
-
-
-            Tweener.addTween(actorClone, movementParams);
-            Tweener.addTween(actorClone, fadeParams);
-        }
+        // We don't do the icon grid animations on Endless
+        this._animationDone();
     },
 
     _restoreItemsOpacity: function() {
