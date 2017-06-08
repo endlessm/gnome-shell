@@ -284,19 +284,27 @@ const Indicator = new Lang.Class({
     },
 
     _updateActionsSubMenu: function() {
-        let width = Math.max (this._logoutAction.get_size()[0],
-                              this._orientationLockAction.get_size()[0]);
-        width = Math.max (width, this._lockScreenAction.get_size()[0]);
-        width = Math.max (width, this._powerOffAction.get_size()[0]);
-        width = Math.max (width, this._altSwitcher.actor.get_size()[0]);
+        let actors = [this._logoutAction, this._orientationLockAction,
+                      this._lockScreenAction, this._altSwitcher.actor];
 
-        // Keep all the buttons' widths synchronized forcefully,
-        // since using Clutter.BindConstraints won't work.
-        this._orientationLockAction.set_size(width, -1);
-        this._lockScreenAction.set_size(width, -1);
-        this._powerOffAction.set_size(width, -1);
-        this._suspendAction.set_size(width, -1);
-        this._logoutAction.set_size(width, -1);
+        // First, reset any size we may have previously forced
+        actors.forEach(function(actor) { actor.set_width(-1); });
+
+        // Now, calculate the largest visible label
+        let width = actors.filter(function(actor) {
+            return actor.is_visible();
+        }).reduce(Lang.bind(this, function(acc, actor) {
+            let actorWidth;
+            if (actor == this._altSwitcher.actor)
+                actorWidth = this._altSwitcher.getWidth();
+            else
+                actorWidth = actor.get_size()[0];
+
+            return Math.max(acc, actorWidth);
+        }), 0);
+
+        // Set it on all actors
+        actors.forEach(function(actor) { actor.set_size(width, -1); });
     },
 
     _updateOrientationLock: function() {
