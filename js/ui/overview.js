@@ -646,17 +646,13 @@ const Overview = new Lang.Class({
         this.viewSelector.show(this._targetPage);
         this._targetPage = null;
 
-        this._overview.opacity = 0;
-        Tweener.addTween(this._overview,
-                         { opacity: 255,
-                           transition: 'easeOutQuad',
-                           time: ANIMATION_TIME,
-                           onComplete: this._showDone,
-                           onCompleteScope: this
-                         });
         this._coverPane.raise_top();
         this._coverPane.show();
         this.emit('showing');
+
+        // Show the overview immediately
+        this._overview.opacity = 255;
+        this._showDone();
     },
 
     _showDone: function() {
@@ -709,19 +705,13 @@ const Overview = new Lang.Class({
 
         this.viewSelector.animateFromOverview();
 
-        // Make other elements fade out.
-        Tweener.addTween(this._overview,
-                         { opacity: 0,
-                           transition: 'easeOutQuad',
-                           time: ANIMATION_TIME,
-                           onComplete: this._hideDone,
-                           onCompleteScope: this
-                         });
-        this._unshadeBackgrounds();
-
         this._coverPane.raise_top();
         this._coverPane.show();
         this.emit('hiding');
+
+        // Hide the overview immediately
+        this._overview.opacity = 0;
+        this._hideDone();
     },
 
     _hideDone: function() {
