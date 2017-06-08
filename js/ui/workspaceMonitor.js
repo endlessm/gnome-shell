@@ -36,7 +36,7 @@ const WorkspaceMonitor = new Lang.Class({
             Main.overview.hide();
     },
 
-    _getVisibleApps: function() {
+    _getRunningApps: function() {
         let runningApps = Shell.AppSystem.get_default().get_running();
         return runningApps.filter(function(app) {
             let windows = app.get_windows();
@@ -47,12 +47,33 @@ const WorkspaceMonitor = new Lang.Class({
                 if (window.get_transient_for())
                     continue;
 
+                return true;
+            }
+
+            return false;
+        });
+    },
+
+    _getVisibleApps: function() {
+        let runningApps = this._getRunningApps();
+        return runningApps.filter(function(app) {
+            let windows = app.get_windows();
+            for (let window of windows) {
                 if (!window.minimized)
                     return true;
             }
 
             return false;
         });
+    },
+
+    get hasActiveWindows() {
+        // Count anything fullscreen as an extra window
+        if (this._inFullscreen)
+            return true;
+
+        let apps = this._getRunningApps();
+        return apps.length > 0;
     },
 
     get hasVisibleWindows() {
