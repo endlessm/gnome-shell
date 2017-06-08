@@ -46,7 +46,7 @@ const EndlessButton = new Lang.Class({
             (event.type() == Clutter.EventType.TOUCH_BEGIN ||
              event.type() == Clutter.EventType.BUTTON_PRESS)) {
 
-            Main.overview.toggle();
+            Main.overview.toggleApps();
         }
 
         return Clutter.EVENT_PROPAGATE;

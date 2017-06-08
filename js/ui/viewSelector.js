@@ -205,9 +205,9 @@ const ViewSelector = new Lang.Class({
         Main.overview.show();
     },
 
-    show: function() {
+    show: function(viewPage) {
         this._activePage = null;
-        this._showPage(this._appsPage);
+        this._showPage(this._pageFromViewPage(viewPage));
         this._workspacesDisplay.show(this._showAppsButton.checked);
     },
 
@@ -353,11 +353,27 @@ const ViewSelector = new Lang.Class({
         return Clutter.EVENT_PROPAGATE;
     },
 
+    _pageFromViewPage: function(viewPage) {
+        let page;
+
+        if (viewPage == ViewPage.WINDOWS) {
+            page = this._workspacesPage;
+        } else {
+            page = this._appsPage;
+        }
+
+        return page;
+    },
+
     getActivePage: function() {
         if (this._activePage == this._workspacesPage)
             return ViewPage.WINDOWS;
         else
             return ViewPage.APPS;
+    },
+
+    setActivePage: function(viewPage) {
+        this._showPage(this._pageFromViewPage(viewPage));
     },
 
     fadeIn: function() {
