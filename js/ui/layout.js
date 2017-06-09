@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
@@ -309,7 +310,16 @@ const LayoutManager = new Lang.Class({
     },
 
     _addBackgroundMenu: function(bgManager) {
-        BackgroundMenu.addBackgroundMenu(bgManager.backgroundActor, this);
+        let clickAction = new Clutter.ClickAction();
+        bgManager.backgroundActor.add_action(clickAction);
+
+        BackgroundMenu.addBackgroundMenuForAction(clickAction, this);
+
+        clickAction.connect('clicked', Lang.bind(this, function(action) {
+            let button = action.get_button();
+            if (button == Gdk.BUTTON_PRIMARY)
+                Main.overview.showApps();
+        }));
     },
 
     _createBackgroundManager: function(monitorIndex) {
