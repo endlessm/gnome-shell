@@ -30,7 +30,8 @@ const SideComponent = imports.ui.sideComponent;
 const BackgroundMenu = imports.ui.backgroundMenu;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
-var MINIMIZE_WINDOW_ANIMATION_TIME = 0.2;
+var MINIMIZE_WINDOW_ANIMATION_TIME = 0.25;
+var SHOW_SPEEDWAGON_ANIMATION_TIME = 0.3;
 var SHOW_WINDOW_ANIMATION_TIME = 0.15;
 var DIALOG_SHOW_WINDOW_ANIMATION_TIME = 0.1;
 var DESTROY_WINDOW_ANIMATION_TIME = 0.15;
@@ -967,6 +968,7 @@ var WindowManager = new Lang.Class({
         this._shellwm.connect('kill-switch-workspace', Lang.bind(this, this._switchWorkspaceDone));
         this._shellwm.connect('kill-window-effects', Lang.bind(this, function (shellwm, actor) {
             this._minimizeWindowDone(shellwm, actor);
+            this._unminimizeWindowDone(shellwm, actor);
             this._mapWindowDone(shellwm, actor);
             this._destroyWindowDone(shellwm, actor);
             this._sizeChangeWindowDone(shellwm, actor);
@@ -1479,30 +1481,12 @@ var WindowManager = new Lang.Class({
                            onOverwriteParams: [shellwm, actor]
                          });
         } else {
-            let xDest, yDest, xScale, yScale;
-            let [success, geom] = actor.meta_window.get_icon_geometry();
-            if (success) {
-                xDest = geom.x;
-                yDest = geom.y;
-                xScale = geom.width / actor.width;
-                yScale = geom.height / actor.height;
-            } else {
-                let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
-                xDest = monitor.x;
-                yDest = monitor.y;
-                if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
-                    xDest += monitor.width;
-                xScale = 0;
-                yScale = 0;
-            }
+            let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
 
             Tweener.addTween(actor,
-                             { scale_x: xScale,
-                               scale_y: yScale,
-                               x: xDest,
-                               y: yDest,
+                             { y: monitor.y + monitor.height,
                                time: MINIMIZE_WINDOW_ANIMATION_TIME,
-                               transition: 'easeInExpo',
+                               transition: 'easeOutQuad',
                                onComplete: this._minimizeWindowDone,
                                onCompleteScope: this,
                                onCompleteParams: [shellwm, actor],
@@ -1534,7 +1518,9 @@ var WindowManager = new Lang.Class({
         let types = [Meta.WindowType.NORMAL,
                      Meta.WindowType.MODAL_DIALOG,
                      Meta.WindowType.DIALOG];
-        if (!this._shouldAnimateActor(actor, types)) {
+
+        // If the overview is visible, we will handle the animation here.
+        if (!this._shouldAnimateActor(actor, types) && !Main.overview.visible) {
             shellwm.completed_unminimize(actor);
             return;
         }
@@ -1556,30 +1542,17 @@ var WindowManager = new Lang.Class({
                            onOverwriteParams: [shellwm, actor]
                          });
         } else {
-            let [success, geom] = actor.meta_window.get_icon_geometry();
-            if (success) {
-                actor.set_position(geom.x, geom.y);
-                actor.set_scale(geom.width / actor.width,
-                                geom.height / actor.height);
-            } else {
-                let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
-                actor.set_position(monitor.x, monitor.y);
-                if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
-                    actor.x += monitor.width;
-                actor.set_scale(0, 0);
-            }
+            let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+            actor.set_position(actor.x, monitor.y + monitor.height);
 
             let rect = actor.meta_window.get_frame_rect();
             let [xDest, yDest] = [rect.x, rect.y];
 
             actor.show();
             Tweener.addTween(actor,
-                             { scale_x: 1.0,
-                               scale_y: 1.0,
-                               x: xDest,
-                               y: yDest,
+                             { y: yDest,
                                time: MINIMIZE_WINDOW_ANIMATION_TIME,
-                               transition: 'easeInExpo',
+                               transition: 'easeOutQuad',
                                onComplete: this._unminimizeWindowDone,
                                onCompleteScope: this,
                                onCompleteParams: [shellwm, actor],
@@ -1938,26 +1911,53 @@ var WindowManager = new Lang.Class({
 
         switch (actor._windowType) {
         case Meta.WindowType.NORMAL:
-            actor.set_pivot_point(0.5, 1.0);
-            actor.scale_x = 0.01;
-            actor.scale_y = 0.05;
-            actor.opacity = 0;
-            actor.show();
-            this._mapping.push(actor);
+            // Speedwagon windows slide from the bottom, while regular
+            // windows just fade in. Regular windows with a Speedwagon
+            // splash were already special-cased before reaching here.
+            if (isSplashWindow) {
+                let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+                actor.x = monitor.x;
+                actor.y = monitor.y + monitor.height;
+                actor.show();
+                this._mapping.push(actor);
 
-            Tweener.addTween(actor,
-                             { opacity: 255,
-                               scale_x: 1,
-                               scale_y: 1,
-                               time: SHOW_WINDOW_ANIMATION_TIME,
-                               transition: 'easeOutExpo',
-                               onComplete: this._mapWindowDone,
-                               onCompleteScope: this,
-                               onCompleteParams: [shellwm, actor],
-                               onOverwrite: this._mapWindowOverwrite,
-                               onOverwriteScope: this,
-                               onOverwriteParams: [shellwm, actor]
-                             });
+                Tweener.addTween(actor,
+                                 { opacity: 255,
+                                   x: monitor.x,
+                                   y: monitor.y,
+                                   scale_x: 1,
+                                   scale_y: 1,
+                                   time: SHOW_SPEEDWAGON_ANIMATION_TIME,
+                                   transition: 'linear',
+                                   onComplete: this._mapWindowDone,
+                                   onCompleteScope: this,
+                                   onCompleteParams: [shellwm, actor],
+                                   onOverwrite: this._mapWindowOverwrite,
+                                   onOverwriteScope: this,
+                                   onOverwriteParams: [shellwm, actor]
+                                 });
+            } else {
+                actor.set_pivot_point(0.5, 1.0);
+                actor.scale_x = 0.01;
+                actor.scale_y = 0.05;
+                actor.opacity = 0;
+                actor.show();
+                this._mapping.push(actor);
+
+                Tweener.addTween(actor,
+                                 { opacity: 255,
+                                   scale_x: 1,
+                                   scale_y: 1,
+                                   time: SHOW_WINDOW_ANIMATION_TIME,
+                                   transition: 'easeOutExpo',
+                                   onComplete: this._mapWindowDone,
+                                   onCompleteScope: this,
+                                   onCompleteParams: [shellwm, actor],
+                                   onOverwrite: this._mapWindowOverwrite,
+                                   onOverwriteScope: this,
+                                   onOverwriteParams: [shellwm, actor]
+                                 });
+            }
             break;
         case Meta.WindowType.MODAL_DIALOG:
         case Meta.WindowType.DIALOG:
