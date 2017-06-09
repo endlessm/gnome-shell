@@ -13,7 +13,9 @@ const St = imports.gi.St;
 const GObject = imports.gi.GObject;
 
 const AppDisplay = imports.ui.appDisplay;
+const LayoutManager = imports.ui.layout;
 const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
 const OverviewControls = imports.ui.overviewControls;
 const Params = imports.misc.params;
 const Search = imports.ui.search;
@@ -30,6 +32,10 @@ const ViewPage = {
     WINDOWS: 1,
     APPS: 2,
     SEARCH: 3
+};
+
+const ViewsDisplayPage = {
+    APP_GRID: 1
 };
 
 const FocusTrap = new Lang.Class({
@@ -138,6 +144,80 @@ const ShowOverviewAction = new Lang.Class({
     }
 });
 
+const ViewsDisplayLayout = new Lang.Class({
+    Name: 'ViewsDisplayLayout',
+    Extends: Clutter.BinLayout,
+
+    _init: function(appDisplayActor) {
+        this.parent();
+
+        this._appDisplayActor = appDisplayActor;
+        this._appDisplayActor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+    },
+
+    _onStyleChanged: function() {
+        this.layout_changed();
+    }
+});
+
+const ViewsDisplayContainer = new Lang.Class({
+    Name: 'ViewsDisplayContainer',
+    Extends: St.Widget,
+
+    _init: function(appDisplay) {
+        this._appDisplay = appDisplay;
+        this._activePage = ViewsDisplayPage.APP_GRID;
+
+        this.parent({ layout_manager: new ViewsDisplayLayout(this._appDisplay.actor),
+                      x_expand: true,
+                      y_expand: true });
+
+        this.add_actor(this._appDisplay.actor);
+    },
+
+    showPage: function(page) {
+        if (this._activePage === page)
+            return;
+
+        this._activePage = page;
+    },
+
+    getActivePage: function() {
+        return this._activePage;
+    }
+});
+
+const ViewsDisplay = new Lang.Class({
+    Name: 'ViewsDisplay',
+
+    _init: function() {
+        this._appDisplay = new AppDisplay.AppDisplay()
+
+        this.actor = new ViewsDisplayContainer(this._appDisplay);
+    },
+
+    get appDisplay() {
+        return this._appDisplay;
+    },
+
+    get activeViewsPage() {
+        return this.actor.getActivePage();
+    }
+});
+
+const ViewsDisplayConstraint = new Lang.Class({
+    Name: 'ViewsDisplayConstraint',
+    Extends: Monitor.MonitorConstraint,
+
+    vfunc_update_allocation: function(actor, actorBox) {
+        let originalBox = actorBox.copy();
+        this.parent(actor, actorBox);
+
+        actorBox.init_rect(originalBox.get_x(), originalBox.get_y(),
+                           actorBox.get_width(), originalBox.get_height());
+    }
+});
+
 const ViewSelector = new Lang.Class({
     Name: 'ViewSelector',
 
@@ -176,9 +256,13 @@ const ViewSelector = new Lang.Class({
         this._workspacesPage = this._addPage(this._workspacesDisplay.actor,
                                              _("Windows"), 'focus-windows-symbolic');
 
-        this.appDisplay = new AppDisplay.AppDisplay();
-        this._appsPage = this._addPage(this.appDisplay.actor,
-                                       _("Applications"), 'view-app-grid-symbolic');
+        this._viewsDisplay = new ViewsDisplay();
+        this._appsPage = this._addPage(this._viewsDisplay.actor,
+                                       _("Applications"), 'view-grid-symbolic');
+        this._appsPage.add_constraint(new ViewsDisplayConstraint({ primary: true,
+                                                                   work_area: true }));
+
+        this.appDisplay = this._viewsDisplay.appDisplay;
 
         this._searchResults = new Search.SearchResults();
         this._searchPage = this._addPage(this._searchResults.actor,
