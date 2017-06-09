@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const Gdk = imports.gi.Gdk;
 const Lang = imports.lang;
 const St = imports.gi.St;
 const Shell = imports.gi.Shell;
