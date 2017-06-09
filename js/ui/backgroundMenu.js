@@ -41,7 +41,18 @@ const BackgroundMenu = new Lang.Class({
     }
 });
 
-function addBackgroundMenu(actor, layoutManager) {
+function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
+    // Either the actor or the action has to be defined
+    if (!actor && !clickAction)
+        return;
+
+    if (actor) {
+        clickAction = new Clutter.ClickAction();
+        actor.add_action(clickAction);
+    } else {
+        actor = clickAction.get_actor();
+    }
+
     actor.reactive = true;
     actor._backgroundMenu = new BackgroundMenu(layoutManager);
     actor._backgroundManager = new PopupMenu.PopupMenuManager({ actor: actor });
@@ -52,7 +63,6 @@ function addBackgroundMenu(actor, layoutManager) {
         actor._backgroundMenu.open(BoxPointer.PopupAnimation.NONE);
     }
 
-    let clickAction = new Clutter.ClickAction();
     clickAction.connect('long-press', function(action, actor, state) {
         if (state == Clutter.LongPressState.QUERY)
             return ((action.get_button() == 0 ||
@@ -71,7 +81,6 @@ function addBackgroundMenu(actor, layoutManager) {
             openMenu(x, y);
         }
     });
-    actor.add_action(clickAction);
 
     let grabOpBeginId = global.display.connect('grab-op-begin', function () {
         clickAction.release();
@@ -83,4 +92,15 @@ function addBackgroundMenu(actor, layoutManager) {
         actor._backgroundManager = null;
         global.display.disconnect(grabOpBeginId);
     });
+}
+
+function addBackgroundMenu(actor, layoutManager) {
+    _addBackgroundMenuFull(actor, null, layoutManager);
+}
+
+function addBackgroundMenuForAction(clickAction, layoutManager) {
+    if (!Main.sessionMode.hasOverview)
+        return;
+
+    _addBackgroundMenuFull(null, clickAction, layoutManager);
 }
