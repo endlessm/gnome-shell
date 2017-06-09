@@ -591,9 +591,7 @@ const Overview = new Lang.Class({
         }
 
         if (!Main.workspaceMonitor.hasActiveWindows) {
-            // FIXME: Do we want to do anything in this case now
-            // that we don't even have the dash?
-            log("No active windows available");
+            this._noWindowsDialog.show();
             return;
         }
 
