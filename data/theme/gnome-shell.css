@@ -2042,7 +2042,7 @@ stage {
 }
 
 .popup-menu .popup-menu-item.selected {
-    background-color: rgba(95, 95, 95, 1.0);
+    background-color: #2f2f2f;
 }
 
 #panel .hot-corner {
@@ -2208,4 +2208,24 @@ stage {
     background-color: rgba(0,0,0,0.5);
     text-align: center;
     -x-offset: 8px;
+}
+
+.system-menu-action {
+    border: 1px solid #666;
+}
+
+.system-menu-action:hover,
+.system-menu-action:focus {
+    background-color: rgba(238, 238, 236, 0.2);
+    border: 1px solid #666;
+    padding: 13px;
+}
+
+.system-menu-action-container {
+    spacing: 10px;
+}
+
+.system-menu-action-desc {
+    color: #ccc;
+    font-size: 9pt;
 }
