@@ -3,6 +3,7 @@
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
@@ -26,13 +27,15 @@ const IconGrid = imports.ui.iconGrid;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 
+const SEARCH_ACTIVATION_TIMEOUT = 50;
 const ViewPage = {
     WINDOWS: 1,
     APPS: 2
 };
 
 const ViewsDisplayPage = {
-    APP_GRID: 1
+    APP_GRID: 1,
+    SEARCH: 2
 };
 
 const FocusTrap = new Lang.Class({
@@ -123,15 +126,41 @@ const ViewsDisplayLayout = new Lang.Class({
     Name: 'ViewsDisplayLayout',
     Extends: Clutter.BinLayout,
 
-    _init: function(appDisplayActor) {
+    _init: function(entry, appDisplayActor, searchResultsActor) {
         this.parent();
 
+        this._entry = entry;
         this._appDisplayActor = appDisplayActor;
+        this._searchResultsActor = searchResultsActor;
+
+        this._entry.connect('style-changed', Lang.bind(this, this._onStyleChanged));
         this._appDisplayActor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
     },
 
     _onStyleChanged: function() {
         this.layout_changed();
+    },
+
+    set searchResultsTween(v) {
+        if (v == this._searchResultsTween || this._searchResultsActor == null)
+            return;
+
+        this._appDisplayActor.visible = v != 1;
+        this._searchResultsActor.visible = v != 0;
+
+        this._appDisplayActor.opacity = (1 - v) * 255;
+        this._searchResultsActor.opacity = v * 255;
+
+        let entryTranslation = - this._heightAboveEntry * v;
+        this._entry.translation_y = entryTranslation;
+
+        this._searchResultsActor.translation_y = entryTranslation;
+
+        this._searchResultsTween = v;
+    },
+
+    get searchResultsTween() {
+        return this._searchResultsTween;
     }
 });
 
@@ -142,23 +171,47 @@ const ViewsDisplayContainer = new Lang.Class({
         'views-page-changed': { }
     },
 
-    _init: function(appDisplay) {
+    _init: function(entry, appDisplay, searchResults) {
+        this._entry = entry;
         this._appDisplay = appDisplay;
+        this._searchResults = searchResults;
+
         this._activePage = ViewsDisplayPage.APP_GRID;
 
-        this.parent({ layout_manager: new ViewsDisplayLayout(this._appDisplay.actor),
+        let layoutManager = new ViewsDisplayLayout(entry, appDisplay.actor, searchResults.actor);
+        this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true });
 
+        this.add_actor(this._entry);
         this.add_actor(this._appDisplay.actor);
+        this.add_actor(this._searchResults.actor);
     },
 
-    showPage: function(page) {
+    _onTweenComplete: function() {
+        this._searchResults.isAnimating = false;
+    },
+
+    showPage: function(page, doAnimation) {
         if (this._activePage === page)
             return;
 
         this._activePage = page;
         this.emit('views-page-changed');
+
+        let tweenTarget = page == ViewsDisplayPage.SEARCH ? 1 : 0;
+        if (doAnimation) {
+            this._searchResults.isAnimating = true;
+            Tweener.addTween(this.layout_manager,
+                             { searchResultsTween: tweenTarget,
+                               transition: 'easeOutQuad',
+                               time: 0.25,
+                               onComplete: this._onTweenComplete,
+                               onCompleteScope: this,
+                             });
+        } else {
+            this.layout_manager.searchResultsTween = tweenTarget;
+        }
     },
 
     getActivePage: function() {
@@ -170,9 +223,100 @@ const ViewsDisplay = new Lang.Class({
     Name: 'ViewsDisplay',
 
     _init: function() {
+        this._enterSearchTimeoutId = 0;
+        this._localSearchMetricTimeoutId = 0;
+
         this._appDisplay = new AppDisplay.AppDisplay()
 
-        this.actor = new ViewsDisplayContainer(this._appDisplay);
+        this._searchResults = new Search.SearchResults();
+        this._searchResults.connect('search-progress-updated', Lang.bind(this, this._updateSpinner));
+
+        // Since the entry isn't inside the results container we install this
+        // dummy widget as the last results container child so that we can
+        // include the entry in the keynav tab path
+        this._focusTrap = new FocusTrap({ can_focus: true });
+        this._focusTrap.connect('key-focus-in', Lang.bind(this, function() {
+            this.entry.grab_key_focus();
+        }));
+        this._searchResults.actor.add_actor(this._focusTrap);
+
+        global.focus_manager.add_group(this._searchResults.actor);
+
+        this.entry = new ShellEntry.OverviewEntry();
+        this.entry.connect('search-activated', Lang.bind(this, this._onSearchActivated));
+        this.entry.connect('search-active-changed', Lang.bind(this, this._onSearchActiveChanged));
+        this.entry.connect('search-navigate-focus', Lang.bind(this, this._onSearchNavigateFocus));
+        this.entry.connect('search-terms-changed', Lang.bind(this, this._onSearchTermsChanged));
+
+        this.entry.clutter_text.connect('key-focus-in', Lang.bind(this, function() {
+            this._searchResults.highlightDefault(true);
+        }));
+        this.entry.clutter_text.connect('key-focus-out', Lang.bind(this, function() {
+            this._searchResults.highlightDefault(false);
+        }));
+
+        // Clicking on any empty area should exit search and get back to the desktop.
+        let clickAction = new Clutter.ClickAction();
+        clickAction.connect('clicked', Lang.bind(this, this._resetSearch));
+        Main.overview.addAction(clickAction, false);
+        this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
+
+        this.actor = new ViewsDisplayContainer(this.entry, this._appDisplay, this._searchResults);
+    },
+
+    _updateSpinner: function() {
+        this.entry.setSpinning(this._searchResults.searchInProgress);
+    },
+
+    _enterLocalSearch: function() {
+        if (this._enterSearchTimeoutId > 0)
+            return;
+
+        // We give a very short time for search results to populate before
+        // triggering the animation, unless an animation is already in progress
+        if (this._searchResults.isAnimating) {
+            this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+            return;
+        }
+
+        this._enterSearchTimeoutId = Mainloop.timeout_add(SEARCH_ACTIVATION_TIMEOUT, Lang.bind(this, function () {
+            this._enterSearchTimeoutId = 0;
+            this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+        }));
+    },
+
+    _leaveLocalSearch: function() {
+        if (this._enterSearchTimeoutId > 0) {
+            Mainloop.source_remove(this._enterSearchTimeoutId);
+            this._enterSearchTimeoutId = 0;
+        }
+        this.actor.showPage(ViewsDisplayPage.APP_GRID, true);
+    },
+
+    _onSearchActivated: function() {
+        this._searchResults.activateDefault();
+        this._resetSearch();
+    },
+
+    _onSearchActiveChanged: function() {
+        if (this.entry.active) {
+            this._enterLocalSearch();
+        } else {
+            this._leaveLocalSearch();
+        }
+    },
+
+    _onSearchNavigateFocus: function(entry, direction) {
+        this._searchResults.navigateFocus(direction);
+    },
+
+    _onSearchTermsChanged: function() {
+        let terms = this.entry.getSearchTerms();
+        this._searchResults.setTerms(terms);
+    },
+
+    _resetSearch: function() {
+        this.entry.resetSearch();
     },
 
     get appDisplay() {
@@ -220,6 +364,7 @@ const ViewSelector = new Lang.Class({
                                                                    work_area: true }));
 
         this.appDisplay = this._viewsDisplay.appDisplay;
+        this._entry = this._viewsDisplay.entry;
 
         this._stageKeyPressId = 0;
         Main.overview.connect('showing', Lang.bind(this,
