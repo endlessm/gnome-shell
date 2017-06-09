@@ -35,7 +35,23 @@ var BackgroundMenu = class BackgroundMenu extends PopupMenu.PopupMenu {
     }
 };
 
-function addBackgroundMenu(actor, layoutManager) {
+function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
+    // We don't want the background menu enabled on the desktop
+    // during the FBE, or in any mode without an overview, fwiw.
+    if (!Main.sessionMode.hasOverview)
+        return;
+
+    // Either the actor or the action has to be defined
+    if (!actor && !clickAction)
+        return;
+
+    if (actor) {
+        clickAction = new Clutter.ClickAction();
+        actor.add_action(clickAction);
+    } else {
+        actor = clickAction.get_actor();
+    }
+
     actor.reactive = true;
     actor._backgroundMenu = new BackgroundMenu(layoutManager);
     actor._backgroundManager = new PopupMenu.PopupMenuManager({ actor: actor });
@@ -46,7 +62,6 @@ function addBackgroundMenu(actor, layoutManager) {
         actor._backgroundMenu.open(BoxPointer.PopupAnimation.NONE);
     }
 
-    let clickAction = new Clutter.ClickAction();
     clickAction.connect('long-press', (action, actor, state) => {
         if (state == Clutter.LongPressState.QUERY)
             return ((action.get_button() == 0 ||
@@ -65,7 +80,6 @@ function addBackgroundMenu(actor, layoutManager) {
             openMenu(x, y);
         }
     });
-    actor.add_action(clickAction);
 
     let grabOpBeginId = global.display.connect('grab-op-begin', () => {
         clickAction.release();
@@ -89,4 +103,12 @@ function addBackgroundMenu(actor, layoutManager) {
         if (!actor.allocation.contains(xHot, yHot))
             clickAction.release();
     });
+}
+
+function addBackgroundMenu(actor, layoutManager) {
+    _addBackgroundMenuFull(actor, null, layoutManager);
+}
+
+function addBackgroundMenuForAction(clickAction, layoutManager) {
+    _addBackgroundMenuFull(null, clickAction, layoutManager);
 }
