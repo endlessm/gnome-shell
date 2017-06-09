@@ -563,7 +563,7 @@ const Overview = new Lang.Class({
         }
 
         if (!Main.workspaceMonitor.hasActiveWindows) {
-            // TODO: Show a dialog with a 'No apps open' message to the user.
+            this._noWindowsDialog.show();
             return;
         }
 
