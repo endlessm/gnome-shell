@@ -46,10 +46,12 @@ function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
     if (!actor && !clickAction)
         return;
 
-    if (actor)
+    if (actor) {
         clickAction = new Clutter.ClickAction();
-    else
+        actor.add_action(clickAction);
+    } else {
         actor = clickAction.get_actor();
+    }
 
     actor.reactive = true;
     actor._backgroundMenu = new BackgroundMenu(layoutManager);
@@ -79,7 +81,6 @@ function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
             openMenu(x, y);
         }
     });
-    actor.add_action(clickAction);
 
     let grabOpBeginId = global.display.connect('grab-op-begin', function () {
         clickAction.release();
