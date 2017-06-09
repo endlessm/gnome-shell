@@ -32,8 +32,10 @@ const EndlessButton = new Lang.Class({
         this._label = new St.Label({ text: _("Show Desktop"),
                                      style_class: 'app-icon-hover-label' });
 
+        this._labelOffsetX = 0;
         this._labelOffsetY = 0;
         this._label.connect('style-changed', Lang.bind(this, function(actor, forHeight, alloc) {
+            this._labelOffsetX = this._label.get_theme_node().get_length('-label-offset-x');
             this._labelOffsetY = this._label.get_theme_node().get_length('-label-offset-y');
         }));
     },
@@ -62,12 +64,13 @@ const EndlessButton = new Lang.Class({
             this._label.raise_top();
 
             // Update the tooltip position
+            let monitor = Main.layoutManager.findMonitorForActor(this._label);
             let iconMidpoint = this.actor.get_transformed_position()[0] + this.actor.width / 2;
-            this._label.translation_x = Math.floor(iconMidpoint - this._label.width / 2);
+            this._label.translation_x = Math.floor(iconMidpoint - this._label.width / 2) + monitor.x + this._labelOffsetX;
             this._label.translation_y = Math.floor(this.actor.get_transformed_position()[1] - this._labelOffsetY);
 
             // Clip left edge to be the left edge of the screen
-            this._label.translation_x = Math.max(this._label.translation_x, 0);
+            this._label.translation_x = Math.max(this._label.translation_x, monitor.x + this._labelOffsetX);
         } else {
             // Remove the tooltip from uiGroup
             if (this._label.get_parent() != null)
