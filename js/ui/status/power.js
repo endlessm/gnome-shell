@@ -123,6 +123,7 @@ const Indicator = new Lang.Class({
         // The icons
         let icon = this._proxy.IconName;
         this._indicator.icon_name = icon;
+        this._indicator.visible = true;
         this._item.icon.icon_name = icon;
 
         // The icon label
