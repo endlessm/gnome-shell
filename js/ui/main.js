@@ -52,6 +52,7 @@ const A11Y_SCHEMA = 'org.gnome.desktop.a11y.keyboard';
 const STICKY_KEYS_ENABLE = 'stickykeys-enable';
 const GNOMESHELL_STARTED_MESSAGE_ID = 'f3ea493c22934e26811cd62abe8e203a';
 
+let appStore = null;
 let componentManager = null;
 let panel = null;
 let overview = null;

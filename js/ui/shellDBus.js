@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
+const EosMetrics = imports.gi.EosMetrics;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
@@ -11,9 +12,13 @@ const Config = imports.misc.config;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
 const ExtensionUtils = imports.misc.extensionUtils;
+const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const Screenshot = imports.ui.screenshot;
 const ViewSelector = imports.ui.viewSelector;
+
+// Occurs when an application is added to the app grid.
+const SHELL_APP_ADDED_EVENT = '51640a4e-79aa-47ac-b7e2-d3106a06e129';
 
 const GnomeShellIface = '<node> \
 <interface name="org.gnome.Shell"> \
@@ -87,6 +92,7 @@ const GnomeShell = new Lang.Class({
         this._extensionsService = new GnomeShellExtensions();
         this._screenshotService = new Screenshot.ScreenshotService();
 
+        this._appstoreService = new AppStoreService();
         this._appLauncherService = new AppLauncher();
 
         this._grabbedAccelerators = new Map();
@@ -476,6 +482,96 @@ const ScreenSaverDBus = new Lang.Class({
     },
 });
 
+const AppStoreIface = '<node> \
+<interface name="org.gnome.Shell.AppStore"> \
+<method name="AddApplication"> \
+    <arg type="s" direction="in" name="id" /> \
+</method> \
+<method name="AddAppIfNotVisible"> \
+    <arg type="s" direction="in" name="id" /> \
+</method> \
+<method name="RemoveApplication"> \
+    <arg type="s" direction="in" name="id" /> \
+</method> \
+<method name="ListApplications"> \
+    <arg type="as" direction="out" name="applications" /> \
+</method> \
+<method name="AddFolder"> \
+    <arg type="s" direction="in" name="id" /> \
+</method> \
+<method name="RemoveFolder"> \
+    <arg type="s" direction="in" name="id" /> \
+</method> \
+<method name="ResetDesktop"> \
+</method> \
+<signal name="ApplicationsChanged"> \
+    <arg type="as" name="applications" /> \
+</signal> \
+</interface> \
+</node>';
+
+const AppStoreService = new Lang.Class({
+    Name: 'AppStoreServiceDBus',
+
+    _init: function() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
+
+        IconGridLayout.layout.connect('changed', Lang.bind(this, this._emitApplicationsChanged));
+    },
+
+    AddApplication: function(id) {
+        let eventRecorder = EosMetrics.EventRecorder.get_default();
+        let appId = new GLib.Variant('s', id);
+        eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
+
+        if (!IconGridLayout.layout.iconIsFolder(id))
+            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+    },
+
+    AddAppIfNotVisible: function(id) {
+        let eventRecorder = EosMetrics.EventRecorder.get_default();
+        let appId = new GLib.Variant('s', id);
+        eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
+
+        if (IconGridLayout.layout.iconIsFolder(id))
+            return;
+
+        let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+        if (visibleIcons.indexOf(id) == -1)
+            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+    },
+
+    RemoveApplication: function(id) {
+        if (!IconGridLayout.layout.iconIsFolder(id))
+            IconGridLayout.layout.removeIcon(id, false);
+    },
+
+    AddFolder: function(id) {
+        if (IconGridLayout.layout.iconIsFolder(id))
+            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+    },
+
+    RemoveFolder: function(id) {
+        if (IconGridLayout.layout.iconIsFolder(id))
+            IconGridLayout.layout.removeIcon(id, false);
+    },
+
+    ResetDesktop: function() {
+        IconGridLayout.layout.resetDesktop();
+    },
+
+    ListApplicationsAsync: function(params, invocation) {
+        let allApps = IconGridLayout.layout.listApplications();
+        return invocation.return_value(GLib.Variant.new('(as)', [allApps]));
+    },
+
+    _emitApplicationsChanged: function() {
+        let allApps = IconGridLayout.layout.listApplications();
+        this._dbusImpl.emit_signal('ApplicationsChanged', GLib.Variant.new('(as)', [allApps]));
+    }
+});
+
 const AppLauncherIface = '<node> \
 <interface name="org.gnome.Shell.AppLauncher"> \
 <method name="Launch"> \
@@ -496,6 +592,11 @@ const AppLauncher = new Lang.Class({
     },
 
     LaunchAsync: function(params, invocation) {
+        if (name == 'eos-app-store') {
+            Main.appStore.show(timestamp, true);
+            return;
+        }
+
         let [appName, timestamp] = params;
         if (!appName.endsWith('.desktop'))
             appName += '.desktop';
@@ -510,5 +611,7 @@ const AppLauncher = new Lang.Class({
 
         let activationContext = new AppActivation.AppActivationContext(app);
         activationContext.activate(null, timestamp);
+
+        Main.appStore.appLaunched = true;
     }
 });
