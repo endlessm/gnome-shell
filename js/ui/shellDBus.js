@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
+const EosMetrics = imports.gi.EosMetrics;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
@@ -15,6 +16,9 @@ const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const Screenshot = imports.ui.screenshot;
 const ViewSelector = imports.ui.viewSelector;
+
+// Occurs when an application is added to the app grid.
+const SHELL_APP_ADDED_EVENT = '51640a4e-79aa-47ac-b7e2-d3106a06e129';
 
 const GnomeShellIface = '<node> \
 <interface name="org.gnome.Shell"> \
@@ -519,6 +523,7 @@ const AppStoreService = new Lang.Class({
     AddApplication: function(id) {
         let eventRecorder = EosMetrics.EventRecorder.get_default();
         let appId = new GLib.Variant('s', id);
+        eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
 
         if (!IconGridLayout.layout.iconIsFolder(id))
             IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
@@ -527,6 +532,7 @@ const AppStoreService = new Lang.Class({
     AddAppIfNotVisible: function(id) {
         let eventRecorder = EosMetrics.EventRecorder.get_default();
         let appId = new GLib.Variant('s', id);
+        eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
 
         if (IconGridLayout.layout.iconIsFolder(id))
             return;
