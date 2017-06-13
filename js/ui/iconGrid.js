@@ -514,11 +514,11 @@ const IconGrid = new Lang.Class({
     },
 
     rowsForHeight: function(forHeight) {
-        return Math.floor((forHeight - (this.topPadding + this.bottomPadding) + this._getSpacing()) / (this._getVItemSize() + this._getSpacing()));
+        return Math.max(0, Math.floor((forHeight - (this.topPadding + this.bottomPadding) + this._getSpacing()) / (this._getVItemSize() + this._getSpacing())));
     },
 
     usedHeightForNRows: function(nRows) {
-        return (this._getVItemSize() + this._getSpacing()) * nRows - this._getSpacing() + this.topPadding + this.bottomPadding;
+        return (Math.max(0, this._getVItemSize() + this._getSpacing()) * nRows - this._getSpacing() + this.topPadding + this.bottomPadding);
     },
 
     usedWidth: function(forWidth) {
@@ -719,7 +719,7 @@ const PaginatedIconGrid = new Lang.Class({
         let spacing = this._getSpacing();
         // We want to contain the grid inside the parent box with padding
         this._rowsPerPage = this.rowsForHeight(availHeightPerPage);
-        this._nPages = Math.ceil(nRows / this._rowsPerPage);
+        this._nPages = this._rowsPerPage ? Math.ceil(nRows / this._rowsPerPage) : 0;
         this._spaceBetweenPages = availHeightPerPage - (this.topPadding + this.bottomPadding) - this._availableHeightPerPageForItems();
         this._childrenPerPage = nColumns * this._rowsPerPage;
     },
@@ -730,7 +730,7 @@ const PaginatedIconGrid = new Lang.Class({
     },
 
     _availableHeightPerPageForItems: function() {
-        return this.usedHeightForNRows(this._rowsPerPage) - (this.topPadding + this.bottomPadding);
+        return Math.max(0, this.usedHeightForNRows(this._rowsPerPage) - (this.topPadding + this.bottomPadding));
     },
 
     nPages: function() {
