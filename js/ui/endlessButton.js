@@ -7,6 +7,7 @@ const St = imports.gi.St;
 
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
+const ViewSelector = imports.ui.viewSelector;
 
 const EndlessButton = new Lang.Class({
     Name: 'EndlessButton',
@@ -29,8 +30,7 @@ const EndlessButton = new Lang.Class({
     _setupTooltipText: function() {
 
         // Create a new tooltip label
-        this._label = new St.Label({ text: _("Show Desktop"),
-                                     style_class: 'app-icon-hover-label' });
+        this._label = new St.Label({ style_class: 'app-icon-hover-label' });
 
         this._labelOffsetX = 0;
         this._labelOffsetY = 0;
@@ -38,6 +38,25 @@ const EndlessButton = new Lang.Class({
             this._labelOffsetX = this._label.get_theme_node().get_length('-label-offset-x');
             this._labelOffsetY = this._label.get_theme_node().get_length('-label-offset-y');
         }));
+
+        let pageChangedId = Main.overview.connect('page-changed', Lang.bind(this, this._updateHoverLabel));
+
+        this.actor.connect('destroy', Lang.bind(this, function() {
+            Main.overview.disconnect(pageChangedId);
+        }));
+
+        this._updateHoverLabel();
+    },
+
+    _updateHoverLabel: function() {
+        let viewSelector = Main.overview.viewSelector;
+        let newText = _("Show Desktop");
+
+        if (viewSelector &&
+            viewSelector.getActivePage() === ViewSelector.ViewPage.APPS)
+            newText = _("Show Apps");
+
+        this._label.text = newText;
     },
 
     // overrides default implementation from PanelMenu.Button
