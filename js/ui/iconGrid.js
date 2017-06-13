@@ -639,6 +639,11 @@ const PaginatedIconGrid = new Lang.Class({
     },
 
     _getPreferredHeight: function (grid, forWidth, alloc) {
+        // REMOVEME: This is probably not right, but for now it's the only way
+        // I found to ensure the right values are precomputed when requesting
+        // the preferred height for the widget, so that we can allocate it.
+        this._computePagesForWidth(forWidth)
+
         alloc.min_size = (this._availableHeightPerPageForItems() + this.bottomPadding + this.topPadding) * this._nPages + this._spaceBetweenPages * this._nPages;
         alloc.natural_size = (this._availableHeightPerPageForItems() + this.bottomPadding + this.topPadding) * this._nPages + this._spaceBetweenPages * this._nPages;
     },
@@ -705,8 +710,8 @@ const PaginatedIconGrid = new Lang.Class({
         return children.slice(firstIndex, lastIndex);
     },
 
-    _computePages: function (availWidthPerPage, availHeightPerPage) {
-        let [nColumns, usedWidth] = this._computeLayout(availWidthPerPage);
+    _rowsAndColumns: function(forWidth) {
+        let [nColumns, _] = this._computeLayout(forWidth);
         let nRows;
         let children = this._getVisibleChildren();
         if (nColumns > 0)
@@ -716,11 +721,32 @@ const PaginatedIconGrid = new Lang.Class({
         if (this._rowLimit)
             nRows = Math.min(nRows, this._rowLimit);
 
-        let spacing = this._getSpacing();
-        // We want to contain the grid inside the parent box with padding
+        return [nRows, nColumns];
+    },
+
+    // Computes the pagination-related values taking into account both
+    // the available width and height as specified. Called when size
+    // allocation has changed and we know both parameters.
+    _computePages: function (availWidthPerPage, availHeightPerPage) {
+        let [nRows, nColumns] = this._rowsAndColumns(availWidthPerPage);
+
         this._rowsPerPage = this.rowsForHeight(availHeightPerPage);
         this._nPages = this._rowsPerPage ? Math.ceil(nRows / this._rowsPerPage) : 0;
         this._spaceBetweenPages = availHeightPerPage - (this.topPadding + this.bottomPadding) - this._availableHeightPerPageForItems();
+
+        this._childrenPerPage = nColumns * this._rowsPerPage;
+    },
+
+    // Computes the pagination-related values taking into account the
+    // available width only, assuming infinite height. Used only from
+    // _getPreferredHeight(forWidth), useful for initial allocations.
+    _computePagesForWidth: function (availWidthPerPage) {
+        let [nRows, nColumns] = this._rowsAndColumns(availWidthPerPage);
+
+        this._rowsPerPage = nRows;
+        this._nPages = this._rowsPerPage ? Math.ceil(nRows / this._rowsPerPage) : 0;
+        this._spaceBetweenPages = this._getSpacing();
+
         this._childrenPerPage = nColumns * this._rowsPerPage;
     },
 
