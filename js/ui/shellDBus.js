@@ -581,6 +581,17 @@ const AppLauncherIface = '<node> \
 </interface> \
 </node>';
 
+function activationContextForAppName(appName, appSys) {
+    if (!appName.endsWith('.desktop'))
+        appName += '.desktop';
+
+    let app = appSys.lookup_app(appName);
+    if (!app)
+        return null;
+
+    return new AppActivation.AppActivationContext(app);
+}
+
 const AppLauncher = new Lang.Class({
     Name: 'AppLauncherDBus',
 
@@ -592,24 +603,22 @@ const AppLauncher = new Lang.Class({
     },
 
     LaunchAsync: function(params, invocation) {
-        if (name == 'eos-app-store') {
+        let [appName, timestamp] = params;
+
+        if (appName == 'eos-app-store') {
             Main.appStore.show(timestamp, true);
             return;
         }
 
-        let [appName, timestamp] = params;
-        if (!appName.endsWith('.desktop'))
-            appName += '.desktop';
+        let activationContext = activationContextForAppName(appName, this._appSys);
 
-        let app = this._appSys.lookup_app(appName);
-        if (!app) {
+        if (!activationContext) {
             invocation.return_error_literal(Gio.IOErrorEnum,
                                             Gio.IOErrorEnum.NOT_FOUND,
                                             'Unable to launch app ' + appName + ': Not installed');
             return;
         }
 
-        let activationContext = new AppActivation.AppActivationContext(app);
         activationContext.activate(null, timestamp);
 
         Main.appStore.appLaunched = true;
