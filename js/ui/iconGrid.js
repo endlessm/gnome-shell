@@ -732,7 +732,7 @@ const PaginatedIconGrid = new Lang.Class({
 
         this._rowsPerPage = this.rowsForHeight(availHeightPerPage);
         this._nPages = this._rowsPerPage ? Math.ceil(nRows / this._rowsPerPage) : 0;
-        this._spaceBetweenPages = availHeightPerPage - (this.topPadding + this.bottomPadding) - this._availableHeightPerPageForItems();
+        this._spaceBetweenPages = 0;//availHeightPerPage - (this.topPadding + this.bottomPadding) - this._availableHeightPerPageForItems();
 
         this._childrenPerPage = nColumns * this._rowsPerPage;
     },
@@ -745,7 +745,7 @@ const PaginatedIconGrid = new Lang.Class({
 
         this._rowsPerPage = nRows;
         this._nPages = this._rowsPerPage ? Math.ceil(nRows / this._rowsPerPage) : 0;
-        this._spaceBetweenPages = this._getSpacing();
+        this._spaceBetweenPages = 0;// this._spaceBetweenPages = this._getSpacing();
 
         this._childrenPerPage = nColumns * this._rowsPerPage;
     },
