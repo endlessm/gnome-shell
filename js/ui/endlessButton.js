@@ -7,6 +7,7 @@ const St = imports.gi.St;
 
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
+const ViewSelector = imports.ui.viewSelector;
 
 const EndlessButton = new Lang.Class({
     Name: 'EndlessButton',
@@ -37,6 +38,14 @@ const EndlessButton = new Lang.Class({
         this._label.connect('style-changed', Lang.bind(this, function(actor, forHeight, alloc) {
             this._labelOffsetX = this._label.get_theme_node().get_length('-label-offset-x');
             this._labelOffsetY = this._label.get_theme_node().get_length('-label-offset-y');
+        }));
+
+        Main.overview.connect('page-changed', Lang.bind(this, function() {
+            let viewSelector = Main.overview.viewSelector;
+            if (viewSelector.getActivePage() !== ViewSelector.ViewPage.APPS)
+                this._label.text = _("Show Desktop");
+            else
+                this._label.text = _("Show Apps");
         }));
     },
 
