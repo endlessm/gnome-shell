@@ -150,10 +150,84 @@ const ViewsDisplayLayout = new Lang.Class({
 
         this._entry.connect('style-changed', Lang.bind(this, this._onStyleChanged));
         this._appDisplayActor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+
+        this._heightAboveDiscoveryFeedButton = 0;
+        this._heightAboveEntry = 0;
+        this.searchResultsTween = 0;
+        this._lowResolutionMode = false;
     },
 
     _onStyleChanged: function() {
         this.layout_changed();
+    },
+
+    _centeredHeightAbove: function (height, availHeight) {
+        return Math.floor(Math.max((availHeight - height) / 2, 0));
+    },
+
+    _calcAppDisplayPlacement: function (viewHeight, entryHeight, availHeight) {
+        // If we have the space for it, we add some padding to the top of the
+        // all view when calculating its centered position. This is to offset
+        // the icon labels at the bottom of the icon grid, so the icons
+        // themselves appears centered.
+        let themeNode = this._appDisplayActor.get_theme_node();
+        let topPadding = themeNode.get_length('-natural-padding-top');
+        let heightAbove = this._centeredHeightAbove(viewHeight + topPadding, availHeight);
+        let leftover = Math.max(availHeight - viewHeight - heightAbove, 0);
+        heightAbove += Math.min(topPadding, leftover);
+        // Always leave enough room for the search entry at the top
+        heightAbove = Math.max(entryHeight, heightAbove);
+        return heightAbove;
+    },
+
+    vfunc_allocate: function(container, box, flags) {
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        log("")
+        log("-------------------")
+        log("availWidth: " + availWidth)
+        log("availHeight: " + availHeight)
+
+        // Entry height
+        let entryHeight = this._entry.get_preferred_height(availWidth)[1];
+        let themeNode = this._entry.get_theme_node();
+        let entryMinPadding = themeNode.get_length('-minimum-vpadding');
+        let entryTopMargin = themeNode.get_length('margin-top');
+        entryHeight += entryMinPadding * 2;
+
+        // AppDisplay height
+        let appDisplayHeight = this._appDisplayActor.get_preferred_height(availWidth)[1];
+        let heightAboveGrid = this._calcAppDisplayPlacement(appDisplayHeight, entryHeight, availHeight);
+        let heightAboveGrid = this._calcAppDisplayPlacement(appDisplayHeight, entryHeight, availHeight);
+        this._heightAboveEntry = this._centeredHeightAbove(entryHeight, heightAboveGrid);
+
+        log("AVAIL width: " + availWidth)
+        log("GOT height: " + appDisplayHeight)
+
+        let entryBox = box.copy();
+        entryBox.y1 = this._heightAboveEntry + entryTopMargin;
+        entryBox.y2 = entryBox.y1 + entryHeight;
+        this._entry.allocate(entryBox, flags);
+
+        let appDisplayBox = box.copy();
+        appDisplayBox.y1 = this._calcAppDisplayPlacement(appDisplayHeight, entryHeight, availHeight);
+        appDisplayBox.y2 = Math.min(appDisplayBox.y1 + appDisplayHeight, box.y2);
+
+        log("-------------------")
+        log("")
+
+        this._appDisplayActor.allocate(appDisplayBox, flags);
+        this._appDisplayActor.style = 'border: 1px solid red;';
+
+        // The views clone does not have a searchResultsActor
+        if (this._searchResultsActor) {
+            let searchResultsBox = box.copy();
+            let searchResultsHeight = availHeight - entryHeight;
+            searchResultsBox.y1 = entryBox.y2;
+            searchResultsBox.y2 = searchResultsBox.y1 + searchResultsHeight;
+            this._searchResultsActor.allocate(searchResultsBox, flags);
+        }
     },
 
     set searchResultsTween(v) {
