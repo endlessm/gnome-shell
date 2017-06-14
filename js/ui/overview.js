@@ -204,6 +204,7 @@ const Overview = new Lang.Class({
         this._backgroundGroup = new Meta.BackgroundGroup({ reactive: true });
         Main.layoutManager.overviewGroup.add_child(this._backgroundGroup);
         this._bgManagers = [];
+        this._viewsClone = null;
 
         this._desktopFade = new St.Widget();
         Main.layoutManager.overviewGroup.add_child(this._desktopFade);
@@ -251,6 +252,11 @@ const Overview = new Lang.Class({
 
         if (this._initCalled)
             this.init();
+    },
+
+    setViewsClone: function(actor) {
+        this._viewsClone = actor;
+        this._backgroundGroup.add_child(this._viewsClone);
     },
 
     _updateBackgrounds: function() {
