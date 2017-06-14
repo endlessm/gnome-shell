@@ -392,25 +392,54 @@ var PageIndicators = new Lang.Class({
 });
 Signals.addSignalMethods(PageIndicators.prototype);
 
+var AllViewContainer = new Lang.Class({
+    Name: 'AllViewContainer',
+    Extends: St.Widget,
+
+    _init: function(gridActor) {
+        this.parent({ layout_manager: new Clutter.BinLayout(),
+                      x_expand: true,
+                      y_expand: true });
+
+        this.gridActor = gridActor;
+
+        gridActor.y_expand = true;
+        gridActor.y_align = Clutter.ActorAlign.START;
+
+        this.scrollView = new St.ScrollView({ style_class: 'all-apps-scroller',
+                                              x_expand: true,
+                                              y_expand: true,
+                                              x_fill: true,
+                                              y_fill: false,
+                                              reactive: true,
+                                              hscrollbar_policy: Gtk.PolicyType.NEVER,
+                                              vscrollbar_policy: Gtk.PolicyType.EXTERNAL,
+                                              y_align: Clutter.ActorAlign.START });
+
+        this.stack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        let box = new St.BoxLayout({ vertical: true });
+
+        this.stack.add_child(gridActor);
+        box.add_child(this.stack);
+
+        // For some reason I couldn't investigate yet using add_child()
+        // here makes the icon grid not to show up on the desktop.
+        this.scrollView.add_actor(box);
+
+        this.add_child(this.scrollView);
+    }
+});
+
 var AllView = new Lang.Class({
     Name: 'AllView',
     Extends: BaseAppView,
 
     _init: function() {
         this.parent({ usePagination: true }, null);
-        this._scrollView = new St.ScrollView({ style_class: 'all-apps',
-                                               x_expand: true,
-                                               y_expand: true,
-                                               x_fill: true,
-                                               y_fill: false,
-                                               reactive: true,
-                                               y_align: St.Align.START });
-        this.actor = new St.Widget({ layout_manager: new Clutter.BinLayout(),
-                                     x_expand:true, y_expand:true });
-        this.actor.add_actor(this._scrollView);
+        this.actor = new AllViewContainer(this._grid.actor);
+        this._scrollView = this.actor.scrollView;
+        this._stack = this.actor.stack;
 
-        this._scrollView.set_policy(Gtk.PolicyType.NEVER,
-                                    Gtk.PolicyType.EXTERNAL);
         this._adjustment = this._scrollView.vscroll.adjustment;
 
         this._pageIndicators = new PageIndicators();
@@ -423,16 +452,9 @@ var AllView = new Lang.Class({
 
         this.folderIcons = [];
 
-        this._stack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-        let box = new St.BoxLayout({ vertical: true });
-
         this._grid.currentPage = 0;
-        this._stack.add_actor(this._grid.actor);
         this._eventBlocker = new St.Widget({ x_expand: true, y_expand: true });
         this._stack.add_actor(this._eventBlocker);
-
-        box.add_actor(this._stack);
-        this._scrollView.add_actor(box);
 
         this._scrollView.connect('scroll-event', Lang.bind(this, this._onScroll));
 
@@ -920,7 +942,9 @@ var AppDisplay = new Lang.Class({
         this._privacySettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.privacy' });
         this._allView = new AllView();
 
-        this.actor = new St.Widget({ x_expand: true, y_expand: true,
+        this.actor = new St.Widget({ style_class: 'all-apps',
+                                     x_expand: true,
+                                     y_expand: true,
                                      layout_manager: new Clutter.BinLayout() });
 
         this.actor.add_actor(this._allView.actor);
