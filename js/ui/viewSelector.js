@@ -324,6 +324,14 @@ const ViewSelector = new Lang.Class({
 
         let symbol = event.get_key_symbol();
 
+        if (this._activePage == this._workspacesPage) {
+            if (symbol == Clutter.Escape) {
+                Main.overview.toggleWindows();
+                return Clutter.EVENT_STOP;
+            }
+            return Clutter.EVENT_PROPAGATE;
+        }
+
         if (!global.stage.key_focus) {
             if (symbol == Clutter.Tab || symbol == Clutter.Down) {
                 this._activePage.navigate_focus(null, Gtk.DirectionType.TAB_FORWARD, false);
