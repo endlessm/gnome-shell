@@ -82,6 +82,14 @@ let discreteGpuAvailable = false;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
+var EOS_INACTIVE_GRID_OPACITY = 96;
+var EOS_ACTIVE_GRID_OPACITY = 255;
+
+var EOS_INACTIVE_GRID_TRANSITION = 'easeOutQuad';
+var EOS_ACTIVE_GRID_TRANSITION = 'easeInQuad';
+
+var EOS_INACTIVE_GRID_SATURATION = 1;
+var EOS_ACTIVE_GRID_SATURATION = 0;
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -258,6 +266,10 @@ var BaseAppView = new Lang.Class({
         }
 
         Tweener.addTween(this._grid.actor, params);
+    },
+
+    get gridActor() {
+        return this._grid.actor;
     }
 });
 Signals.addSignalMethods(BaseAppView.prototype);
@@ -929,6 +941,14 @@ var AppDisplay = new Lang.Class({
 
     adaptToSize: function(width, height) {
         return this._allView.adaptToSize(width, height);
+    },
+
+    get gridContainer() {
+        return this._allView.actor;
+    },
+
+    get gridActor() {
+        return this._allView.gridActor;
     }
 })
 
