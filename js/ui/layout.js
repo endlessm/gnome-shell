@@ -9,6 +9,7 @@ const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 const St = imports.gi.St;
 
+const AppDisplay = imports.ui.appDisplay;
 const Background = imports.ui.background;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const LoginManager = imports.misc.loginManager;
@@ -326,6 +327,31 @@ var LayoutManager = new Lang.Class({
     setViewsClone: function(actor) {
         this._viewsClone = actor;
         this._backgroundGroup.add_child(this._viewsClone);
+    },
+
+    _animateViewsClone: function(targetOpacity, targetSaturation) {
+        if (!this._viewsClone)
+            return;
+
+        // Don't unnecessarily tween the clone's saturation & opacity.
+        if (this._viewsClone.opacity == targetOpacity && this._viewsClone.saturation == targetSaturation)
+            return;
+
+        Tweener.addTween(this._viewsClone,
+                         { opacity: targetOpacity,
+                           saturation: targetSaturation,
+                           time: 0.25,
+                           transition: AppDisplay.EOS_ACTIVE_GRID_TRANSITION });
+    },
+
+    prepareToEnterOverview: function() {
+        this._animateViewsClone(AppDisplay.EOS_ACTIVE_GRID_OPACITY,
+                                AppDisplay.EOS_ACTIVE_GRID_SATURATION);
+    },
+
+    prepareToLeaveOverview: function() {
+        this._animateViewsClone(AppDisplay.EOS_INACTIVE_GRID_OPACITY,
+                                AppDisplay.EOS_INACTIVE_GRID_SATURATION);
     },
 
     _addBackgroundMenu: function(bgManager) {
