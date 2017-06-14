@@ -309,6 +309,11 @@ const LayoutManager = new Lang.Class({
         this.emit('hot-corners-changed');
     },
 
+    setViewsClone: function(actor) {
+        this._viewsClone = actor;
+        this._backgroundGroup.add_child(this._viewsClone);
+    },
+
     _addBackgroundMenu: function(bgManager) {
         let clickAction = new Clutter.ClickAction();
         bgManager.backgroundActor.add_action(clickAction);
