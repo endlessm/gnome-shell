@@ -151,6 +151,7 @@ var LayoutManager = new Lang.Class({
         global.window_group.add_child(this._backgroundGroup);
         this._backgroundGroup.lower_bottom();
         this._bgManagers = [];
+        this._viewsClone = null;
 
         // Need to update struts on new workspaces when they are added
         global.screen.connect('notify::n-workspaces',
@@ -320,6 +321,11 @@ var LayoutManager = new Lang.Class({
         }
 
         this.emit('hot-corners-changed');
+    },
+
+    setViewsClone: function(actor) {
+        this._viewsClone = actor;
+        this._backgroundGroup.add_child(this._viewsClone);
     },
 
     _addBackgroundMenu: function(bgManager) {
