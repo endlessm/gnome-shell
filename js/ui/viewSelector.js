@@ -581,6 +581,9 @@ const ViewSelector = new Lang.Class({
         this._entry = this._viewsDisplay.entry;
 
         this._stageKeyPressId = 0;
+
+        this._addViewsPageClone();
+
         Main.overview.connect('showing', Lang.bind(this,
             function () {
                 this._stageKeyPressId = global.stage.connect('key-press-event',
@@ -641,6 +644,18 @@ const ViewSelector = new Lang.Class({
                 Main.overview.show();
         }));
         global.stage.add_action(gesture);
+    },
+
+    _addViewsPageClone: function() {
+        let layoutViewsClone = new ViewsClone(this, this._viewsDisplay, false);
+        Main.layoutManager.setViewsClone(layoutViewsClone);
+
+        let overviewViewsClone = new ViewsClone(this, this._viewsDisplay, true);
+        Main.overview.setViewsClone(overviewViewsClone);
+        this._appsPage.bind_property('visible',
+                                     overviewViewsClone, 'visible',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.INVERT_BOOLEAN);
     },
 
     _onEmptySpaceClicked: function() {
