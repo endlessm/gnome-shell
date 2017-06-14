@@ -615,6 +615,7 @@ const AppLauncher = new Lang.Class({
 
         if (appName == 'eos-app-store') {
             Main.appStore.show(timestamp, true);
+            Main.appStore.appLaunched = true;
             return;
         }
 
@@ -628,7 +629,6 @@ const AppLauncher = new Lang.Class({
         }
 
         activationContext.activate(null, timestamp);
-        Main.appStore.appLaunched = true;
     },
 
     LaunchViaDBusCallAsync: function(params, invocation) {
