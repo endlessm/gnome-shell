@@ -69,6 +69,15 @@ const EOS_LINK_PREFIX = 'eos-link-';
 
 const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
 
+var EOS_INACTIVE_GRID_OPACITY = 96;
+var EOS_ACTIVE_GRID_OPACITY = 255;
+
+var EOS_INACTIVE_GRID_TRANSITION = 'easeOutQuad';
+var EOS_ACTIVE_GRID_TRANSITION = 'easeInQuad';
+
+var EOS_INACTIVE_GRID_SATURATION = 1;
+var EOS_ACTIVE_GRID_SATURATION = 0;
+
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
     if (!categoriesStr)
@@ -242,6 +251,10 @@ class BaseAppView {
         }
 
         Tweener.addTween(this._grid, params);
+    }
+
+    get gridActor() {
+        return this._grid;
     }
 };
 Signals.addSignalMethods(BaseAppView.prototype);
@@ -777,6 +790,14 @@ var AppDisplay = class AppDisplay {
 
     adaptToSize(width, height) {
         return this._allView.adaptToSize(width, height);
+    }
+
+    get gridContainer() {
+        return this._allView.actor;
+    }
+
+    get gridActor() {
+        return this._allView.gridActor;
     }
 };
 
