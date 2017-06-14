@@ -147,6 +147,8 @@ const ShowOverviewAction = new Lang.Class({
 const ViewsDisplayLayout = new Lang.Class({
     Name: 'ViewsDisplayLayout',
     Extends: Clutter.BinLayout,
+    Signals: { 'grid-available-size-changed': { param_types: [GObject.TYPE_INT,
+                                                              GObject.TYPE_INT] } },
 
     _init: function(appDisplayActor) {
         this.parent();
@@ -157,6 +159,17 @@ const ViewsDisplayLayout = new Lang.Class({
 
     _onStyleChanged: function() {
         this.layout_changed();
+    },
+
+    vfunc_allocate: function(actor, box, flags) {
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        // We want to emit the signal BEFORE any allocation has happened since the
+        // icon grid will need to precompute certain values before being able to
+        // report a sensible preferred height for the specified width.
+        this.emit('grid-available-size-changed', availWidth, availHeight);
+        this.parent(actor, box, flags);
     }
 });
 
@@ -168,11 +181,26 @@ const ViewsDisplayContainer = new Lang.Class({
         this._appDisplay = appDisplay;
         this._activePage = ViewsDisplayPage.APP_GRID;
 
-        this.parent({ layout_manager: new ViewsDisplayLayout(this._appDisplay.actor),
+        let layoutManager = new ViewsDisplayLayout(this._appDisplay.actor);
+        this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true });
 
+        layoutManager.connect('grid-available-size-changed', Lang.bind(this, this._onGridAvailableSizeChanged));
+
         this.add_actor(this._appDisplay.actor);
+    },
+
+    _onGridAvailableSizeChanged: function(actor, width, height) {
+        let box = new Clutter.ActorBox();
+        box.x1 = box.y1 = 0;
+        box.x2 = width;
+        box.y2 = height;
+        box = this._appDisplay.actor.get_theme_node().get_content_box(box);
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        this._appDisplay.adaptToSize(availWidth, availHeight);
     },
 
     showPage: function(page) {
