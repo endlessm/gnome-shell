@@ -685,8 +685,15 @@ const ViewSelector = new Lang.Class({
         Main.overview.show();
     },
 
+    _clearSearch: function() {
+        this._entry.resetSearch();
+        this._viewsDisplay.actor.showPage(ViewsDisplayPage.APP_GRID, false);
+    },
+
     show: function(viewPage) {
         this._activePage = null;
+        this._clearSearch();
+
         this._showPage(this._pageFromViewPage(viewPage));
         this._workspacesDisplay.show(true);
     },
@@ -710,6 +717,11 @@ const ViewSelector = new Lang.Class({
 
     hide: function() {
         // Nothing to do, since we always show the app selector
+    },
+
+    focusSearch: function() {
+        if (this._activePage == this._appsPage)
+            this._entry.grab_key_focus();
     },
 
     _addPage: function(actor, name, a11yIcon, params) {
@@ -786,6 +798,13 @@ const ViewSelector = new Lang.Class({
         }
     },
 
+    _pageChanged: function() {
+        if (this._activePage != this._appsPage)
+            this._clearSearch();
+
+        this.emit('page-changed');
+    },
+
     _showPage: function(page) {
         if (!Main.overview.visible)
             return;
@@ -795,7 +814,7 @@ const ViewSelector = new Lang.Class({
 
         let oldPage = this._activePage;
         this._activePage = page;
-        this.emit('page-changed');
+        this._pageChanged();
 
         if (oldPage)
             this._animateOut(oldPage)
@@ -819,6 +838,12 @@ const ViewSelector = new Lang.Class({
             Main.overview.toggleWindows();
             return Clutter.EVENT_STOP;
         }
+
+        if (this._entry.handleStageEvent(event))
+            return Clutter.EVENT_STOP;
+
+        if (this._entry.active)
+            return Clutter.EVENT_PROPAGATE;
 
         if (!global.stage.key_focus) {
             if (symbol == Clutter.Tab || symbol == Clutter.Down) {
