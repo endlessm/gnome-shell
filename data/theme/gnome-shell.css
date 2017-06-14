@@ -2199,6 +2199,18 @@ stage {
     background-image: url("corner-ripple-br.png");
 }
 
+.all-apps {
+    -natural-padding-top: 25px;
+
+    /* We set the padding to zero to prevent inconsistencies with clones */
+    padding: 0px;
+ }
+
+.all-apps-scroller > StBoxLayout {
+    /* horizontal padding to make sure page indicators don't overlap content */
+    padding: 0px 70px;
+}
+
 #searchEntry {
     width: 350px;
     height: 38px;
