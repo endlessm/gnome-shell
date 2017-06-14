@@ -478,6 +478,7 @@ const Overview = new Lang.Class({
 
     focusSearch: function() {
         this.show();
+        this._viewSelector.focusSearch();
     },
 
     _showOrSwitchPage: function(page) {
