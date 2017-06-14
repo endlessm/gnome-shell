@@ -150,6 +150,7 @@ var LayoutManager = GObject.registerClass({
         global.window_group.add_child(this._backgroundGroup);
         this._backgroundGroup.lower_bottom();
         this._bgManagers = [];
+        this._viewsClone = null;
 
         // Need to update struts on new workspaces when they are added
         let workspaceManager = global.workspace_manager;
@@ -326,6 +327,11 @@ var LayoutManager = GObject.registerClass({
         }
 
         this.emit('hot-corners-changed');
+    }
+
+    setViewsClone(actor) {
+        this._viewsClone = actor;
+        this._backgroundGroup.add_child(this._viewsClone);
     }
 
     _addBackgroundMenu(bgManager) {
