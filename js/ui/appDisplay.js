@@ -35,7 +35,7 @@ const SystemActions = imports.misc.systemActions;
 
 var MAX_APPLICATION_WORK_MILLIS = 75;
 var MENU_POPUP_TIMEOUT = 600;
-var MAX_COLUMNS = 6;
+var MAX_COLUMNS = 7;
 var MIN_COLUMNS = 4;
 var MIN_ROWS = 4;
 
