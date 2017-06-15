@@ -12,7 +12,7 @@ const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 const Main = imports.ui.main;
 
-const ICON_SIZE = 96;
+const ICON_SIZE = 64;
 const MIN_ICON_SIZE = 16;
 
 const EXTRA_SPACE_ANIMATION_TIME = 0.25;
@@ -657,30 +657,6 @@ const IconGrid = new Lang.Class({
         this._fixedHItemSize = this._hItemSize;
         this._fixedVItemSize = this._vItemSize;
         this._updateSpacingForSize(availWidth, availHeight);
-        let spacing = this._getSpacing();
-
-        if (this.columnsForWidth(availWidth) < this._minColumns || this.rowsForHeight(availHeight) < this._minRows) {
-            let neededWidth = this.usedWidthForNColumns(this._minColumns) - availWidth ;
-            let neededHeight = this.usedHeightForNRows(this._minRows) - availHeight ;
-
-            let neededSpacePerItem = (neededWidth > neededHeight) ? Math.ceil(neededWidth / this._minColumns)
-                                                                  : Math.ceil(neededHeight / this._minRows);
-            this._fixedHItemSize = Math.max(this._hItemSize - neededSpacePerItem, MIN_ICON_SIZE);
-            this._fixedVItemSize = Math.max(this._vItemSize - neededSpacePerItem, MIN_ICON_SIZE);
-
-            this._updateSpacingForSize(availWidth, availHeight);
-        }
-        Meta.later_add(Meta.LaterType.BEFORE_REDRAW,
-                       Lang.bind(this, this._updateIconSizes));
-    },
-
-    // Note that this is ICON_SIZE as used by BaseIcon, not elsewhere in IconGrid; it's a bit messed up
-    _updateIconSizes: function() {
-        let scale = Math.min(this._fixedHItemSize, this._fixedVItemSize) / Math.max(this._hItemSize, this._vItemSize);
-        let newIconSize = Math.floor(ICON_SIZE * scale);
-        for (let i in this._items) {
-            this._items[i].icon.setIconSize(newIconSize);
-        }
     }
 });
 Signals.addSignalMethods(IconGrid.prototype);
