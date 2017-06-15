@@ -210,8 +210,11 @@ const BaseAppView = new Lang.Class({
 
     _doSpringAnimation: function(animationDirection) {
         this._grid.actor.opacity = 255;
-        this._grid.animateSpring(animationDirection,
-                                 Main.overview.getShowAppsButton());
+
+        // We don't do the icon grid animations on Endless, but we still need
+        // to call this method so that the animation-done signal gets emitted,
+        // in order not to break the transitoins.
+        this._grid.animateSpring(animationDirection, null);
     },
 
     animate: function(animationDirection, onComplete) {
