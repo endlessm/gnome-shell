@@ -31,7 +31,7 @@ const Util = imports.misc.util;
 
 const MAX_APPLICATION_WORK_MILLIS = 75;
 const MENU_POPUP_TIMEOUT = 600;
-const MAX_COLUMNS = 6;
+const MAX_COLUMNS = 7;
 const MIN_COLUMNS = 4;
 const MIN_ROWS = 4;
 
