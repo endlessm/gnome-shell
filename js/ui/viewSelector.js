@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const EosMetrics = imports.gi.EosMetrics;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
@@ -29,6 +30,20 @@ const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 const PINCH_GESTURE_THRESHOLD = 0.7;
 
 const SEARCH_ACTIVATION_TIMEOUT = 50;
+const SEARCH_METRIC_INACTIVITY_TIMEOUT_SECONDS = 3;
+
+// Occurs when a user initiates a search from the desktop. The payload, with
+// type `(us)`, consists of an enum value from the DesktopSearchProvider enum
+// telling what kind of search was requested; followed by the search query.
+const EVENT_DESKTOP_SEARCH = 'b02266bc-b010-44b2-ae0f-8f116ffa50eb';
+
+// Represents the various search providers that can be used for searching from
+// the desktop. Keep in sync with the corresponding enum in
+// https://github.com/endlessm/eos-analytics/tree/master/src/main/java/com/endlessm/postprocessing/query/SearchQuery.java.
+const DesktopSearchProvider = {
+    MY_COMPUTER: 0,
+};
+
 const ViewPage = {
     WINDOWS: 1,
     APPS: 2
@@ -335,6 +350,7 @@ const ViewsDisplay = new Lang.Class({
 
     _init: function() {
         this._enterSearchTimeoutId = 0;
+        this._localSearchMetricTimeoutId = 0;
 
         this._appDisplay = new AppDisplay.AppDisplay()
 
@@ -372,6 +388,12 @@ const ViewsDisplay = new Lang.Class({
         this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
 
         this.actor = new ViewsDisplayContainer(this.entry, this._appDisplay, this._searchResults);
+    },
+
+    _recordDesktopSearchMetric: function(query, searchProvider) {
+        let eventRecorder = EosMetrics.EventRecorder.get_default();
+        let auxiliaryPayload = new GLib.Variant('(us)', [searchProvider, query]);
+        eventRecorder.record_event(EVENT_DESKTOP_SEARCH, auxiliaryPayload);
     },
 
     _updateSpinner: function() {
@@ -424,6 +446,22 @@ const ViewsDisplay = new Lang.Class({
     _onSearchTermsChanged: function() {
         let terms = this.entry.getSearchTerms();
         this._searchResults.setTerms(terms);
+
+        // Since the search is live, only record a metric a few seconds after
+        // the user has stopped typing. Don't record one if the user deleted
+        // what they wrote and left it at that.
+        if (this._localSearchMetricTimeoutId > 0)
+            Mainloop.source_remove(this._localSearchMetricTimeoutId);
+        this._localSearchMetricTimeoutId = Mainloop.timeout_add_seconds(
+            SEARCH_METRIC_INACTIVITY_TIMEOUT_SECONDS,
+            function () {
+                let query = terms.join(' ');
+                if (query !== '')
+                    this._recordDesktopSearchMetric(query,
+                        DesktopSearchProvider.MY_COMPUTER);
+                this._localSearchMetricTimeoutId = 0;
+                return GLib.SOURCE_REMOVE;
+            }.bind(this));
     },
 
     _resetSearch: function() {
