@@ -5,6 +5,7 @@ const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Meta = imports.gi.Meta;
 const Mainloop = imports.mainloop;
+const Pango = imports.gi.Pango;
 const Signals = imports.signals;
 const Lang = imports.lang;
 const St = imports.gi.St;
@@ -17,10 +18,12 @@ const Monitor = imports.ui.monitor;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const ModalDialog = imports.ui.modalDialog;
 const OverviewControls = imports.ui.overviewControls;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
+const ViewSelector = imports.ui.viewSelector;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
 
 // Time for initial animation going into Overview mode
@@ -34,6 +37,8 @@ const SHADE_ANIMATION_TIME = .20;
 const DND_WINDOW_SWITCH_TIMEOUT = 750;
 
 const OVERVIEW_ACTIVATION_TIMEOUT = 0.5;
+
+const NO_WINDOWS_OPEN_DIALOG_TIMEOUT = 2000; // ms
 
 const ShellInfo = new Lang.Class({
     Name: 'ShellInfo',
@@ -87,6 +92,55 @@ const ShellInfo = new Lang.Class({
     }
 });
 
+const NoWindowsDialog = new Lang.Class({
+    Name: 'NoWindowsDialog',
+    Extends: ModalDialog.ModalDialog,
+
+    _init: function() {
+        this.parent({ styleClass: 'prompt-dialog',
+                      shellReactive: true,
+                      destroyOnClose: false });
+
+        this._timeoutId = 0;
+
+        let descriptionLabel = new St.Label({ style_class: 'prompt-dialog-headline headline',
+                                              text: _('No apps are open') });
+        descriptionLabel.clutter_text.line_wrap = true;
+        descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
+        this.contentLayout.add(descriptionLabel,
+                               { x_fill: false,
+                                 y_fill: false,
+                                 x_align: St.Align.MIDDLE,
+                                 y_align: St.Align.MIDDLE });
+
+        this._group.connect('key-press-event', Lang.bind(this, function(event) {
+            this.close(global.get_current_time());
+            return Clutter.EVENT_PROPAGATE;
+        }));
+    },
+
+    show: function() {
+        if (this._timeoutId != 0)
+            Mainloop.source_remove(this._timeoutId);
+
+        this._timeoutId =
+            Mainloop.timeout_add(NO_WINDOWS_OPEN_DIALOG_TIMEOUT, Lang.bind(this, function() {
+                this.hide();
+                return GLib.SOURCE_REMOVE;
+            }));
+        this.open(global.get_current_time());
+    },
+
+    hide: function() {
+        if (this._timeoutId != 0) {
+            Mainloop.source_remove(this._timeoutId);
+            this._timeoutId = 0;
+        }
+        this.close(global.get_current_time());
+    },
+});
+
 const Overview = new Lang.Class({
     Name: 'Overview',
 
@@ -96,6 +150,7 @@ const Overview = new Lang.Class({
 
         Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
         this._sessionUpdated();
+        this._noWindowsDialog = new NoWindowsDialog();
     },
 
     _createOverview: function() {
@@ -107,13 +162,22 @@ const Overview = new Lang.Class({
 
         this._overviewCreated = true;
 
+        // this._allMonitorsGroup is a simple actor that covers all monitors,
+        // used to install actions that apply to all monitors
+        this._allMonitorsGroup = new Clutter.Actor({ reactive: true });
+        this._allMonitorsGroup.add_constraint(
+            new Clutter.BindConstraint({ source: Main.layoutManager.overviewGroup,
+                                         coordinate: Clutter.BindCoordinate.ALL }));
+
         /* Translators: This is the main view to select
            activities. See also note for "Activities" string. */
         this._overview = new St.BoxLayout({ name: 'overview',
                                             accessible_name: _("Overview"),
+                                            reactive: true,
                                             vertical: true });
         this._overview.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
         this._overview._delegate = this;
+        this._allMonitorsGroup.add_actor(this._overview);
 
         // The main Background actors are inside global.window_group which are
         // hidden when displaying the overview, so we create a new
@@ -131,6 +195,8 @@ const Overview = new Lang.Class({
 
         this.visible = false;           // animating to overview, in overview, animating out
         this._shown = false;            // show() and not hide()
+        this._toggleToHidden = false;   // Whether to hide the overview when either toggle function is called
+        this._targetPage = null;        // do we have a target page to animate to?
         this._modal = false;            // have a modal grab
         this.animationInProgress = false;
         this.visibleTarget = false;
@@ -143,7 +209,7 @@ const Overview = new Lang.Class({
         Main.layoutManager.overviewGroup.add_child(this._coverPane);
         this._coverPane.connect('event', Lang.bind(this, function (actor, event) { return Clutter.EVENT_STOP; }));
 
-        Main.layoutManager.overviewGroup.add_child(this._overview);
+        Main.layoutManager.overviewGroup.add_child(this._allMonitorsGroup);
 
         this._coverPane.hide();
 
@@ -178,33 +244,8 @@ const Overview = new Lang.Class({
 
         for (let i = 0; i < Main.layoutManager.monitors.length; i++) {
             let bgManager = new Background.BackgroundManager({ container: this._backgroundGroup,
-                                                               monitorIndex: i,
-                                                               vignette: true });
+                                                               monitorIndex: i });
             this._bgManagers.push(bgManager);
-        }
-    },
-
-    _unshadeBackgrounds: function() {
-        let backgrounds = this._backgroundGroup.get_children();
-        for (let i = 0; i < backgrounds.length; i++) {
-            Tweener.addTween(backgrounds[i],
-                             { brightness: 1.0,
-                               vignette_sharpness: 0.0,
-                               time: SHADE_ANIMATION_TIME,
-                               transition: 'easeOutQuad'
-                             });
-        }
-    },
-
-    _shadeBackgrounds: function() {
-        let backgrounds = this._backgroundGroup.get_children();
-        for (let i = 0; i < backgrounds.length; i++) {
-            Tweener.addTween(backgrounds[i],
-                             { brightness: Lightbox.VIGNETTE_BRIGHTNESS,
-                               vignette_sharpness: Lightbox.VIGNETTE_SHARPNESS,
-                               time: SHADE_ANIMATION_TIME,
-                               transition: 'easeOutQuad'
-                             });
         }
     },
 
@@ -232,33 +273,16 @@ const Overview = new Lang.Class({
                                         opacity: 0 });
         this._overview.add_actor(this._panelGhost);
 
-        this._searchEntry = new St.Entry({ style_class: 'search-entry',
-                                           /* Translators: this is the text displayed
-                                              in the search entry when no search is
-                                              active; it should not exceed ~30
-                                              characters. */
-                                           hint_text: _("Type to search…"),
-                                           track_hover: true,
-                                           can_focus: true });
-        this._searchEntryBin = new St.Bin({ child: this._searchEntry,
-                                            x_align: St.Align.MIDDLE });
-        this._overview.add_actor(this._searchEntryBin);
-
         // Create controls
-        this._controls = new OverviewControls.ControlsManager(this._searchEntry);
-        this._dash = this._controls.dash;
+        this._controls = new OverviewControls.ControlsManager();
         this.viewSelector = this._controls.viewSelector;
 
         // Add our same-line elements after the search entry
         this._overview.add(this._controls.actor, { y_fill: true, expand: true });
 
-        // TODO - recalculate everything when desktop size changes
-        this.dashIconSize = this._dash.iconSize;
-        this._dash.connect('icon-size-changed',
-                           Lang.bind(this, function() {
-                               this.dashIconSize = this._dash.iconSize;
-                           }));
+        this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
 
+        Main.layoutManager.connect('startup-prepared', Lang.bind(this, this._onStartupPrepared));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
         this._relayout();
     },
@@ -281,6 +305,15 @@ const Overview = new Lang.Class({
             return;
 
         this._shellInfo.setMessage(text, options);
+    },
+
+    _onPageChanged: function() {
+        this._toggleToHidden = false;
+
+        // SideComponent hooks on this signal but can't connect directly to
+        // viewSelector since it won't be created at the time the component
+        // is enabled, so rely on the overview and re-issue it from here.
+        this.emit('page-changed');
     },
 
     _onDragBegin: function() {
@@ -363,11 +396,14 @@ const Overview = new Lang.Class({
         return Clutter.EVENT_PROPAGATE;
     },
 
-    addAction: function(action) {
+    addAction: function(action, isPrimary) {
         if (this.isDummy)
             return;
 
-        this._backgroundGroup.add_action(action);
+        if (isPrimary)
+            this._overview.add_action(action);
+        else
+            this._allMonitorsGroup.add_action(action);
     },
 
     _getDesktopClone: function() {
@@ -442,7 +478,37 @@ const Overview = new Lang.Class({
 
     focusSearch: function() {
         this.show();
-        this._searchEntry.grab_key_focus();
+        this._viewSelector.focusSearch();
+    },
+
+    _showOrSwitchPage: function(page) {
+        if (this.visible) {
+            this.viewSelector.setActivePage(page);
+        } else {
+            this._targetPage = page;
+            this.show();
+        }
+    },
+
+    _onStartupPrepared: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
+    },
+
+    showApps: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
+    },
+
+    showWindows: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.WINDOWS);
     },
 
     fadeInDesktop: function() {
@@ -470,6 +536,69 @@ const Overview = new Lang.Class({
                            time: ANIMATION_TIME,
                            transition: 'easeOutQuad'
                          });
+    },
+
+    toggleApps: function() {
+        if (this.isDummy)
+            return;
+
+        if (!this.visible ||
+            this.viewSelector.getActivePage() !== ViewSelector.ViewPage.APPS) {
+            this.showApps();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasActiveWindows) {
+            this._noWindowsDialog.show();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasVisibleWindows) {
+            // There are active windows but all of them are hidden, so activate
+            // the most recently used one before hiding the overview.
+            let appSystem = Shell.AppSystem.get_default();
+            let runningApps = appSystem.get_running();
+            if (runningApps.length > 0)
+                runningApps[0].activate();
+        }
+
+        // Toggle to the currently open window
+        this.hide();
+    },
+
+    toggleWindows: function() {
+        if (this.isDummy)
+            return;
+
+        if (!this.visible) {
+            this.showWindows();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasActiveWindows) {
+            this._noWindowsDialog.show();
+            return;
+        }
+
+        if (this.viewSelector.getActivePage() !== ViewSelector.ViewPage.WINDOWS) {
+            this.showWindows();
+            return;
+        }
+
+        if (!this._toggleToHidden) {
+            this.showApps();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasVisibleWindows) {
+            // There are active windows but all of them are
+            // hidden, so we get back to show the icons grid.
+            this.showApps();
+            return;
+        }
+
+        // Toggle to the currently open window
+        this.hide();
     },
 
     // Checks if the Activities button is currently sensitive to
@@ -545,21 +674,24 @@ const Overview = new Lang.Class({
         this._activationTime = Date.now() / 1000;
 
         Meta.disable_unredirect_for_screen(global.screen);
-        this.viewSelector.show();
 
-        this._overview.opacity = 0;
-        Tweener.addTween(this._overview,
-                         { opacity: 255,
-                           transition: 'easeOutQuad',
-                           time: ANIMATION_TIME,
-                           onComplete: this._showDone,
-                           onCompleteScope: this
-                         });
-        this._shadeBackgrounds();
+        if (!this._targetPage)
+            this._targetPage = ViewSelector.ViewPage.WINDOWS;
+
+        this.viewSelector.show(this._targetPage);
+        this._targetPage = null;
+
+        // Since the overview is just becoming visible, we should toggle back
+        // the hidden state
+        this._toggleToHidden = true;
 
         this._coverPane.raise_top();
         this._coverPane.show();
         this.emit('showing');
+
+        // Show the overview immediately
+        this._overview.opacity = 255;
+        this._showDone();
     },
 
     _showDone: function() {
@@ -598,6 +730,9 @@ const Overview = new Lang.Class({
 
         this._shown = false;
 
+        // Hide the 'No windows dialog' in case it is open
+        this._noWindowsDialog.hide();
+
         this._animateNotVisible();
         this._syncGrab();
     },
@@ -612,19 +747,13 @@ const Overview = new Lang.Class({
 
         this.viewSelector.animateFromOverview();
 
-        // Make other elements fade out.
-        Tweener.addTween(this._overview,
-                         { opacity: 0,
-                           transition: 'easeOutQuad',
-                           time: ANIMATION_TIME,
-                           onComplete: this._hideDone,
-                           onCompleteScope: this
-                         });
-        this._unshadeBackgrounds();
-
         this._coverPane.raise_top();
         this._coverPane.show();
         this.emit('hiding');
+
+        // Hide the overview immediately
+        this._overview.opacity = 0;
+        this._hideDone();
     },
 
     _hideDone: function() {
@@ -662,10 +791,6 @@ const Overview = new Lang.Class({
             this.hide();
         else
             this.show();
-    },
-
-    getShowAppsButton: function() {
-        return this._dash.showAppsButton;
     }
 });
 Signals.addSignalMethods(Overview.prototype);

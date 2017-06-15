@@ -14,6 +14,7 @@ const Mainloop = imports.mainloop;
 const Atk = imports.gi.Atk;
 
 const AppFavorites = imports.ui.appFavorites;
+const BackgroundMenu = imports.ui.backgroundMenu;
 const BoxPointer = imports.ui.boxpointer;
 const DND = imports.ui.dnd;
 const GrabHelper = imports.ui.grabHelper;
@@ -30,7 +31,7 @@ const Util = imports.misc.util;
 
 const MAX_APPLICATION_WORK_MILLIS = 75;
 const MENU_POPUP_TIMEOUT = 600;
-const MAX_COLUMNS = 6;
+const MAX_COLUMNS = 7;
 const MIN_COLUMNS = 4;
 const MIN_ROWS = 4;
 
@@ -199,8 +200,11 @@ const BaseAppView = new Lang.Class({
 
     _doSpringAnimation: function(animationDirection) {
         this._grid.actor.opacity = 255;
-        this._grid.animateSpring(animationDirection,
-                                 Main.overview.getShowAppsButton());
+
+        // We don't do the icon grid animations on Endless, but we still need
+        // to call this method so that the animation-done signal gets emitted,
+        // in order not to break the transitoins.
+        this._grid.animateSpring(animationDirection, null);
     },
 
     animate: function(animationDirection, onComplete) {
@@ -428,7 +432,16 @@ const AllView = new Lang.Class({
             if (!this._currentPopup.actor.contains(actor))
                 this._currentPopup.popdown();
         }));
-        this._eventBlocker.add_action(this._clickAction);
+        Main.overview.addAction(this._clickAction, false);
+        this._eventBlocker.bind_property('reactive', this._clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
+
+        this._bgAction = new Clutter.ClickAction();
+        Main.overview.addAction(this._bgAction, true);
+        BackgroundMenu.addBackgroundMenuForAction(this._bgAction, Main.layoutManager);
+        this._clickAction.bind_property('enabled', this._bgAction, 'enabled',
+                                        GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN);
+        this.actor.bind_property('mapped', this._bgAction, 'enabled',
+                                 GObject.BindingFlags.SYNC_CREATE);
 
         this._displayingPopup = false;
 
@@ -441,7 +454,10 @@ const AllView = new Lang.Class({
             }));
         this._grid.connect('space-opened', Lang.bind(this,
             function() {
-                this._scrollView.get_effect('fade').enabled = false;
+                let fadeEffect = this._scrollView.get_effect('fade');
+                if (fadeEffect)
+                    fadeEffect.enabled = false;
+
                 this.emit('space-ready');
             }));
         this._grid.connect('space-closed', Lang.bind(this,
@@ -640,7 +656,11 @@ const AllView = new Lang.Class({
 
     _closeSpaceForPopup: function() {
         this._updateIconOpacities(false);
-        this._scrollView.get_effect('fade').enabled = true;
+
+        let fadeEffect = this._scrollView.get_effect('fade');
+        if (fadeEffect)
+            fadeEffect.enabled = true;
+
         this._grid.closeExtraSpace();
     },
 
@@ -877,22 +897,6 @@ const ControlsBoxLayout = Lang.Class({
     }
 });
 
-const ViewStackLayout = new Lang.Class({
-    Name: 'ViewStackLayout',
-    Extends: Clutter.BinLayout,
-    Signals: { 'allocated-size-changed': { param_types: [GObject.TYPE_INT,
-                                                         GObject.TYPE_INT] } },
-
-    vfunc_allocate: function (actor, box, flags) {
-        let availWidth = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-        // Prepare children of all views for the upcoming allocation, calculate all
-        // the needed values to adapt available size
-        this.emit('allocated-size-changed', availWidth, availHeight);
-        this.parent(actor, box, flags);
-    }
-});
-
 const AppDisplay = new Lang.Class({
     Name: 'AppDisplay',
 
@@ -900,11 +904,8 @@ const AppDisplay = new Lang.Class({
         this._privacySettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.privacy' });
 
         this._allView = new AllView();
-
-        let viewStackLayout = new ViewStackLayout();
         this.actor = new St.Widget({ x_expand: true, y_expand: true,
-                                     layout_manager: viewStackLayout });
-        viewStackLayout.connect('allocated-size-changed', Lang.bind(this, this._onAllocatedSizeChanged));
+                                     layout_manager: new Clutter.BinLayout() });
 
         this.actor.add_actor(this._allView.actor);
         this._showView();
@@ -923,16 +924,8 @@ const AppDisplay = new Lang.Class({
         this._allView.selectApp(id);
     },
 
-    _onAllocatedSizeChanged: function(actor, width, height) {
-        let box = new Clutter.ActorBox();
-        box.x1 = box.y1 =0;
-        box.x2 = width;
-        box.y2 = height;
-        box = this.actor.get_theme_node().get_content_box(box);
-        let availWidth = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-
-        this._allView.adaptToSize(availWidth, availHeight);
+    adaptToSize: function(width, height) {
+        return this._allView.adaptToSize(width, height);
     }
 })
 
@@ -1662,7 +1655,9 @@ const AppIcon = new Lang.Class({
     },
 
     getDragActor: function() {
-        return this.app.create_icon_texture(Main.overview.dashIconSize);
+        // This is a temporary change not to depend on the dash while
+        // we don't implement our own Drag'n'Drop mechanism in EOS.
+        return this.app.create_icon_texture(64);
     },
 
     // Returns the original actor that should align with the actor

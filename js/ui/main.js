@@ -99,7 +99,7 @@ function _sessionUpdated() {
     wm.setCustomKeybindingHandler('panel-main-menu',
                                   Shell.ActionMode.NORMAL |
                                   Shell.ActionMode.OVERVIEW,
-                                  sessionMode.hasOverview ? Lang.bind(overview, overview.toggle) : null);
+                                  sessionMode.hasOverview ? Lang.bind(overview, overview.toggleWindows) : null);
     wm.allowKeybinding('overlay-key', Shell.ActionMode.NORMAL |
                                       Shell.ActionMode.OVERVIEW);
 
@@ -196,7 +196,7 @@ function _initializeUI() {
 
     global.display.connect('overlay-key', Lang.bind(overview, function () {
         if (!_a11ySettings.get_boolean (STICKY_KEYS_ENABLE))
-            overview.toggle();
+            overview.toggleApps();
     }));
 
     global.display.connect('show-restart-message', function(display, message) {

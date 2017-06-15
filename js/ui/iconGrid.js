@@ -12,7 +12,7 @@ const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 const Main = imports.ui.main;
 
-const ICON_SIZE = 96;
+const ICON_SIZE = 64;
 const MIN_ICON_SIZE = 16;
 
 const EXTRA_SPACE_ANIMATION_TIME = 0.25;
@@ -470,113 +470,8 @@ const IconGrid = new Lang.Class({
     },
 
     animateSpring: function(animationDirection, sourceActor) {
-        if (this._animating)
-            return;
-
-        this._animating = true;
-
-        let actors = this._getChildrenToAnimate();
-        if (actors.length == 0) {
-            this._animationDone();
-            return;
-        }
-
-        let [sourceX, sourceY] = sourceActor.get_transformed_position();
-        let [sourceWidth, sourceHeight] = sourceActor.get_size();
-        // Get the center
-        let [sourceCenterX, sourceCenterY] = [sourceX + sourceWidth / 2, sourceY + sourceHeight / 2];
-        // Design decision, 1/2 of the source actor size.
-        let [sourceScaledWidth, sourceScaledHeight] = [sourceWidth / 2, sourceHeight / 2];
-
-        actors.forEach(function(actor) {
-            let [actorX, actorY] = actor._transformedPosition = actor.get_transformed_position();
-            let [x, y] = [actorX - sourceX, actorY - sourceY];
-            actor._distance = Math.sqrt(x * x + y * y);
-        });
-        let maxDist = actors.reduce(function(prev, cur) {
-            return Math.max(prev, cur._distance);
-        }, 0);
-        let minDist = actors.reduce(function(prev, cur) {
-            return Math.min(prev, cur._distance);
-        }, Infinity);
-        let normalization = maxDist - minDist;
-
-        for (let index = 0; index < actors.length; index++) {
-            let actor = actors[index];
-            actor.opacity = 0;
-            actor.reactive = false;
-
-            let actorClone = new Clutter.Clone({ source: actor });
-            Main.uiGroup.add_actor(actorClone);
-
-            let [width, height,,] = this._getAllocatedChildSizeAndSpacing(actor);
-            actorClone.set_size(width, height);
-            let scaleX = sourceScaledWidth / width;
-            let scaleY = sourceScaledHeight / height;
-            let [adjustedSourcePositionX, adjustedSourcePositionY] = [sourceCenterX - sourceScaledWidth / 2, sourceCenterY - sourceScaledHeight / 2];
-
-            let movementParams, fadeParams;
-            if (animationDirection == AnimationDirection.IN) {
-                let isLastItem = actor._distance == minDist;
-
-                actorClone.opacity = 0;
-                actorClone.set_scale(scaleX, scaleY);
-
-                actorClone.set_position(adjustedSourcePositionX, adjustedSourcePositionY);
-
-                let delay = (1 - (actor._distance - minDist) / normalization) * ANIMATION_MAX_DELAY_FOR_ITEM;
-                let [finalX, finalY]  = actor._transformedPosition;
-                movementParams = { time: ANIMATION_TIME_IN,
-                                   transition: 'easeInOutQuad',
-                                   delay: delay,
-                                   x: finalX,
-                                   y: finalY,
-                                   scale_x: 1,
-                                   scale_y: 1,
-                                   onComplete: Lang.bind(this, function() {
-                                       if (isLastItem)
-                                           this._animationDone();
-
-                                       actor.opacity = 255;
-                                       actor.reactive = true;
-                                       actorClone.destroy();
-                                   })};
-                fadeParams = { time: ANIMATION_FADE_IN_TIME_FOR_ITEM,
-                               transition: 'easeInOutQuad',
-                               delay: delay,
-                               opacity: 255 };
-            } else {
-                let isLastItem = actor._distance == maxDist;
-
-                let [startX, startY]  = actor._transformedPosition;
-                actorClone.set_position(startX, startY);
-
-                let delay = (actor._distance - minDist) / normalization * ANIMATION_MAX_DELAY_OUT_FOR_ITEM;
-                movementParams = { time: ANIMATION_TIME_OUT,
-                                   transition: 'easeInOutQuad',
-                                   delay: delay,
-                                   x: adjustedSourcePositionX,
-                                   y: adjustedSourcePositionY,
-                                   scale_x: scaleX,
-                                   scale_y: scaleY,
-                                   onComplete: Lang.bind(this, function() {
-                                       if (isLastItem) {
-                                           this._animationDone();
-                                           this._restoreItemsOpacity();
-                                       }
-                                       actor.reactive = true;
-                                       actorClone.destroy();
-                                   })};
-                fadeParams = { time: ANIMATION_FADE_IN_TIME_FOR_ITEM,
-                               transition: 'easeInOutQuad',
-                               delay: ANIMATION_TIME_OUT + delay - ANIMATION_FADE_IN_TIME_FOR_ITEM,
-                               opacity: 0 };
-            }
-
-
-            Tweener.addTween(actorClone, movementParams);
-            Tweener.addTween(actorClone, fadeParams);
-        }
+        // We don't do the icon grid animations on Endless
+        this._animationDone();
     },
 
     _restoreItemsOpacity: function() {
@@ -762,30 +657,6 @@ const IconGrid = new Lang.Class({
         this._fixedHItemSize = this._hItemSize;
         this._fixedVItemSize = this._vItemSize;
         this._updateSpacingForSize(availWidth, availHeight);
-        let spacing = this._getSpacing();
-
-        if (this.columnsForWidth(availWidth) < this._minColumns || this.rowsForHeight(availHeight) < this._minRows) {
-            let neededWidth = this.usedWidthForNColumns(this._minColumns) - availWidth ;
-            let neededHeight = this.usedHeightForNRows(this._minRows) - availHeight ;
-
-            let neededSpacePerItem = (neededWidth > neededHeight) ? Math.ceil(neededWidth / this._minColumns)
-                                                                  : Math.ceil(neededHeight / this._minRows);
-            this._fixedHItemSize = Math.max(this._hItemSize - neededSpacePerItem, MIN_ICON_SIZE);
-            this._fixedVItemSize = Math.max(this._vItemSize - neededSpacePerItem, MIN_ICON_SIZE);
-
-            this._updateSpacingForSize(availWidth, availHeight);
-        }
-        Meta.later_add(Meta.LaterType.BEFORE_REDRAW,
-                       Lang.bind(this, this._updateIconSizes));
-    },
-
-    // Note that this is ICON_SIZE as used by BaseIcon, not elsewhere in IconGrid; it's a bit messed up
-    _updateIconSizes: function() {
-        let scale = Math.min(this._fixedHItemSize, this._fixedVItemSize) / Math.max(this._hItemSize, this._vItemSize);
-        let newIconSize = Math.floor(ICON_SIZE * scale);
-        for (let i in this._items) {
-            this._items[i].icon.setIconSize(newIconSize);
-        }
     }
 });
 Signals.addSignalMethods(IconGrid.prototype);
