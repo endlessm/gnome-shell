@@ -132,6 +132,8 @@ const Overview = new Lang.Class({
 
         this.visible = false;           // animating to overview, in overview, animating out
         this._shown = false;            // show() and not hide()
+        this._toggleToHidden = false;   // Whether to hide the overview when either toggle function is called
+        this._targetPage = null;        // do we have a target page to animate to?
         this._modal = false;            // have a modal grab
         this.animationInProgress = false;
         this.visibleTarget = false;
@@ -243,6 +245,8 @@ const Overview = new Lang.Class({
     },
 
     _onPageChanged: function() {
+        this._toggleToHidden = false;
+
         // SideComponent hooks on this signal but can't connect directly to
         // viewSelector since it won't be created at the time the component
         // is enabled, so rely on the overview and re-issue it from here.
@@ -411,10 +415,12 @@ const Overview = new Lang.Class({
     },
 
     _showOrSwitchPage: function(page) {
-        if (this.visible)
+        if (this.visible) {
             this.viewSelector.setActivePage(page);
-        else
+        } else {
+            this._targetPage = page;
             this.show();
+        }
     },
 
     _onStartupPrepared: function() {
@@ -487,6 +493,41 @@ const Overview = new Lang.Class({
             let runningApps = appSystem.get_running();
             if (runningApps.length > 0)
                 runningApps[0].activate();
+        }
+
+        // Toggle to the currently open window
+        this.hide();
+    },
+
+    toggleWindows: function() {
+        if (this.isDummy)
+            return;
+
+        if (!this.visible) {
+            this.showWindows();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasActiveWindows) {
+            // TODO: Show a dialog with a 'No apps open' message to the user.
+            return;
+        }
+
+        if (this.viewSelector.getActivePage() !== ViewSelector.ViewPage.WINDOWS) {
+            this.showWindows();
+            return;
+        }
+
+        if (!this._toggleToHidden) {
+            this.showApps();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasVisibleWindows) {
+            // There are active windows but all of them are
+            // hidden, so we get back to show the icons grid.
+            this.showApps();
+            return;
         }
 
         // Toggle to the currently open window
@@ -566,7 +607,16 @@ const Overview = new Lang.Class({
         this._activationTime = Date.now() / 1000;
 
         Meta.disable_unredirect_for_screen(global.screen);
-        this.viewSelector.show();
+
+        if (!this._targetPage)
+            this._targetPage = ViewSelector.ViewPage.WINDOWS;
+
+        this.viewSelector.show(this._targetPage);
+        this._targetPage = null;
+
+        // Since the overview is just becoming visible, we should toggle back
+        // the hidden state
+        this._toggleToHidden = true;
 
         this._overview.opacity = 0;
         Tweener.addTween(this._overview,
