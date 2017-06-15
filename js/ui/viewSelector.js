@@ -28,13 +28,16 @@ const IconGrid = imports.ui.iconGrid;
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 var PINCH_GESTURE_THRESHOLD = 0.7;
 
+const SEARCH_ACTIVATION_TIMEOUT = 50;
+
 var ViewPage = {
     WINDOWS: 1,
     APPS: 2
 };
 
 const ViewsDisplayPage = {
-    APP_GRID: 1
+    APP_GRID: 1,
+    SEARCH: 2
 };
 
 var FocusTrap = new Lang.Class({
@@ -149,26 +152,117 @@ var ViewsDisplayLayout = new Lang.Class({
     Signals: { 'grid-available-size-changed': { param_types: [GObject.TYPE_INT,
                                                               GObject.TYPE_INT] } },
 
-    _init: function(appDisplayActor) {
+    _init: function(entry, gridContainerActor, searchResultsActor) {
         this.parent();
 
-        this._appDisplayActor = appDisplayActor;
-        this._appDisplayActor.connect('style-changed', this._onStyleChanged.bind(this));
+        this._entry = entry;
+        this._gridContainerActor = gridContainerActor;
+        this._searchResultsActor = searchResultsActor;
+
+        this._entry.connect('style-changed', this._onStyleChanged.bind(this));
+        this._gridContainerActor.connect('style-changed', this._onStyleChanged.bind(this));
+
+        this._heightAboveEntry = 0;
+        this.searchResultsTween = 0;
+        this._lowResolutionMode = false;
     },
 
     _onStyleChanged: function() {
         this.layout_changed();
     },
 
-    vfunc_allocate: function(actor, box, flags) {
-        let availWidth = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
+    _centeredHeightAbove: function (height, availHeight) {
+        return Math.max(0, Math.floor((availHeight - height) / 2));
+    },
+
+    _computeGridContainerPlacement: function (viewHeight, entryHeight, availHeight) {
+        // If we have the space for it, we add some padding to the top of the
+        // all view when calculating its centered position. This is to offset
+        // the icon labels at the bottom of the icon grid, so the icons
+        // themselves appears centered.
+        let themeNode = this._gridContainerActor.get_theme_node();
+        let topPadding = themeNode.get_length('-natural-padding-top');
+        let heightAbove = this._centeredHeightAbove(viewHeight + topPadding, availHeight);
+        let leftover = Math.max(availHeight - viewHeight - heightAbove, 0);
+        heightAbove += Math.min(topPadding, leftover);
+        // Always leave enough room for the search entry at the top
+        heightAbove = Math.max(entryHeight, heightAbove);
+        return heightAbove;
+    },
+
+    _computeChildrenAllocation: function(allocation) {
+        let availWidth = allocation.x2 - allocation.x1;
+        let availHeight = allocation.y2 - allocation.y1;
+
+        // Entry height
+        let entryHeight = this._entry.get_preferred_height(availWidth)[1];
+        let themeNode = this._entry.get_theme_node();
+        let entryMinPadding = themeNode.get_length('-minimum-vpadding');
+        let entryTopMargin = themeNode.get_length('margin-top');
+        entryHeight += entryMinPadding * 2;
+
+        // GridContainer height
+        let gridContainerHeight = this._gridContainerActor.get_preferred_height(availWidth)[1];
+        let heightAboveGrid = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
+        this._heightAboveEntry = this._centeredHeightAbove(entryHeight, heightAboveGrid);
+
+        let entryBox = allocation.copy();
+        entryBox.y1 = this._heightAboveEntry + entryTopMargin;
+        entryBox.y2 = entryBox.y1 + entryHeight;
+
+        let gridContainerBox = allocation.copy();
+        // The grid container box should have the dimensions of this container but start
+        // after the search entry and according to the calculated xplacement policies
+        gridContainerBox.y1 = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
+
+        let searchResultsBox = allocation.copy();
+
+        // The views clone does not have a searchResultsActor
+        if (this._searchResultsActor) {
+            let searchResultsHeight = availHeight - entryHeight;
+            searchResultsBox.x1 = allocation.x1;
+            searchResultsBox.x2 = allocation.x2;
+            searchResultsBox.y1 = entryBox.y2;
+            searchResultsBox.y2 = searchResultsBox.y1 + searchResultsHeight;
+        }
+
+        return [entryBox, gridContainerBox, searchResultsBox];
+    },
+
+    vfunc_allocate: function(container, allocation, flags) {
+        let [entryBox, gridContainerBox, searchResultsBox] = this._computeChildrenAllocation(allocation);
 
         // We want to emit the signal BEFORE any allocation has happened since the
         // icon grid will need to precompute certain values before being able to
         // report a sensible preferred height for the specified width.
-        this.emit('grid-available-size-changed', availWidth, availHeight);
-        this.parent(actor, box, flags);
+        this.emit('grid-available-size-changed', allocation.x2 - allocation.x1, allocation.y2 - allocation.y1);
+
+        this._entry.allocate(entryBox, flags);
+        this._gridContainerActor.allocate(gridContainerBox, flags);
+        if (this._searchResultsActor)
+            this._searchResultsActor.allocate(searchResultsBox, flags);
+    },
+
+    set searchResultsTween(v) {
+        if (v == this._searchResultsTween || this._searchResultsActor == null)
+            return;
+
+        this._gridContainerActor.visible = v != 1;
+        this._searchResultsActor.visible = v != 0;
+
+        this._gridContainerActor.opacity = (1 - v) * 255;
+        this._searchResultsActor.opacity = v * 255;
+
+        let entryTranslation = - this._heightAboveEntry * v;
+        this._entry.translation_y = entryTranslation;
+
+        this._searchResultsActor.translation_y = entryTranslation;
+
+        this._searchResultsTween = v;
+    },
+
+    get searchResultsTween() {
+        return this._searchResultsTween;
     }
 });
 
@@ -176,18 +270,27 @@ var ViewsDisplayContainer = new Lang.Class({
     Name: 'ViewsDisplayContainer',
     Extends: St.Widget,
 
-    _init: function(appDisplay) {
-        this._appDisplay = appDisplay;
+    _init: function(entry, gridContainer, searchResults) {
+        this._entry = entry;
+        this._gridContainer = gridContainer;
+        this._searchResults = searchResults;
+
         this._activePage = ViewsDisplayPage.APP_GRID;
 
-        let layoutManager = new ViewsDisplayLayout(this._appDisplay.actor);
+        let layoutManager = new ViewsDisplayLayout(entry, gridContainer.actor, searchResults.actor);
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true });
 
         layoutManager.connect('grid-available-size-changed', this._onGridAvailableSizeChanged.bind(this));
 
-        this.add_actor(this._appDisplay.actor);
+        this.add_child(this._entry);
+        this.add_child(this._gridContainer.actor);
+        this.add_child(this._searchResults.actor);
+    },
+
+    _onTweenComplete: function() {
+        this._searchResults.isAnimating = false;
     },
 
     _onGridAvailableSizeChanged: function(actor, width, height) {
@@ -195,18 +298,32 @@ var ViewsDisplayContainer = new Lang.Class({
         box.x1 = box.y1 = 0;
         box.x2 = width;
         box.y2 = height;
-        box = this._appDisplay.actor.get_theme_node().get_content_box(box);
+        box = this._gridContainer.actor.get_theme_node().get_content_box(box);
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
 
-        this._appDisplay.adaptToSize(availWidth, availHeight);
+        this._gridContainer.adaptToSize(availWidth, availHeight);
     },
 
-    showPage: function(page) {
+    showPage: function(page, doAnimation) {
         if (this._activePage === page)
             return;
 
         this._activePage = page;
+
+        let tweenTarget = page == ViewsDisplayPage.SEARCH ? 1 : 0;
+        if (doAnimation) {
+            this._searchResults.isAnimating = true;
+            Tweener.addTween(this.layout_manager,
+                             { searchResultsTween: tweenTarget,
+                               transition: 'easeOutQuad',
+                               time: 0.25,
+                               onComplete: this._onTweenComplete,
+                               onCompleteScope: this,
+                             });
+        } else {
+            this.layout_manager.searchResultsTween = tweenTarget;
+        }
     },
 
     getActivePage: function() {
@@ -218,9 +335,100 @@ var ViewsDisplay = new Lang.Class({
     Name: 'ViewsDisplay',
 
     _init: function() {
+        this._enterSearchTimeoutId = 0;
+
         this._appDisplay = new AppDisplay.AppDisplay()
 
-        this.actor = new ViewsDisplayContainer(this._appDisplay);
+        this._searchResults = new Search.SearchResults();
+        this._searchResults.connect('search-progress-updated', this._updateSpinner.bind(this));
+
+        // Since the entry isn't inside the results container we install this
+        // dummy widget as the last results container child so that we can
+        // include the entry in the keynav tab path
+        this._focusTrap = new FocusTrap({ can_focus: true });
+        this._focusTrap.connect('key-focus-in', () => {
+            this.entry.grab_key_focus();
+        });
+        this._searchResults.actor.add_actor(this._focusTrap);
+
+        global.focus_manager.add_group(this._searchResults.actor);
+
+        this.entry = new ShellEntry.OverviewEntry();
+        this.entry.connect('search-activated', this._onSearchActivated.bind(this));
+        this.entry.connect('search-active-changed', this._onSearchActiveChanged.bind(this));
+        this.entry.connect('search-navigate-focus', this._onSearchNavigateFocus.bind(this));
+        this.entry.connect('search-terms-changed', this._onSearchTermsChanged.bind(this));
+
+        this.entry.clutter_text.connect('key-focus-in', () => {
+            this._searchResults.highlightDefault(true);
+        });
+        this.entry.clutter_text.connect('key-focus-out', () => {
+            this._searchResults.highlightDefault(false);
+        });
+
+        // Clicking on any empty area should exit search and get back to the desktop.
+        let clickAction = new Clutter.ClickAction();
+        clickAction.connect('clicked', this._resetSearch.bind(this));
+        Main.overview.addAction(clickAction, false);
+        this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
+
+        this.actor = new ViewsDisplayContainer(this.entry, this._appDisplay, this._searchResults);
+    },
+
+    _updateSpinner: function() {
+        this.entry.setSpinning(this._searchResults.searchInProgress);
+    },
+
+    _enterSearch: function() {
+        if (this._enterSearchTimeoutId > 0)
+            return;
+
+        // We give a very short time for search results to populate before
+        // triggering the animation, unless an animation is already in progress
+        if (this._searchResults.isAnimating) {
+            this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+            return;
+        }
+
+        this._enterSearchTimeoutId = Mainloop.timeout_add(SEARCH_ACTIVATION_TIMEOUT, () => {
+            this._enterSearchTimeoutId = 0;
+            this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+
+            return GLib.SOURCE_REMOVE;
+        });
+    },
+
+    _leaveSearch: function() {
+        if (this._enterSearchTimeoutId > 0) {
+            Mainloop.source_remove(this._enterSearchTimeoutId);
+            this._enterSearchTimeoutId = 0;
+        }
+        this.actor.showPage(ViewsDisplayPage.APP_GRID, true);
+    },
+
+    _onSearchActivated: function() {
+        this._searchResults.activateDefault();
+        this._resetSearch();
+    },
+
+    _onSearchActiveChanged: function() {
+        if (this.entry.active)
+            this._enterSearch();
+        else
+            this._leaveSearch();
+    },
+
+    _onSearchNavigateFocus: function(entry, direction) {
+        this._searchResults.navigateFocus(direction);
+    },
+
+    _onSearchTermsChanged: function() {
+        let terms = this.entry.getSearchTerms();
+        this._searchResults.setTerms(terms);
+    },
+
+    _resetSearch: function() {
+        this.entry.resetSearch();
     },
 
     get appDisplay() {
