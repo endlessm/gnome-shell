@@ -399,7 +399,7 @@ const AllViewContainer = new Lang.Class({
         gridActor.y_expand = true;
         gridActor.y_align = Clutter.ActorAlign.CENTER;
 
-        this.scrollView = new St.ScrollView({ style_class: 'all-apps',
+        this.scrollView = new St.ScrollView({ style_class: 'all-apps-scroller',
                                               x_expand: true,
                                               y_expand: true,
                                               x_fill: true,
@@ -947,7 +947,9 @@ const AppDisplay = new Lang.Class({
         this._privacySettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.privacy' });
 
         this._allView = new AllView();
-        this.actor = new St.Widget({ x_expand: true, y_expand: true,
+        this.actor = new St.Widget({ style_class: 'all-apps',
+                                     x_expand: true,
+                                     y_expand: true,
                                      layout_manager: new Clutter.BinLayout() });
 
         this.actor.add_actor(this._allView.actor);

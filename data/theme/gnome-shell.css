@@ -2161,6 +2161,18 @@ stage {
   margin-left: 16px;
 }
 
+.all-apps {
+    -natural-padding-top: 25px;
+
+    /* We set the padding to zero to prevent inconsistencies with clones */
+    padding: 0px;
+ }
+
+.all-apps-scroller > StBoxLayout {
+    /* horizontal padding to make sure page indicators don't overlap content */
+    padding: 0px 70px;
+}
+
 .icon-grid {
     spacing: 10px;
     -shell-grid-horizontal-item-size: 118px;
