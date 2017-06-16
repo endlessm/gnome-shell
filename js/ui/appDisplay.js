@@ -399,7 +399,9 @@ const AllViewContainer = new Lang.Class({
     Name: 'AllViewContainer',
     Extends: St.Widget,
 
-    _init: function(gridActor) {
+    _init: function(gridActor, params) {
+        params = Params.parse(params, { allowScrolling: true });
+
         this.parent({ layout_manager: new Clutter.BinLayout(),
                       x_expand: true,
                       y_expand: true });
@@ -414,7 +416,7 @@ const AllViewContainer = new Lang.Class({
                                               y_expand: true,
                                               x_fill: true,
                                               y_fill: false,
-                                              reactive: true,
+                                              reactive: params.allowScrolling,
                                               hscrollbar_policy: Gtk.PolicyType.NEVER,
                                               vscrollbar_policy: Gtk.PolicyType.EXTERNAL,
                                               y_align: Clutter.ActorAlign.START });

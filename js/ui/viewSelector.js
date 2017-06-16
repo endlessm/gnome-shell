@@ -493,15 +493,18 @@ const ViewsClone = new Lang.Class({
 
         let iconGridClone = new Clutter.Clone({ source: appDisplay.gridActor,
                                                 x_expand: true,
-                                                y_expand: true });
+                                                y_expand: true,
+                                                reactive: false });
 
-        let appGridContainer = new AppDisplay.AllViewContainer(iconGridClone);
+        let appGridContainer = new AppDisplay.AllViewContainer(iconGridClone,
+                                                               { allowScrolling: false });
         appGridContainer.reactive = false;
 
         let layoutManager = new ViewsDisplayLayout(entry, appGridContainer, null);
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true,
+                      reactive: false,
                       opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY });
 
         this._saturation = new Clutter.DesaturateEffect({ factor: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
