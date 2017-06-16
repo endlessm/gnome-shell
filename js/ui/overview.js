@@ -272,19 +272,20 @@ const Overview = new Lang.Class({
 
         this._shellInfo = new ShellInfo();
 
-        // Add a clone of the panel to the overview so spacing and such is
-        // automatic
-        this._panelGhost = new St.Bin({ child: new Clutter.Clone({ source: Main.panel.actor }),
-                                        reactive: false,
-                                        opacity: 0 });
-        this._overview.add_actor(this._panelGhost);
-
         // Create controls
         this._controls = new OverviewControls.ControlsManager();
         this.viewSelector = this._controls.viewSelector;
 
         // Add our same-line elements after the search entry
         this._overview.add(this._controls.actor, { y_fill: true, expand: true });
+
+        // Add a clone of the panel to the overview so spacing and such is
+        // automatic
+        this._panelGhost = new St.Bin({ child: new Clutter.Clone({ source: Main.panel.actor }),
+                                        reactive: false,
+                                        opacity: 0 });
+
+        this._overview.add_actor(this._panelGhost);
 
         this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
 
