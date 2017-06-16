@@ -1237,7 +1237,7 @@ const HotCorner = new Lang.Class({
 
         if (Main.overview.shouldToggleByCornerOrButton()) {
             this._rippleAnimation();
-            Main.overview.toggle();
+            Main.overview.toggleWindows();
         }
     },
 
