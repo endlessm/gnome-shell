@@ -512,6 +512,13 @@ const ViewSelector = new Lang.Class({
                 }
             }));
 
+        Main.wm.addKeybinding('toggle-application-view',
+                              new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
+                              Meta.KeyBindingFlags.NONE,
+                              Shell.ActionMode.NORMAL |
+                              Shell.ActionMode.OVERVIEW,
+                              Lang.bind(this, Main.overview.toggleApps));
+
         Main.wm.addKeybinding('toggle-overview',
                               new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
                               Meta.KeyBindingFlags.NONE,
