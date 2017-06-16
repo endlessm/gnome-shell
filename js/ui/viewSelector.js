@@ -466,15 +466,18 @@ class ViewsClone extends St.Widget {
 
         let iconGridClone = new Clutter.Clone({ source: appDisplay.gridActor,
                                                 x_expand: true,
-                                                y_expand: true });
+                                                y_expand: true,
+                                                reactive: false });
 
-        let appGridContainer = new AppDisplay.AllViewContainer(iconGridClone);
+        let appGridContainer = new AppDisplay.AllViewContainer(iconGridClone,
+                                                               { allowScrolling: false });
         appGridContainer.reactive = false;
 
         let layoutManager = new ViewsDisplayLayout(entry, appGridContainer, null);
         super._init({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true,
+                      reactive: false,
                       opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY });
 
         // Ensure the cloned grid is scrolled to the same page as the original one
