@@ -452,7 +452,7 @@ const ControlsManager = new Lang.Class({
 
         geometry.width -= thumbnailsWidth;
 
-        if (this.actor.get_text_direction() != Clutter.TextDirection.LTR)
+        if (this.actor.get_text_direction() == Clutter.TextDirection.RTL)
             geometry.x += thumbnailsWidth;
 
         this.viewSelector.setWorkspacesFullGeometry(geometry);

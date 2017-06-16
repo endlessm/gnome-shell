@@ -390,6 +390,8 @@ const ViewsDisplay = new Lang.Class({
         this._enterSearchTimeoutId = Mainloop.timeout_add(SEARCH_ACTIVATION_TIMEOUT, Lang.bind(this, function () {
             this._enterSearchTimeoutId = 0;
             this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+
+            return GLib.SOURCE_REMOVE;
         }));
     },
 
@@ -512,12 +514,19 @@ const ViewSelector = new Lang.Class({
                 }
             }));
 
+        Main.wm.addKeybinding('toggle-application-view',
+                              new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
+                              Meta.KeyBindingFlags.NONE,
+                              Shell.ActionMode.NORMAL |
+                              Shell.ActionMode.OVERVIEW,
+                              Lang.bind(this, Main.overview.toggleApps));
+
         Main.wm.addKeybinding('toggle-overview',
                               new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
                               Meta.KeyBindingFlags.NONE,
                               Shell.ActionMode.NORMAL |
                               Shell.ActionMode.OVERVIEW,
-                              Lang.bind(Main.overview, Main.overview.toggle));
+                              Lang.bind(Main.overview, Main.overview.toggleWindows));
 
         let side;
         if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)

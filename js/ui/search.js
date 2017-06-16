@@ -422,7 +422,7 @@ const SearchResults = new Lang.Class({
                                             vertical: true });
         Util.blockClickEventsOnActor(this.actor);
 
-        this._content = new St.BoxLayout({ name: 'searchResultsBox',
+        this._content = new St.BoxLayout({ name: 'searchResultsContent',
                                            vertical: true });
         this._contentBin = new MaxWidthBin({ name: 'searchResultsBin',
                                              x_fill: true,
