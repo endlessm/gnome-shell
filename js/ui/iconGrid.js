@@ -707,7 +707,6 @@ const IconGrid = new Lang.Class({
     adaptToSize: function(availWidth, availHeight) {
         this._fixedHItemSize = this._hItemSize;
         this._fixedVItemSize = this._vItemSize;
-        this._updateSpacingForSize(availWidth, availHeight);
     }
 });
 Signals.addSignalMethods(IconGrid.prototype);
