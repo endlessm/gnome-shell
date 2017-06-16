@@ -470,8 +470,8 @@ const AllView = new Lang.Class({
         panAction.connect('gesture-cancel', Lang.bind(this, this._onPanEnd));
         panAction.connect('gesture-end', Lang.bind(this, this._onPanEnd));
         this._panAction = panAction;
-        this._scrollView.add_action(panAction);
         this._panning = false;
+
         this._clickAction = new Clutter.ClickAction();
         this._clickAction.connect('clicked', Lang.bind(this, function() {
             if (!this._currentPopup)
@@ -835,6 +835,11 @@ const AllView = new Lang.Class({
         // Update folder views
         for (let i = 0; i < this.folderIcons.length; i++)
             this.folderIcons[i].adaptToSize(availWidth, availHeight);
+
+        // Enable panning depending on the number of pages
+        this._scrollView.remove_action(this._panAction);
+        if (this._grid.nPages() > 1)
+            this._scrollView.add_action(this._panAction);
     }
 });
 Signals.addSignalMethods(AllView.prototype);
