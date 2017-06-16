@@ -390,6 +390,8 @@ const ViewsDisplay = new Lang.Class({
         this._enterSearchTimeoutId = Mainloop.timeout_add(SEARCH_ACTIVATION_TIMEOUT, Lang.bind(this, function () {
             this._enterSearchTimeoutId = 0;
             this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+
+            return GLib.SOURCE_REMOVE;
         }));
     },
 
