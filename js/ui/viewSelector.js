@@ -233,7 +233,7 @@ const ViewSelector = new Lang.Class({
                               Meta.KeyBindingFlags.NONE,
                               Shell.ActionMode.NORMAL |
                               Shell.ActionMode.OVERVIEW,
-                              Lang.bind(Main.overview, Main.overview.toggle));
+                              Lang.bind(Main.overview, Main.overview.toggleWindows));
 
         let side;
         if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
