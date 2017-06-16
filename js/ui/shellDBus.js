@@ -578,8 +578,27 @@ const AppLauncherIface = '<node> \
     <arg type="s" direction="in" name="name" /> \
     <arg type="u" direction="in" name="timestamp" /> \
 </method> \
+<method name="LaunchViaDBusCall"> \
+    <arg type="s" direction="in" name="name" /> \
+    <arg type="s" direction="in" name="busName" /> \
+    <arg type="s" direction="in" name="objectPath" /> \
+    <arg type="s" direction="in" name="interfaceName" /> \
+    <arg type="s" direction="in" name="methodName" /> \
+    <arg type="v" direction="in" name="args" /> \
+</method> \
 </interface> \
 </node>';
+
+function activationContextForAppName(appName, appSys) {
+    if (!appName.endsWith('.desktop'))
+        appName += '.desktop';
+
+    let app = appSys.lookup_app(appName);
+    if (!app)
+        return null;
+
+    return new AppActivation.AppActivationContext(app);
+}
 
 const AppLauncher = new Lang.Class({
     Name: 'AppLauncherDBus',
@@ -592,26 +611,49 @@ const AppLauncher = new Lang.Class({
     },
 
     LaunchAsync: function(params, invocation) {
-        if (name == 'eos-app-store') {
+        let [appName, timestamp] = params;
+
+        if (appName == 'eos-app-store') {
             Main.appStore.show(timestamp, true);
+            Main.appStore.appLaunched = true;
             return;
         }
 
-        let [appName, timestamp] = params;
-        if (!appName.endsWith('.desktop'))
-            appName += '.desktop';
+        let activationContext = activationContextForAppName(appName, this._appSys);
 
-        let app = this._appSys.lookup_app(appName);
-        if (!app) {
+        if (!activationContext) {
             invocation.return_error_literal(Gio.IOErrorEnum,
                                             Gio.IOErrorEnum.NOT_FOUND,
                                             'Unable to launch app ' + appName + ': Not installed');
             return;
         }
 
-        let activationContext = new AppActivation.AppActivationContext(app);
         activationContext.activate(null, timestamp);
+    },
 
-        Main.appStore.appLaunched = true;
+    LaunchViaDBusCallAsync: function(params, invocation) {
+        let [appName, busName, path, interfaceName, method, args] = params;
+        let activationContext = activationContextForAppName(appName, this._appSys);
+
+        if (!activationContext) {
+            invocation.return_error_literal(Gio.IOErrorEnum,
+                                            Gio.IOErrorEnum.NOT_FOUND,
+                                            'Unable to launch app ' + appName + ': Not installed');
+            return;
+        }
+
+        activationContext.activateViaDBusCall(busName, path, interfaceName, method, args, function(error, result) {
+            if (error) {
+                logError(error);
+                invocation.return_error_literal(Gio.IOErrorEnum,
+                                                Gio.IOErrorEnum.FAILED,
+                                                'Unable to launch app ' + appName +
+                                                ' through DBus call on ' + busName +
+                                                ' ' + path + ' ' + interfaceName + ' ' +
+                                                method + ': ' + String(error));
+            } else {
+                invocation.return_value(result);
+            }
+        });
     }
 });
