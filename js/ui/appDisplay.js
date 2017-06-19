@@ -960,6 +960,11 @@ const AppSearchProvider = new Lang.Class({
         let groups = Shell.AppSystem.search(query);
         let usage = Shell.AppUsage.get_default();
         let results = [];
+        let codingEnabled = global.settings.get_boolean('enable-coding-game');
+        let codingApps = [
+            'com.endlessm.Coding.Chatbox.desktop',
+            'eos-shell-extension-prefs.desktop'
+        ];
         groups.forEach(function(group) {
             group = group.filter(function(appID) {
                 let app = Gio.DesktopAppInfo.new(appID);
@@ -968,6 +973,10 @@ const AppSearchProvider = new Lang.Class({
 
                 // exclude links that are not part of the desktop grid
                 if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
+                    return false;
+
+                // exclude coding related apps if coding game is not enabled
+                if (!codingEnabled && codingApps.indexOf(appID) > -1)
                     return false;
 
                 return app && app.should_show();
@@ -1462,6 +1471,7 @@ const AppIcon = new Lang.Class({
         delete iconParams['isDraggable'];
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
+        iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
         iconParams['setSizeManually'] = true;
         this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
         this._iconContainer.add_child(this.icon.actor);
@@ -1502,17 +1512,47 @@ const AppIcon = new Lang.Class({
                 this._updateRunningStyle();
             }));
         this._updateRunningStyle();
+
+        if (app.get_id() === 'com.endlessm.Coding.Chatbox.desktop')
+            this._newGtkNotificationSourceId = Main.notificationDaemon.gtk.connect('new-gtk-notification-source',
+                                                                                   Lang.bind(this, this._onNewGtkNotificationSource));
     },
 
     _onDestroy: function() {
         if (this._stateChangedId > 0)
             this.app.disconnect(this._stateChangedId);
         this._stateChangedId = 0;
+
+        if (this._newGtkNotificationSourceId > 0)
+            Main.notificationDaemon.gtk.disconnect(this._newGtkNotificationSourceId);
+        this._newGtkNotificationSourceId = 0;
+
         this._removeMenuTimeout();
     },
 
     _createIcon: function(iconSize) {
         return this.app.create_icon_texture(iconSize);
+    },
+
+    _createExtraIcons: function(iconSize) {
+        if (!this._notificationSource)
+            return [];
+
+        let sourceActor = new AppIconSourceActor(this._notificationSource, iconSize);
+        return [sourceActor.actor];
+    },
+
+    _onNewGtkNotificationSource: function(daemon, source) {
+        if (source.app != this.app)
+            return;
+
+        this._notificationSource = source;
+        this._notificationSource.connect('destroy', Lang.bind(this, function() {
+            this._notificationSource = null;
+            this.icon.reloadIcon();
+        }));
+
+        this.icon.reloadIcon();
     },
 
     _removeMenuTimeout: function() {
