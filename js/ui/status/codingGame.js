@@ -17,7 +17,7 @@ const CodingGameIndicator = new Lang.Class({
     Extends: PanelMenu.SingleIconButton,
 
     _init: function() {
-        this.parent(_('Coding'), Clutter.ActorAlign.CENTER, Clutter.ActorAlign.CENTER);
+        this.parent(_("Coding"), Clutter.ActorAlign.CENTER, Clutter.ActorAlign.CENTER);
         this.setIcon(Gio.icon_new_for_string('folder-drag-accept-symbolic'));
         this.mainIcon.width = 24;
         this.mainIcon.height = 24;
