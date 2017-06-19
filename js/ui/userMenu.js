@@ -25,7 +25,7 @@ const ONLINE_ACCOUNTS_PANEL_LAUNCHER = 'gnome-online-accounts-panel.desktop';
 const USER_ACCOUNTS_PANEL_LAUNCHER = 'gnome-user-accounts-panel.desktop';
 
 const HELP_CENTER_TEXT = _("Help Center");
-const HELP_CENTER_LAUNCHER = 'yelp.desktop';
+const HELP_CENTER_LAUNCHER = 'org.gnome.Yelp.desktop';
 
 const UserAccountSection = new Lang.Class({
     Name: 'UserAccountSection',
