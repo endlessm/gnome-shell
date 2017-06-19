@@ -10,7 +10,9 @@ misc/config.js: misc/config.js.in Makefile
 	    -e "s|[@]GETTEXT_PACKAGE@|$(GETTEXT_PACKAGE)|g" \
 	    -e "s|[@]datadir@|$(datadir)|g" \
 	    -e "s|[@]libexecdir@|$(libexecdir)|g" \
+	    -e "s|[@]pkgdatadir@|$(pkgdatadir)|g" \
 	    -e "s|[@]sysconfdir@|$(sysconfdir)|g" \
+	    -e "s|[@]localstatedir@|$(localstatedir)|g" \
                $< > $@
 
 js_resource_files = $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir) --sourcedir=$(builddir) --generate-dependencies $(srcdir)/js-resources.gresource.xml)

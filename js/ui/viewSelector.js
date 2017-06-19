@@ -74,6 +74,72 @@ function getTermsForSearchString(searchString) {
     return terms;
 }
 
+function maybeCreateInactiveDiscoveryFeedButton() {
+    if (checkIfDiscoveryFeedEnabled()) {
+        let discoveryFeed = new DiscoveryFeedButton();
+        discoveryFeed.reactive = false;
+        return discoveryFeed;
+    }
+
+    return null;
+}
+
+function checkIfDiscoveryFeedEnabled() {
+    let supportedLanguages = global.settings.get_value('discovery-feed-languages').deep_unpack();
+    let systemLanguages = GLib.get_language_names();
+
+    let isEnabled = supportedLanguages.some(function(lang) {
+        return systemLanguages.indexOf(lang) !== -1;
+    });
+
+    return isEnabled;
+}
+
+function maybeCreateDiscoveryFeed() {
+    if (checkIfDiscoveryFeedEnabled()) {
+        let discoveryFeedButton = new DiscoveryFeedButton();
+        discoveryFeedButton.connect('clicked', Lang.bind(this, function() {
+            Main.discoveryFeed.show(global.get_current_time());
+        }));
+
+        return discoveryFeedButton;
+    }
+
+    return null;
+}
+
+/** DiscoveryFeedButton:
+ *
+ * This class handles the button to launch the discovery feed application
+ */
+const DiscoveryFeedButton = new Lang.Class({
+    Name: 'DiscoveryFeedButton',
+    Extends: St.Button,
+
+    _init: function() {
+        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/discovery-feed-open-tab.png');
+        let gicon = new Gio.FileIcon({ file: iconFile });
+        this._icon = new St.Icon({ gicon: gicon,
+                                   style_class: 'discovery-feed-icon',
+                                   track_hover: true });
+        this.parent({ name: 'discovery-feed',
+                      child: this._icon,
+                      x_align: Clutter.ActorAlign.CENTER,
+                      y_align: Clutter.ActorAlign.CENTER });
+    }
+});
+
+function allocateDiscoveryFeedButtonToBox(discoveryFeedButton, box, availWidth) {
+    let discoveryFeedButtonHeight = discoveryFeedButton.get_preferred_height(availWidth)[1];
+    let discoveryFeedButtonBox = box.copy();
+    let x1 = (availWidth - discoveryFeedButton.get_width()) * 0.5;
+    discoveryFeedButtonBox.y1 = 0;
+    discoveryFeedButtonBox.y2 = discoveryFeedButtonBox.y1 + discoveryFeedButtonHeight;
+    discoveryFeedButtonBox.x1 = x1;
+    discoveryFeedButtonBox.x2 = x1 + discoveryFeedButton.get_width();
+    return discoveryFeedButtonBox;
+}
+
 const ShowOverviewAction = new Lang.Class({
     Name: 'ShowOverviewAction',
     Extends: Clutter.GestureAction,
@@ -143,12 +209,16 @@ const ViewsDisplayLayout = new Lang.Class({
     Signals: { 'allocated-size-changed': { param_types: [GObject.TYPE_INT,
                                                          GObject.TYPE_INT] } },
 
-    _init: function(entry, appDisplayActor, searchResultsActor) {
+    _init: function(entry,
+                    discoveryFeedButton,
+                    appDisplayActor,
+                    searchResultsActor) {
         this.parent();
 
         this._entry = entry;
         this._appDisplayActor = appDisplayActor;
         this._searchResultsActor = searchResultsActor;
+        this._discoveryFeedButton = discoveryFeedButton;
 
         this._entry.connect('style-changed', Lang.bind(this, this._onStyleChanged));
         this._appDisplayActor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
@@ -198,6 +268,12 @@ const ViewsDisplayLayout = new Lang.Class({
         this._heightAboveEntry = this._centeredHeightAbove(entryHeight, heightAboveGrid);
 
         let entryBox = allocation.copy();
+        let discoveryFeedButtonBox = allocation.copy();
+        if (this._discoveryFeedButton !== null)
+            discoveryFeedButtonBox = allocateDiscoveryFeedButtonToBox(this._discoveryFeedButton,
+                                                                      entryBox,
+                                                                      availWidth);
+
         entryBox.y1 = this._heightAboveEntry + entryTopMargin;
         entryBox.y2 = entryBox.y1 + entryHeight;
 
@@ -216,11 +292,11 @@ const ViewsDisplayLayout = new Lang.Class({
             searchResultsBox.y2 = searchResultsBox.y1 + searchResultsHeight;
         }
 
-        return [entryBox, appDisplayBox, searchResultsBox];
+        return [entryBox, appDisplayBox, searchResultsBox, discoveryFeedButtonBox];
     },
 
     vfunc_allocate: function(container, allocation, flags) {
-        let [entryBox, appDisplayBox, searchResultsBox] = this._computeChildrenAllocation(allocation);
+        let [entryBox, appDisplayBox, searchResultsBox, discoveryFeedButtonBox] = this._computeChildrenAllocation(allocation);
 
         // We want to emit the signal BEFORE any allocation has happened since the
         // icon grid will need to precompute certain values before being able to
@@ -231,6 +307,9 @@ const ViewsDisplayLayout = new Lang.Class({
         this._appDisplayActor.allocate(appDisplayBox, flags);
         if (this._searchResultsActor)
             this._searchResultsActor.allocate(searchResultsBox, flags);
+
+        if (this._discoveryFeedButton)
+            this._discoveryFeedButton.allocate(discoveryFeedButtonBox, flags);
     },
 
     set searchResultsTween(v) {
@@ -242,6 +321,11 @@ const ViewsDisplayLayout = new Lang.Class({
 
         this._appDisplayActor.opacity = (1 - v) * 255;
         this._searchResultsActor.opacity = v * 255;
+
+        if (this._discoveryFeedButton !== null) {
+            this._discoveryFeedButton.visible = v != 1;
+            this._discoveryFeedButton.opacity = (1 - v) * 255;
+        }
 
         let entryTranslation = - this._heightAboveEntry * v;
         this._entry.translation_y = entryTranslation;
@@ -260,14 +344,20 @@ const ViewsDisplayContainer = new Lang.Class({
     Name: 'ViewsDisplayContainer',
     Extends: St.Widget,
 
-    _init: function(entry, appDisplay, searchResults) {
+    _init: function(entry, discoveryFeedButton, appDisplay, searchResults) {
+        this._activePage = null;
         this._entry = entry;
         this._appDisplay = appDisplay;
+        this._discoveryFeedButton = discoveryFeedButton;
         this._searchResults = searchResults;
 
         this._activePage = ViewsDisplayPage.APP_GRID;
 
-        let layoutManager = new ViewsDisplayLayout(entry, appDisplay.actor, searchResults.actor);
+        let layoutManager = new ViewsDisplayLayout(entry,
+                                                   discoveryFeedButton,
+                                                   appDisplay.actor,
+                                                   searchResults.actor);
+
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true });
@@ -275,6 +365,8 @@ const ViewsDisplayContainer = new Lang.Class({
         layoutManager.connect('allocated-size-changed', Lang.bind(this, this._onAllocatedSizeChanged));
 
         this.add_child(this._entry);
+        if (this._discoveryFeedButton !== null)
+            this.add_child(this._discoveryFeedButton);
         this.add_child(this._appDisplay.actor);
         this.add_child(this._searchResults.actor);
     },
@@ -327,6 +419,7 @@ const ViewsDisplay = new Lang.Class({
     _init: function() {
         this._enterSearchTimeoutId = 0;
         this._localSearchMetricTimeoutId = 0;
+        this.discoveryFeed = maybeCreateDiscoveryFeed();
 
         this._appDisplay = new AppDisplay.AppDisplay()
 
@@ -363,7 +456,10 @@ const ViewsDisplay = new Lang.Class({
         Main.overview.addAction(clickAction, false);
         this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
 
-        this.actor = new ViewsDisplayContainer(this.entry, this._appDisplay, this._searchResults);
+        this.actor = new ViewsDisplayContainer(this.entry,
+                                               this.discoveryFeed,
+                                               this._appDisplay,
+                                               this._searchResults);
     },
 
     _recordDesktopSearchMetric: function(query, searchProvider) {
@@ -390,6 +486,8 @@ const ViewsDisplay = new Lang.Class({
         this._enterSearchTimeoutId = Mainloop.timeout_add(SEARCH_ACTIVATION_TIMEOUT, Lang.bind(this, function () {
             this._enterSearchTimeoutId = 0;
             this.actor.showPage(ViewsDisplayPage.SEARCH, true);
+
+            return GLib.SOURCE_REMOVE;
         }));
     },
 
@@ -608,12 +706,19 @@ const ViewSelector = new Lang.Class({
                 }
             }));
 
+        Main.wm.addKeybinding('toggle-application-view',
+                              new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
+                              Meta.KeyBindingFlags.NONE,
+                              Shell.ActionMode.NORMAL |
+                              Shell.ActionMode.OVERVIEW,
+                              Lang.bind(this, Main.overview.toggleApps));
+
         Main.wm.addKeybinding('toggle-overview',
                               new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
                               Meta.KeyBindingFlags.NONE,
                               Shell.ActionMode.NORMAL |
                               Shell.ActionMode.OVERVIEW,
-                              Lang.bind(Main.overview, Main.overview.toggle));
+                              Lang.bind(Main.overview, Main.overview.toggleWindows));
 
         let side;
         if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)

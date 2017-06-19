@@ -277,7 +277,6 @@ const Overview = new Lang.Class({
         this._panelGhost = new St.Bin({ child: new Clutter.Clone({ source: Main.panel.actor }),
                                         reactive: false,
                                         opacity: 0 });
-        this._overview.add_actor(this._panelGhost);
 
         // Create controls
         this._controls = new OverviewControls.ControlsManager();
@@ -285,6 +284,7 @@ const Overview = new Lang.Class({
 
         // Add our same-line elements after the search entry
         this._overview.add(this._controls.actor, { y_fill: true, expand: true });
+        this._overview.add(this._panelGhost);
 
         this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
 
@@ -797,6 +797,10 @@ const Overview = new Lang.Class({
             this.hide();
         else
             this.show();
+    },
+
+    getActivePage: function() {
+        return this.viewSelector.getActivePage();
     }
 });
 Signals.addSignalMethods(Overview.prototype);

@@ -418,8 +418,23 @@ const Dash = new Lang.Class({
         this._container.add_actor(this._showAppsIcon);
 
         this.actor = new St.Bin({ child: this._container });
+        this.actor.connect('notify::height', Lang.bind(this,
+            function() {
+                if (this._maxHeight != this.actor.height)
+                    this._queueRedisplay();
+                this._maxHeight = this.actor.height;
+            }));
+
+        this._workId = Main.initializeDeferredWork(this._box, Lang.bind(this, this._redisplay));
 
         this._appSystem = Shell.AppSystem.get_default();
+
+        this._appSystem.connect('installed-changed', Lang.bind(this, function() {
+            AppFavorites.getAppFavorites().reload();
+            this._queueRedisplay();
+        }));
+        AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._queueRedisplay));
+        this._appSystem.connect('app-state-changed', Lang.bind(this, this._queueRedisplay));
 
         Main.overview.connect('item-drag-begin',
                               Lang.bind(this, this._onDragBegin));
@@ -490,6 +505,10 @@ const Dash = new Lang.Class({
         for (let i = 0; i < apps.length; i++)
             ids[apps[i].get_id()] = apps[i];
         return ids;
+    },
+
+    _queueRedisplay: function () {
+        Main.queueDeferredWork(this._workId);
     },
 
     _hookUpLabel: function(item, appIcon) {
