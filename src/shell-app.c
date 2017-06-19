@@ -1301,13 +1301,18 @@ shell_app_get_app_info (ShellApp *app)
 
 gboolean
 shell_app_create_custom_launcher_with_name (ShellApp *app,
-                                            const char *label)
+                                            const char *label,
+                                            GError **error)
 {
+  g_autoptr(GDesktopAppInfo) appinfo = NULL;
+  g_auto(GStrv) keys = NULL;
   GError *internal_error;
   const char *filename;
-  char *new_path, *buf;
-  GKeyFile *keyfile;
+  g_autofree char *new_path = NULL;
+  g_autofree char *buf = NULL;
+  g_autoptr(GKeyFile) keyfile = NULL;
   gsize len;
+  gsize i;
 
   if (app->info == NULL)
     return FALSE;
@@ -1324,32 +1329,30 @@ shell_app_create_custom_launcher_with_name (ShellApp *app,
   g_key_file_load_from_file (keyfile, filename, 0, &internal_error);
   if (internal_error != NULL)
     {
-      g_warning ("Unable to load desktop file '%s': %s", filename, internal_error->message);
-
-      g_error_free (internal_error);
-      g_key_file_unref (keyfile);
+      g_propagate_error (error, internal_error);
 
       return FALSE;
     }
 
-  /* replace the 'Name' key with the new one */
+  /* remove all translated 'Name' keys */
+  keys = g_key_file_get_keys (keyfile,
+                              G_KEY_FILE_DESKTOP_GROUP,
+                              &len,
+                              NULL);
+  for (i = 0; i < len; i++)
+    {
+      if (strncmp (keys[i], G_KEY_FILE_DESKTOP_KEY_NAME, strlen (G_KEY_FILE_DESKTOP_KEY_NAME)) == 0)
+        g_key_file_remove_key (keyfile,
+                               G_KEY_FILE_DESKTOP_GROUP,
+                               keys[i],
+                               NULL);
+    }
+
+  /* create a new 'Name' key with the new name */
   g_key_file_set_string (keyfile,
                          G_KEY_FILE_DESKTOP_GROUP,
                          G_KEY_FILE_DESKTOP_KEY_NAME,
                          label);
-
-  buf = g_key_file_to_data (keyfile, &len, &internal_error);
-  if (internal_error != NULL)
-    {
-      g_warning ("Unable to save desktop file: %s", internal_error->message);
-
-      g_error_free (internal_error);
-      g_key_file_unref (keyfile);
-
-      return FALSE;
-    }
-
-  g_key_file_unref (keyfile);
 
   new_path = g_build_filename (g_get_user_data_dir (), "applications", NULL);
 
@@ -1357,10 +1360,12 @@ shell_app_create_custom_launcher_with_name (ShellApp *app,
     {
       int saved_errno = errno;
 
-      g_warning ("Unable to create '%s': %s", new_path, g_strerror (saved_errno));
-
-      g_free (new_path);
-      g_free (buf);
+      g_set_error (error,
+                   G_FILE_ERROR,
+                   g_file_error_from_errno (saved_errno),
+                   "Unable to create '%s': %s",
+                   new_path,
+                   g_strerror (saved_errno));
 
       return FALSE;
     }
@@ -1369,20 +1374,39 @@ shell_app_create_custom_launcher_with_name (ShellApp *app,
 
   new_path = g_build_filename (g_get_user_data_dir (), "applications", shell_app_get_id (app), NULL);
 
-  g_file_set_contents (new_path, buf, len, &internal_error);
+  if (!g_file_test (new_path, G_FILE_TEST_EXISTS))
+    {
+      /* Create a new 'X-Endless-CreatedBy' key to indicate the file was created
+       * by eos-desktop */
+      g_key_file_set_string (keyfile,
+                             G_KEY_FILE_DESKTOP_GROUP,
+                             "X-Endless-CreatedBy",
+                             "eos-desktop");
+    }
+
+  buf = g_key_file_to_data (keyfile, &len, &internal_error);
   if (internal_error != NULL)
     {
-      g_warning ("Unable to write desktop file '%s': %s", new_path, internal_error->message);
-
-      g_error_free (internal_error);
-      g_free (new_path);
-      g_free (buf);
+      g_propagate_error (error, internal_error);
 
       return FALSE;
     }
 
-  g_free (new_path);
-  g_free (buf);
+  g_file_set_contents (new_path, buf, len, &internal_error);
+  if (internal_error != NULL)
+    {
+      g_propagate_error (error, internal_error);
+
+      return FALSE;
+    }
+
+  /* Update the app's information with the newly created file */
+  appinfo = g_desktop_app_info_new_from_filename (new_path);
+
+  if (appinfo == NULL)
+    return FALSE;
+
+  _shell_app_set_app_info (app, appinfo);
 
   return TRUE;
 }
