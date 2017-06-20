@@ -217,9 +217,6 @@ const SearchResultsBase = new Lang.Class({
         Main.overview.hide();
     },
 
-    _setMoreIconVisible: function(visible) {
-    },
-
     _ensureResultActors: function(results, callback) {
         let metasNeeded = results.filter(Lang.bind(this, function(resultId) {
             return this._resultDisplays[resultId] === undefined;
@@ -285,7 +282,6 @@ const SearchResultsBase = new Lang.Class({
                 results.forEach(Lang.bind(this, function(resultId) {
                     this._addItem(this._resultDisplays[resultId]);
                 }));
-                this._setMoreIconVisible(hasMoreResults && this.provider.canLaunchSearch);
                 this.actor.show();
                 callback();
             }));
@@ -322,10 +318,6 @@ const ListSearchResults = new Lang.Class({
                                              y_align: St.Align.MIDDLE });
 
         this._resultDisplayBin.set_child(this._container);
-    },
-
-    _setMoreIconVisible: function(visible) {
-        this.providerIcon.moreIcon.visible = visible;
     },
 
     _getMaxDisplayedResults: function() {
@@ -811,19 +803,11 @@ const ProviderIcon = new Lang.Class({
 
         let rtl = (this.get_text_direction() == Clutter.TextDirection.RTL);
 
-        this.moreIcon = new St.Widget({ style_class: 'search-provider-icon-more',
-                                        visible: false,
-                                        x_align: rtl ? Clutter.ActorAlign.START : Clutter.ActorAlign.END,
-                                        y_align: Clutter.ActorAlign.END,
-                                        x_expand: true,
-                                        y_expand: true });
-
         let icon = new St.Icon({ icon_size: this.PROVIDER_ICON_SIZE,
                                  gicon: provider.appInfo.get_icon() });
 
         this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
         this._content.add_actor(icon);
-        this._content.add_actor(this.moreIcon);
 
         let box = new St.BoxLayout({ vertical: true, x_expand: false });
         this.set_child(box);
