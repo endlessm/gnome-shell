@@ -176,8 +176,8 @@ const SearchResultsBase = new Lang.Class({
                                               y_fill: true });
         this.actor.add(this._resultDisplayBin, { expand: true });
 
-        let separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
-        this.actor.add(separator.actor);
+        this.separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
+        this.actor.add(this.separator.actor);
 
         this._resultDisplays = {};
 
@@ -335,7 +335,11 @@ const ListSearchResults = new Lang.Class({
     },
 
     _addItem: function(display) {
-        this._content.add_actor(display.actor);
+        if (this._content.get_n_children() > 0) {
+            display.separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
+            this._content.add(display.separator.actor);
+        }
+        this._content.add_actor(display.actor, { expand: true });
     },
 
     getFirstResult: function() {
@@ -670,6 +674,21 @@ const SearchResults = new Lang.Class({
         }
     },
 
+    _syncSeparatorVisiblity: function () {
+        let lastVisibleDisplay;
+        for (let i = 0; i < this._providers.length; i++) {
+            let provider = this._providers[i];
+            let display = provider.display;
+
+            display.separator.actor.show();
+            if (display.actor.visible)
+                lastVisibleDisplay = display;
+        }
+
+        if (lastVisibleDisplay)
+            lastVisibleDisplay.separator.actor.hide();
+    },
+
     _updateSearchProgress: function () {
         let haveResults = this._providers.some(function(provider) {
             let display = provider.display;
@@ -677,6 +696,7 @@ const SearchResults = new Lang.Class({
         });
         let showStatus = !haveResults && !this.isAnimating;
 
+        this._syncSeparatorVisiblity();
         this._scrollView.visible = haveResults;
         this._statusBin.visible = showStatus;
 
