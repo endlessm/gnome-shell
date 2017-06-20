@@ -499,7 +499,9 @@ const ViewsClone = new Lang.Class({
                                                                { allowScrolling: false });
         appGridContainer.reactive = false;
 
-        let layoutManager = new ViewsDisplayLayout(entry, appGridContainer, null);
+        let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
+
+        let layoutManager = new ViewsDisplayLayout(entry, discoveryFeedButton, appGridContainer, null);
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true,
@@ -510,6 +512,8 @@ const ViewsClone = new Lang.Class({
                                                           enabled: false });
         iconGridClone.add_effect(this._saturation);
 
+        if (discoveryFeedButton)
+            this.add_child(discoveryFeedButton);
         this.add_child(entry);
         this.add_child(appGridContainer);
 
