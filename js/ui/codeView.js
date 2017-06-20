@@ -1020,6 +1020,7 @@ const CodeViewManager = new Lang.Class({
             return false;
 
         this._sessions.splice(idx, 1);
+        return true;
     },
 
     removeBuilderWindow: function(actor) {
