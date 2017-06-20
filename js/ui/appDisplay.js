@@ -1204,7 +1204,7 @@ const FolderIcon = new Lang.Class({
         this._popupInvalidated = false;
 
         this.icon = new IconGrid.BaseIcon('', { createIcon: Lang.bind(this, this._createIcon),
-                                                setSizeManually: true,
+                                                setSizeManually: false,
                                                 editable: true });
         this.actor.set_child(this.icon.actor);
         this.actor.label_actor = this.icon.label;
@@ -1581,7 +1581,7 @@ const AppIcon = new Lang.Class({
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
         iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
-        iconParams['setSizeManually'] = true;
+        iconParams['setSizeManually'] = false;
         this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
         this._iconContainer.add_child(this.icon.actor);
 
