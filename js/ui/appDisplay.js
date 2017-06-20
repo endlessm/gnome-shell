@@ -423,14 +423,14 @@ const AllViewContainer = new Lang.Class({
                                               y_align: Clutter.ActorAlign.START });
 
         this.stack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-        let box = new St.BoxLayout({ vertical: true });
+        this.stackBox = new St.BoxLayout({ vertical: true });
 
         this.stack.add_child(gridActor);
-        box.add_child(this.stack);
+        this.stackBox.add_child(this.stack);
 
         // For some reason I couldn't investigate yet using add_child()
         // here makes the icon grid not to show up on the desktop.
-        this.scrollView.add_actor(box);
+        this.scrollView.add_actor(this.stackBox);
 
         this.add_child(this.scrollView);
     }
@@ -446,6 +446,7 @@ const AllView = new Lang.Class({
         this.actor = new AllViewContainer(this._grid.actor);
         this._scrollView = this.actor.scrollView;
         this._stack = this.actor.stack;
+        this._stackBox = this.actor.stackBox;
 
         this._adjustment = this._scrollView.vscroll.adjustment;
 
@@ -807,6 +808,8 @@ const AllView = new Lang.Class({
         box.y2 = height;
         box = this.actor.get_theme_node().get_content_box(box);
         box = this._scrollView.get_theme_node().get_content_box(box);
+        box = this._stackBox.get_theme_node().get_content_box(box);
+        box = this._stack.get_theme_node().get_content_box(box);
         box = this._grid.actor.get_theme_node().get_content_box(box);
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
