@@ -33,7 +33,7 @@ const MAX_APPLICATION_WORK_MILLIS = 75;
 const MENU_POPUP_TIMEOUT = 600;
 const MAX_COLUMNS = 7;
 const MIN_COLUMNS = 4;
-const MIN_ROWS = 4;
+const MIN_ROWS = 2;
 
 const INACTIVE_GRID_OPACITY = 77;
 // This time needs to be less than IconGrid.EXTRA_SPACE_ANIMATION_TIME
@@ -399,7 +399,7 @@ const AllViewContainer = new Lang.Class({
         gridActor.y_expand = true;
         gridActor.y_align = Clutter.ActorAlign.CENTER;
 
-        this.scrollView = new St.ScrollView({ style_class: 'all-apps',
+        this.scrollView = new St.ScrollView({ style_class: 'all-apps-scroller',
                                               x_expand: true,
                                               y_expand: true,
                                               x_fill: true,
@@ -410,14 +410,14 @@ const AllViewContainer = new Lang.Class({
                                               y_align: Clutter.ActorAlign.START });
 
         this.stack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-        let box = new St.BoxLayout({ vertical: true });
+        this.stackBox = new St.BoxLayout({ vertical: true });
 
         this.stack.add_child(gridActor);
-        box.add_child(this.stack);
+        this.stackBox.add_child(this.stack);
 
         // For some reason I couldn't investigate yet using add_child()
         // here makes the icon grid not to show up on the desktop.
-        this.scrollView.add_actor(box);
+        this.scrollView.add_actor(this.stackBox);
 
         this.add_child(this.scrollView);
     }
@@ -433,6 +433,7 @@ const AllView = new Lang.Class({
         this.actor = new AllViewContainer(this._grid.actor);
         this._scrollView = this.actor.scrollView;
         this._stack = this.actor.stack;
+        this._stackBox = this.actor.stackBox;
 
         this._adjustment = this._scrollView.vscroll.adjustment;
 
@@ -457,8 +458,8 @@ const AllView = new Lang.Class({
         panAction.connect('gesture-cancel', Lang.bind(this, this._onPanEnd));
         panAction.connect('gesture-end', Lang.bind(this, this._onPanEnd));
         this._panAction = panAction;
-        this._scrollView.add_action(panAction);
         this._panning = false;
+
         this._clickAction = new Clutter.ClickAction();
         this._clickAction.connect('clicked', Lang.bind(this, function() {
             if (!this._currentPopup)
@@ -800,6 +801,8 @@ const AllView = new Lang.Class({
         box.y2 = height;
         box = this.actor.get_theme_node().get_content_box(box);
         box = this._scrollView.get_theme_node().get_content_box(box);
+        box = this._stackBox.get_theme_node().get_content_box(box);
+        box = this._stack.get_theme_node().get_content_box(box);
         box = this._grid.actor.get_theme_node().get_content_box(box);
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
@@ -828,6 +831,11 @@ const AllView = new Lang.Class({
         // Update folder views
         for (let i = 0; i < this.folderIcons.length; i++)
             this.folderIcons[i].adaptToSize(availWidth, availHeight);
+
+        // Enable panning depending on the number of pages
+        this._scrollView.remove_action(this._panAction);
+        if (this._grid.nPages() > 1)
+            this._scrollView.add_action(this._panAction);
     }
 });
 Signals.addSignalMethods(AllView.prototype);
@@ -942,7 +950,9 @@ const AppDisplay = new Lang.Class({
         this._privacySettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.privacy' });
 
         this._allView = new AllView();
-        this.actor = new St.Widget({ x_expand: true, y_expand: true,
+        this.actor = new St.Widget({ style_class: 'all-apps',
+                                     x_expand: true,
+                                     y_expand: true,
                                      layout_manager: new Clutter.BinLayout() });
 
         this.actor.add_actor(this._allView.actor);
@@ -1174,7 +1184,7 @@ const FolderIcon = new Lang.Class({
         this._popupInvalidated = false;
 
         this.icon = new IconGrid.BaseIcon('', { createIcon: Lang.bind(this, this._createIcon),
-                                                setSizeManually: true,
+                                                setSizeManually: false,
                                                 editable: true });
         this.actor.set_child(this.icon.actor);
         this.actor.label_actor = this.icon.label;
@@ -1535,7 +1545,7 @@ const AppIcon = new Lang.Class({
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
         iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
-        iconParams['setSizeManually'] = true;
+        iconParams['setSizeManually'] = false;
         this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
         this._iconContainer.add_child(this.icon.actor);
 
