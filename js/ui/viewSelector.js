@@ -143,15 +143,15 @@ const ViewsDisplayLayout = new Lang.Class({
     Signals: { 'allocated-size-changed': { param_types: [GObject.TYPE_INT,
                                                          GObject.TYPE_INT] } },
 
-    _init: function(entry, appDisplayActor, searchResultsActor) {
+    _init: function(entry, gridContainerActor, searchResultsActor) {
         this.parent();
 
         this._entry = entry;
-        this._appDisplayActor = appDisplayActor;
+        this._gridContainerActor = gridContainerActor;
         this._searchResultsActor = searchResultsActor;
 
         this._entry.connect('style-changed', Lang.bind(this, this._onStyleChanged));
-        this._appDisplayActor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+        this._gridContainerActor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
 
         this._heightAboveEntry = 0;
         this.searchResultsTween = 0;
@@ -166,12 +166,12 @@ const ViewsDisplayLayout = new Lang.Class({
         return Math.max(0, Math.floor((availHeight - height) / 2));
     },
 
-    _computeAppDisplayPlacement: function (viewHeight, entryHeight, availHeight) {
+    _computeGridContainerPlacement: function (viewHeight, entryHeight, availHeight) {
         // If we have the space for it, we add some padding to the top of the
         // all view when calculating its centered position. This is to offset
         // the icon labels at the bottom of the icon grid, so the icons
         // themselves appears centered.
-        let themeNode = this._appDisplayActor.get_theme_node();
+        let themeNode = this._gridContainerActor.get_theme_node();
         let topPadding = themeNode.get_length('-natural-padding-top');
         let heightAbove = this._centeredHeightAbove(viewHeight + topPadding, availHeight);
         let leftover = Math.max(availHeight - viewHeight - heightAbove, 0);
@@ -192,18 +192,18 @@ const ViewsDisplayLayout = new Lang.Class({
         let entryTopMargin = themeNode.get_length('margin-top');
         entryHeight += entryMinPadding * 2;
 
-        // AppDisplay height
-        let appDisplayHeight = this._appDisplayActor.get_preferred_height(availWidth)[1];
-        let heightAboveGrid = this._computeAppDisplayPlacement(appDisplayHeight, entryHeight, availHeight);
+        // GridContainer height
+        let gridContainerHeight = this._gridContainerActor.get_preferred_height(availWidth)[1];
+        let heightAboveGrid = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
         this._heightAboveEntry = this._centeredHeightAbove(entryHeight, heightAboveGrid);
 
         let entryBox = allocation.copy();
         entryBox.y1 = this._heightAboveEntry + entryTopMargin;
         entryBox.y2 = entryBox.y1 + entryHeight;
 
-        let appDisplayBox = allocation.copy();
-        appDisplayBox.y1 = this._computeAppDisplayPlacement(appDisplayHeight, entryHeight, availHeight);
-        appDisplayBox.y2 = Math.min(appDisplayBox.y1 + appDisplayHeight, allocation.y2);
+        let gridContainerBox = allocation.copy();
+        gridContainerBox.y1 = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
+        gridContainerBox.y2 = Math.min(gridContainerBox.y1 + gridContainerHeight, allocation.y2);
 
         let searchResultsBox = allocation.copy();
 
@@ -216,11 +216,11 @@ const ViewsDisplayLayout = new Lang.Class({
             searchResultsBox.y2 = searchResultsBox.y1 + searchResultsHeight;
         }
 
-        return [entryBox, appDisplayBox, searchResultsBox];
+        return [entryBox, gridContainerBox, searchResultsBox];
     },
 
     vfunc_allocate: function(container, allocation, flags) {
-        let [entryBox, appDisplayBox, searchResultsBox] = this._computeChildrenAllocation(allocation);
+        let [entryBox, gridContainerBox, searchResultsBox] = this._computeChildrenAllocation(allocation);
 
         // We want to emit the signal BEFORE any allocation has happened since the
         // icon grid will need to precompute certain values before being able to
@@ -228,7 +228,7 @@ const ViewsDisplayLayout = new Lang.Class({
         this.emit('allocated-size-changed', allocation.x2 - allocation.x1, allocation.y2 - allocation.y1);
 
         this._entry.allocate(entryBox, flags);
-        this._appDisplayActor.allocate(appDisplayBox, flags);
+        this._gridContainerActor.allocate(gridContainerBox, flags);
         if (this._searchResultsActor)
             this._searchResultsActor.allocate(searchResultsBox, flags);
     },
@@ -237,10 +237,10 @@ const ViewsDisplayLayout = new Lang.Class({
         if (v == this._searchResultsTween || this._searchResultsActor == null)
             return;
 
-        this._appDisplayActor.visible = v != 1;
+        this._gridContainerActor.visible = v != 1;
         this._searchResultsActor.visible = v != 0;
 
-        this._appDisplayActor.opacity = (1 - v) * 255;
+        this._gridContainerActor.opacity = (1 - v) * 255;
         this._searchResultsActor.opacity = v * 255;
 
         let entryTranslation = - this._heightAboveEntry * v;
@@ -260,14 +260,14 @@ const ViewsDisplayContainer = new Lang.Class({
     Name: 'ViewsDisplayContainer',
     Extends: St.Widget,
 
-    _init: function(entry, appDisplay, searchResults) {
+    _init: function(entry, gridContainer, searchResults) {
         this._entry = entry;
-        this._appDisplay = appDisplay;
+        this._gridContainer = gridContainer;
         this._searchResults = searchResults;
 
         this._activePage = ViewsDisplayPage.APP_GRID;
 
-        let layoutManager = new ViewsDisplayLayout(entry, appDisplay.actor, searchResults.actor);
+        let layoutManager = new ViewsDisplayLayout(entry, gridContainer.actor, searchResults.actor);
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true });
@@ -275,7 +275,7 @@ const ViewsDisplayContainer = new Lang.Class({
         layoutManager.connect('allocated-size-changed', Lang.bind(this, this._onAllocatedSizeChanged));
 
         this.add_child(this._entry);
-        this.add_child(this._appDisplay.actor);
+        this.add_child(this._gridContainer.actor);
         this.add_child(this._searchResults.actor);
     },
 
@@ -288,11 +288,11 @@ const ViewsDisplayContainer = new Lang.Class({
         box.x1 = box.y1 = 0;
         box.x2 = width;
         box.y2 = height;
-        box = this._appDisplay.actor.get_theme_node().get_content_box(box);
+        box = this._gridContainer.actor.get_theme_node().get_content_box(box);
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
 
-        this._appDisplay.adaptToSize(availWidth, availHeight);
+        this._gridContainer.adaptToSize(availWidth, availHeight);
     },
 
     showPage: function(page, doAnimation) {
@@ -453,6 +453,101 @@ const ViewsDisplay = new Lang.Class({
     }
 });
 
+const ViewsClone = new Lang.Class({
+    Name: 'ViewsClone',
+    Extends: St.Widget,
+
+    _init: function(viewSelector, viewsDisplay, forOverview) {
+        this._viewSelector = viewSelector;
+        this._viewsDisplay = viewsDisplay;
+        this._forOverview = forOverview;
+
+        let appDisplay = this._viewsDisplay.appDisplay;
+        let entry = new ShellEntry.OverviewEntry();
+        entry.reactive = false;
+        entry.clutter_text.reactive = false;
+
+        let iconGridClone = new Clutter.Clone({ source: appDisplay.gridActor,
+                                                x_expand: true,
+                                                y_expand: true,
+                                                reactive: false });
+
+        let appGridContainer = new AppDisplay.AllViewContainer(iconGridClone,
+                                                               { allowScrolling: false });
+        appGridContainer.reactive = false;
+
+        let layoutManager = new ViewsDisplayLayout(entry, appGridContainer, null);
+        this.parent({ layout_manager: layoutManager,
+                      x_expand: true,
+                      y_expand: true,
+                      reactive: false,
+                      opacity: AppDisplay.EOS_INACTIVE_GRID_OPACITY });
+
+        this._saturation = new Clutter.DesaturateEffect({ factor: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
+                                                          enabled: false });
+        iconGridClone.add_effect(this._saturation);
+
+        this.add_child(entry);
+        this.add_child(appGridContainer);
+
+        let workareaConstraint = new Monitor.MonitorConstraint({ primary: true,
+                                                                 work_area: true });
+        this.add_constraint(workareaConstraint);
+
+        Main.overview.connect('showing', Lang.bind(this, function() {
+            this.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+            this._saturation.factor = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
+            this._saturation.enabled = this._forOverview;
+        }));
+        Main.overview.connect('hidden', Lang.bind(this, function() {
+            this.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+            this._saturation.factor = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
+            this._saturation.enabled = !this._forOverview;
+
+            // When we're hidden and coming from the apps page, tween out the
+            // clone saturation and opacity in the background as an override
+            if (!this._forOverview &&
+                this._viewSelector.getActivePage() == ViewPage.APPS) {
+                this.opacity = AppDisplay.EOS_ACTIVE_GRID_OPACITY;
+                this.saturation = AppDisplay.EOS_ACTIVE_GRID_SATURATION;
+                Tweener.addTween(this,
+                                 { opacity: AppDisplay.EOS_INACTIVE_GRID_OPACITY,
+                                   saturation: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
+                                   time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
+                                   transition: 'easeOutQuad' });
+            }
+        }));
+
+        let settings = Clutter.Settings.get_default();
+        settings.connect('notify::font-dpi', Lang.bind(this, function() {
+            let overviewVisible = Main.layoutManager.overviewGroup.visible;
+            let saturationEnabled = this._saturation.enabled;
+
+            /* Maybe because of the already known issue with FBO and ClutterClones,
+             * simply redrawing the overview group without assuring it is visible
+             * won't work. Clutter was supposed to do that, but it doesn't. The
+             * FBO, in this case, is introduced through the saturation effect.
+             */
+            this._saturation.enabled = false;
+            Main.layoutManager.overviewGroup.visible = true;
+
+            Main.layoutManager.overviewGroup.queue_redraw();
+
+            /* Restore the previous states */
+            Main.layoutManager.overviewGroup.visible = overviewVisible;
+            this._saturation.enabled = saturationEnabled;
+        }));
+    },
+
+    set saturation(factor) {
+        this._saturation.factor = factor;
+    },
+
+    get saturation() {
+        return this._saturation.factor;
+    }
+});
+
 const ViewsDisplayConstraint = new Lang.Class({
     Name: 'ViewsDisplayConstraint',
     Extends: Monitor.MonitorConstraint,
@@ -489,6 +584,9 @@ const ViewSelector = new Lang.Class({
         this._entry = this._viewsDisplay.entry;
 
         this._stageKeyPressId = 0;
+
+        this._addViewsPageClone();
+
         Main.overview.connect('showing', Lang.bind(this,
             function () {
                 this._stageKeyPressId = global.stage.connect('key-press-event',
@@ -549,6 +647,18 @@ const ViewSelector = new Lang.Class({
                 Main.overview.show();
         }));
         global.stage.add_action(gesture);
+    },
+
+    _addViewsPageClone: function() {
+        let layoutViewsClone = new ViewsClone(this, this._viewsDisplay, false);
+        Main.layoutManager.setViewsClone(layoutViewsClone);
+
+        let overviewViewsClone = new ViewsClone(this, this._viewsDisplay, true);
+        Main.overview.setViewsClone(overviewViewsClone);
+        this._appsPage.bind_property('visible',
+                                     overviewViewsClone, 'visible',
+                                     GObject.BindingFlags.SYNC_CREATE |
+                                     GObject.BindingFlags.INVERT_BOOLEAN);
     },
 
     _onEmptySpaceClicked: function() {

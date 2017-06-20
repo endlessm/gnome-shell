@@ -13,6 +13,7 @@ const Background = imports.ui.background;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const LoginManager = imports.misc.loginManager;
 
+const AppDisplay = imports.ui.appDisplay;
 const DND = imports.ui.dnd;
 const Main = imports.ui.main;
 const Monitor = imports.ui.monitor;
@@ -150,6 +151,7 @@ const LayoutManager = new Lang.Class({
         global.window_group.add_child(this._backgroundGroup);
         this._backgroundGroup.lower_bottom();
         this._bgManagers = [];
+        this._viewsClone = null;
 
         // Need to update struts on new workspaces when they are added
         global.screen.connect('notify::n-workspaces',
@@ -307,6 +309,20 @@ const LayoutManager = new Lang.Class({
         }
 
         this.emit('hot-corners-changed');
+    },
+
+    setViewsClone: function(actor) {
+        this._viewsClone = actor;
+        this._backgroundGroup.add_child(this._viewsClone);
+    },
+
+    prepareForOverview: function() {
+        Main.overview.opacityPrepared = true;
+        Tweener.addTween(this._viewsClone,
+                         { opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
+                           saturation: AppDisplay.EOS_ACTIVE_GRID_SATURATION,
+                           time: 0.25,
+                           transition: AppDisplay.EOS_ACTIVE_GRID_TRANSITION });
     },
 
     _addBackgroundMenu: function(bgManager) {
