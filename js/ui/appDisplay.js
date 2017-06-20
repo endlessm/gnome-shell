@@ -33,7 +33,7 @@ const MAX_APPLICATION_WORK_MILLIS = 75;
 const MENU_POPUP_TIMEOUT = 600;
 const MAX_COLUMNS = 7;
 const MIN_COLUMNS = 4;
-const MIN_ROWS = 4;
+const MIN_ROWS = 2;
 
 const INACTIVE_GRID_OPACITY = 77;
 // This time needs to be less than IconGrid.EXTRA_SPACE_ANIMATION_TIME
