@@ -239,9 +239,6 @@ var SearchResultsBase = new Lang.Class({
         Main.overview.hide();
     },
 
-    _setMoreCount: function(count) {
-    },
-
     _ensureResultActors: function(results, callback) {
         let metasNeeded = results.filter(Lang.bind(this, function(resultId) {
             return this._resultDisplays[resultId] === undefined;
@@ -289,7 +286,6 @@ var SearchResultsBase = new Lang.Class({
         } else {
             let maxResults = this._getMaxDisplayedResults();
             let results = this.provider.filterResults(providerResults, maxResults);
-            let moreCount = Math.max(providerResults.length - results.length, 0);
 
             this._ensureResultActors(results, Lang.bind(this, function(successful) {
                 if (!successful) {
@@ -306,7 +302,6 @@ var SearchResultsBase = new Lang.Class({
                 results.forEach(Lang.bind(this, function(resultId) {
                     this._addItem(this._resultDisplays[resultId]);
                 }));
-                this._setMoreCount(this.provider.canLaunchSearch ? moreCount : 0);
                 this.actor.show();
                 callback();
             }));
@@ -343,10 +338,6 @@ var ListSearchResults = new Lang.Class({
                                              y_align: St.Align.MIDDLE });
 
         this._resultDisplayBin.set_child(this._container);
-    },
-
-    _setMoreCount: function(count) {
-        this.providerInfo.setMoreCount(count);
     },
 
     _getMaxDisplayedResults: function() {
@@ -863,22 +854,8 @@ var ProviderInfo = new Lang.Class({
         let icon = new St.Icon({ icon_size: this.PROVIDER_ICON_SIZE,
                                  gicon: provider.appInfo.get_icon() });
 
-        let detailsBox = new St.BoxLayout({ style_class: 'list-search-provider-details',
-                                            vertical: true,
-                                            x_expand: true });
-
-        let nameLabel = new St.Label({ text: provider.appInfo.get_name(),
-                                       x_align: Clutter.ActorAlign.START });
-
-        this._moreLabel = new St.Label({ x_align: Clutter.ActorAlign.START });
-
-        detailsBox.add_actor(nameLabel);
-        detailsBox.add_actor(this._moreLabel);
-
-
         this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
         this._content.add_actor(icon);
-        this._content.add_actor(detailsBox);
 
         let box = new St.BoxLayout({ vertical: true, x_expand: false });
         this.set_child(box);
@@ -895,10 +872,5 @@ var ProviderInfo = new Lang.Class({
         let app = appSys.lookup_app(this.provider.appInfo.get_id());
         if (app.state == Shell.AppState.STOPPED)
             IconGrid.zoomOutActor(this._content);
-    },
-
-    setMoreCount: function(count) {
-        this._moreLabel.text = ngettext("%d more", "%d more", count).format(count);
-        this._moreLabel.visible = count > 0;
     }
 });
