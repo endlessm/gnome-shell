@@ -2281,6 +2281,14 @@ stage {
 
 .search-section {
     padding: 0px 10px;
+    spacing: 0px;
+}
+
+/* small bold */
+.search-section .overview-icon,
+.search-provider-icon-label {
+    font-size: 11pt;
+    font-weight: bold;
 }
 
 .search-section-separator {
@@ -2305,11 +2313,18 @@ stage {
     font-weight: bold;
 }
 
+.list-search-results {
+    spacing: 0px;
+}
+
 .list-search-result-content {
     spacing: 10px;
+    padding: 0px;
+    min-height: 32px;
 }
 
 .list-search-result-title {
+    font-size: 13pt;
     font-weight: bold;
     color: #444444;
 }
@@ -2343,7 +2358,8 @@ stage {
     text-align: center;
 }
 
-.search-section .overview-icon-label {
+.search-section .overview-icon-label,
+.search-provider-icon-label {
     color: #444444;
     text-shadow: none;
     width: 100px;
@@ -2390,6 +2406,11 @@ stage {
 .search-provider:active,
 .grid-search-result:active {
     background-color: rgba(192,192,192,0.9);
+}
+
+.grid-search-result:active .overview-icon,
+.grid-search-result:checked .overview-icon {
+    box-shadow: none
 }
 
 .search-scroll.vfade {

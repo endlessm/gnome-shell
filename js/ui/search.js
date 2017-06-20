@@ -210,7 +210,7 @@ const SearchResultsBase = new Lang.Class({
 
     _activateResult: function(result, id) {
         this.provider.activateResult(id, this._terms);
-        Main.overview.toggle();
+        Main.overview.hide();
     },
 
     _setMoreIconVisible: function(visible) {
