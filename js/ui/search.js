@@ -313,7 +313,9 @@ const ListSearchResults = new Lang.Class({
 
         this._content = new St.BoxLayout({ style_class: 'list-search-results',
                                            vertical: true });
-        this._container.add(this._content, { expand: true });
+        this._container.add(this._content, { expand: true,
+                                             y_fill: false,
+                                             y_align: St.Align.MIDDLE });
 
         this._resultDisplayBin.set_child(this._container);
     },
@@ -359,7 +361,7 @@ const GridSearchResults = new Lang.Class({
         this.parent(provider);
 
         this._grid = new IconGrid.IconGrid({ rowLimit: MAX_GRID_SEARCH_RESULTS_ROWS,
-                                             xAlign: St.Align.START });
+                                             xAlign: St.Align.MIDDLE });
         this._bin = new St.Bin({ x_align: St.Align.MIDDLE });
         this._bin.set_child(this._grid.actor);
 
