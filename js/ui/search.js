@@ -795,7 +795,7 @@ const ProviderIcon = new Lang.Class({
     Name: 'ProviderIcon',
     Extends: St.Button,
 
-    PROVIDER_ICON_SIZE: 48,
+    PROVIDER_ICON_SIZE: 64,
 
     _init: function(provider) {
         this.provider = provider;
@@ -804,9 +804,6 @@ const ProviderIcon = new Lang.Class({
                       can_focus: true,
                       accessible_name: provider.appInfo.get_name(),
                       track_hover: true });
-
-        this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-        this.set_child(this._content);
 
         let rtl = (this.get_text_direction() == Clutter.TextDirection.RTL);
 
@@ -819,8 +816,19 @@ const ProviderIcon = new Lang.Class({
 
         let icon = new St.Icon({ icon_size: this.PROVIDER_ICON_SIZE,
                                  gicon: provider.appInfo.get_icon() });
+
+        this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
         this._content.add_actor(icon);
         this._content.add_actor(this.moreIcon);
+
+        let box = new St.BoxLayout({ vertical: true, x_expand: false });
+        this.set_child(box);
+
+        box.add_actor(this._content);
+
+        let label = new St.Label({ text: provider.appInfo.get_name(),
+                                   style_class: 'search-provider-icon-label' });
+        box.add_actor(label);
     },
 
     animateLaunch: function() {
