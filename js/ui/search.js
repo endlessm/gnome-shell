@@ -421,6 +421,23 @@ const SearchResults = new Lang.Class({
                                             vertical: true });
         Util.blockClickEventsOnActor(this.actor);
 
+        let closeIcon = new St.Icon({ icon_name: 'window-close-symbolic' });
+        let closeButton = new St.Button({ name: 'searchResultsCloseButton',
+                                          child: closeIcon,
+                                          x_expand: true,
+                                          y_expand: false });
+        // We need to set the ClutterActor align, not St.Bin
+        closeButton.set_x_align(Clutter.ActorAlign.END);
+        closeButton.set_y_align(Clutter.ActorAlign.START);
+        closeButton.connect('clicked', Lang.bind(this, function () {
+            this.emit('search-close-clicked');
+        }));
+
+        let topBin = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        topBin.add_actor(closeButton);
+
+        this.actor.add_child(topBin);
+
         this._content = new St.BoxLayout({ name: 'searchResultsContent',
                                            vertical: true });
         this._contentBin = new MaxWidthBin({ name: 'searchResultsBin',
