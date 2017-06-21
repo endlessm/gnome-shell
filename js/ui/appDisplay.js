@@ -58,6 +58,7 @@ const EOS_DESKTOP_MIN_ROWS = 2;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
+const EOS_ENABLE_APP_CENTER_KEY = 'enable-app-center';
 const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
 
 var EOS_INACTIVE_GRID_OPACITY = 96;
@@ -494,6 +495,8 @@ var AllView = class AllView extends BaseAppView {
         this.actor.bind_property('mapped', this._bgAction, 'enabled',
                                  GObject.BindingFlags.SYNC_CREATE);
 
+        this._appCenterIcon = null;
+
         this._displayingPopup = false;
         this._currentPopupDestroyId = 0;
 
@@ -529,6 +532,9 @@ var AllView = class AllView extends BaseAppView {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
         IconGridLayout.layout.connect('changed', () => {
+            Main.queueDeferredWork(this._redisplayWorkId);
+        });
+        global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
 
@@ -590,10 +596,28 @@ var AllView = class AllView extends BaseAppView {
             newApps.push(icon);
         });
 
+        // Add the App Center icon if it is enabled (and installed)
+        this._maybeAddAppCenterIcon(newApps);
+
         return newApps;
     }
 
-    // Overridden from BaseAppView
+    _maybeAddAppCenterIcon(apps) {
+        if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
+            return;
+
+        let appSys = Shell.AppSystem.get_default();
+        if (!appSys.lookup_app(EOS_APP_CENTER_ID)) {
+            log('App center ' + EOS_APP_CENTER_ID + ' is not installed');
+            return;
+        }
+
+        if (!this._appCenterIcon)
+            this._appCenterIcon = new AppCenterIcon();
+
+        apps.push(this._appCenterIcon);
+    }
+
     animate(animationDirection, onComplete) {
         this._scrollView.reactive = false;
         let completionFunc = () => {
@@ -2516,3 +2540,21 @@ var SystemActionIcon = class SystemActionIcon extends Search.GridSearchResult {
         Main.overview.viewSelector.show(ViewSelector.ViewPage.APPS);
     }
 };
+
+var AppCenterIcon = GObject.registerClass(
+class AppCenterIcon extends AppIcon {
+    _init() {
+        let viewIconParams = {
+            isDraggable: false,
+            showMenu: false,
+        };
+
+        let appSys = Shell.AppSystem.get_default();
+        let app = appSys.lookup_app(EOS_APP_CENTER_ID);
+
+        super._init(app, viewIconParams);
+
+        this._id = EOS_APP_CENTER_ID;
+        this._name = this.app.get_generic_name();
+    }
+});
