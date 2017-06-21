@@ -549,18 +549,13 @@ const AllView = new Lang.Class({
         let gridLayout = IconGridLayout.layout;
         let desktopIds = gridLayout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
 
-        let apps = [];
-        let folders = [];
+        let items = [];
         for (let idx in desktopIds) {
             let itemId = desktopIds[idx];
-            if (gridLayout.iconIsFolder(itemId))
-                folders.push(itemId);
-            else
-                apps.push(itemId);
+            items.push(itemId);
         }
 
         let appSys = Shell.AppSystem.get_default();
-
 
         // Allow dragging of the icon only if the Dash would accept a drop to
         // change favorite-apps. There are no other possible drop targets from
@@ -570,22 +565,23 @@ const AllView = new Lang.Class({
         // but we hope that is not used much.
         let favoritesWritable = global.settings.is_writable('favorite-apps');
 
-        apps.forEach(Lang.bind(this, function(appId) {
-            let app = appSys.lookup_app(appId);
+        items.forEach(Lang.bind(this, function(itemId) {
+            let icon = null;
+
+            if (gridLayout.iconIsFolder(itemId)) {
+                icon = new FolderIcon(itemId, this);
+                icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
+                this.folderIcons.push(icon);
+            } else {
+                let app = appSys.lookup_app(itemId);
+                if (app)
+                    icon = new AppIcon(app, { isDraggable: favoritesWritable,
+                                              editable: true });
+            }
 
             // Some apps defined by the icon grid layout might not be installed
-            if (app) {
-                let icon = new AppIcon(app, { isDraggable: favoritesWritable,
-                                              editable: true });
+            if (icon)
                 this.addItem(icon);
-            }
-        }));
-
-        folders.forEach(Lang.bind(this, function(id) {
-            let icon = new FolderIcon(id, this);
-            icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
-            this.addItem(icon);
-            this.folderIcons.push(icon);
         }));
 
         this.loadGrid();
