@@ -1589,9 +1589,12 @@ var AppIcon = new Lang.Class({
             iconParams = {};
 
         // Get the isDraggable property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { isDraggable: true }, true);
+        let appIconParams = Params.parse(iconParams, { isDraggable: true, showMenu: true }, true);
         let isDraggable = appIconParams['isDraggable'];
         delete iconParams['isDraggable'];
+
+        this._showMenu = appIconParams['showMenu'];
+        delete iconParams['showMenu'];
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
         iconParams['createExtraIcons'] = this._createExtraIcons.bind(this);
@@ -1759,6 +1762,10 @@ var AppIcon = new Lang.Class({
 
     popupMenu: function() {
         this._removeMenuTimeout();
+
+        if (!this._showMenu)
+            return true;
+
         this.actor.fake_release();
 
         if (this._draggable)
