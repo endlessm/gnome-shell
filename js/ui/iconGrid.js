@@ -807,7 +807,12 @@ const PaginatedIconGrid = new Lang.Class({
         // We want to contain the grid inside the parent box with padding
         this._rowsPerPage = Math.min(Math.max (this._minRows, nRows), this.rowsForHeight(availHeightPerPage));
         this._nPages = Math.ceil(nRows / this._rowsPerPage);
-        this._spaceBetweenPages = this._nPages > 1 ? (availHeightPerPage - (this.topPadding + this.bottomPadding) - this._availableHeightPerPageForItems()) : 0;
+
+        if (this._nPages > 1)
+            this._spaceBetweenPages = availHeightPerPage - (this.topPadding + this.bottomPadding) - this._availableHeightPerPageForItems();
+        else
+            this._spaceBetweenPages = this._getSpacing();
+
         this._childrenPerPage = nColumns * this._rowsPerPage;
     },
 
