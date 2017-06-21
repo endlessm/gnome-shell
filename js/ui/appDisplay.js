@@ -1097,8 +1097,26 @@ const FolderView = new Lang.Class({
     },
 
     createFolderIcon: function(size) {
-        let icon = this._dirInfo.get_icon();
-        return new St.Icon({ gicon: icon });
+        let layout = new Clutter.GridLayout();
+        let icon = new St.Widget({ layout_manager: layout,
+                                   style_class: 'app-folder-icon' });
+        layout.hookup_style(icon);
+        let subSize = Math.floor(FOLDER_SUBICON_FRACTION * size);
+
+        let numItems = this._allItems.length;
+        let rtl = icon.get_text_direction() == Clutter.TextDirection.RTL;
+        for (let i = 0; i < 4; i++) {
+            let bin;
+            if (i < numItems) {
+                let texture = this._allItems[i].app.create_icon_texture(subSize);
+                bin = new St.Bin({ child: texture });
+            } else {
+                bin = new St.Bin({ width: subSize, height: subSize });
+            }
+            layout.attach(bin, rtl ? (i + 1) % 2 : i % 2, Math.floor(i / 2), 1, 1);
+        }
+
+        return icon;
     },
 
     _onPan: function(action) {
