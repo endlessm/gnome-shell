@@ -87,6 +87,9 @@ const EOS_DESKTOP_MIN_ROWS = 2;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
+const EOS_ENABLE_APP_CENTER_KEY = 'enable-app-center';
+const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
+
 var EOS_INACTIVE_GRID_OPACITY = 96;
 var EOS_ACTIVE_GRID_OPACITY = 255;
 
@@ -531,6 +534,8 @@ var AllView = new Lang.Class({
         this.actor.bind_property('mapped', this._bgAction, 'enabled',
                                  GObject.BindingFlags.SYNC_CREATE);
 
+        this._appCenterIcon = null;
+
         this._displayingPopup = false;
 
         this._currentPopup = null;
@@ -580,6 +585,9 @@ var AllView = new Lang.Class({
         IconGridLayout.layout.connect('changed', () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
+        global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, () => {
+            Main.queueDeferredWork(this._redisplayWorkId);
+        });
 
         this._addedFolderId = null;
         IconGridLayout.layout.connect('folder-added', (iconGridLayout, id) => {
@@ -598,6 +606,7 @@ var AllView = new Lang.Class({
 
     removeAll: function() {
         this.folderIcons = [];
+        this._appCenterIcon = null;
         this.parent();
     },
 
@@ -649,7 +658,27 @@ var AllView = new Lang.Class({
                 this.addItem(icon);
         });
 
+        // Add the App Center icon if it is enabled (and installed)
+        this._maybeAddAppCenterIcon();
+
         this.loadGrid();
+    },
+
+    _maybeAddAppCenterIcon: function() {
+        if (this._appCenterIcon)
+            return;
+
+        if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
+            return;
+
+        let appSys = Shell.AppSystem.get_default();
+        if (!appSys.lookup_app(EOS_APP_CENTER_ID)) {
+            log('App center ' + EOS_APP_CENTER_ID + ' is not installed');
+            return;
+        }
+
+        this._appCenterIcon = new AppCenterIcon();
+        this.addItem(this._appCenterIcon);
     },
 
     // Overriden from BaseAppView
@@ -2503,4 +2532,28 @@ var SystemActionIcon = new Lang.Class({
         SystemActions.getDefault().activateAction(this.metaInfo['id']);
         Main.overview.viewSelector.show(ViewSelector.ViewPage.APPS);
     }
+});
+
+var AppCenterIcon = new Lang.Class({
+    Name: 'AppCenterIcon',
+    Extends: AppIcon,
+
+    _init : function() {
+        let viewIconParams = { isDraggable: false,
+                               showMenu: false };
+        let iconParams = { editable: false };
+
+        let appSys = Shell.AppSystem.get_default();
+        let app = appSys.lookup_app(EOS_APP_CENTER_ID);
+
+        this.parent(app, viewIconParams, iconParams);
+    },
+
+    getId: function() {
+        return EOS_APP_CENTER_ID;
+    },
+
+    getName: function() {
+        return this.app.get_generic_name();
+    },
 });
