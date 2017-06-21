@@ -69,6 +69,9 @@ const EOS_DESKTOP_MIN_ROWS = 2;
 
 const EOS_LINK_PREFIX = 'eos-link-';
 
+const EOS_ENABLE_APP_CENTER_KEY = 'enable-app-center';
+const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
+
 const EOS_INACTIVE_GRID_OPACITY = 96;
 const EOS_ACTIVE_GRID_OPACITY = 255;
 
@@ -528,6 +531,9 @@ const AllView = new Lang.Class({
         IconGridLayout.layout.connect('changed', Lang.bind(this, function() {
             Main.queueDeferredWork(this._redisplayWorkId);
         }));
+        global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, Lang.bind(this, function() {
+            Main.queueDeferredWork(this._redisplayWorkId);
+        }));
 
         this._loadApps();
     },
@@ -586,6 +592,10 @@ const AllView = new Lang.Class({
             if (icon)
                 this.addItem(icon);
         }));
+
+        // Add the App Center icon if it is enabled
+        if (global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
+            this.addItem(new AppCenterIcon());
 
         this.loadGrid();
     },
@@ -1556,9 +1566,13 @@ const AppIcon = new Lang.Class({
             iconParams = {};
 
         // Get the isDraggable property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { isDraggable: true }, true);
+        let appIconParams = Params.parse(iconParams, { isDraggable: true, showMenu: true },
+                                         true);
         let isDraggable = appIconParams['isDraggable'];
         delete iconParams['isDraggable'];
+
+        this._showMenu = appIconParams['showMenu'];
+        delete iconParams['showMenu'];
 
         iconParams['createIcon'] = Lang.bind(this, this._createIcon);
         iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
@@ -1730,6 +1744,10 @@ const AppIcon = new Lang.Class({
 
     popupMenu: function() {
         this._removeMenuTimeout();
+
+        if (!this._showMenu)
+            return true;
+
         this.actor.fake_release();
 
         if (this._draggable)
@@ -1964,3 +1982,22 @@ const AppIconMenu = new Lang.Class({
     }
 });
 Signals.addSignalMethods(AppIconMenu.prototype);
+
+const AppCenterIcon = new Lang.Class({
+    Name: 'AppCenterIcon',
+    Extends: AppIcon,
+
+    _init : function() {
+        let params = { isDraggable: false,
+                       editable: false,
+                       showMenu: false };
+
+        let appSystem = Shell.AppSystem.get_default();
+        let app = appSystem.lookup_app(EOS_APP_CENTER_ID);
+
+        this.parent(app, params);
+
+        this.icon.label.set_text(_("More Apps"));
+    },
+});
+Signals.addSignalMethods(AppCenterIcon.prototype);
