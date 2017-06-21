@@ -1404,9 +1404,12 @@ var AppIcon = class AppIcon {
             iconParams = {};
 
         // Get the isDraggable property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { isDraggable: true }, true);
+        let appIconParams = Params.parse(iconParams, { isDraggable: true, showMenu: true }, true);
         let isDraggable = appIconParams['isDraggable'];
         delete iconParams['isDraggable'];
+
+        this._showMenu = appIconParams['showMenu'];
+        delete iconParams['showMenu'];
 
         iconParams['createIcon'] = this._createIcon.bind(this);
         iconParams['createExtraIcons'] = this._createExtraIcons.bind(this);
@@ -1543,6 +1546,10 @@ var AppIcon = class AppIcon {
 
     popupMenu() {
         this._removeMenuTimeout();
+
+        if (!this._showMenu)
+            return true;
+
         this.actor.fake_release();
 
         if (this._draggable)
