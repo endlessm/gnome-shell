@@ -99,7 +99,8 @@ const _modes = {
                     ['networkAgent', 'polkitAgent',
                      'keyring', 'autorunManager', 'automountManager',
                      'appStore',
-                     'discoveryFeed'
+                     'discoveryFeed',
+                     'updaterManager'
                     ] :
                     ['polkitAgent',
                      'keyring', 'autorunManager', 'automountManager',
