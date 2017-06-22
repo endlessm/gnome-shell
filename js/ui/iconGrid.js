@@ -28,6 +28,9 @@ const ANIMATION_FADE_IN_TIME_FOR_ITEM = 1/4 * ANIMATION_TIME_IN;
 
 const ANIMATION_BOUNCE_ICON_SCALE = 1.1;
 
+const LOW_RESOLUTION_WIDTH = 720;
+const LOW_RESOLUTION_HEIGHT = 480;
+
 const AnimationDirection = {
     IN: 0,
     OUT: 1
@@ -708,6 +711,10 @@ const IconGrid = new Lang.Class({
     adaptToSize: function(availWidth, availHeight) {
         this._fixedHItemSize = this._hItemSize;
         this._fixedVItemSize = this._vItemSize;
+
+        /* Recompute spacing when the resolution is low */
+        if (availWidth <= LOW_RESOLUTION_WIDTH || availHeight <= LOW_RESOLUTION_HEIGHT)
+            this._updateSpacingForSize(availWidth, availHeight);
     }
 });
 Signals.addSignalMethods(IconGrid.prototype);
