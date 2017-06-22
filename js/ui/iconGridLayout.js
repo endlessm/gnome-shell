@@ -365,6 +365,79 @@ const IconGridLayout = new Lang.Class({
                 Lang.bind(this, this._enumerateDirectoryFiles));
     },
 
+    _createFolderFile: function(name) {
+        let keyFile = new GLib.KeyFile();
+
+        keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
+                          GLib.KEY_FILE_DESKTOP_KEY_NAME, name);
+
+        keyFile.set_value(GLib.KEY_FILE_DESKTOP_GROUP,
+                          GLib.KEY_FILE_DESKTOP_KEY_TYPE, GLib.KEY_FILE_DESKTOP_TYPE_DIRECTORY);
+
+        let dir = Gio.File.new_for_path(GLib.get_user_data_dir() + '/desktop-directories');
+        try {
+            dir.make_directory_with_parents(null);
+        } catch (err if err.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXISTS)) {
+            // Already exists; nothing to do here...
+        } catch (err) {
+            logError(err, 'Error creating %s'.format(dir.get_path()));
+            return null;
+        }
+
+        let enumerator = null;
+        try {
+            enumerator = dir.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
+        } catch (err) {
+            logError(err, 'Error trying to traverse %s'.format(dir.get_path()));
+            return null;
+        }
+
+        let prefix = 'eos-folder-user-';
+        let suffix = '.directory';
+        let re = new RegExp(prefix + '([0-9]+)' + suffix);
+        let folderIndex = -1;
+
+        try {
+            for (let f = enumerator.next_file(null); f != null; f = enumerator.next_file(null)) {
+                let result = re.exec(f.get_name());
+                if (result != null) {
+                    let newFolderIndex = result[1];
+                    folderIndex = Math.max(folderIndex, parseInt(newFolderIndex));
+                }
+            }
+        } catch (err) {
+            logError(err, 'Error traversing %s'.format(dir.get_path()));
+            return null;
+        }
+
+        try {
+            enumerator.close(null);
+        } catch (err) {
+            logError(err, 'Error closing file enumerator for %s'.format(dir.get_path()));
+            return null;
+        }
+
+        ++folderIndex;
+        let filename = prefix + folderIndex + suffix;
+        let absFilename = GLib.build_filenamev([dir.get_path(), filename]);
+
+        try {
+            keyFile.save_to_file(absFilename);
+        } catch (err) {
+            logError(err, 'Failed to save key file for directory %s'.format(absFilename));
+            return null;
+        }
+
+        return filename;
+    },
+
+    addFolder: function() {
+        let id = this._createFolderFile(_("New Folder"));
+        if (!id)
+            return;
+        this.appendIcon(id, DESKTOP_GRID_ID);
+    },
+
     _enumerateDirectoryFiles: function(file, result) {
         let enumerator = file.enumerate_children_finish(result);
         enumerator.next_files_async(
