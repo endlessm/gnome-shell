@@ -4,6 +4,7 @@ const { Clutter, Meta, Shell, St } = imports.gi;
 
 const AppActivation = imports.ui.appActivation;
 const BoxPointer = imports.ui.boxpointer;
+const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 
@@ -25,7 +26,7 @@ var BackgroundMenu = class BackgroundMenu extends PopupMenu.PopupMenu {
         });
 
         this.addAction(_("Add Folder"), () => {
-            Main.appStore.showPage(global.get_current_time(), 'folders');
+            IconGridLayout.layout.addFolder();
         });
 
         this.actor.add_style_class_name('background-menu');
