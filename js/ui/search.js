@@ -25,6 +25,7 @@ const SEARCH_PROVIDERS_SCHEMA = 'org.gnome.desktop.search-providers';
 
 const MAX_LIST_SEARCH_RESULTS_ROWS = 3;
 const MAX_GRID_SEARCH_RESULTS_ROWS = 1;
+const MAX_GRID_SEARCH_RESULTS_COLS = 8;
 
 const MaxWidthBin = new Lang.Class({
     Name: 'MaxWidthBin',
@@ -175,8 +176,8 @@ const SearchResultsBase = new Lang.Class({
                                               y_fill: true });
         this.actor.add(this._resultDisplayBin, { expand: true });
 
-        let separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
-        this.actor.add(separator.actor);
+        this.separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
+        this.actor.add(this.separator.actor);
 
         this._resultDisplays = {};
 
@@ -209,10 +210,7 @@ const SearchResultsBase = new Lang.Class({
 
     _activateResult: function(result, id) {
         this.provider.activateResult(id, this._terms);
-        Main.overview.toggle();
-    },
-
-    _setMoreIconVisible: function(visible) {
+        Main.overview.hide();
     },
 
     _ensureResultActors: function(results, callback) {
@@ -280,7 +278,6 @@ const SearchResultsBase = new Lang.Class({
                 results.forEach(Lang.bind(this, function(resultId) {
                     this._addItem(this._resultDisplays[resultId]);
                 }));
-                this._setMoreIconVisible(hasMoreResults && this.provider.canLaunchSearch);
                 this.actor.show();
                 callback();
             }));
@@ -312,13 +309,11 @@ const ListSearchResults = new Lang.Class({
 
         this._content = new St.BoxLayout({ style_class: 'list-search-results',
                                            vertical: true });
-        this._container.add(this._content, { expand: true });
+        this._container.add(this._content, { expand: true,
+                                             y_fill: false,
+                                             y_align: St.Align.MIDDLE });
 
         this._resultDisplayBin.set_child(this._container);
-    },
-
-    _setMoreIconVisible: function(visible) {
-        this.providerIcon.moreIcon.visible = visible;
     },
 
     _getMaxDisplayedResults: function() {
@@ -334,7 +329,11 @@ const ListSearchResults = new Lang.Class({
     },
 
     _addItem: function(display) {
-        this._content.add_actor(display.actor);
+        if (this._content.get_n_children() > 0) {
+            display.separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
+            this._content.add(display.separator.actor);
+        }
+        this._content.add_actor(display.actor, { expand: true });
     },
 
     getFirstResult: function() {
@@ -350,17 +349,11 @@ const GridSearchResults = new Lang.Class({
     Name: 'GridSearchResults',
     Extends: SearchResultsBase,
 
-    _init: function(provider, parentContainer) {
+    _init: function(provider) {
         this.parent(provider);
-        // We need to use the parent container to know how much results we can show.
-        // None of the actors in this class can be used for that, since the main actor
-        // goes hidden when no results are displayed, and then it lost its allocation.
-        // Then on the next use of _getMaxDisplayedResults allocation is 0, en therefore
-        // it doesn't show any result although we have some.
-        this._parentContainer = parentContainer;
 
         this._grid = new IconGrid.IconGrid({ rowLimit: MAX_GRID_SEARCH_RESULTS_ROWS,
-                                             xAlign: St.Align.START });
+                                             xAlign: St.Align.MIDDLE });
         this._bin = new St.Bin({ x_align: St.Align.MIDDLE });
         this._bin.set_child(this._grid.actor);
 
@@ -368,9 +361,7 @@ const GridSearchResults = new Lang.Class({
     },
 
     _getMaxDisplayedResults: function() {
-        let parentThemeNode = this._parentContainer.get_theme_node();
-        let availableWidth = parentThemeNode.adjust_for_width(this._parentContainer.width);
-        return this._grid.columnsForWidth(availableWidth) * this._grid.getRowLimit();
+        return MAX_GRID_SEARCH_RESULTS_ROWS * MAX_GRID_SEARCH_RESULTS_COLS;
     },
 
     _clearResultDisplay: function () {
@@ -421,6 +412,23 @@ const SearchResults = new Lang.Class({
         this.actor = new SearchResultsBin({ name: 'searchResults',
                                             vertical: true });
         Util.blockClickEventsOnActor(this.actor);
+
+        let closeIcon = new St.Icon({ icon_name: 'window-close-symbolic' });
+        let closeButton = new St.Button({ name: 'searchResultsCloseButton',
+                                          child: closeIcon,
+                                          x_expand: true,
+                                          y_expand: false });
+        // We need to set the ClutterActor align, not St.Bin
+        closeButton.set_x_align(Clutter.ActorAlign.END);
+        closeButton.set_y_align(Clutter.ActorAlign.START);
+        closeButton.connect('clicked', Lang.bind(this, function () {
+            this.emit('search-close-clicked');
+        }));
+
+        let topBin = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        topBin.add_actor(closeButton);
+
+        this.actor.add_child(topBin);
 
         this._content = new St.BoxLayout({ name: 'searchResultsContent',
                                            vertical: true });
@@ -609,7 +617,7 @@ const SearchResults = new Lang.Class({
         if (provider.appInfo)
             providerDisplay = new ListSearchResults(provider);
         else
-            providerDisplay = new GridSearchResults(provider, this.actor);
+            providerDisplay = new GridSearchResults(provider);
 
         providerDisplay.connect('key-focus-in', Lang.bind(this, this._keyFocusIn));
         providerDisplay.actor.hide();
@@ -677,6 +685,21 @@ const SearchResults = new Lang.Class({
         }
     },
 
+    _syncSeparatorVisiblity: function () {
+        let lastVisibleDisplay;
+        for (let i = 0; i < this._providers.length; i++) {
+            let provider = this._providers[i];
+            let display = provider.display;
+
+            display.separator.actor.show();
+            if (display.actor.visible)
+                lastVisibleDisplay = display;
+        }
+
+        if (lastVisibleDisplay)
+            lastVisibleDisplay.separator.actor.hide();
+    },
+
     _updateSearchProgress: function () {
         let haveResults = this._providers.some(function(provider) {
             let display = provider.display;
@@ -684,6 +707,7 @@ const SearchResults = new Lang.Class({
         });
         let showStatus = !haveResults && !this.isAnimating;
 
+        this._syncSeparatorVisiblity();
         this._scrollView.visible = haveResults;
         this._statusBin.visible = showStatus;
 
@@ -763,7 +787,7 @@ const ProviderIcon = new Lang.Class({
     Name: 'ProviderIcon',
     Extends: St.Button,
 
-    PROVIDER_ICON_SIZE: 48,
+    PROVIDER_ICON_SIZE: 64,
 
     _init: function(provider) {
         this.provider = provider;
@@ -773,22 +797,22 @@ const ProviderIcon = new Lang.Class({
                       accessible_name: provider.appInfo.get_name(),
                       track_hover: true });
 
-        this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-        this.set_child(this._content);
-
         let rtl = (this.get_text_direction() == Clutter.TextDirection.RTL);
-
-        this.moreIcon = new St.Widget({ style_class: 'search-provider-icon-more',
-                                        visible: false,
-                                        x_align: rtl ? Clutter.ActorAlign.START : Clutter.ActorAlign.END,
-                                        y_align: Clutter.ActorAlign.END,
-                                        x_expand: true,
-                                        y_expand: true });
 
         let icon = new St.Icon({ icon_size: this.PROVIDER_ICON_SIZE,
                                  gicon: provider.appInfo.get_icon() });
+
+        this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
         this._content.add_actor(icon);
-        this._content.add_actor(this.moreIcon);
+
+        let box = new St.BoxLayout({ vertical: true, x_expand: false });
+        this.set_child(box);
+
+        box.add_actor(this._content);
+
+        let label = new St.Label({ text: provider.appInfo.get_name(),
+                                   style_class: 'search-provider-icon-label' });
+        box.add_actor(label);
     },
 
     animateLaunch: function() {

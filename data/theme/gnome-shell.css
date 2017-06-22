@@ -2254,7 +2254,11 @@ stage {
     max-width: 875px;
     margin-left: 50px;
     margin-right: 50px;
-    margin-bottom: 33px;
+    margin-bottom: 10px;
+}
+
+#searchResultsContent {
+  spacing: 0px;
 }
 
 #searchResultsCloseButton StIcon {
@@ -2270,14 +2274,27 @@ stage {
     color: #444444;
 }
 
+.search-display > StBoxLayout {
+    padding: 0px;
+}
+
 .search-section {
     padding: 0px 10px;
+    spacing: 0px;
+}
+
+/* small bold */
+.search-section .overview-icon,
+.search-provider-icon-label {
+    font-size: 11pt;
+    font-weight: bold;
 }
 
 .search-section-separator {
     -gradient-height: 1px;
     -gradient-start: rgba(208,208,208,0.9);
     -gradient-end: rgba(208,208,208,0.9);
+    -margin-horizontal: 0em;
     height: 1px;
 }
 
@@ -2295,11 +2312,18 @@ stage {
     font-weight: bold;
 }
 
+.list-search-results {
+    spacing: 0px;
+}
+
 .list-search-result-content {
     spacing: 10px;
+    padding: 0px;
+    min-height: 32px;
 }
 
 .list-search-result-title {
+    font-size: 13pt;
     font-weight: bold;
     color: #444444;
 }
@@ -2333,7 +2357,8 @@ stage {
     text-align: center;
 }
 
-.search-section .overview-icon-label {
+.search-section .overview-icon-label,
+.search-provider-icon-label {
     color: #444444;
     text-shadow: none;
     width: 100px;
@@ -2354,32 +2379,41 @@ stage {
     border-radius-bottomleft: 4px;
 }
 
-.search-provider,
+.search-provider-icon,
 .grid-search-result {
     border-radius: 4px;
-    padding: 7px;
     transition-duration: 100ms;
+    width: 100px;
+}
+
+.search-provider-icon-label {
+    margin-top: 6px;
 }
 
 .list-search-result:hover,
-.search-provider:hover,
+.search-provider-icon:hover,
 .grid-search-result:hover {
     background-color: rgba(226,226,226,0.9);
 }
 
 .list-search-result:focus,
-.search-provider:focus,
+.search-provider-icon:focus,
 .grid-search-result:focus,
 .list-search-result:selected,
-.search-provider:selected,
+.search-provider-icon:selected,
 .grid-search-result:selected {
     background-color: rgba(208,208,208,0.9);
 }
 
 .list-search-result:active,
-.search-provider:active,
+.search-provider-icon:active,
 .grid-search-result:active {
     background-color: rgba(192,192,192,0.9);
+}
+
+.grid-search-result:active .overview-icon,
+.grid-search-result:checked .overview-icon {
+    box-shadow: none
 }
 
 .search-scroll.vfade {
