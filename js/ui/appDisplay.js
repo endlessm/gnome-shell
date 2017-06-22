@@ -1124,12 +1124,19 @@ const FolderView = new Lang.Class({
         this.actor = new St.ScrollView({ overlay_scrollbars: true });
         this.actor.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
         let scrollableContainer = new St.BoxLayout({ vertical: true, reactive: true });
+        this._noAppsLabel = new St.Label({ text: _("No apps in this folder! To add an app, drag it onto the folder."),
+                                           style_class: 'folder-no-apps-label'});
+        scrollableContainer.add_actor(this._noAppsLabel);
         scrollableContainer.add_actor(this._grid.actor);
         this.actor.add_actor(scrollableContainer);
 
         let action = new Clutter.PanAction({ interpolate: true });
         action.connect('pan', Lang.bind(this, this._onPan));
         this.actor.add_action(action);
+    },
+
+    updateNoAppsLabelVisibility: function() {
+        this._noAppsLabel.visible = this._grid.visibleItemsCount() == 0;
     },
 
     _keyFocusIn: function(actor) {
@@ -1322,8 +1329,8 @@ const FolderIcon = new Lang.Class({
         let folderApps = IconGridLayout.layout.getIcons(this.id);
         folderApps.forEach(addAppId);
 
-        this.actor.visible = this.view.getAllItems().length > 0;
         this.view.loadGrid();
+        this.view.updateNoAppsLabelVisibility();
         this.emit('apps-changed');
     },
 
@@ -1343,7 +1350,8 @@ const FolderIcon = new Lang.Class({
                 this._popup.popup();
                 this._updatePopupPosition();
             }));
-        this._parentView.openSpaceForPopup(this, this._boxPointerArrowside, this.view.nRowsDisplayedAtOnce());
+        this._parentView.openSpaceForPopup(this, this._boxPointerArrowside,
+                                           Math.max(this.view.nRowsDisplayedAtOnce(), 1));
     },
 
     _calculateBoxPointerArrowSide: function() {
