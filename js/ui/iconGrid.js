@@ -75,8 +75,9 @@ class BaseIcon extends St.Bin {
                                      y_expand: true });
         this._layeredIcon.add_actor(shadow);
 
+        this._editable = params.editable;
         if (params.showLabel) {
-            if (params.editable)
+            if (this._editable)
                 this.label = new EditableLabel.EditableLabel({ text: label,
                                                                style_class: 'overview-icon-label' });
             else
@@ -189,6 +190,12 @@ class BaseIcon extends St.Bin {
 
     reloadIcon() {
         this._createIconTexture(this.iconSize);
+    }
+
+    setLabelMode(mode) {
+        if (!this._editable)
+            return;
+        this.label.setMode(mode);
     }
 });
 
