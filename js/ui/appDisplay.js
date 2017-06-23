@@ -10,6 +10,7 @@ const BackgroundMenu = imports.ui.backgroundMenu;
 const BoxPointer = imports.ui.boxpointer;
 const DND = imports.ui.dnd;
 const GrabHelper = imports.ui.grabHelper;
+const EditableLabelMode = imports.ui.editableLabel.EditableLabelMode;
 const IconGrid = imports.ui.iconGrid;
 const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
@@ -193,8 +194,14 @@ class BaseAppView {
     }
 
     selectApp(id) {
+        this.selectAppWithLabelMode(id, null);
+    }
+
+    selectAppWithLabelMode(id, labelMode) {
         if (this._items[id] && this._items[id].actor.mapped) {
             this._selectAppInternal(id);
+            if (labelMode !== null)
+                this._items[id].icon.setLabelMode(labelMode);
         } else if (this._items[id]) {
             // Need to wait until the view is mapped
             let signalId = this._items[id].actor.connect('notify::mapped',
@@ -202,13 +209,15 @@ class BaseAppView {
                     if (actor.mapped) {
                         actor.disconnect(signalId);
                         this._selectAppInternal(id);
+                        if (labelMode !== null)
+                            this._items[id].icon.setLabelMode(labelMode);
                     }
                 });
         } else {
             // Need to wait until the view is built
             let signalId = this.connect('view-loaded', () => {
                 this.disconnect(signalId);
-                this.selectApp(id);
+                this.selectAppWithLabelMode(id, labelMode);
             });
         }
     }
@@ -394,6 +403,13 @@ var AllView = class AllView extends BaseAppView {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
 
+        this._addedFolderId = null;
+        IconGridLayout.layout.connect('folder-added', (iconGridLayout, id) => {
+            // Save the folder ID so we know which one was added
+            // and set it to edit mode
+            this._addedFolderId = id;
+        });
+
         this._loadApps();
     }
 
@@ -444,6 +460,10 @@ var AllView = class AllView extends BaseAppView {
                 icon = new FolderIcon(item, this);
                 icon.connect('name-changed', this._itemNameChanged.bind(this));
                 this.folderIcons.push(icon);
+                if (this._addedFolderId == itemId) {
+                    this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
+                    this._addedFolderId = null;
+                }
             } else {
                 let app = appSys.lookup_app(itemId);
                 if (app)
