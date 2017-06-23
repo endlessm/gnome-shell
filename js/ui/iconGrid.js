@@ -90,8 +90,9 @@ var BaseIcon = new Lang.Class({
                                      y_expand: true });
         this._layeredIcon.add_actor(shadow);
 
+        this._editable = params.editable;
         if (params.showLabel) {
-            if (params.editable)
+            if (this._editable)
                 this.label = new EditableLabel.EditableLabel({ text: label,
                                                                style_class: 'overview-icon-label' });
             else
@@ -249,6 +250,12 @@ var BaseIcon = new Lang.Class({
 
     reloadIcon: function() {
         this._createIconTexture(this.iconSize);
+    },
+
+    setLabelMode: function(mode) {
+        if (!this._editable)
+            return;
+        this.label.setMode(mode);
     }
 });
 
