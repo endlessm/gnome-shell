@@ -59,21 +59,14 @@ const EditableLabel = new Lang.Class({
 
         // enter highlight mode if this is the first click
         if (this._labelMode == EditableLabelMode.DISPLAY) {
-            this._labelMode = EditableLabelMode.HIGHLIGHT;
-            this.add_style_pseudo_class('highlighted');
-
-            this._grabHelper.grab({ actor: this,
-                                    onUngrab: Lang.bind(this, this._onHighlightUngrab) });
-
+            this.setMode(EditableLabelMode.HIGHLIGHT);
             return true;
         }
 
         if (this._labelMode == EditableLabelMode.HIGHLIGHT) {
             // while in highlight mode, another extra click enters the
-            // actual edit mode, which we handle from the highlight ungrab
-            if (this._grabHelper.grabbed)
-                this._grabHelper.ungrab({ actor: this });
-
+            // actual edit mode
+            this.setMode(EditableLabelMode.EDIT);
             return true;
         }
 
@@ -102,14 +95,12 @@ const EditableLabel = new Lang.Class({
 
         // clicked outside the label - cancel the edit
         if (isUser) {
-            this._labelMode = EditableLabelMode.DISPLAY;
+            this.setMode(EditableLabelMode.DISPLAY);
             this.emit('label-edit-cancel');
             return;
         }
 
         // now prepare for editing...
-        this._labelMode = EditableLabelMode.EDIT;
-
         this._keyFocusId = this.connect('key-focus-in', Lang.bind(this, this._startEditing));
         this._grabHelper.grab({ actor: this,
                                 focus: this,
@@ -182,21 +173,20 @@ const EditableLabel = new Lang.Class({
         if (this._grabHelper.isActorGrabbed(this))
             this._grabHelper.ungrab({ actor: this });
 
-        this._labelMode = EditableLabelMode.DISPLAY;
     },
 
     _cancelEditing: function() {
-        // _endEditing() below will unset oldLabelText
+        // setting the mode to DISPLAY below will unset oldLabelText
         let oldText = this._oldLabelText;
 
-        this._endEditing();
+        this.setMode(EditableLabelMode.DISPLAY);
 
         this.set_text(oldText);
         this.emit('label-edit-cancel');
     },
 
     _confirmEditing: function() {
-        // _endEditing() below will unset oldLabelText
+        // setting the mode to DISPLAY below will unset oldLabelText
         let oldText = this._oldLabelText;
         let text = this.get_text();
 
@@ -205,7 +195,40 @@ const EditableLabel = new Lang.Class({
             return;
         }
 
-        this._endEditing();
+        this.setMode(EditableLabelMode.DISPLAY);
         this.emit('label-edit-update', text);
-    }
+    },
+
+    setMode: function(mode) {
+        if (this._labelMode == mode)
+            return;
+
+        switch (mode) {
+        case EditableLabelMode.DISPLAY:
+            this._endEditing();
+            break;
+
+        case EditableLabelMode.HIGHLIGHT:
+            this.add_style_pseudo_class('highlighted');
+            this._grabHelper.grab({ actor: this,
+                                    onUngrab: Lang.bind(this, this._onHighlightUngrab) });
+            break;
+
+        case EditableLabelMode.EDIT:
+            // we need to be in highlight mode before reaching the edit mode
+            if (this._labelMode != EditableLabelMode.HIGHLIGHT)
+                this.setMode(EditableLabelMode.HIGHLIGHT);
+
+            // enter the edit mode on highlight ungrab
+            if (this._grabHelper.grabbed)
+                this._grabHelper.ungrab({ actor: this });
+            this.grab_key_focus();
+            break;
+
+        default:
+            throw new Error('Invalid mode for EditableLabel: "%s"'.format(mode));
+        }
+
+        this._labelMode = mode;
+    },
 });
