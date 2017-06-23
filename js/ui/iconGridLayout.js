@@ -34,7 +34,8 @@ function findInArray(array, func) {
 }
 
 var IconGridLayout = GObject.registerClass({
-    Signals: { 'changed': {} },
+    Signals: { 'changed': {},
+               'folder-added': { param_types: [GObject.TYPE_STRING] } },
 }, class IconGridLayout extends GObject.Object {
     _init(params) {
         super._init();
@@ -459,6 +460,7 @@ var IconGridLayout = GObject.registerClass({
         let id = this._createFolderFile(_("New Folder"));
         if (!id)
             return;
+        this.emit('folder-added', id);
         this.appendIcon(id, DESKTOP_GRID_ID);
     }
 
