@@ -459,6 +459,7 @@ var IconGridLayout = new Lang.Class({
         let id = this._createFolderFile(_("New Folder"));
         if (!id)
             return;
+        this.emit('folder-added', id);
         this.appendIcon(id, DESKTOP_GRID_ID);
     },
 
