@@ -173,6 +173,10 @@ const EditableLabel = new Lang.Class({
         if (this._grabHelper.isActorGrabbed(this))
             this._grabHelper.ungrab({ actor: this });
 
+        // ensure the focus style is removed, because moving the focus
+        // programmatically (without a click in another actor) didn't
+        // apparently remove it
+        this.remove_style_pseudo_class('focus');
     },
 
     _cancelEditing: function() {
