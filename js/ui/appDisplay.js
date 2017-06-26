@@ -594,9 +594,15 @@ const AllView = new Lang.Class({
                 this.addItem(icon);
         }));
 
-        // Add the App Center icon if it is enabled
-        if (global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
-            this.addItem(new AppCenterIcon());
+        // Add the App Center icon if it is enabled and installed
+        if (global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY)) {
+            let app = appSys.lookup_app(EOS_APP_CENTER_ID);
+            if (app)
+                this.addItem(new AppCenterIcon(app));
+            else
+                log('App center ' + EOS_APP_CENTER_ID + ' is not installed');
+        }
+
 
         this.loadGrid();
     },
@@ -1990,13 +1996,10 @@ const AppCenterIcon = new Lang.Class({
     Name: 'AppCenterIcon',
     Extends: AppIcon,
 
-    _init : function() {
+    _init : function(app) {
         let params = { isDraggable: false,
                        editable: false,
                        showMenu: false };
-
-        let appSystem = Shell.AppSystem.get_default();
-        let app = appSystem.lookup_app(EOS_APP_CENTER_ID);
 
         this.parent(app, params);
 
