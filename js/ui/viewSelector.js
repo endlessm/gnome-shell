@@ -141,8 +141,8 @@ const ShowOverviewAction = new Lang.Class({
 const ViewsDisplayLayout = new Lang.Class({
     Name: 'ViewsDisplayLayout',
     Extends: Clutter.BinLayout,
-    Signals: { 'allocated-size-changed': { param_types: [GObject.TYPE_INT,
-                                                         GObject.TYPE_INT] } },
+    Signals: { 'grid-available-size-changed': { param_types: [GObject.TYPE_INT,
+                                                              GObject.TYPE_INT] } },
 
     _init: function(entry, discoveryFeedButton, gridContainerActor, searchResultsActor) {
         this.parent();
@@ -211,7 +211,9 @@ const ViewsDisplayLayout = new Lang.Class({
 
         let gridContainerBox = allocation.copy();
         gridContainerBox.y1 = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
-        gridContainerBox.y2 = Math.min(gridContainerBox.y1 + gridContainerHeight, allocation.y2);
+        // If the icon grid's current height is 0 we still want to give its box the available height
+        if (gridContainerHeight != 0)
+            gridContainerBox.y2 = Math.min(gridContainerBox.y1 + gridContainerHeight, allocation.y2);
 
         let searchResultsBox = allocation.copy();
 
@@ -233,7 +235,8 @@ const ViewsDisplayLayout = new Lang.Class({
         // We want to emit the signal BEFORE any allocation has happened since the
         // icon grid will need to precompute certain values before being able to
         // report a sensible preferred height for the specified width.
-        this.emit('allocated-size-changed', allocation.x2 - allocation.x1, allocation.y2 - allocation.y1);
+        this.emit('grid-available-size-changed', gridContainerBox.x2 - gridContainerBox.x1,
+                  gridContainerBox.y2 - gridContainerBox.y1);
 
         this._entry.allocate(entryBox, flags);
         if (this._discoveryFeedButton)
@@ -288,7 +291,7 @@ const ViewsDisplayContainer = new Lang.Class({
                       x_expand: true,
                       y_expand: true });
 
-        layoutManager.connect('allocated-size-changed', Lang.bind(this, this._onAllocatedSizeChanged));
+        layoutManager.connect('grid-available-size-changed', Lang.bind(this, this._onGridAvailableSizeChanged));
 
         this.add_child(this._entry);
         if (this._discoveryFeedButton)
@@ -301,7 +304,7 @@ const ViewsDisplayContainer = new Lang.Class({
         this._searchResults.isAnimating = false;
     },
 
-    _onAllocatedSizeChanged: function(actor, width, height) {
+    _onGridAvailableSizeChanged: function(actor, width, height) {
         let box = new Clutter.ActorBox();
         box.x1 = box.y1 = 0;
         box.x2 = width;
