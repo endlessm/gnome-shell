@@ -1792,21 +1792,8 @@ const AppIcon = new Lang.Class({
 
     activate: function (button) {
         let event = Clutter.get_current_event();
-        let modifiers = event ? event.get_state() : 0;
-        let openNewWindow = this.app.can_open_new_window () &&
-                            modifiers & Clutter.ModifierType.CONTROL_MASK &&
-                            this.app.state == Shell.AppState.RUNNING ||
-                            button && button == 2;
-
-        if (this.app.state == Shell.AppState.STOPPED || openNewWindow)
-            this.animateLaunch();
-
-        if (openNewWindow)
-            this.app.open_new_window(-1);
-        else
-            this.app.activate();
-
-        Main.overview.hide();
+        let activationContext = new AppActivation.AppActivationContext(this.app);
+        activationContext.activate(event);
     },
 
     animateLaunch: function() {
