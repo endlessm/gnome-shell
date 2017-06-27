@@ -405,6 +405,11 @@ var AllView = class AllView extends BaseAppView {
 
         this._addedFolderId = null;
         IconGridLayout.layout.connect('folder-added', (iconGridLayout, id) => {
+            // Go to last page; ideally the grid should know in
+            // which page the change took place and show it automatically
+            // which would avoid us having to navigate there directly
+            this.goToPage(this._grid.nPages() - 1);
+
             // Save the folder ID so we know which one was added
             // and set it to edit mode
             this._addedFolderId = id;
