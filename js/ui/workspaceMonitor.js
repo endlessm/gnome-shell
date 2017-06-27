@@ -66,7 +66,7 @@ const WorkspaceMonitor = new Lang.Class({
         }
     },
 
-    _getRunningApps: function() {
+    _getVisibleApps: function() {
         let runningApps = this._appSystem.get_running();
         return runningApps.filter(function(app) {
             let windows = app.get_windows();
@@ -77,18 +77,6 @@ const WorkspaceMonitor = new Lang.Class({
                 if (window.get_transient_for())
                     continue;
 
-                return true;
-            }
-
-            return false;
-        });
-    },
-
-    _getVisibleApps: function() {
-        let runningApps = this._getRunningApps();
-        return runningApps.filter(function(app) {
-            let windows = app.get_windows();
-            for (let window of windows) {
                 if (!window.minimized)
                     return true;
             }
@@ -102,7 +90,7 @@ const WorkspaceMonitor = new Lang.Class({
         if (this._inFullscreen)
             return true;
 
-        let apps = this._getRunningApps();
+        let apps = this._appSystem.get_running();
         return apps.length > 0;
     },
 
