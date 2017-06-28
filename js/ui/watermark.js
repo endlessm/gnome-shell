@@ -2,6 +2,7 @@
 
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 const St = imports.gi.St;
 const Background = imports.ui.background;
@@ -9,7 +10,8 @@ const Main = imports.ui.main;
 const Monitor = imports.ui.monitor;
 const Tweener = imports.ui.tweener;
 
-const WATERMARK_SCHEMA = "org.gnome.shell.watermark";
+const WATERMARK_SCHEMA = 'org.gnome.shell.watermark';
+const WATERMARK_CUSTOM_BRANDING_FILE = '/var/eos-image-defaults/branding/gnome-shell.conf';
 
 const Watermark = new Lang.Class({
     Name: 'Watermark',
@@ -71,8 +73,25 @@ const Watermark = new Lang.Class({
         this._updateVisibility();
     },
 
+    _loadBrandingFile: function() {
+        try {
+            let keyfile = new GLib.KeyFile();
+            keyfile.load_from_file(WATERMARK_CUSTOM_BRANDING_FILE, GLib.KeyFileFlags.NONE);
+            return keyfile.get_string('Watermark', 'logo');
+        } catch(e) {
+            return null;
+        }
+    },
+
     _updateWatermark: function() {
         let filename = this._settings.get_string('watermark-file');
+        let brandingFile = this._loadBrandingFile();
+
+        // If there's no GSettings file, but there is a custom file, use
+        // the custom file instead
+        if (!filename && brandingFile)
+            filename = brandingFile;
+
         let file = Gio.File.new_for_commandline_arg(filename);
         if (this._watermarkFile && this._watermarkFile.equal(file))
             return;
