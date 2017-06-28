@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-17 22:48-0700\n"
-"PO-Revision-Date: 2017-06-19 18:49+0000\n"
+"POT-Creation-Date: 2017-06-23 14:42-0700\n"
+"PO-Revision-Date: 2017-06-23 21:43+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Korean (http://www.transifex.com/endless-mobile-inc/gnome-shell/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -71,10 +71,18 @@ msgid ""
 msgstr "Alt-F2 대화 상자에서 내부 디버깅 및 감시 기능에 접근을 허용합니다."
 
 #: data/org.gnome.shell.gschema.xml.in:23
+msgid "Whether the App Center is displayed"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:26
+msgid "Whether the application grid displays the App Center icon."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:32
 msgid "UUIDs of extensions to enable"
 msgstr "사용할 확장의 UUID 목록"
 
-#: data/org.gnome.shell.gschema.xml.in:24
+#: data/org.gnome.shell.gschema.xml.in:33
 msgid ""
 "GNOME Shell extensions have a UUID property; this key lists extensions which"
 " should be loaded. Any extension that wants to be loaded needs to be in this"
@@ -82,61 +90,61 @@ msgid ""
 "DisableExtension D-Bus methods on org.gnome.Shell."
 msgstr "그놈 셸 확장에는 UUID 속성이 있습니다. 이 키는 읽어들일 확장의 UUID를 나열합니다. 읽어들이려는 확장은 모두 이 목록에 들어 있어야 합니다. EnableExtension 및 DisableExtension D-버스 메소드를 이용해 이 목록을 조작할 수도 있습니다."
 
-#: data/org.gnome.shell.gschema.xml.in:33
+#: data/org.gnome.shell.gschema.xml.in:42
 msgid "Disables the validation of extension version compatibility"
 msgstr "확장의 버전 호환성 검사 하지 않기"
 
-#: data/org.gnome.shell.gschema.xml.in:34
+#: data/org.gnome.shell.gschema.xml.in:43
 msgid ""
 "GNOME Shell will only load extensions that claim to support the current "
 "running version. Enabling this option will disable this check and try to "
 "load all extensions regardless of the versions they claim to support."
 msgstr "그놈 셸에서 현재 실행 중인 버전을 지원하는 확장 기능만 읽어들입니다. 이 옵션을 사용하면 이 버전 검사를 하지 않고, 지원한다고 지정된 버전에 관계없이 모든 확장 기능을 읽어들입니다."
 
-#: data/org.gnome.shell.gschema.xml.in:42
+#: data/org.gnome.shell.gschema.xml.in:51
 msgid "List of desktop file IDs for favorite applications"
 msgstr "즐겨찾기 프로그램의 데스크톱 파일 ID 목록"
 
-#: data/org.gnome.shell.gschema.xml.in:43
+#: data/org.gnome.shell.gschema.xml.in:52
 msgid ""
 "The applications corresponding to these identifiers will be displayed in the"
 " favorites area."
 msgstr "여기 들어 있는 ID에 해당하는 프로그램은 즐겨찾기 영역에 표시됩니다."
 
-#: data/org.gnome.shell.gschema.xml.in:50
+#: data/org.gnome.shell.gschema.xml.in:59
 msgid "App Picker View"
 msgstr "프로그램 고르기 뷰"
 
-#: data/org.gnome.shell.gschema.xml.in:51
+#: data/org.gnome.shell.gschema.xml.in:60
 msgid "Index of the currently selected view in the application picker."
 msgstr "프로그램 고르기에서 현재 선택한 뷰의 인덱스 값."
 
-#: data/org.gnome.shell.gschema.xml.in:57
+#: data/org.gnome.shell.gschema.xml.in:66
 msgid "History for command (Alt-F2) dialog"
 msgstr "명령어 대화 상자에(Alt-F2) 기록 기능"
 
 #. Translators: looking glass is a debugger and inspector tool, see
 #. https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
-#: data/org.gnome.shell.gschema.xml.in:62
+#: data/org.gnome.shell.gschema.xml.in:71
 msgid "History for the looking glass dialog"
 msgstr "돋보기 대화 상자에 기록 기능"
 
-#: data/org.gnome.shell.gschema.xml.in:66
+#: data/org.gnome.shell.gschema.xml.in:75
 msgid "Always show the 'Log out' menu item in the user menu."
 msgstr "사용자 메뉴에 '로그아웃' 메뉴 항목을 항상 표시합니다."
 
-#: data/org.gnome.shell.gschema.xml.in:67
+#: data/org.gnome.shell.gschema.xml.in:76
 msgid ""
 "This key overrides the automatic hiding of the 'Log out' menu item in "
 "single-user, single-session situations."
 msgstr "이 키를 설정하면, 단일 사용자 및 단일 세션에서 '로그아웃' 메뉴 항목 자동 감추기 기능을 사용하지 않습니다."
 
-#: data/org.gnome.shell.gschema.xml.in:74
+#: data/org.gnome.shell.gschema.xml.in:83
 msgid ""
 "Whether to remember password for mounting encrypted or remote filesystems"
 msgstr "암호화 볼륨을 마운트하거나 원격 파일 시스템을 마운트할 때 암호를 저장할지 여부"
 
-#: data/org.gnome.shell.gschema.xml.in:75
+#: data/org.gnome.shell.gschema.xml.in:84
 msgid ""
 "The shell will request a password when an encrypted device or a remote "
 "filesystem is mounted. If the password can be saved for future use a "
@@ -144,12 +152,12 @@ msgid ""
 "state of the checkbox."
 msgstr "암호화된 저장 장치나 원격 파일 시스템을 마운트하는 경우 암호를 입력해야 합니다. 암호를 저장할 수 있으면 '암호 저장' 확인란이 나타납니다. 이 키에서는 이 확인란의 기본 상태를 지정합니다."
 
-#: data/org.gnome.shell.gschema.xml.in:84
+#: data/org.gnome.shell.gschema.xml.in:93
 msgid ""
 "Whether the default Bluetooth adapter had set up devices associated to it"
 msgstr "기본 블루투스 어댑터가 여기 연결할 장치를 준비했는지 여부"
 
-#: data/org.gnome.shell.gschema.xml.in:85
+#: data/org.gnome.shell.gschema.xml.in:94
 msgid ""
 "The shell will only show a Bluetooth menu item if a Bluetooth adapter is "
 "powered, or if there were devices set up associated with the default "
@@ -157,65 +165,85 @@ msgid ""
 "devices associated to it."
 msgstr "그놈 셸에서는 블루투스 어댑터에 전원이 들어오거나, 기본 어댑터에 연결 설정한 장치가 있을 경우엠나 경우에만 블루투스 메뉴 항목을 표시합니다. 기본 어댑터에 연결된 장치가 하나도 없는 상황이 발견되면 이 값을 초기화합니다."
 
-#: data/org.gnome.shell.gschema.xml.in:97
+#: data/org.gnome.shell.gschema.xml.in:106
+msgid "Whether the coding game is enabled"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:109
+msgid ""
+"Whether the coding game is enabled. You will need to restart the shell for "
+"this setting to take effect, as it is intended for product developers."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:117
+msgid "Whether the 'Code View' feature is enabled"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:120
+msgid ""
+"This allows to modify and run a whitelist of applications using GNOME "
+"Builder."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:127
 msgid "Enables the hot corner for the window picker"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:100
+#: data/org.gnome.shell.gschema.xml.in:130
 msgid ""
 "By default, the hot corner for the window picker is enabled. Set false to "
 "disable the hot corner."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:107
+#: data/org.gnome.shell.gschema.xml.in:137
 msgid "Set the left/right position of the hot corner for the window picker"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:110
+#: data/org.gnome.shell.gschema.xml.in:140
 msgid ""
 "Default position of the hot corner is in a right corner. Set false to move "
 "the hot corner to a left corner. The position is not affected by the RTL vs."
 " LTR text direction."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:118
+#: data/org.gnome.shell.gschema.xml.in:148
 msgid "Set the top/bottom position of the hot corner for the window picker"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:121
+#: data/org.gnome.shell.gschema.xml.in:151
 msgid ""
 "Default position of the hot corner is in a bottom corner. Set false to move "
 "the hot corner to a top corner."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:128
+#: data/org.gnome.shell.gschema.xml.in:158
 msgid "Set the size of the hot corner target"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:131
+#: data/org.gnome.shell.gschema.xml.in:161
 msgid ""
 "Number of pixels in one dimension of the square target for the hot corner. "
 "Default is for a single pixel in the very corner. For some virtual machines,"
 " this value may need to be set larger than the default."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:141
+#: data/org.gnome.shell.gschema.xml.in:171
 msgid "Prevent apps from being automatically maximized on launch"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:144
+#: data/org.gnome.shell.gschema.xml.in:174
 msgid ""
 "Makes window management more like standard Gnome. Hides application splash "
 "screens, prevents applications from being forced to open maximized, and does"
 " not automatically switch to the app selector when a window is minimized."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:153
+#: data/org.gnome.shell.gschema.xml.in:183
 msgid ""
 "List of desktop file IDs for applications pinned to taskbar (DEPRECATED)"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:154
+#: data/org.gnome.shell.gschema.xml.in:184
 msgid ""
 "The applications corresponding to these identifiers will be displayed in the"
 " taskbar at the bottom of the Endless desktop. THIS IS DEPRECATED NOW: any "
@@ -223,312 +251,323 @@ msgid ""
 "the shell on start, and then cleared from here."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:163
+#: data/org.gnome.shell.gschema.xml.in:193
 msgid "Layout of application launcher icons in the grid"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:164
+#: data/org.gnome.shell.gschema.xml.in:194
 msgid ""
 "This key specifies the exact order of the icons shown in the applications "
 "launcher view."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:170
+#: data/org.gnome.shell.gschema.xml.in:200
 msgid "Whether or not to enable the wobbly effect"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:173
+#: data/org.gnome.shell.gschema.xml.in:203
 msgid "WOBBLY!"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:180
+#: data/org.gnome.shell.gschema.xml.in:210
 msgid "Wobbly effect Spring Constant"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:183
+#: data/org.gnome.shell.gschema.xml.in:213
 msgid "Springiness of wobbly effect"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:190
+#: data/org.gnome.shell.gschema.xml.in:220
 msgid "Wobbly effect Friction"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:193
+#: data/org.gnome.shell.gschema.xml.in:223
 msgid "Friction of wobbly effect"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:200
+#: data/org.gnome.shell.gschema.xml.in:230
 msgid "Wobbly effect slowdown factor"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:203
+#: data/org.gnome.shell.gschema.xml.in:233
 msgid "Slowdown factor of wobbly effect (1.0 being normal speed)"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:210
+#: data/org.gnome.shell.gschema.xml.in:240
 msgid "Wobbly effect object movement range"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:213
+#: data/org.gnome.shell.gschema.xml.in:243
 msgid ""
 "How much objects are allowed to move in the mesh. A higher range allows for "
 "a more pronounced effect."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:226
+#: data/org.gnome.shell.gschema.xml.in:250
+msgid "Languages for which the discovery feed feature is enabled."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:253
+msgid ""
+"If the system language matches any of these languages, the discovery feed "
+"will be enabled. You will need to restart the shell for changes to this "
+"setting to take effect."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:265
 msgid "Keybinding to open the application menu"
 msgstr "프로그램 메뉴를 여는 키 바인딩"
 
-#: data/org.gnome.shell.gschema.xml.in:227
+#: data/org.gnome.shell.gschema.xml.in:266
 msgid "Keybinding to open the application menu."
 msgstr "프로그램 메뉴를 여는 키 바인딩."
 
-#: data/org.gnome.shell.gschema.xml.in:233
+#: data/org.gnome.shell.gschema.xml.in:272
 msgid "Keybinding to open the \"Show Applications\" view"
 msgstr "\"프로그램 보기\" 뷰를 여는 키 바인딩"
 
-#: data/org.gnome.shell.gschema.xml.in:234
+#: data/org.gnome.shell.gschema.xml.in:273
 msgid ""
 "Keybinding to open the \"Show Applications\" view of the Activities "
 "Overview."
 msgstr "현재 활동 요약의 \"프로그램 보기\" 뷰를 여는 키 바인딩."
 
-#: data/org.gnome.shell.gschema.xml.in:241
+#: data/org.gnome.shell.gschema.xml.in:280
 msgid "Keybinding to open the overview"
 msgstr "현재 활동 요약을 여는 키 바인딩"
 
-#: data/org.gnome.shell.gschema.xml.in:242
+#: data/org.gnome.shell.gschema.xml.in:281
 msgid "Keybinding to open the Activities Overview."
 msgstr "현재 활동 요약을 여는 키 바인딩."
 
-#: data/org.gnome.shell.gschema.xml.in:248
+#: data/org.gnome.shell.gschema.xml.in:287
 msgid "Keybinding to toggle the visibility of the notification list"
 msgstr "알림 목록 보이기를 토글하는 키 바인딩"
 
-#: data/org.gnome.shell.gschema.xml.in:249
+#: data/org.gnome.shell.gschema.xml.in:288
 msgid "Keybinding to toggle the visibility of the notification list."
 msgstr "알림 목록 보이기를 토글하는 키 바인딩."
 
-#: data/org.gnome.shell.gschema.xml.in:255
+#: data/org.gnome.shell.gschema.xml.in:294
 msgid "Keybinding to focus the active notification"
 msgstr "현재 알림에 포커스하는 키 바인딩"
 
-#: data/org.gnome.shell.gschema.xml.in:256
+#: data/org.gnome.shell.gschema.xml.in:295
 msgid "Keybinding to focus the active notification."
 msgstr "현재 알림에 포커스하는 키 바인딩."
 
-#: data/org.gnome.shell.gschema.xml.in:262
+#: data/org.gnome.shell.gschema.xml.in:301
 msgid ""
 "Keybinding that pauses and resumes all running tweens, for debugging "
 "purposes"
 msgstr "실행 중인 모든 하위 프로세스를 일시 중지하고 계속 하는 키 바인딩, 디버깅 목적"
 
-#: data/org.gnome.shell.gschema.xml.in:270
+#: data/org.gnome.shell.gschema.xml.in:309
 msgid "Keybinding that shows the force app exit dialog"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:275
+#: data/org.gnome.shell.gschema.xml.in:314
 msgid "Keybinding to activate the first app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:276
+#: data/org.gnome.shell.gschema.xml.in:315
 msgid ""
 "Keybinding to open the first app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:282
+#: data/org.gnome.shell.gschema.xml.in:321
 msgid "Keybinding to activate the second app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:283
+#: data/org.gnome.shell.gschema.xml.in:322
 msgid ""
 "Keybinding to open the second app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:289
+#: data/org.gnome.shell.gschema.xml.in:328
 msgid "Keybinding to activate the third app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:290
+#: data/org.gnome.shell.gschema.xml.in:329
 msgid ""
 "Keybinding to open the third app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:296
+#: data/org.gnome.shell.gschema.xml.in:335
 msgid "Keybinding to activate the fourth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:297
+#: data/org.gnome.shell.gschema.xml.in:336
 msgid ""
 "Keybinding to open the fourth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:303
+#: data/org.gnome.shell.gschema.xml.in:342
 msgid "Keybinding to activate the fifth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:304
+#: data/org.gnome.shell.gschema.xml.in:343
 msgid ""
 "Keybinding to open the fifth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:310
+#: data/org.gnome.shell.gschema.xml.in:349
 msgid "Keybinding to activate the sixth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:311
+#: data/org.gnome.shell.gschema.xml.in:350
 msgid ""
 "Keybinding to open the sixth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:317
+#: data/org.gnome.shell.gschema.xml.in:356
 msgid "Keybinding to activate the seventh app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:318
+#: data/org.gnome.shell.gschema.xml.in:357
 msgid ""
 "Keybinding to open the seventh app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:324
+#: data/org.gnome.shell.gschema.xml.in:363
 msgid "Keybinding to activate the eighth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:325
+#: data/org.gnome.shell.gschema.xml.in:364
 msgid ""
 "Keybinding to open the eighth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:331
+#: data/org.gnome.shell.gschema.xml.in:370
 msgid "Keybinding to activate the last app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:332
+#: data/org.gnome.shell.gschema.xml.in:371
 msgid ""
 "Keybinding to open the last app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:342
+#: data/org.gnome.shell.gschema.xml.in:381
 msgid "Which keyboard to use"
 msgstr "사용할 키보드"
 
-#: data/org.gnome.shell.gschema.xml.in:343
+#: data/org.gnome.shell.gschema.xml.in:382
 msgid "The type of keyboard to use."
 msgstr "사용할 키보드의 종류."
 
-#: data/org.gnome.shell.gschema.xml.in:354
-#: data/org.gnome.shell.gschema.xml.in:381
+#: data/org.gnome.shell.gschema.xml.in:393
+#: data/org.gnome.shell.gschema.xml.in:420
 msgid "Limit switcher to current workspace."
 msgstr "프로그램 전환을 현재 작업 공간에만 한정."
 
-#: data/org.gnome.shell.gschema.xml.in:355
+#: data/org.gnome.shell.gschema.xml.in:394
 msgid ""
 "If true, only applications that have windows on the current workspace are "
 "shown in the switcher. Otherwise, all applications are included."
 msgstr "참이면, 현재 작업 공간에 창이 있는 프로그램만 프로그램 전환 창에 표시합니다. 참이 아니면 모든 프로그램을 표시합니다."
 
-#: data/org.gnome.shell.gschema.xml.in:372
+#: data/org.gnome.shell.gschema.xml.in:411
 msgid "The application icon mode."
 msgstr "프로그램 아이콘 모드."
 
-#: data/org.gnome.shell.gschema.xml.in:373
+#: data/org.gnome.shell.gschema.xml.in:412
 msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
 "are 'thumbnail-only' (shows a thumbnail of the window), 'app-icon-only' "
 "(shows only the application icon) or 'both'."
 msgstr "창 전환에서 창이 어떻게 표시될지 설정합니다. 가능한 값은: 'thumbnail-only'(창의 섬네일만 표시), 'app-icon-only'(프로그램 아이콘만 표시), 'both'(모두)."
 
-#: data/org.gnome.shell.gschema.xml.in:382
+#: data/org.gnome.shell.gschema.xml.in:421
 msgid ""
 "If true, only windows from the current workspace are shown in the switcher. "
 "Otherwise, all windows are included."
 msgstr "참이면, 현재 작업 공간에 창이 있는 창만 창 전환 창에 표시합니다. 거짓이면 모든 창을 표시합니다."
 
-#: data/org.gnome.shell.gschema.xml.in:393
+#: data/org.gnome.shell.gschema.xml.in:432
 msgid "Attach modal dialog to the parent window"
 msgstr "상위 창에 모달 대화창 붙이기"
 
-#: data/org.gnome.shell.gschema.xml.in:394
-#: data/org.gnome.shell.gschema.xml.in:403
-#: data/org.gnome.shell.gschema.xml.in:411
-#: data/org.gnome.shell.gschema.xml.in:419
-#: data/org.gnome.shell.gschema.xml.in:427
+#: data/org.gnome.shell.gschema.xml.in:433
+#: data/org.gnome.shell.gschema.xml.in:442
+#: data/org.gnome.shell.gschema.xml.in:450
+#: data/org.gnome.shell.gschema.xml.in:458
+#: data/org.gnome.shell.gschema.xml.in:466
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
 msgstr "그놈 셸을 실행할 때 org.gnome.mutter의 키 대신 사용됩니다."
 
-#: data/org.gnome.shell.gschema.xml.in:402
+#: data/org.gnome.shell.gschema.xml.in:441
 msgid "Enable edge tiling when dropping windows on screen edges"
 msgstr "화면 가장자리에 창을 놓을 때 가장자리에 맞춥니다"
 
-#: data/org.gnome.shell.gschema.xml.in:410
+#: data/org.gnome.shell.gschema.xml.in:449
 msgid "Workspaces are managed dynamically"
 msgstr "작업 공간을 동적으로 관리"
 
-#: data/org.gnome.shell.gschema.xml.in:418
+#: data/org.gnome.shell.gschema.xml.in:457
 msgid "Workspaces only on primary monitor"
 msgstr "주 모니터에서만 작업 공간 사용"
 
-#: data/org.gnome.shell.gschema.xml.in:426
+#: data/org.gnome.shell.gschema.xml.in:465
 msgid "Delay focus changes in mouse mode until the pointer stops moving"
 msgstr "마우스 포인터가 움직이지 않을 때까지 포커스 전환을 미루기"
 
-#: data/org.gnome.shell.gschema.xml.in:438
+#: data/org.gnome.shell.gschema.xml.in:477
 msgid "Watermark file"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:439
+#: data/org.gnome.shell.gschema.xml.in:478
 msgid "The full watermark file path"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:443
+#: data/org.gnome.shell.gschema.xml.in:482
 msgid "Watermark position"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:444
+#: data/org.gnome.shell.gschema.xml.in:483
 msgid ""
 "The position of the watermark; valid values are 'center', 'bottom-left', "
 "'bottom-center' and 'bottom-right'"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:452
+#: data/org.gnome.shell.gschema.xml.in:491
 msgid "Watermark size"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:453
+#: data/org.gnome.shell.gschema.xml.in:492
 msgid "The watermark size in percent relative to the screen width"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:458
+#: data/org.gnome.shell.gschema.xml.in:497
 msgid "Watermark border"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:459
+#: data/org.gnome.shell.gschema.xml.in:498
 msgid "The watermark around the logo"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:464
+#: data/org.gnome.shell.gschema.xml.in:503
 msgid "Watermark opacity"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:465
+#: data/org.gnome.shell.gschema.xml.in:504
 msgid "The watermark of the logo"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:469
+#: data/org.gnome.shell.gschema.xml.in:508
 msgid "Watermark always visible"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:470
+#: data/org.gnome.shell.gschema.xml.in:509
 msgid "Show the watermark even on a non default background"
 msgstr ""
 
@@ -723,25 +762,33 @@ msgstr "접근 거부"
 msgid "Grant Access"
 msgstr "접근 허용"
 
-#: js/ui/appDisplay.js:808
+#: js/ui/appDisplay.js:884
 msgid "Frequently used applications will appear here"
 msgstr "자주 사용하는 프로그램이 여기 나타납니다"
 
-#: js/ui/appDisplay.js:1734
+#: js/ui/appDisplay.js:1114
+msgid "No apps in this folder! To add an app, drag it onto the folder."
+msgstr ""
+
+#: js/ui/appDisplay.js:1934
 msgid "New Window"
 msgstr "새 창"
 
-#: js/ui/appDisplay.js:1762 js/ui/dash.js:289
+#: js/ui/appDisplay.js:1962 js/ui/dash.js:289
 msgid "Remove from Favorites"
 msgstr "즐겨찾기에서 제거"
 
-#: js/ui/appDisplay.js:1768
+#: js/ui/appDisplay.js:1968
 msgid "Add to Favorites"
 msgstr "즐겨찾기에 추가"
 
-#: js/ui/appDisplay.js:1778
+#: js/ui/appDisplay.js:1978
 msgid "Show Details"
 msgstr "자세히 보기"
+
+#: js/ui/appDisplay.js:2031
+msgid "More Apps"
+msgstr ""
 
 #: js/ui/audioDeviceSelection.js:59
 msgid "Select Audio Device"
@@ -763,19 +810,19 @@ msgstr "헤드셋"
 msgid "Microphone"
 msgstr "마이크"
 
-#: js/ui/backgroundMenu.js:20
+#: js/ui/backgroundMenu.js:21
 msgid "Change Background…"
 msgstr "배경 바꾸기…"
 
-#: js/ui/backgroundMenu.js:23
+#: js/ui/backgroundMenu.js:24
 msgid "Add App"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:29
+#: js/ui/backgroundMenu.js:30
 msgid "Add Website"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:33
+#: js/ui/backgroundMenu.js:34
 msgid "Add Folder"
 msgstr ""
 
@@ -1001,7 +1048,7 @@ msgstr "인증"
 msgid "Sorry, that didn't work. Please try again."
 msgstr "죄송합니다. 동작하지 않았습니다. 다시 시도하십시오."
 
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:480
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:603
 msgid "Windows"
 msgstr "창"
 
@@ -1305,7 +1352,7 @@ msgctxt "Power menu"
 msgid "Power"
 msgstr "전원"
 
-#: js/ui/panel.js:904
+#: js/ui/panel.js:905
 msgid "Top Bar"
 msgstr "위 막대"
 
@@ -1374,11 +1421,11 @@ msgstr "잠글 수 없습니다"
 msgid "Lock was blocked by an application"
 msgstr "프로그램이 잠금을 막았습니다"
 
-#: js/ui/search.js:692
+#: js/ui/search.js:716
 msgid "Searching…"
 msgstr "검색하는 중…"
 
-#: js/ui/search.js:694
+#: js/ui/search.js:718
 msgid "No results."
 msgstr "결과가 없습니다."
 
@@ -1799,7 +1846,7 @@ msgstr "다른 사용자로 로그인"
 msgid "Unlock Window"
 msgstr "창 잠금 풀기"
 
-#: js/ui/viewSelector.js:484
+#: js/ui/viewSelector.js:607
 msgid "Applications"
 msgstr "프로그램"
 
@@ -1808,21 +1855,21 @@ msgstr "프로그램"
 msgid "“%s” is ready"
 msgstr "“%s” 프로그램이 준비되었습니다"
 
-#: js/ui/windowManager.js:71
+#: js/ui/windowManager.js:72
 msgid "Do you want to keep these display settings?"
 msgstr "이 디스플레이 설정을 유지하시겠습니까?"
 
 #. Translators: this and the following message should be limited in lenght,
 #. to avoid ellipsizing the labels.
-#: js/ui/windowManager.js:90
+#: js/ui/windowManager.js:91
 msgid "Revert Settings"
 msgstr "설정 되돌리기"
 
-#: js/ui/windowManager.js:93
+#: js/ui/windowManager.js:94
 msgid "Keep Changes"
 msgstr "바뀐 사항 유지"
 
-#: js/ui/windowManager.js:111
+#: js/ui/windowManager.js:112
 #, javascript-format
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
@@ -1830,7 +1877,7 @@ msgstr[0] "바뀐 설정을 %d초 후에 되돌립니다"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
-#: js/ui/windowManager.js:718
+#: js/ui/windowManager.js:719
 #, javascript-format
 msgid "%d x %d"
 msgstr "%d x %d"
@@ -1988,13 +2035,16 @@ msgstr ""
 msgid "Quit %s"
 msgstr ""
 
-#: js/ui/endlessButton.js:16
+#: js/ui/endlessButton.js:17
 msgid "Endless Button"
 msgstr ""
 
-#. Create a new tooltip label
-#: js/ui/endlessButton.js:32
+#: js/ui/endlessButton.js:53
 msgid "Show Desktop"
+msgstr ""
+
+#: js/ui/endlessButton.js:57
+msgid "Show Apps"
 msgstr ""
 
 #: js/ui/forceAppExitDialog.js:55
@@ -2027,9 +2077,13 @@ msgstr ""
 msgid "Disable Hot Corner"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:252
+#: js/ui/iconGridLayout.js:253
 #, javascript-format
 msgid "%s has been deleted"
+msgstr ""
+
+#: js/ui/iconGridLayout.js:384
+msgid "New Folder"
 msgstr ""
 
 #: js/ui/internetSearch.js:72
@@ -2047,6 +2101,10 @@ msgstr ""
 #: js/ui/internetSearch.js:83
 #, javascript-format
 msgid "Search the internet for \"%s\""
+msgstr ""
+
+#: js/ui/status/codingGame.js:20
+msgid "Coding"
 msgstr ""
 
 #: js/ui/status/orientation.js:49
