@@ -328,6 +328,7 @@ const OverviewEntry = new Lang.Class({
 
     _stopSearch: function() {
         global.stage.set_key_focus(null);
+        this.setSpinning(false);
     },
 
     _startSearch: function(event) {
