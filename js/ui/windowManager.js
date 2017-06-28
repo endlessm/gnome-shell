@@ -2,6 +2,7 @@
 
 const Cairo = imports.cairo;
 const Clutter = imports.gi.Clutter;
+const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const GObject = imports.gi.GObject;
