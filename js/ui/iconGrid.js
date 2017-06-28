@@ -766,7 +766,7 @@ const PaginatedIconGrid = new Lang.Class({
         }
 
         let x = box.x1 + leftEmptySpace + this.leftPadding;
-        let y = box.y1 + this.topPadding;
+        let y = box.y1 + this.topPadding + this._spaceBetweenPages / 2;
         let columnIndex = 0;
         let rowIndex = 0;
 
@@ -846,7 +846,7 @@ const PaginatedIconGrid = new Lang.Class({
 
         let firstPageItem = pageNumber * this._childrenPerPage
         let childBox = this._getVisibleChildren()[firstPageItem].get_allocation_box();
-        return childBox.y1 - this.topPadding;
+        return childBox.y1 - this.topPadding - this._spaceBetweenPages / 2;
     },
 
     getItemPage: function(item) {
@@ -883,6 +883,13 @@ const PaginatedIconGrid = new Lang.Class({
         let nRowsAbove = (side == St.Side.TOP) ? sourceRow + 1
                                                : sourceRow;
         let nRowsBelow = this._rowsPerPage - nRowsAbove;
+
+        // Since it always tries to show up the folder icon, then when only 1 row is
+        // being displayed, the number of rows (to be moved out) here is 0; however
+        // we override that because it's better to move the folder icon out of the
+        // view than not showing the folder popup at all.
+        if (nRows == 0)
+            nRows = 1;
 
         let nRowsUp, nRowsDown;
         if (side == St.Side.TOP) {
