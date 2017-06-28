@@ -18,6 +18,7 @@ const AppFavorites = imports.ui.appFavorites;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const BoxPointer = imports.ui.boxpointer;
 const DND = imports.ui.dnd;
+const EditableLabelMode = imports.ui.editableLabel.EditableLabelMode;
 const GrabHelper = imports.ui.grabHelper;
 const IconGrid = imports.ui.iconGrid;
 const IconGridLayout = imports.ui.iconGridLayout;
@@ -193,21 +194,29 @@ const BaseAppView = new Lang.Class({
     },
 
     selectApp: function(id) {
+        this.selectAppWithLabelMode(id, null);
+    },
+
+    selectAppWithLabelMode: function(id, labelMode) {
         if (this._items[id] && this._items[id].actor.mapped) {
             this._selectAppInternal(id);
+            if (labelMode !== null)
+                this._items[id].icon.setLabelMode(labelMode);
         } else if (this._items[id]) {
             // Need to wait until the view is mapped
             let signalId = this._items[id].actor.connect('notify::mapped', Lang.bind(this, function(actor) {
                 if (actor.mapped) {
                     actor.disconnect(signalId);
                     this._selectAppInternal(id);
+                    if (labelMode !== null)
+                        this._items[id].icon.setLabelMode(labelMode);
                 }
             }));
         } else {
             // Need to wait until the view is built
             let signalId = this.connect('view-loaded', Lang.bind(this, function() {
                 this.disconnect(signalId);
-                this.selectApp(id);
+                this.selectAppWithLabelMode(id, labelMode);
             }));
         }
     },
@@ -536,6 +545,19 @@ const AllView = new Lang.Class({
             Main.queueDeferredWork(this._redisplayWorkId);
         }));
 
+        this._addedFolderId = null;
+        IconGridLayout.layout.connect('folder-added',
+                                      Lang.bind(this, function(iconGridLayout, id){
+                                          // Go to last page; ideally the grid should know in
+                                          // which page the change took place and show it automatically
+                                          // which would avoid us having to navigate there directly
+                                          this.goToPage(this._grid.nPages() - 1);
+
+                                          // Save the folder ID so we know which one was added
+                                          // and set it to edit mode
+                                          this._addedFolderId = id;
+                                      }));
+
         this._loadApps();
     },
 
@@ -582,6 +604,10 @@ const AllView = new Lang.Class({
                 icon = new FolderIcon(itemId, this);
                 icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
                 this.folderIcons.push(icon);
+                if (this._addedFolderId == itemId) {
+                    this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
+                    this._addedFolderId = null;
+                }
             } else {
                 let app = appSys.lookup_app(itemId);
                 if (app)
@@ -1097,12 +1123,19 @@ const FolderView = new Lang.Class({
         this.actor = new St.ScrollView({ overlay_scrollbars: true });
         this.actor.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
         let scrollableContainer = new St.BoxLayout({ vertical: true, reactive: true });
+        this._noAppsLabel = new St.Label({ text: _("No apps in this folder! To add an app, drag it onto the folder."),
+                                           style_class: 'folder-no-apps-label'});
+        scrollableContainer.add_actor(this._noAppsLabel);
         scrollableContainer.add_actor(this._grid.actor);
         this.actor.add_actor(scrollableContainer);
 
         let action = new Clutter.PanAction({ interpolate: true });
         action.connect('pan', Lang.bind(this, this._onPan));
         this.actor.add_action(action);
+    },
+
+    updateNoAppsLabelVisibility: function() {
+        this._noAppsLabel.visible = this._grid.visibleItemsCount() == 0;
     },
 
     _keyFocusIn: function(actor) {
@@ -1298,8 +1331,8 @@ const FolderIcon = new Lang.Class({
         let folderApps = IconGridLayout.layout.getIcons(this.id);
         folderApps.forEach(addAppId);
 
-        this.actor.visible = this.view.getAllItems().length > 0;
         this.view.loadGrid();
+        this.view.updateNoAppsLabelVisibility();
         this.emit('apps-changed');
     },
 
@@ -1319,7 +1352,8 @@ const FolderIcon = new Lang.Class({
                 this._popup.popup();
                 this._updatePopupPosition();
             }));
-        this._parentView.openSpaceForPopup(this, this._boxPointerArrowside, this.view.nRowsDisplayedAtOnce());
+        this._parentView.openSpaceForPopup(this, this._boxPointerArrowside,
+                                           Math.max(this.view.nRowsDisplayedAtOnce(), 1));
     },
 
     _calculateBoxPointerArrowSide: function() {
