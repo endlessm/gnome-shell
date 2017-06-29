@@ -730,6 +730,7 @@ const PaginatedIconGrid = new Lang.Class({
         this._rowsPerPage = 0;
         this._spaceBetweenPages = 0;
         this._childrenPerPage = 0;
+        this._maxRowsPerPage = 0;
     },
 
     _getPreferredHeight: function (grid, forWidth, alloc) {
@@ -766,7 +767,7 @@ const PaginatedIconGrid = new Lang.Class({
         }
 
         let x = box.x1 + leftEmptySpace + this.leftPadding;
-        let y = box.y1 + this.topPadding + this._spaceBetweenPages / 2;
+        let y = box.y1 + this.topPadding;
         let columnIndex = 0;
         let rowIndex = 0;
 
@@ -821,6 +822,7 @@ const PaginatedIconGrid = new Lang.Class({
             this._spaceBetweenPages = this._getSpacing();
 
         this._childrenPerPage = nColumns * this._rowsPerPage;
+        this._maxRowsPerPage = this.rowsForHeight(availHeightPerPage);
     },
 
     adaptToSize: function(availWidth, availHeight) {
@@ -846,7 +848,7 @@ const PaginatedIconGrid = new Lang.Class({
 
         let firstPageItem = pageNumber * this._childrenPerPage
         let childBox = this._getVisibleChildren()[firstPageItem].get_allocation_box();
-        return childBox.y1 - this.topPadding - this._spaceBetweenPages / 2;
+        return childBox.y1 - this.topPadding;
     },
 
     getItemPage: function(item) {
@@ -882,7 +884,7 @@ const PaginatedIconGrid = new Lang.Class({
 
         let nRowsAbove = (side == St.Side.TOP) ? sourceRow + 1
                                                : sourceRow;
-        let nRowsBelow = this._rowsPerPage - nRowsAbove;
+        let nRowsBelow = this._maxRowsPerPage - nRowsAbove;
 
         // Since it always tries to show up the folder icon, then when only 1 row is
         // being displayed, the number of rows (to be moved out) here is 0; however

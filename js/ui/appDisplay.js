@@ -412,7 +412,7 @@ const AllViewContainer = new Lang.Class({
         this.gridActor = gridActor;
 
         gridActor.y_expand = true;
-        gridActor.y_align = Clutter.ActorAlign.CENTER;
+        gridActor.y_align = Clutter.ActorAlign.START;
 
         this.scrollView = new St.ScrollView({ style_class: 'all-apps-scroller',
                                               x_expand: true,
