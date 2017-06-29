@@ -11,6 +11,7 @@ misc/config.js: misc/config.js.in Makefile
 	    -e "s|[@]datadir@|$(datadir)|g" \
 	    -e "s|[@]libexecdir@|$(libexecdir)|g" \
 	    -e "s|[@]localstatedir@|$(localstatedir)|g" \
+	    -e "s|[@]pkgdatadir@|$(pkgdatadir)|g" \
 	    -e "s|[@]sysconfdir@|$(sysconfdir)|g" \
 	    -e "s|[@]LIBMUTTER_API_VERSION@|$(LIBMUTTER_API_VERSION)|g" \
                $< > $@

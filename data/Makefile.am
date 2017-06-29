@@ -1,6 +1,8 @@
 CLEANFILES =
 NULL =
 
+pkgdata_DATA = vendor-customer-support.ini
+
 desktopdir=$(datadir)/applications
 desktop_DATA = org.gnome.Shell.desktop gnome-shell-extension-prefs.desktop eos-launch.desktop eos-link-feedback.desktop
 
@@ -36,6 +38,9 @@ endif
 %.desktop:%.desktop.in
 	$(AM_V_GEN) $(MSGFMT) --desktop --template $(builddir)/$< \
 	                      -d $(top_srcdir)/po -o $@
+
+rulesdir = $(datadir)/polkit-1/rules.d
+rules_DATA = 40-gdm.rules
 
 introspectiondir = $(datadir)/dbus-1/interfaces
 introspection_DATA =				\
@@ -117,6 +122,8 @@ EXTRA_DIST =						\
 	$(menu_DATA)					\
 	$(convert_DATA)					\
 	$(keys_DATA)					\
+	$(rules_DATA)					\
+	$(pkgdata_DATA)					\
 	$(dist_theme_files)				\
 	perf-background.xml.in				\
 	org.gnome.Shell.PortalHelper.desktop.in.in	\
