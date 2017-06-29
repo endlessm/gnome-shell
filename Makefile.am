@@ -25,6 +25,7 @@ DIST_EXCLUDE =					\
 	HACKING					\
 	MAINTAINERS				\
 	tools/build/*				\
+	tools/password-unlocker.js		\
 	.tx/config
 
 distcheck-hook:
