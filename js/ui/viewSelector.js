@@ -210,10 +210,9 @@ const ViewsDisplayLayout = new Lang.Class({
                                                                                       availWidth);
 
         let gridContainerBox = allocation.copy();
+        // The grid container box should have the dimensions of this container but start
+        // after the search entry and according to the calculated xplacement policies
         gridContainerBox.y1 = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
-        // If the icon grid's current height is 0 we still want to give its box the available height
-        if (gridContainerHeight != 0)
-            gridContainerBox.y2 = Math.min(gridContainerBox.y1 + gridContainerHeight, allocation.y2);
 
         let searchResultsBox = allocation.copy();
 
