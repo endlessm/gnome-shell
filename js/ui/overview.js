@@ -317,9 +317,9 @@ const Overview = new Lang.Class({
 
         this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
 
-        Main.layoutManager.connect('startup-prepared', Lang.bind(this, this._onStartupPrepared));
+        Main.layoutManager.connect('startup-complete', Lang.bind(this, this._onStartupCompleted));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
-        this._relayout();
+        this._relayoutNoHide();
     },
 
     addSearchProvider: function(provider) {
@@ -463,6 +463,10 @@ const Overview = new Lang.Class({
         // when it is next shown.
         this.hide();
 
+        this._relayoutNoHide();
+    },
+
+    _relayoutNoHide: function () {
         let workArea = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
 
         this._coverPane.set_position(0, workArea.y);
@@ -525,7 +529,7 @@ const Overview = new Lang.Class({
         }
     },
 
-    _onStartupPrepared: function() {
+    _onStartupCompleted: function() {
         if (this.isDummy)
             return;
 
