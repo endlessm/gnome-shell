@@ -1713,8 +1713,13 @@ var ViewIcon = new Lang.Class({
     },
 
     getDragActor: function() {
-        // Each subclass creates the actor returned here in different ways
-        throw new Error('Not implemented');
+        let iconParams = { createIcon: Lang.bind(this, this._createIcon),
+                           showLabel: (this.icon.label != null),
+                           setSizeManually: false };
+
+        let icon = new IconGrid.BaseIcon(this.getName(), iconParams);
+        icon.actor.add_style_class_name('dnd');
+        return icon.actor;
     },
 
     // Returns the original actor that should align with the actor
@@ -2337,10 +2342,6 @@ var AppIcon = new Lang.Class({
 
     canDragOver: function(dest) {
         return true;
-    },
-
-    getDragActor: function() {
-        return this.app.create_icon_texture(this._iconSize);
     },
 
     shouldShowTooltip: function() {
