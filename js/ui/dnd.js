@@ -16,9 +16,9 @@ const Params = imports.misc.params;
 // Time to scale down to maxDragActorSize
 const SCALE_ANIMATION_TIME = 0.25;
 // Time to animate to original position on cancel
-const SNAP_BACK_ANIMATION_TIME = 0.25;
+const SNAP_BACK_ANIMATION_TIME = 0;
 // Time to animate to original position on success
-const REVERT_ANIMATION_TIME = 0.75;
+const REVERT_ANIMATION_TIME = 0;
 
 const DragMotionResult = {
     NO_DROP:   0,
