@@ -1087,11 +1087,14 @@ const AllView = new Lang.Class({
             this._eventBlocker.reactive = false;
             this._currentPopup.popdown();
 
-            // Append the inserted icon to the end of the grid
+            // Append the inserted app to the end of the grid
             let appSystem = Shell.AppSystem.get_default();
-            let item = appSystem.lookup_app(source.getId());
-            let icon = this._dragView._createItemIcon(item);
-            this._dragView.addIcon(icon);
+            let app  = appSystem.lookup_app(source.getId());
+            let icon = new AppIcon(app,
+                                   { isDraggable: true,
+                                     parentView: this },
+                                   { editable: true });
+            this.addItem(icon);
         }
 
         IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
@@ -1736,6 +1739,8 @@ const FolderIcon = new Lang.Class({
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
 
+        this.canDrop = true;
+
         this.view = new FolderView(this, this._dirInfo);
 
         this.actor.connect('clicked', Lang.bind(this,
@@ -1803,7 +1808,10 @@ const FolderIcon = new Lang.Class({
             if (!app.get_app_info().should_show())
                 return;
 
-            let icon = new AppIcon(app, null, { editable: true });
+            let icon = new AppIcon(app,
+                                   { isDraggable: true,
+                                     parentView: this.view },
+                                   { editable: true });
             this.view.addItem(icon);
         }).bind(this);
 
@@ -1905,6 +1913,12 @@ const FolderIcon = new Lang.Class({
 
     getDragActor: function() {
         return this.view.createFolderIcon(this._iconSize);
+    },
+
+    handleIconDrop: function(source) {
+        // Move the source icon into this folder
+        IconGridLayout.layout.appendIcon(source.getId(), this.getId());
+        return true;
     },
 
     get folder() {
