@@ -199,8 +199,7 @@ const BaseIcon = new Lang.Class({
         this.extraIcons = this.createExtraIcons(this.iconSize);
 
         this._layeredIcon.add_actor(this.icon);
-        if (this._shadowAbove)
-            this._layeredIcon.set_child_below_sibling(this.icon, null);
+        this._layeredIcon.set_child_below_sibling(this.icon, null);
 
         this.extraIcons.forEach(Lang.bind(this, function (i) {
             this._layeredIcon.add_actor(i);
