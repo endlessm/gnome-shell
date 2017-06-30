@@ -715,11 +715,10 @@ const ViewSelector = new Lang.Class({
     },
 
     show: function(viewPage) {
-        this._activePage = null;
         this._clearSearch();
+        this._workspacesDisplay.show(true);
 
         this._showPage(this._pageFromViewPage(viewPage));
-        this._workspacesDisplay.show(true);
     },
 
     animateFromOverview: function() {
@@ -740,7 +739,7 @@ const ViewSelector = new Lang.Class({
     },
 
     hide: function() {
-        // Nothing to do, since we always show the app selector
+        this._workspacesDisplay.hide();
     },
 
     focusSearch: function() {
