@@ -411,18 +411,6 @@ var ControlsManager = class {
         this._group.add_actor(this._thumbnailsSlider.actor);
 
         layout.connect('allocation-changed', this._updateWorkspacesGeometry.bind(this));
-
-        Main.overview.connect('item-drag-begin', () => {
-            let activePage = this.viewSelector.getActivePage();
-            if (activePage != ViewSelector.ViewPage.WINDOWS)
-                this.viewSelector.fadeHalf();
-        });
-        Main.overview.connect('item-drag-end', () => {
-            this.viewSelector.fadeIn();
-        });
-        Main.overview.connect('item-drag-cancelled', () => {
-            this.viewSelector.fadeIn();
-        });
     }
 
     _updateWorkspacesGeometry() {
