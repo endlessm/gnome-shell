@@ -420,7 +420,11 @@ const ViewsDisplay = new Lang.Class({
     },
 
     _updateSpinner: function() {
-        this.entry.setSpinning(this._searchResults.searchInProgress);
+        // Make sure we never set the spinner on when there's nothing to search,
+        // regardless of the reported current state, as it can be out of date.
+        let searchTerms = this.entry.text.trim();
+        let spinning = (searchTerms.length > 0) && this._searchResults.searchInProgress;
+        this.entry.setSpinning(spinning);
     },
 
     _enterSearch: function() {
