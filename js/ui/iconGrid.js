@@ -41,6 +41,15 @@ const APPICON_ANIMATION_OUT_TIME = 0.25;
 const LEFT_DIVIDER_LEEWAY = 30;
 const RIGHT_DIVIDER_LEEWAY = 30;
 
+const NUDGE_ANIMATION_TYPE = 'easeOutElastic';
+const NUDGE_DURATION = 0.8;
+const NUDGE_PERIOD = 0.7;
+
+const NUDGE_RETURN_ANIMATION_TYPE = 'easeOutQuint';
+const NUDGE_RETURN_DURATION = 0.3;
+
+const NUDGE_FACTOR = 0.2;
+
 const CursorLocation = {
     DEFAULT: 0,
     ON_ICON: 1,
@@ -737,6 +746,49 @@ const IconGrid = new Lang.Class({
     },
 
     // DnD support
+
+    nudgeItemsAtIndex: function(index, cursorLocation) {
+        // No nudging when the cursor is in an empty area
+        if (cursorLocation == CursorLocation.EMPTY_AREA)
+            return;
+
+        let nudgeIdx = index;
+        let rtl = (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL);
+
+        if (cursorLocation != CursorLocation.START_EDGE) {
+            let leftItem = this.getItemAtIndex(nudgeIdx - 1);
+            this._animateNudge(leftItem, NUDGE_ANIMATION_TYPE, NUDGE_DURATION,
+                               rtl ? Math.floor(this._hItemSize * NUDGE_FACTOR) : Math.floor(-this._hItemSize * NUDGE_FACTOR));
+        }
+
+        // Nudge the icon to the right if we are the first item or not at the
+        // end of row
+        if (cursorLocation != CursorLocation.END_EDGE) {
+            let rightItem = this.getItemAtIndex(nudgeIdx);
+            this._animateNudge(rightItem, NUDGE_ANIMATION_TYPE, NUDGE_DURATION,
+                               rtl ? Math.floor(-this._hItemSize * NUDGE_FACTOR) : Math.floor(this._hItemSize * NUDGE_FACTOR));
+        }
+    },
+
+    removeNudgeTransforms: function() {
+        let children = this._grid.get_children();
+        for (let index = 0; index < children.length; index++) {
+            this._animateNudge(children[index], NUDGE_RETURN_ANIMATION_TYPE,
+                               NUDGE_RETURN_DURATION,
+                               0);
+        }
+    },
+
+    _animateNudge: function(item, animationType, duration, offset) {
+        if (!item)
+            return;
+
+        Tweener.addTween(item, { translation_x: offset,
+                                 time: duration,
+                                 transition: animationType,
+                                 transitionParams: { period: duration * 1000 * NUDGE_PERIOD }
+                               });
+    },
 
     indexOf: function(item) {
         let children = this._grid.get_children();
