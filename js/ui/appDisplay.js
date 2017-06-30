@@ -2473,27 +2473,6 @@ const AppIcon = new Lang.Class({
             }));
         }
 
-        if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop')) {
-            menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-            let item = new PopupMenu.PopupMenuItem(_("Show Details"));
-            menu.addMenuItem(item);
-            item.connect('activate', Lang.bind(this, function() {
-                let id = this.app.get_id();
-                let args = GLib.Variant.new('(ss)', [id, '']);
-                Gio.DBus.get(Gio.BusType.SESSION, null,
-                    function(o, res) {
-                        let bus = Gio.DBus.get_finish(res);
-                        bus.call('org.gnome.Software',
-                                 '/org/gnome/Software',
-                                 'org.gtk.Actions', 'Activate',
-                                 GLib.Variant.new('(sava{sv})',
-                                                  ['details', [args], null]),
-                                 null, 0, -1, null, null);
-                        Main.overview.hide();
-                    });
-            }));
-        }
-
         return menu;
     },
 
