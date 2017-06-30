@@ -1256,34 +1256,149 @@ const FolderView = new Lang.Class({
     }
 });
 
+const ViewIconState = {
+    NORMAL: 0,
+    DND_PLACEHOLDER: 1,
+    NUM_STATES: 2
+};
+
+const ViewIcon = new Lang.Class({
+    Name: 'ViewIcon',
+
+    _init: function(buttonParams, iconParams) {
+        buttonParams = Params.parse(buttonParams,
+                                    { style_class: 'app-well-app',
+                                      button_mask: St.ButtonMask.ONE |
+                                                   St.ButtonMask.TWO |
+                                                   St.ButtonMask.THREE,
+                                      toggle_mode: false,
+                                      can_focus: true,
+                                      x_fill: true,
+                                      y_fill: true
+                                    },
+                                    true);
+        iconParams = Params.parse(iconParams,
+                                  { editable: false,
+                                    showLabel: true },
+                                  true);
+
+
+        // Might be changed once the createIcon() method is called.
+        this._iconSize = IconGrid.ICON_SIZE;
+        this._iconState = ViewIconState.NORMAL;
+
+        this.actor = new St.Button(buttonParams);
+        this.actor._delegate = this;
+        this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        // Get the isDraggable property without passing it on to the BaseIcon:
+        let appIconParams = Params.parse(iconParams, { isDraggable: true },
+                                         true);
+        let isDraggable = appIconParams['isDraggable'];
+        delete iconParams['isDraggable'];
+
+        this.icon = new IconGrid.BaseIcon(this.getName(), iconParams);
+        if (iconParams['showLabel'] && iconParams['editable']) {
+            this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
+            this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
+        }
+
+        this.actor.label_actor = this.icon.label;
+
+        if (isDraggable) {
+            this._draggable = DND.makeDraggable(this.actor);
+            this._draggable.connect('drag-begin', Lang.bind(this, function() {
+                this.prepareForDrag();
+                Main.overview.beginItemDrag(this);
+            }));
+            this._draggable.connect('drag-cancelled', Lang.bind(this, function() {
+                Main.overview.cancelledItemDrag(this);
+            }));
+            this._draggable.connect('drag-end', Lang.bind(this, function() {
+                Main.overview.endItemDrag(this);
+            }));
+        }
+    },
+
+    getName: function() {
+        throw new Error('Not implemented');
+    },
+
+    _onLabelUpdate: function() {
+        // Do nothing by default
+    },
+
+    _onLabelCancel: function() {
+        this.icon.actor.sync_hover();
+    },
+
+    _onDestroy: function() {
+        this.actor._delegate = null;
+    },
+
+    _createIconBase: function(iconSize) {
+        if (this._iconSize != iconSize)
+            this._iconSize = iconSize;
+
+        // Replace the original icon with an empty placeholder
+        if (this._iconState == ViewIconState.DND_PLACEHOLDER)
+            return new St.Icon({ icon_size: this._iconSize });
+
+        return this._createIconFunc(this._iconSize);
+    },
+
+    prepareForDrag: function() {
+        throw new Error('Not implemented');
+    },
+
+    getDragActor: function() {
+        // Each subclass creates the actor returned here in different ways
+        throw new Error('Not implemented');
+    },
+
+    // Returns the original actor that should align with the actor
+    // we show as the item is being dragged.
+    getDragActorSource: function() {
+        return this.icon.icon;
+    },
+
+    set iconState(iconState) {
+        if (this._iconState == iconState)
+            return;
+
+        this._iconState = iconState;
+        this.icon.reloadIcon();
+    },
+
+    get iconState() {
+        return this._iconState;
+    }
+});
+
 const FolderIcon = new Lang.Class({
     Name: 'FolderIcon',
+    Extends: ViewIcon,
 
     _init: function(id, parentView) {
+        let buttonParams = { button_mask: St.ButtonMask.ONE,
+                             toggle_mode: true };
+        let iconParams = { isDraggable: false,
+                           createIcon: Lang.bind(this, this._createIcon),
+                           setSizeManually: false,
+                           editable: true };
         this.id = id;
         this.name = '';
         this._parentView = parentView;
 
         this._dirInfo = Shell.DesktopDirInfo.new(id);
+        this._name = this._dirInfo.get_name();
 
-        this.actor = new St.Button({ style_class: 'app-well-app app-folder',
-                                     button_mask: St.ButtonMask.ONE,
-                                     toggle_mode: true,
-                                     can_focus: true,
-                                     x_fill: true,
-                                     y_fill: true });
-        this.actor._delegate = this;
+        this.parent(buttonParams, iconParams);
+        this.actor.add_style_class_name('app-folder');
+        this.actor.set_child(this.icon.actor);
+
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
-
-        this.icon = new IconGrid.BaseIcon('', { createIcon: Lang.bind(this, this._createIcon),
-                                                setSizeManually: false,
-                                                editable: true });
-        this.actor.set_child(this.icon.actor);
-        this.actor.label_actor = this.icon.label;
-
-        this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
-        this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
 
         this.view = new FolderView(this._dirInfo);
 
@@ -1302,6 +1417,10 @@ const FolderIcon = new Lang.Class({
         this._redisplay();
     },
 
+    getName: function() {
+        return this._name;
+    },
+
     getAppIds: function() {
         return this.view.getAllItems().map(function(item) {
             return item.id;
@@ -1318,10 +1437,6 @@ const FolderIcon = new Lang.Class({
                       + ' using new name: '
                       + newText);
         }
-    },
-
-    _onLabelCancel: function() {
-        this.icon.actor.sync_hover();
     },
 
     _updateName: function() {
@@ -1348,7 +1463,7 @@ const FolderIcon = new Lang.Class({
             if (!app.get_app_info().should_show())
                 return;
 
-            let icon = new AppIcon(app, null);
+            let icon = new AppIcon(app, null, null);
             this.view.addItem(icon);
         }).bind(this);
 
@@ -1436,6 +1551,9 @@ const FolderIcon = new Lang.Class({
             this.view.adaptToSize(width, height);
         this._popupInvalidated = true;
     },
+
+    prepareForDrag: function() {
+    }
 });
 Signals.addSignalMethods(FolderIcon.prototype);
 
@@ -1617,6 +1735,7 @@ const AppIconSourceActor = new Lang.Class({
 
 const AppIcon = new Lang.Class({
     Name: 'AppIcon',
+    Extends: ViewIcon,
 
     _init : function(app, iconParams) {
         this.app = app;
@@ -1624,12 +1743,21 @@ const AppIcon = new Lang.Class({
         this.name = app.get_name();
         this._sourceAddedId = 0;
 
-        this.actor = new St.Button({ style_class: 'app-well-app',
-                                     reactive: true,
-                                     button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
-                                     can_focus: true,
-                                     x_fill: true,
-                                     y_fill: true });
+        let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
+        let iconParams = Params.parse(iconParams, { createIcon: Lang.bind(this, this._createIcon),
+                                                    createExtraIcons: Lang.bind(this, this._createExtraIcons) },
+                                      true);
+        if (!iconParams)
+            iconParams = {};
+
+        // Get the showMenu property without passing it on to the BaseIcon:
+        let appIconParams = Params.parse(iconParams, { showMenu: true },
+                                         true);
+
+        this._showMenu = appIconParams['showMenu'];
+        delete iconParams['showMenu'];
+
+        this.parent(buttonParams, iconParams);
 
         this._dot = new St.Widget({ style_class: 'app-well-app-running-dot',
                                     layout_manager: new Clutter.BinLayout(),
@@ -1639,31 +1767,10 @@ const AppIcon = new Lang.Class({
 
         this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
                                               x_expand: true, y_expand: true });
+        this._iconContainer.add_child(this.icon.actor);
 
         this.actor.set_child(this._iconContainer);
         this._iconContainer.add_child(this._dot);
-
-        this.actor._delegate = this;
-
-        if (!iconParams)
-            iconParams = {};
-
-        // Get the isDraggable property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { isDraggable: true, showMenu: true },
-                                         true);
-        let isDraggable = appIconParams['isDraggable'];
-        delete iconParams['isDraggable'];
-
-        this._showMenu = appIconParams['showMenu'];
-        delete iconParams['showMenu'];
-
-        iconParams['createIcon'] = Lang.bind(this, this._createIcon);
-        iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
-        iconParams['setSizeManually'] = false;
-        this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
-        this._iconContainer.add_child(this.icon.actor);
-
-        this.actor.label_actor = this.icon.label;
 
         this.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
         this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
@@ -1671,30 +1778,8 @@ const AppIcon = new Lang.Class({
         this.actor.connect('clicked', Lang.bind(this, this._onClicked));
         this.actor.connect('popup-menu', Lang.bind(this, this._onKeyboardPopupMenu));
 
-        if (iconParams['showLabel'] && iconParams['editable']) {
-            this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
-            this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
-        }
-
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
-
-        if (isDraggable) {
-            this._draggable = DND.makeDraggable(this.actor);
-            this._draggable.connect('drag-begin', Lang.bind(this,
-                function () {
-                    this._removeMenuTimeout();
-                    Main.overview.beginItemDrag(this);
-                }));
-            this._draggable.connect('drag-cancelled', Lang.bind(this,
-                function () {
-                    Main.overview.cancelledItemDrag(this);
-                }));
-            this._draggable.connect('drag-end', Lang.bind(this,
-                function () {
-                   Main.overview.endItemDrag(this);
-                }));
-        }
 
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
 
@@ -1710,12 +1795,8 @@ const AppIcon = new Lang.Class({
                                                            Lang.bind(this, this._sourceAdded));
     },
 
-    _onLabelUpdate: function() {
-      // Do nothing by default
-    },
-
-    _onLabelCancel: function() {
-        this.icon.actor.sync_hover();
+    getName: function() {
+        return this.name;
     },
 
     _onDestroy: function() {
@@ -1889,16 +1970,12 @@ const AppIcon = new Lang.Class({
         this.app.open_new_window(params.workspace);
     },
 
-    getDragActor: function() {
-        // This is a temporary change not to depend on the dash while
-        // we don't implement our own Drag'n'Drop mechanism in EOS.
-        return this.app.create_icon_texture(IconGrid.ICON_SIZE);
+    prepareForDrag: function() {
+        this._removeMenuTimeout();
     },
 
-    // Returns the original actor that should align with the actor
-    // we show as the item is being dragged.
-    getDragActorSource: function() {
-        return this.icon.icon;
+    getDragActor: function() {
+        return this.app.create_icon_texture(this._iconSize);
     },
 
     shouldShowTooltip: function() {
