@@ -12,7 +12,6 @@ const St = imports.gi.St;
 const Shell = imports.gi.Shell;
 const Gdk = imports.gi.Gdk;
 
-const AppDisplay = imports.ui.appDisplay;
 const Background = imports.ui.background;
 const DND = imports.ui.dnd;
 const Monitor = imports.ui.monitor;
@@ -40,6 +39,16 @@ const DND_WINDOW_SWITCH_TIMEOUT = 750;
 const OVERVIEW_ACTIVATION_TIMEOUT = 0.5;
 
 const NO_WINDOWS_OPEN_DIALOG_TIMEOUT = 2000; // ms
+
+// FIXME: Something is fishy here, as importing appDisplay entirely would
+// somehow break notifications (really), probably due to some circular
+// dependency that cause gjs to initialize things in the wrong order.
+//
+// For now we do this hack due to lack of time, but for the next rebase
+// we either should move constants to a entirely new file that can be
+// safely imported, or figure out what's wrong with importing appDisplay.
+const EOS_INACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_INACTIVE_GRID_OPACITY;
+const EOS_ACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_ACTIVE_GRID_OPACITY;
 
 const ShellInfo = new Lang.Class({
     Name: 'ShellInfo',
@@ -716,20 +725,20 @@ const Overview = new Lang.Class({
         this.emit('showing');
 
         if (Main.layoutManager.startingUp || this.opacityPrepared) {
-            this._overview.opacity = AppDisplay.EOS_ACTIVE_GRID_OPACITY;
+            this._overview.opacity = EOS_ACTIVE_GRID_OPACITY;
             this.opacityPrepared = false;
             this._showDone();
             return;
         }
 
         if (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS) {
-            this._overview.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+            this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
         } else {
             this._overview.opacity = 0;
         }
 
         Tweener.addTween(this._overview,
-                         { opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
+                         { opacity: EOS_ACTIVE_GRID_OPACITY,
                            transition: 'easeOutQuad',
                            time: ANIMATION_TIME,
                            onComplete: this._showDone,
@@ -791,7 +800,7 @@ const Overview = new Lang.Class({
 
         let hidingFromApps = (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS);
         if (hidingFromApps)
-            this._overview.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+            this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
 
         if (hidingFromApps) {
             // When we're hiding from the apps page, we want to instantaneously
