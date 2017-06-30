@@ -1861,6 +1861,17 @@ var RenameFolderMenu = class RenameFolderMenu extends PopupMenu.PopupMenu {
             this.destroy();
         });
 
+        // Separator
+        let separator = new PopupMenu.PopupSeparatorMenuItem();
+        this.addMenuItem(separator);
+
+        // Add the "Remove from desktop" menu item at the end.
+        let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
+        this.addMenuItem(item);
+        item.connect('activate', () => {
+            IconGridLayout.layout.removeIcon(source.id, true);
+        });
+
         Main.uiGroup.add_actor(this.actor);
     }
 };
@@ -2480,6 +2491,12 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
                 });
             }
         }
+
+        // Add the "Remove from desktop" menu item at the end.
+        let item = this._appendMenuItem(_("Remove from desktop"));
+        item.connect('activate', () => {
+            IconGridLayout.layout.removeIcon(this._source.id, true);
+        });
     }
 
     _appendSeparator() {
