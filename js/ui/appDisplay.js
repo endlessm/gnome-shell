@@ -1382,7 +1382,7 @@ const FolderIcon = new Lang.Class({
     Extends: ViewIcon,
 
     _init: function(id, parentView) {
-        let viewIconParams = { isDraggable: false };
+        let viewIconParams = { isDraggable: true };
         let buttonParams = { button_mask: St.ButtonMask.ONE,
                              toggle_mode: true };
         let iconParams = { createIcon: Lang.bind(this, this._createIcon),
