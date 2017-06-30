@@ -1513,27 +1513,37 @@ class ViewIcon extends GObject.Object {
     }
 
     replaceText(newText) {
-        if (this.icon.label) {
-            this._origText = this.icon.label.text;
-            this.icon.label.text = newText;
-        }
+        if (!this.icon.label)
+            return;
+
+        this._origText = this.icon.label.text;
+        this.icon.label.text = newText;
     }
 
     restoreText() {
-        if (this._origText) {
-            this.icon.label.text = this._origText;
-            this._origText = null;
-        }
+        if (!this._origText)
+            return;
+
+        this.icon.label.text = this._origText;
+        this._origText = null;
+    }
+
+    prepareDndPlaceholder() {
+        this.replaceText('');
+    }
+
+    resetDnDPlaceholder() {
+        this.restoreText();
     }
 
     handleViewDragBegin() {
         this.iconState = ViewIconState.DND_PLACEHOLDER;
-        this.replaceText(null);
+        this.prepareDndPlaceholder();
     }
 
     handleViewDragEnd() {
         this.iconState = ViewIconState.NORMAL;
-        this.restoreText();
+        this.resetDnDPlaceholder();
     }
 
     prepareForDrag() {
@@ -2139,6 +2149,20 @@ var AppIcon = GObject.registerClass({
 
     prepareForDrag() {
         this._removeMenuTimeout();
+    }
+
+    prepareDndPlaceholder() {
+        super.prepareDndPlaceholder();
+        this._dot.hide();
+    }
+
+    resetDnDPlaceholder() {
+        super.resetDnDPlaceholder();
+
+        if (this.app.state != Shell.AppState.STOPPED)
+            this._dot.show();
+        else
+            this._dot.hide();
     }
 
     canDragOver(dest) {
