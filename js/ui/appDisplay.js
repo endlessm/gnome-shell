@@ -1598,27 +1598,37 @@ const ViewIcon = new Lang.Class({
     },
 
     replaceText: function(newText) {
-        if (this.icon.label) {
-            this._origText = this.icon.label.text;
-            this.icon.label.text = newText;
-        }
+        if (!this.icon.label)
+            return;
+
+        this._origText = this.icon.label.text;
+        this.icon.label.text = newText;
     },
 
     restoreText: function() {
-        if (this._origText) {
-            this.icon.label.text = this._origText;
-            this._origText = null;
-        }
+        if (!this._origText)
+            return;
+
+        this.icon.label.text = this._origText;
+        this._origText = null;
+    },
+
+    prepareDndPlaceholder: function() {
+        this.replaceText('');
+    },
+
+    resetDnDPlaceholder: function() {
+        this.restoreText();
     },
 
     handleViewDragBegin: function() {
         this.iconState = ViewIconState.DND_PLACEHOLDER;
-        this.replaceText(null);
+        this.prepareDndPlaceholder();
     },
 
     handleViewDragEnd: function() {
         this.iconState = ViewIconState.NORMAL;
-        this.restoreText();
+        this.resetDnDPlaceholder();
     },
 
     prepareForDrag: function() {
@@ -2267,6 +2277,20 @@ const AppIcon = new Lang.Class({
 
     prepareForDrag: function() {
         this._removeMenuTimeout();
+    },
+
+    prepareDndPlaceholder: function() {
+        this.parent();
+        this._dot.hide();
+    },
+
+    resetDnDPlaceholder: function() {
+        this.parent();
+
+        if (this.app.state != Shell.AppState.STOPPED)
+            this._dot.show();
+        else
+            this._dot.hide();
     },
 
     canDragOver: function(dest) {
