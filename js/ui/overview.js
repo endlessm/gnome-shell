@@ -40,6 +40,16 @@ const OVERVIEW_ACTIVATION_TIMEOUT = 0.5;
 
 const NO_WINDOWS_OPEN_DIALOG_TIMEOUT = 2000; // ms
 
+// FIXME: Something is fishy here, as importing appDisplay entirely would
+// somehow break notifications (really), probably due to some circular
+// dependency that cause gjs to initialize things in the wrong order.
+//
+// For now we do this hack due to lack of time, but for the next rebase
+// we either should move constants to a entirely new file that can be
+// safely imported, or figure out what's wrong with importing appDisplay.
+const EOS_INACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_INACTIVE_GRID_OPACITY;
+const EOS_ACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_ACTIVE_GRID_OPACITY;
+
 const ShellInfo = new Lang.Class({
     Name: 'ShellInfo',
 
@@ -218,6 +228,7 @@ const Overview = new Lang.Class({
         this._modal = false;            // have a modal grab
         this.animationInProgress = false;
         this.visibleTarget = false;
+        this.opacityPrepared = false;
 
         // During transitions, we raise this to the top to avoid having the overview
         // area be reactive; it causes too many issues such as double clicks on
@@ -714,17 +725,29 @@ const Overview = new Lang.Class({
         // the hidden state
         this._toggleToHidden = true;
 
-        this._overview.opacity = 0;
+        this._coverPane.raise_top();
+        this._coverPane.show();
+        this.emit('showing');
+
+        if (Main.layoutManager.startingUp || this.opacityPrepared) {
+            this._overview.opacity = EOS_ACTIVE_GRID_OPACITY;
+            this.opacityPrepared = false;
+            this._showDone();
+            return;
+        }
+
+        if (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS)
+            this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
+        else
+            this._overview.opacity = 0;
+
         Tweener.addTween(this._overview,
-                         { opacity: 255,
+                         { opacity: EOS_ACTIVE_GRID_OPACITY,
                            transition: 'easeOutQuad',
                            time: ANIMATION_TIME,
                            onComplete: this._showDone,
                            onCompleteScope: this
                          });
-        this._coverPane.raise_top();
-        this._coverPane.show();
-        this.emit('showing');
     },
 
     _showDone: function() {
@@ -777,6 +800,20 @@ const Overview = new Lang.Class({
 
         this.animationInProgress = true;
         this.visibleTarget = false;
+        this.emit('hiding');
+
+        let hidingFromApps = (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS);
+        if (hidingFromApps)
+            this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
+
+        if (hidingFromApps) {
+            // When we're hiding from the apps page, we want to instantaneously
+            // switch to the application, so don't fade anything. We'll tween
+            // the grid clone in the background separately - see comment in
+            // viewSelector.js::ViewsClone.
+            this._hideDone();
+            return;
+        }
 
         this.viewSelector.animateFromOverview();
 
@@ -791,7 +828,6 @@ const Overview = new Lang.Class({
 
         this._coverPane.raise_top();
         this._coverPane.show();
-        this.emit('hiding');
     },
 
     _hideDone: function() {
