@@ -724,7 +724,6 @@ const Overview = new Lang.Class({
 
         if (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS) {
             this._overview.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
-            saturationTarget = AppDisplay.EOS_ACTIVE_GRID_SATURATION;
         } else {
             this._overview.opacity = 0;
         }
