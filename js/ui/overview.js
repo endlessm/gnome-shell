@@ -259,7 +259,7 @@ var Overview = new Lang.Class({
         this.viewSelector.connect('page-changed', this._onPageChanged.bind(this));
         Main.layoutManager.connect('startup-prepared', this._onStartupPrepared.bind(this));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
-        this._relayout();
+        this._relayoutNoHide();
     },
 
     addSearchProvider: function(provider) {
@@ -400,6 +400,10 @@ var Overview = new Lang.Class({
         // when it is next shown.
         this.hide();
 
+        this._relayoutNoHide();
+    },
+
+    _relayoutNoHide: function () {
         if (!Main.layoutManager.primaryMonitor)
             return;
 
