@@ -10,9 +10,9 @@ const Tweener = imports.ui.tweener;
 // Time to scale down to maxDragActorSize
 var SCALE_ANIMATION_TIME = 0.25;
 // Time to animate to original position on cancel
-var SNAP_BACK_ANIMATION_TIME = 0.25;
+var SNAP_BACK_ANIMATION_TIME = 0;
 // Time to animate to original position on success
-var REVERT_ANIMATION_TIME = 0.75;
+var REVERT_ANIMATION_TIME = 0;
 
 var DragMotionResult = {
     NO_DROP:   0,
