@@ -199,6 +199,14 @@ class BaseAppView {
         return this._allItems[index];
     }
 
+    nudgeItemsAtIndex(index, location) {
+        this._grid.nudgeItemsAtIndex(index, location);
+    }
+
+    removeNudgeTransforms() {
+        this._grid.removeNudgeTransforms();
+    }
+
     canDropAt(x, y, canDropPastEnd) {
         return this._grid.canDropAt(x, y, canDropPastEnd);
     }
@@ -691,7 +699,14 @@ var AllView = class AllView extends BaseAppView {
         return true;
     }
 
+    _resetNudgeState() {
+        if (this._dragView)
+            this._dragView.removeNudgeTransforms();
+    }
+
     _resetDragViewState() {
+        this._resetNudgeState();
+
         this._insertIdx = -1;
         this._onIconIdx = -1;
         this._lastCursorLocation = -1;
@@ -787,6 +802,10 @@ var AllView = class AllView extends BaseAppView {
             dragEvent.dragActor.opacity = EOS_ACTIVE_GRID_OPACITY;
         }
 
+        // If we are in a new spot, remove the previous nudges
+        if (isNewPosition)
+            this._resetNudgeState();
+
         // Update our insert/hover index and the last cursor location
         this._lastCursorLocation = cursorLocation;
         if (onIcon) {
@@ -807,8 +826,15 @@ var AllView = class AllView extends BaseAppView {
         this._onIconIdx = -1;
         this._insertIdx = idx;
 
+        if (this._shouldNudgeItems(isNewPosition))
+            this._dragView.nudgeItemsAtIndex(this._insertIdx, cursorLocation);
+
         // Propagate the signal in any case when moving icons
         return DND.DragMotionResult.CONTINUE;
+    }
+
+    _shouldNudgeItems(isNewPosition) {
+        return (isNewPosition && this._positionReallyMoved());
     }
 
     _setDragHoverState(state) {
