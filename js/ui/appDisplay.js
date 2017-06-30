@@ -478,14 +478,6 @@ var AllView = class AllView extends BaseAppView {
 
         let appSys = Shell.AppSystem.get_default();
 
-        // Allow dragging of the icon only if the Dash would accept a drop to
-        // change favorite-apps. There are no other possible drop targets from
-        // the app picker, so there's no other need for a drag to start,
-        // at least on single-monitor setups.
-        // This also disables drag-to-launch on multi-monitor setups,
-        // but we hope that is not used much.
-        let favoritesWritable = global.settings.is_writable('favorite-apps');
-
         items.forEach((itemId) => {
             let icon = null;
 
@@ -502,7 +494,7 @@ var AllView = class AllView extends BaseAppView {
                 let app = appSys.lookup_app(itemId);
                 if (app)
                     icon = new AppIcon(app,
-                                       { isDraggable: favoritesWritable,
+                                       { isDraggable: true,
                                          parentView: this },
                                        null);
             }
@@ -1027,19 +1019,11 @@ var FrequentView = class FrequentView extends BaseAppView {
         if(!hasUsefulData)
             return;
 
-        // Allow dragging of the icon only if the Dash would accept a drop to
-        // change favorite-apps. There are no other possible drop targets from
-        // the app picker, so there's no other need for a drag to start,
-        // at least on single-monitor setups.
-        // This also disables drag-to-launch on multi-monitor setups,
-        // but we hope that is not used much.
-        let favoritesWritable = global.settings.is_writable('favorite-apps');
-
         for (let i = 0; i < mostUsed.length; i++) {
             if (!mostUsed[i].get_app_info().should_show())
                 continue;
             let appIcon = new AppIcon(mostUsed[i],
-                                      { isDraggable: favoritesWritable },
+                                      { isDraggable: true },
                                       null);
             this._grid.addItem(appIcon, -1);
         }
