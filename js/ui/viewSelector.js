@@ -513,7 +513,7 @@ const ViewsClone = new Lang.Class({
                       x_expand: true,
                       y_expand: true,
                       reactive: false,
-                      opacity: AppDisplay.EOS_INACTIVE_GRID_OPACITY });
+                      opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY });
 
         this._saturation = new Clutter.DesaturateEffect({ factor: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
                                                           enabled: false });
@@ -527,6 +527,12 @@ const ViewsClone = new Lang.Class({
         let workareaConstraint = new Monitor.MonitorConstraint({ primary: true,
                                                                  work_area: true });
         this.add_constraint(workareaConstraint);
+
+        Main.layoutManager.connect('startup-complete', Lang.bind(this, function() {
+            this.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+            this._saturation.factor = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
+            this._saturation.enabled = this._forOverview;
+        }));
 
         Main.overview.connect('showing', Lang.bind(this, function() {
             this.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
