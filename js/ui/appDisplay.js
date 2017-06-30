@@ -83,6 +83,8 @@ const EOS_ACTIVE_GRID_TRANSITION = 'easeInQuad';
 const EOS_INACTIVE_GRID_SATURATION = 1;
 const EOS_ACTIVE_GRID_SATURATION = 0;
 
+const EOS_DRAG_OVER_FOLDER_OPACITY = 128;
+
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
     if (!categoriesStr)
@@ -184,6 +186,26 @@ const BaseAppView = new Lang.Class({
             this._grid.addItem(item);
         }));
         this.emit('view-loaded');
+    },
+
+    indexOf: function(icon) {
+        return this._grid.indexOf(icon.actor);
+    },
+
+    getIconForIndex: function(index) {
+        return this._allItems[index];
+    },
+
+    nudgeItemsAtIndex: function(index, location) {
+        this._grid.nudgeItemsAtIndex(index, location);
+    },
+
+    removeNudgeTransforms: function() {
+        this._grid.removeNudgeTransforms();
+    },
+
+    canDropAt: function(x, y, canDropPastEnd) {
+        return this._grid.canDropAt(x, y, canDropPastEnd);
     },
 
     _selectAppInternal: function(id) {
@@ -447,6 +469,8 @@ const AllView = new Lang.Class({
                     { minRows: EOS_DESKTOP_MIN_ROWS });
 
         this.actor = new AllViewContainer(this._grid.actor);
+        this.actor._delegate = this;
+
         this._scrollView = this.actor.scrollView;
         this._stack = this.actor.stack;
         this._stackBox = this.actor.stackBox;
@@ -497,10 +521,23 @@ const AllView = new Lang.Class({
         this.actor.bind_property('mapped', this._bgAction, 'enabled',
                                  GObject.BindingFlags.SYNC_CREATE);
 
+        this._appCenterIcon = null;
+
         this._displayingPopup = false;
+
+        this._currentPopup = null;
+
+        this._dragView = null;
+        this._dragIcon = null;
+        this._insertIdx = -1;
+        this._onIconIdx = -1;
+        this._lastCursorLocation = -1;
 
         this._availWidth = 0;
         this._availHeight = 0;
+
+        Main.overview.connect('item-drag-begin', Lang.bind(this, this._onDragBegin));
+        Main.overview.connect('item-drag-end', Lang.bind(this, this._onDragEnd));
 
         Main.overview.connect('hidden', Lang.bind(this,
             function() {
@@ -563,6 +600,7 @@ const AllView = new Lang.Class({
 
     removeAll: function() {
         this.folderIcons = [];
+        this._appCenterIcon = null;
         this.parent();
     },
 
@@ -589,14 +627,6 @@ const AllView = new Lang.Class({
 
         let appSys = Shell.AppSystem.get_default();
 
-        // Allow dragging of the icon only if the Dash would accept a drop to
-        // change favorite-apps. There are no other possible drop targets from
-        // the app picker, so there's no other need for a drag to start,
-        // at least on single-monitor setups.
-        // This also disables drag-to-launch on multi-monitor setups,
-        // but we hope that is not used much.
-        let favoritesWritable = global.settings.is_writable('favorite-apps');
-
         items.forEach(Lang.bind(this, function(itemId) {
             let icon = null;
 
@@ -611,8 +641,10 @@ const AllView = new Lang.Class({
             } else {
                 let app = appSys.lookup_app(itemId);
                 if (app)
-                    icon = new AppIcon(app, { isDraggable: favoritesWritable,
-                                              editable: true });
+                    icon = new AppIcon(app,
+                                       { isDraggable: true,
+                                         parentView: this },
+                                       { editable: true });
             }
 
             // Some apps defined by the icon grid layout might not be installed
@@ -620,17 +652,27 @@ const AllView = new Lang.Class({
                 this.addItem(icon);
         }));
 
-        // Add the App Center icon if it is enabled and installed
-        if (global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY)) {
-            let app = appSys.lookup_app(EOS_APP_CENTER_ID);
-            if (app)
-                this.addItem(new AppCenterIcon(app));
-            else
-                log('App center ' + EOS_APP_CENTER_ID + ' is not installed');
-        }
-
+        // Add the App Center icon if it is enabled (and installed)
+        this._maybeAddAppCenterIcon();
 
         this.loadGrid();
+    },
+
+    _maybeAddAppCenterIcon: function() {
+        if (this._appCenterIcon)
+            return;
+
+        if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
+            return;
+
+        let appSys = Shell.AppSystem.get_default();
+        if (!appSys.lookup_app(EOS_APP_CENTER_ID)) {
+            log('App center ' + EOS_APP_CENTER_ID + ' is not installed');
+            return;
+        }
+
+        this._appCenterIcon = new AppCenterIcon(this);
+        this.addItem(this._appCenterIcon);
     },
 
     // Overriden from BaseAppView
@@ -803,6 +845,298 @@ const AllView = new Lang.Class({
         return Clutter.EVENT_PROPAGATE;
     },
 
+    getViewId: function() {
+        return IconGridLayout.DESKTOP_GRID_ID;
+    },
+
+    _positionReallyMoved: function() {
+        if (this._insertIdx == -1)
+            return false;
+
+        // If we're immediately right of the original position,
+        // we didn't really move
+        if ((this._insertIdx == this._originalIdx ||
+             this._insertIdx == this._originalIdx + 1) &&
+            this._dragView == this._dragIcon.parentView)
+            return false;
+
+        return true;
+    },
+
+    _resetNudgeState: function() {
+        if (this._dragView)
+            this._dragView.removeNudgeTransforms();
+    },
+
+    _resetDragViewState: function() {
+        this._resetNudgeState();
+
+        this._insertIdx = -1;
+        this._onIconIdx = -1;
+        this._lastCursorLocation = -1;
+        this._dragView = null;
+    },
+
+    _setupDragState: function(source) {
+        if (!source || !source.parentView)
+            return;
+
+        if (!source.handleViewDragBegin)
+            return;
+
+        this._dragIcon = source;
+        this._originalIdx = source.parentView.indexOf(source);
+
+        this._dragMonitor = {
+            dragMotion: Lang.bind(this, this._onDragMotion)
+        };
+        DND.addDragMonitor(this._dragMonitor);
+
+        this._resetDragViewState();
+
+        source.handleViewDragBegin();
+        if (this._appCenterIcon && (source.canDragOver(this._appCenterIcon)))
+            this._appCenterIcon.handleViewDragBegin();
+    },
+
+    _clearDragState: function(source) {
+        if (!source || !source.parentView)
+            return;
+
+        if (!source.handleViewDragEnd)
+            return;
+
+        this._dragIcon = null;
+        this._originalIdx = -1;
+
+        if (this._dragMonitor) {
+            DND.removeDragMonitor(this._dragMonitor);
+            this._dragMonitor = null;
+        }
+
+        this._resetDragViewState();
+
+        source.handleViewDragEnd();
+        if (this._appCenterIcon && (source.canDragOver(this._appCenterIcon)))
+            this._appCenterIcon.handleViewDragEnd();
+    },
+
+    _onDragBegin: function(overview, source) {
+        // Save the currently dragged item info
+        this._setupDragState(source);
+
+        // Hide the event blocker in all cases to allow for dash DnD
+        this._eventBlocker.hide();
+    },
+
+    _onDragEnd: function(overview, source) {
+        this._eventBlocker.show();
+        this._clearDragState(source);
+    },
+
+    _onDragMotion: function(dragEvent) {
+        // If the icon is dragged to the top or the bottom of the grid,
+        // we want to scroll it, if possible
+        if (this._handleDragOvershoot(dragEvent)) {
+            this._resetDragViewState();
+            return DND.DragMotionResult.CONTINUE;
+        }
+        // Handle motion over grid
+        let dragView = null;
+
+        if (this._dragIcon.parentView.actor.contains(dragEvent.targetActor))
+            dragView = this._dragIcon.parentView;
+        else if (this.actor.contains(dragEvent.targetActor))
+            dragView = this;
+
+        if (dragView != this._dragView) {
+            if (this._dragView && this._onIconIdx > -1)
+                this._setDragHoverState(false);
+
+            this._resetDragViewState();
+            this._dragView = dragView;
+        }
+
+        if (!this._dragView)
+            return DND.DragMotionResult.CONTINUE;
+
+        let draggingWithinFolder =
+            this._currentPopup && (this._dragView == this._dragIcon.parentView);
+        let canDropPastEnd = draggingWithinFolder || !this._appCenterIcon;
+
+        // Ask grid can we drop here
+        let [idx, cursorLocation] = this._dragView.canDropAt(dragEvent.x,
+                                                             dragEvent.y,
+                                                             canDropPastEnd);
+
+        let onIcon = (cursorLocation == IconGrid.CursorLocation.ON_ICON);
+        let isNewPosition = (!onIcon && idx != this._insertIdx) ||
+            (cursorLocation != this._lastCursorLocation);
+
+        // If we are not over our last hovered icon, remove its hover state
+        if (this._onIconIdx != -1 &&
+            ((idx != this._onIconIdx) || !onIcon)) {
+            this._setDragHoverState(false);
+            dragEvent.dragActor.opacity = EOS_ACTIVE_GRID_OPACITY;
+        }
+
+        // If we are in a new spot, remove the previous nudges
+        if (isNewPosition)
+            this._resetNudgeState();
+
+        // Update our insert/hover index and the last cursor location
+        this._lastCursorLocation = cursorLocation;
+        if (onIcon) {
+            this._onIconIdx = idx;
+            this._insertIdx = -1;
+
+            let hoverResult = this._getDragHoverResult();
+            if (hoverResult == DND.DragMotionResult.MOVE_DROP) {
+                // If we are hovering over a drop target, set its hover state
+                this._setDragHoverState(true);
+                dragEvent.dragActor.opacity = EOS_DRAG_OVER_FOLDER_OPACITY;
+            }
+
+            return hoverResult;
+        }
+
+        // Dropping in a space between icons
+        this._onIconIdx = -1;
+        this._insertIdx = idx;
+
+        if (this._shouldNudgeItems(isNewPosition))
+            this._dragView.nudgeItemsAtIndex(this._insertIdx, cursorLocation);
+
+        // Propagate the signal in any case when moving icons
+        return DND.DragMotionResult.CONTINUE;
+    },
+
+    _handleDragOvershoot: function(dragEvent) {
+        let [ gridX, gridY ] = this.actor.get_transformed_position();
+        let [ gridW, gridH ] = this.actor.get_transformed_size();
+        let gridBottom = gridY + gridH;
+
+        if (dragEvent.y > gridY && dragEvent.y < gridBottom) {
+            // We're within the grid boundaries - cancel any existing
+            // scrolling
+            if (Tweener.isTweening(this._adjustment))
+                Tweener.removeTweens(this._adjustment);
+
+            return false;
+        }
+
+        if (dragEvent.y <= gridY &&
+            this._adjustment.value > 0) {
+            this.goToPage(this._grid.currentPage - 1);
+            return true;
+        }
+
+        let maxAdjust = this._adjustment.upper - this._adjustment.page_size;
+        if (dragEvent.y >= gridBottom &&
+            this._adjustment.value < maxAdjust) {
+            this.goToPage(this._grid.currentPage + 1);
+            return true;
+        }
+
+        return false;
+    },
+
+    _shouldNudgeItems: function(isNewPosition) {
+        return (isNewPosition && this._positionReallyMoved());
+    },
+
+    _setDragHoverState: function(state) {
+        let viewIcon = this._dragView.getIconForIndex(this._onIconIdx);
+
+        if (viewIcon && this._dragIcon.canDragOver(viewIcon))
+            viewIcon.setDragHoverState(state);
+    },
+
+    _getDragHoverResult: function() {
+        // If we are hovering over our own icon placeholder, ignore it
+        if (this._onIconIdx == this._originalIdx &&
+            this._dragView == this._dragIcon.parentView)
+            return DND.DragMotionResult.NO_DROP;
+
+        let validHoverDrop = false;
+        let viewIcon = this._dragView.getIconForIndex(this._onIconIdx);
+
+        // We can only move applications into folders or the app store
+        if (viewIcon)
+            validHoverDrop = viewIcon.canDrop && this._dragIcon.canDragOver(viewIcon);
+
+        if (validHoverDrop)
+            return DND.DragMotionResult.MOVE_DROP;
+
+        return DND.DragMotionResult.CONTINUE;
+    },
+
+    acceptDrop: function(source, actor, x, y, time) {
+        let position = [x, y];
+
+        // This makes sure that if we dropped an icon outside of the grid,
+        // we use the root grid as our target. This can only happen when
+        // dragging an icon out of a folder
+        if (this._dragView == null)
+            this._dragView = this;
+
+        let droppedOutsideOfFolder = this._currentPopup && (this._dragView != this._dragIcon.parentView);
+        let dropIcon = this._dragView.getIconForIndex(this._onIconIdx);
+        let droppedOnAppOutsideOfFolder = droppedOutsideOfFolder && dropIcon && !dropIcon.canDrop;
+
+        if (this._onIconIdx != -1 && !droppedOnAppOutsideOfFolder) {
+            // Find out what icon the drop is under
+            if (!dropIcon || !dropIcon.canDrop)
+                return false;
+
+            if (!source.canDragOver(dropIcon))
+                return false;
+
+            let accepted  = dropIcon.handleIconDrop(source);
+            if (!accepted)
+                return false;
+
+            if (this._currentPopup) {
+                this._eventBlocker.reactive = false;
+                this._currentPopup.popdown();
+            }
+
+            return true;
+        }
+
+        // If we are not dropped outside of a folder (allowed move) and we're
+        // outside of the grid area, or didn't actually change position, ignore
+        // the request to move
+        if (!this._positionReallyMoved() && !droppedOutsideOfFolder)
+            return false;
+
+        // If we are not over an icon but within the grid, shift the
+        // grid around to accomodate it
+        let icon = this._dragView.getIconForIndex(this._insertIdx);
+        let insertId = icon ? icon.getId() : null;
+        let folderId = this._dragView.getViewId();
+
+        // If we dropped the icon outside of the folder, close the popup and
+        // add the icon to the main view
+        if (droppedOutsideOfFolder) {
+            source.blockHandler = true;
+            this._eventBlocker.reactive = false;
+            this._currentPopup.popdown();
+
+            // Append the inserted app to the end of the grid
+            let appSystem = Shell.AppSystem.get_default();
+            let app  = appSystem.lookup_app(source.getId());
+            let icon = new AppIcon(app,
+                                   { isDraggable: true,
+                                     parentView: this },
+                                   { editable: true });
+            this.addItem(icon);
+        }
+
+        IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
+        return true;
+    },
+
     addFolderPopup: function(popup) {
         this._stack.add_actor(popup.actor);
         popup.connect('open-state-changed', Lang.bind(this,
@@ -925,19 +1259,12 @@ const FrequentView = new Lang.Class({
         if(!hasUsefulData)
             return;
 
-        // Allow dragging of the icon only if the Dash would accept a drop to
-        // change favorite-apps. There are no other possible drop targets from
-        // the app picker, so there's no other need for a drag to start,
-        // at least on single-monitor setups.
-        // This also disables drag-to-launch on multi-monitor setups,
-        // but we hope that is not used much.
-        let favoritesWritable = global.settings.is_writable('favorite-apps');
-
         for (let i = 0; i < mostUsed.length; i++) {
             if (!mostUsed[i].get_app_info().should_show())
                 continue;
             let appIcon = new AppIcon(mostUsed[i],
-                                      { isDraggable: favoritesWritable });
+                                      { isDraggable: true },
+                                      null);
             this._grid.addItem(appIcon, -1);
         }
     },
@@ -1111,9 +1438,10 @@ const FolderView = new Lang.Class({
     Name: 'FolderView',
     Extends: BaseAppView,
 
-    _init: function(dirInfo) {
+    _init: function(folderIcon, dirInfo) {
         this.parent(null, null);
 
+        this._folderIcon = folderIcon;
         this._dirInfo = dirInfo;
 
         // If it not expand, the parent doesn't take into account its preferred_width when allocating
@@ -1230,38 +1558,226 @@ const FolderView = new Lang.Class({
 
     setPaddingOffsets: function(offset) {
         this._offsetForEachSide = offset;
+    },
+
+    getViewId: function() {
+        return this._folderIcon.getId();
+    }
+});
+
+const ViewIconState = {
+    NORMAL: 0,
+    DND_PLACEHOLDER: 1,
+    NUM_STATES: 2
+};
+
+const ViewIcon = new Lang.Class({
+    Name: 'ViewIcon',
+
+    _init: function(params, buttonParams, iconParams) {
+        params = Params.parse(params,
+                              { isDraggable: true,
+                                showMenu: true,
+                                parentView: null },
+                              true);
+        buttonParams = Params.parse(buttonParams,
+                                    { style_class: 'app-well-app',
+                                      button_mask: St.ButtonMask.ONE |
+                                                   St.ButtonMask.TWO |
+                                                   St.ButtonMask.THREE,
+                                      toggle_mode: false,
+                                      can_focus: true,
+                                      x_fill: true,
+                                      y_fill: true
+                                    },
+                                    true);
+
+        this.showMenu = params.showMenu;
+        this.parentView = params.parentView;
+
+        this.canDrop = false;
+        this.blockHandler = false;
+
+        // Might be changed once the createIcon() method is called.
+        this._iconSize = IconGrid.ICON_SIZE;
+        this._iconState = ViewIconState.NORMAL;
+
+        this.actor = new St.Button(buttonParams);
+        this.actor._delegate = this;
+        this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        this._createIconFunc = iconParams['createIcon'];
+        iconParams['createIcon'] = Lang.bind(this, this._createIconBase);
+
+        // Used to save the text when setting up the DnD placeholder.
+        this._origText = null;
+
+        this.icon = new IconGrid.BaseIcon(this.getName(), iconParams);
+        if (iconParams['showLabel'] && iconParams['editable']) {
+            this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
+            this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
+        }
+
+        this.actor.label_actor = this.icon.label;
+
+        if (params.isDraggable) {
+            this._draggable = DND.makeDraggable(this.actor);
+            this._draggable.connect('drag-begin', Lang.bind(this, function() {
+                this.prepareForDrag();
+                Main.overview.beginItemDrag(this);
+            }));
+            this._draggable.connect('drag-cancelled', Lang.bind(this, function() {
+                Main.overview.cancelledItemDrag(this);
+            }));
+            this._draggable.connect('drag-end', Lang.bind(this, function() {
+                Main.overview.endItemDrag(this);
+            }));
+        }
+    },
+
+    getName: function() {
+        throw new Error('Not implemented');
+    },
+
+    _onLabelCancel: function() {
+        this.icon.actor.sync_hover();
+    },
+
+    _onDestroy: function() {
+        this.actor._delegate = null;
+    },
+
+    _createIconBase: function(iconSize) {
+        if (this._iconSize != iconSize)
+            this._iconSize = iconSize;
+
+        // Replace the original icon with an empty placeholder
+        if (this._iconState == ViewIconState.DND_PLACEHOLDER)
+            return new St.Icon({ icon_size: this._iconSize });
+
+        return this._createIconFunc(this._iconSize);
+    },
+
+    remove: function() {
+        this.blockHandler = true;
+        IconGridLayout.layout.removeIcon(this.getId(), true);
+        this.blockHandler = false;
+
+        this.handleViewDragEnd();
+        this.actor.hide();
+    },
+
+    replaceText: function(newText) {
+        if (!this.icon.label)
+            return;
+
+        this._origText = this.icon.label.text;
+        this.icon.label.text = newText;
+    },
+
+    restoreText: function() {
+        if (!this._origText)
+            return;
+
+        this.icon.label.text = this._origText;
+        this._origText = null;
+    },
+
+    prepareDndPlaceholder: function() {
+        this.replaceText('');
+    },
+
+    resetDnDPlaceholder: function() {
+        this.restoreText();
+    },
+
+    handleViewDragBegin: function() {
+        this.iconState = ViewIconState.DND_PLACEHOLDER;
+        this.prepareDndPlaceholder();
+    },
+
+    handleViewDragEnd: function() {
+        if (!this.blockHandler) {
+            this.iconState = ViewIconState.NORMAL;
+            this.resetDnDPlaceholder();
+        }
+    },
+
+    prepareForDrag: function() {
+        throw new Error('Not implemented');
+    },
+
+    setDragHoverState: function(state) {
+        this.icon.actor.set_hover(state);
+    },
+
+    canDragOver: function(dest) {
+        return false;
+    },
+
+    handleIconDrop: function(source) {
+        throw new Error('Not implemented');
+    },
+
+    getDragActor: function() {
+        let iconParams = { createIcon: Lang.bind(this, this._createIcon),
+                           showLabel: (this.icon.label != null),
+                           setSizeManually: false,
+                           editable: true };
+
+        let icon = new IconGrid.BaseIcon(this.getName(), iconParams);
+        icon.actor.add_style_class_name('dnd');
+        return icon.actor;
+    },
+
+    // Returns the original actor that should align with the actor
+    // we show as the item is being dragged.
+    getDragActorSource: function() {
+        return this.icon.icon;
+    },
+
+    set iconState(iconState) {
+        if (this._iconState == iconState)
+            return;
+
+        this._iconState = iconState;
+        this.icon.reloadIcon();
+    },
+
+    get iconState() {
+        return this._iconState;
     }
 });
 
 const FolderIcon = new Lang.Class({
     Name: 'FolderIcon',
+    Extends: ViewIcon,
 
     _init: function(id, parentView) {
+        let viewIconParams = { isDraggable: true,
+                               parentView: parentView };
+        let buttonParams = { button_mask: St.ButtonMask.ONE,
+                             toggle_mode: true };
+        let iconParams = { createIcon: Lang.bind(this, this._createIcon),
+                           setSizeManually: false,
+                           editable: true };
         this.id = id;
         this._parentView = parentView;
 
         this._dirInfo = Shell.DesktopDirInfo.new(id);
+        this._name = this._dirInfo.get_name();
 
-        this.actor = new St.Button({ style_class: 'app-well-app app-folder',
-                                     button_mask: St.ButtonMask.ONE,
-                                     toggle_mode: true,
-                                     can_focus: true,
-                                     x_fill: true,
-                                     y_fill: true });
-        this.actor._delegate = this;
+        this.parent(viewIconParams, buttonParams, iconParams);
+
+        this.actor.add_style_class_name('app-folder');
+        this.actor.set_child(this.icon.actor);
+
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
 
-        this.icon = new IconGrid.BaseIcon('', { createIcon: Lang.bind(this, this._createIcon),
-                                                setSizeManually: false,
-                                                editable: true });
-        this.actor.set_child(this.icon.actor);
-        this.actor.label_actor = this.icon.label;
+        this.canDrop = true;
 
-        this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
-        this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
-
-        this.view = new FolderView(this._dirInfo);
+        this.view = new FolderView(this, this._dirInfo);
 
         this.actor.connect('clicked', Lang.bind(this,
             function() {
@@ -1276,6 +1792,14 @@ const FolderIcon = new Lang.Class({
             }));
 
         this._redisplay();
+    },
+
+    getName: function() {
+        return this._name;
+    },
+
+    getId: function() {
+        return this._dirInfo.get_id();
     },
 
     getAppIds: function() {
@@ -1294,10 +1818,6 @@ const FolderIcon = new Lang.Class({
                       + ' using new name: '
                       + newText);
         }
-    },
-
-    _onLabelCancel: function() {
-        this.icon.actor.sync_hover();
     },
 
     _updateName: function() {
@@ -1324,7 +1844,10 @@ const FolderIcon = new Lang.Class({
             if (!app.get_app_info().should_show())
                 return;
 
-            let icon = new AppIcon(app, { editable: true });
+            let icon = new AppIcon(app,
+                                   { isDraggable: true,
+                                     parentView: this.view },
+                                   { editable: true });
             this.view.addItem(icon);
         }).bind(this);
 
@@ -1412,6 +1935,31 @@ const FolderIcon = new Lang.Class({
             this.view.adaptToSize(width, height);
         this._popupInvalidated = true;
     },
+
+    prepareForDrag: function() {
+    },
+
+    canDragOver: function(dest) {
+        // Can't drag folders over other folders
+        if (dest.folder)
+            return false;
+
+        return true;
+    },
+
+    getDragActor: function() {
+        return this.view.createFolderIcon(this._iconSize);
+    },
+
+    handleIconDrop: function(source) {
+        // Move the source icon into this folder
+        IconGridLayout.layout.appendIcon(source.getId(), this.getId());
+        return true;
+    },
+
+    get folder() {
+        return this._dirInfo;
+    }
 });
 Signals.addSignalMethods(FolderIcon.prototype);
 
@@ -1578,18 +2126,22 @@ Signals.addSignalMethods(AppFolderPopup.prototype);
 
 const AppIcon = new Lang.Class({
     Name: 'AppIcon',
+    Extends: ViewIcon,
 
-    _init : function(app, iconParams) {
+    _init : function(app, viewIconParams, iconParams) {
         this.app = app;
         this.id = app.get_id();
         this.name = app.get_name();
 
-        this.actor = new St.Button({ style_class: 'app-well-app',
-                                     reactive: true,
-                                     button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
-                                     can_focus: true,
-                                     x_fill: true,
-                                     y_fill: true });
+        let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
+        iconParams = Params.parse(iconParams, { createIcon: Lang.bind(this, this._createIcon),
+                                                createExtraIcons: Lang.bind(this, this._createExtraIcons),
+                                                editable: true },
+                                  true);
+        if (!iconParams)
+            iconParams = {};
+
+        this.parent(viewIconParams, buttonParams, iconParams);
 
         this._dot = new St.Widget({ style_class: 'app-well-app-running-dot',
                                     layout_manager: new Clutter.BinLayout(),
@@ -1599,31 +2151,10 @@ const AppIcon = new Lang.Class({
 
         this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
                                               x_expand: true, y_expand: true });
+        this._iconContainer.add_child(this.icon.actor);
 
         this.actor.set_child(this._iconContainer);
         this._iconContainer.add_child(this._dot);
-
-        this.actor._delegate = this;
-
-        if (!iconParams)
-            iconParams = {};
-
-        // Get the isDraggable property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { isDraggable: true, showMenu: true },
-                                         true);
-        let isDraggable = appIconParams['isDraggable'];
-        delete iconParams['isDraggable'];
-
-        this._showMenu = appIconParams['showMenu'];
-        delete iconParams['showMenu'];
-
-        iconParams['createIcon'] = Lang.bind(this, this._createIcon);
-        iconParams['createExtraIcons'] = Lang.bind(this, this._createExtraIcons);
-        iconParams['setSizeManually'] = false;
-        this.icon = new IconGrid.BaseIcon(app.get_name(), iconParams);
-        this._iconContainer.add_child(this.icon.actor);
-
-        this.actor.label_actor = this.icon.label;
 
         this.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
         this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
@@ -1631,30 +2162,8 @@ const AppIcon = new Lang.Class({
         this.actor.connect('clicked', Lang.bind(this, this._onClicked));
         this.actor.connect('popup-menu', Lang.bind(this, this._onKeyboardPopupMenu));
 
-        if (iconParams['showLabel'] && iconParams['editable']) {
-            this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
-            this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
-        }
-
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
-
-        if (isDraggable) {
-            this._draggable = DND.makeDraggable(this.actor);
-            this._draggable.connect('drag-begin', Lang.bind(this,
-                function () {
-                    this._removeMenuTimeout();
-                    Main.overview.beginItemDrag(this);
-                }));
-            this._draggable.connect('drag-cancelled', Lang.bind(this,
-                function () {
-                    Main.overview.cancelledItemDrag(this);
-                }));
-            this._draggable.connect('drag-end', Lang.bind(this,
-                function () {
-                   Main.overview.endItemDrag(this);
-                }));
-        }
 
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
 
@@ -1670,6 +2179,10 @@ const AppIcon = new Lang.Class({
                                                                                    Lang.bind(this, this._onNewGtkNotificationSource));
     },
 
+    getName: function() {
+        return this.name;
+    },
+
     _onLabelUpdate: function(label, newText) {
         try {
             this.app.create_custom_launcher_with_name(newText);
@@ -1680,10 +2193,6 @@ const AppIcon = new Lang.Class({
                       + ' using new name: '
                       + newText);
         }
-    },
-
-    _onLabelCancel: function() {
-        this.icon.actor.sync_hover();
     },
 
     _onDestroy: function() {
@@ -1788,7 +2297,7 @@ const AppIcon = new Lang.Class({
     popupMenu: function() {
         this._removeMenuTimeout();
 
-        if (!this._showMenu)
+        if (!this.showMenu)
             return true;
 
         this.actor.fake_release();
@@ -1853,16 +2362,26 @@ const AppIcon = new Lang.Class({
         this.app.open_new_window(params.workspace);
     },
 
-    getDragActor: function() {
-        // This is a temporary change not to depend on the dash while
-        // we don't implement our own Drag'n'Drop mechanism in EOS.
-        return this.app.create_icon_texture(IconGrid.ICON_SIZE);
+    prepareForDrag: function() {
+        this._removeMenuTimeout();
     },
 
-    // Returns the original actor that should align with the actor
-    // we show as the item is being dragged.
-    getDragActorSource: function() {
-        return this.icon.icon;
+    prepareDndPlaceholder: function() {
+        this.parent();
+        this._dot.hide();
+    },
+
+    resetDnDPlaceholder: function() {
+        this.parent();
+
+        if (this.app.state != Shell.AppState.STOPPED)
+            this._dot.show();
+        else
+            this._dot.hide();
+    },
+
+    canDragOver: function(dest) {
+        return true;
     },
 
     shouldShowTooltip: function() {
@@ -2013,18 +2532,79 @@ const AppIconMenu = new Lang.Class({
 });
 Signals.addSignalMethods(AppIconMenu.prototype);
 
+const AppCenterIconState = {
+    EMPTY_TRASH: ViewIconState.NUM_STATES,
+    FULL_TRASH: ViewIconState.NUM_STATES + 1
+};
+
 const AppCenterIcon = new Lang.Class({
     Name: 'AppCenterIcon',
     Extends: AppIcon,
 
-    _init : function(app) {
-        let params = { isDraggable: false,
-                       editable: false,
-                       showMenu: false };
+    _init : function(parentView) {
+        let viewIconParams = { isDraggable: false,
+                               showMenu: false,
+                               parentView: parentView };
 
-        this.parent(app, params);
+        let iconParams = { createIcon: Lang.bind(this, this._createIcon),
+                           editable: false };
 
-        this.icon.label.set_text(_("More Apps"));
+        let appSys = Shell.AppSystem.get_default();
+        let app = appSys.lookup_app(EOS_APP_CENTER_ID);
+
+        this.parent(app, viewIconParams, iconParams);
+
+        this.canDrop = true;
     },
+
+    _setStyleClass: function(state) {
+        if (state == AppCenterIconState.EMPTY_TRASH) {
+            this.actor.remove_style_class_name('trash-icon-full');
+            this.actor.add_style_class_name('trash-icon-empty');
+        } else if (state == AppCenterIconState.FULL_TRASH) {
+            this.actor.remove_style_class_name('trash-icon-empty');
+            this.actor.add_style_class_name('trash-icon-full');
+        } else {
+            this.actor.remove_style_class_name('trash-icon-empty');
+            this.actor.remove_style_class_name('trash-icon-full');
+        }
+    },
+
+    _createIcon: function(iconSize) {
+        // Set the icon image as a background via CSS,
+        // and return an empty icon to satisfy the caller
+        this._setStyleClass(this.iconState);
+
+        if (this.iconState != ViewIconState.NORMAL)
+            return new St.Icon({ icon_size: iconSize });
+
+        // In normal state we chain up to the parent to get the default icon.
+        return this.parent(iconSize);
+    },
+
+    getId: function() {
+        return EOS_APP_CENTER_ID;
+    },
+
+    getName: function() {
+        return _("More Apps");
+    },
+
+    handleViewDragBegin: function() {
+        this.iconState = AppCenterIconState.EMPTY_TRASH;
+        this.replaceText(_("Delete"));
+    },
+
+    setDragHoverState: function(state) {
+        let appCenterIconState = state ?
+            AppCenterIconState.FULL_TRASH : AppCenterIconState.EMPTY_TRASH;
+        this.iconState = appCenterIconState;
+    },
+
+    handleIconDrop: function(source) {
+        source.remove();
+        this.handleViewDragEnd();
+        return true;
+    }
 });
 Signals.addSignalMethods(AppCenterIcon.prototype);

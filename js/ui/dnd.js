@@ -16,9 +16,9 @@ const Params = imports.misc.params;
 // Time to scale down to maxDragActorSize
 const SCALE_ANIMATION_TIME = 0.25;
 // Time to animate to original position on cancel
-const SNAP_BACK_ANIMATION_TIME = 0.25;
+const SNAP_BACK_ANIMATION_TIME = 0;
 // Time to animate to original position on success
-const REVERT_ANIMATION_TIME = 0.75;
+const REVERT_ANIMATION_TIME = 0;
 
 const DragMotionResult = {
     NO_DROP:   0,
@@ -296,19 +296,11 @@ const _Draggable = new Lang.Class({
             // to know what was the drag actor source.
             if (this.actor._delegate.getDragActorSource) {
                 this._dragActorSource = this.actor._delegate.getDragActorSource();
-                // If the user dragged from the source, then position
-                // the dragActor over it. Otherwise, center it
-                // around the pointer
+                // Position the actor in the middle of the pointer
                 let [sourceX, sourceY] = this._dragActorSource.get_transformed_position();
-                let x, y;
-                if (stageX > sourceX && stageX <= sourceX + this._dragActor.width &&
-                    stageY > sourceY && stageY <= sourceY + this._dragActor.height) {
-                    x = sourceX;
-                    y = sourceY;
-                } else {
-                    x = stageX - this._dragActor.width / 2;
-                    y = stageY - this._dragActor.height / 2;
-                }
+                let x = stageX - this._dragActor.width / 2;
+                let y = stageY - this._dragActor.height / 2;
+
                 this._dragActor.set_position(x, y);
             } else {
                 this._dragActorSource = this.actor;
@@ -530,7 +522,7 @@ const _Draggable = new Lang.Class({
             // Snap the clone back to its source
             [x, y] = this._dragActorSource.get_transformed_position();
             let [sourceScaledWidth, sourceScaledHeight] = this._dragActorSource.get_transformed_size();
-            scale = this._dragActor.width / sourceScaledWidth;
+            scale = sourceScaledWidth ? this._dragActor.width / sourceScaledWidth : 1;
         } else if (this._dragOrigParent) {
             // Snap the actor back to its original position within
             // its parent, adjusting for the fact that the parent
