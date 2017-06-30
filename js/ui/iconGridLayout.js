@@ -307,6 +307,7 @@ const IconGridLayout = new Lang.Class({
             icons = this._iconTree[i];
             let oldPos = icons.indexOf(id);
             if (oldPos != -1) {
+                icons.splice(oldPos, 1);
                 existing = true;
                 break;
             }
