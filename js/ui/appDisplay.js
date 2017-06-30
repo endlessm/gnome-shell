@@ -1648,6 +1648,13 @@ const ViewIconMenu = new Lang.Class({
             this.addMenuItem(ctxtMenuSection);
             this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         }
+
+        // Add the "Remove from desktop" menu item at the end.
+        let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
+        this.addMenuItem(item);
+        item.connect('activate', Lang.bind(this, function() {
+            this._source.remove();
+        }));
     },
 
     popup: function(activatingButton) {
