@@ -319,7 +319,7 @@ const Overview = new Lang.Class({
 
         Main.layoutManager.connect('startup-complete', Lang.bind(this, this._onStartupCompleted));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
-        this._relayout();
+        this._relayoutNoHide();
     },
 
     addSearchProvider: function(provider) {
@@ -463,6 +463,10 @@ const Overview = new Lang.Class({
         // when it is next shown.
         this.hide();
 
+        this._relayoutNoHide();
+    },
+
+    _relayoutNoHide: function () {
         let workArea = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
 
         this._coverPane.set_position(0, workArea.y);
