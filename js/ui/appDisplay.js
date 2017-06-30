@@ -539,7 +539,7 @@ var AllView = class AllView extends BaseAppView {
             return;
         }
 
-        this._appCenterIcon = new AppCenterIcon();
+        this._appCenterIcon = new AppCenterIcon(this);
         this.addItem(this._appCenterIcon);
     }
 
@@ -758,6 +758,8 @@ var AllView = class AllView extends BaseAppView {
         this._resetDragViewState();
 
         source.handleViewDragBegin();
+        if (this._appCenterIcon && (source.canDragOver(this._appCenterIcon)))
+            this._appCenterIcon.handleViewDragBegin();
     }
 
     _clearDragState(source) {
@@ -778,6 +780,8 @@ var AllView = class AllView extends BaseAppView {
         this._resetDragViewState();
 
         source.handleViewDragEnd();
+        if (this._appCenterIcon && (source.canDragOver(this._appCenterIcon)))
+            this._appCenterIcon.handleViewDragEnd();
     }
 
     _onDragBegin(overview, source) {
@@ -811,7 +815,7 @@ var AllView = class AllView extends BaseAppView {
 
         let draggingWithinFolder =
             this._currentPopup && (this._dragView == this._dragIcon.parentView);
-        let canDropPastEnd = draggingWithinFolder;
+        let canDropPastEnd = draggingWithinFolder || !this._appCenterIcon;
 
         // Ask grid can we drop here
         let [idx, cursorLocation] = this._dragView.canDropAt(dragEvent.x,
@@ -1468,6 +1472,9 @@ class ViewIcon extends GObject.Object {
         this.showMenu = params.showMenu;
         this.parentView = params.parentView;
 
+        this.canDrop = false;
+        this.blockHandler = false;
+
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
         this._iconState = ViewIconState.NORMAL;
@@ -1540,6 +1547,15 @@ class ViewIcon extends GObject.Object {
         return this._createIconFunc(this._iconSize);
     }
 
+    remove() {
+        this.blockHandler = true;
+        IconGridLayout.layout.removeIcon(this.getId(), true);
+        this.blockHandler = false;
+
+        this.handleViewDragEnd();
+        this.actor.hide();
+    }
+
     replaceText(newText) {
         if (!this.icon.label)
             return;
@@ -1570,8 +1586,10 @@ class ViewIcon extends GObject.Object {
     }
 
     handleViewDragEnd() {
-        this.iconState = ViewIconState.NORMAL;
-        this.resetDnDPlaceholder();
+        if (!this.blockHandler) {
+            this.iconState = ViewIconState.NORMAL;
+            this.resetDnDPlaceholder();
+        }
     }
 
     prepareForDrag() {
@@ -1584,6 +1602,10 @@ class ViewIcon extends GObject.Object {
 
     canDragOver(dest) {
         return false;
+    }
+
+    handleIconDrop(source) {
+        throw new Error('Not implemented');
     }
 
     getDragActor() {
@@ -1670,7 +1692,7 @@ var FolderIcon = GObject.registerClass({
     }
 
     getAppIds() {
-        return this.view.getAllItems().map(function(item) {
+        return this.view.getAllItems().map(item => {
             return item.id;
         });
     }
@@ -2366,17 +2388,49 @@ var SystemActionIcon = class SystemActionIcon extends Search.GridSearchResult {
     }
 };
 
+const AppCenterIconState = {
+    EMPTY_TRASH: ViewIconState.NUM_STATES,
+    FULL_TRASH: ViewIconState.NUM_STATES + 1
+};
+
 var AppCenterIcon = GObject.registerClass(
 class AppCenterIcon extends AppIcon {
-    _init() {
+    _init(parentView) {
         let viewIconParams = { isDraggable: false,
-                               showMenu: false };
-        let iconParams = { editable: false };
+                               showMenu: false,
+                               parentView: parentView };
+
+        let iconParams = { createIcon: this._createIcon.bind(this) };
 
         let appSys = Shell.AppSystem.get_default();
         let app = appSys.lookup_app(EOS_APP_CENTER_ID);
 
         super._init(app, viewIconParams, iconParams);
+        this.canDrop = true;
+    }
+    _setStyleClass(state) {
+        if (state == AppCenterIconState.EMPTY_TRASH) {
+            this.actor.remove_style_class_name('trash-icon-full');
+            this.actor.add_style_class_name('trash-icon-empty');
+        } else if (state == AppCenterIconState.FULL_TRASH) {
+            this.actor.remove_style_class_name('trash-icon-empty');
+            this.actor.add_style_class_name('trash-icon-full');
+        } else {
+            this.actor.remove_style_class_name('trash-icon-empty');
+            this.actor.remove_style_class_name('trash-icon-full');
+        }
+    }
+
+    _createIcon(iconSize) {
+        // Set the icon image as a background via CSS,
+        // and return an empty icon to satisfy the caller
+        this._setStyleClass(this.iconState);
+
+        if (this.iconState != ViewIconState.NORMAL)
+            return new St.Icon({ icon_size: iconSize });
+
+        // In normal state we chain up to the parent to get the default icon.
+        return super._createIcon	(iconSize);
     }
 
     getId() {
@@ -2385,5 +2439,22 @@ class AppCenterIcon extends AppIcon {
 
     getName() {
         return this.app.get_generic_name();
+    }
+
+    handleViewDragBegin() {
+        this.iconState = AppCenterIconState.EMPTY_TRASH;
+        this.replaceText(_("Delete"));
+    }
+
+    setDragHoverState(state) {
+        let appCenterIconState = state ?
+            AppCenterIconState.FULL_TRASH : AppCenterIconState.EMPTY_TRASH;
+        this.iconState = appCenterIconState;
+    }
+
+    handleIconDrop(source) {
+        source.remove();
+        this.handleViewDragEnd();
+        return true;
     }
 });
