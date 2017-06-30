@@ -944,6 +944,12 @@ const AllView = new Lang.Class({
     },
 
     _onDragMotion: function(dragEvent) {
+        // If the icon is dragged to the top or the bottom of the grid,
+        // we want to scroll it, if possible
+        if (this._handleDragOvershoot(dragEvent)) {
+            this._resetDragViewState();
+            return DND.DragMotionResult.CONTINUE;
+        }
         // Handle motion over grid
         let dragView = null;
 
@@ -1012,6 +1018,36 @@ const AllView = new Lang.Class({
 
         // Propagate the signal in any case when moving icons
         return DND.DragMotionResult.CONTINUE;
+    },
+
+    _handleDragOvershoot: function(dragEvent) {
+        let [ gridX, gridY ] = this.actor.get_transformed_position();
+        let [ gridW, gridH ] = this.actor.get_transformed_size();
+        let gridBottom = gridY + gridH;
+
+        if (dragEvent.y > gridY && dragEvent.y < gridBottom) {
+            // We're within the grid boundaries - cancel any existing
+            // scrolling
+            if (Tweener.isTweening(this._adjustment))
+                Tweener.removeTweens(this._adjustment);
+
+            return false;
+        }
+
+        if (dragEvent.y <= gridY &&
+            this._adjustment.value > 0) {
+            this.goToPage(this._grid.currentPage - 1);
+            return true;
+        }
+
+        let maxAdjust = this._adjustment.upper - this._adjustment.page_size;
+        if (dragEvent.y >= gridBottom &&
+            this._adjustment.value < maxAdjust) {
+            this.goToPage(this._grid.currentPage + 1);
+            return true;
+        }
+
+        return false;
     },
 
     _shouldNudgeItems: function(isNewPosition) {
