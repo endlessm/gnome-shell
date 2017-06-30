@@ -2572,28 +2572,6 @@ const AppIcon = new Lang.Class({
             }));
         }
 
-        if (global.settings.is_writable('favorite-apps')) {
-            menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-            let isFavorite = AppFavorites.getAppFavorites().isFavorite(this.app.get_id());
-
-            if (isFavorite) {
-                let item = new PopupMenu.PopupMenuItem(_("Remove from Favorites"));
-                menu.addMenuItem(item);
-                item.connect('activate', Lang.bind(this, function() {
-                    let favs = AppFavorites.getAppFavorites();
-                    favs.removeFavorite(this.app.get_id());
-                }));
-            } else {
-                let item = new PopupMenu.PopupMenuItem(_("Add to Favorites"));
-                menu.addMenuItem(item);
-                item.connect('activate', Lang.bind(this, function() {
-                    let favs = AppFavorites.getAppFavorites();
-                    favs.addFavorite(this.app.get_id());
-                }));
-            }
-        }
-
         if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop')) {
             menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
             let item = new PopupMenu.PopupMenuItem(_("Show Details"));
