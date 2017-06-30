@@ -2549,12 +2549,70 @@ class AppCenterIcon extends AppIcon {
             showMenu: false,
         };
 
+        let iconParams = {
+            createIcon: this._createIcon.bind(this),
+        };
+
         let appSys = Shell.AppSystem.get_default();
         let app = appSys.lookup_app(EOS_APP_CENTER_ID);
 
-        super._init(app, viewIconParams);
+        super._init(app, viewIconParams, iconParams);
 
         this._id = EOS_APP_CENTER_ID;
         this._name = this.app.get_generic_name();
+    }
+
+    _onDragBegin() {
+        super._onDragBegin();
+
+        this.icon.label.text = _("Remove");
+        this.icon.update();
+    }
+
+    _onDragEnd() {
+        super._onDragEnd();
+
+        this.icon.label.text = this.app.get_generic_name();
+        this.icon.update();
+    }
+
+    _setHoveringByDnd(hovering) {
+        this._hovering = hovering;
+
+        this.icon.update();
+    }
+
+    _createIcon(iconSize) {
+        if (!this._dragMonitor)
+            return super._createIcon(iconSize);
+
+        let iconResource = '';
+        if (this._hovering)
+            iconResource = 'resource:///org/gnome/shell/theme/trash-icon-full.png';
+        else
+            iconResource = 'resource:///org/gnome/shell/theme/trash-icon-empty.png';
+
+        let gicon = new Gio.FileIcon({
+            file: Gio.File.new_for_uri(iconResource),
+        });
+
+        return new St.Icon({
+            gicon: gicon,
+            icon_size: iconSize,
+        });
+    }
+
+    _canAccept(source) {
+        return source instanceof ViewIcon;
+    }
+
+    acceptDrop(source) {
+        this._setHoveringByDnd(false);
+
+        if (!this._canAccept(source))
+            return false;
+
+        IconGridLayout.layout.removeIcon(source.id, true);
+        return true;
     }
 });
