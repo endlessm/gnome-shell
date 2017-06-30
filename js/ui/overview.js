@@ -502,7 +502,7 @@ const Overview = new Lang.Class({
 
     focusSearch: function() {
         this.show();
-        this._viewSelector.focusSearch();
+        this.viewSelector.focusSearch();
     },
 
     _showOrSwitchPage: function(page) {
