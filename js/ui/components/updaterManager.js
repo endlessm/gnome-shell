@@ -4,7 +4,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 
-const LoginManager = imports.misc.loginManager;
+const GnomeSession = imports.misc.gnomeSession;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 
@@ -85,7 +85,7 @@ const UpdaterManager = new Lang.Class({
         this._proxy = new UpdaterProxy(Gio.DBus.system, 'com.endlessm.Updater',
                                        '/com/endlessm/Updater', Lang.bind(this, this._onProxyConstructed));
 
-        this._loginManager = LoginManager.getLoginManager();
+        this._sessionManager = new GnomeSession.SessionManager();
 
         this._config = new GLib.KeyFile();
         this._lastAutoStep = AUTO_UPDATES_DEFAULT_STEP;
@@ -238,7 +238,7 @@ const UpdaterManager = new Lang.Class({
             _("Software updates were installed on your system"));
         this._notification.addAction(_("Restart Now"), Lang.bind(this, function() {
             this._notification.destroy();
-            this._loginManager.reboot();
+            this._sessionManager.RebootRemote();
         }));
 
         this._source.notify(this._notification);
