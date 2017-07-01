@@ -1667,15 +1667,18 @@ var ViewIconMenu = class extends PopupMenu.PopupMenu {
         let ctxtMenuSection = this._source.getContextualMenu();
         if (ctxtMenuSection && !ctxtMenuSection.isEmpty()) {
             this.addMenuItem(ctxtMenuSection);
-            this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            if (this._source.canBeRemoved())
+                this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         }
 
-        // Add the "Remove from desktop" menu item at the end.
-        let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
-        this.addMenuItem(item);
-        item.connect('activate', () => {
-            this._source.remove();
-        });
+        if (this._source.canBeRemoved()) {
+            // Add the "Remove from desktop" menu item at the end.
+            let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
+            this.addMenuItem(item);
+            item.connect('activate', () => {
+                this._source.remove();
+            });
+        }
     }
 
     popup(activatingButton) {
@@ -1806,15 +1809,24 @@ var ViewIcon = GObject.registerClass({
         throw new Error('Not implemented');
     }
 
+    hasMenu() {
+        return this.showMenu;
+    }
+
     getContextualMenu() {
         // No contextual menu by default;
         return null;
     }
 
+    canBeRemoved() {
+        // Icons are removable by default
+        return true;
+    }
+
     popupMenu() {
         this._removeMenuTimeout();
 
-        if (!this.showMenu)
+        if (!this.hasMenu())
             return true;
 
         this.actor.fake_release();
@@ -2103,6 +2115,17 @@ var FolderIcon = GObject.registerClass({
         this._openSpaceForPopup();
     }
 
+    hasMenu() {
+        // A folder shows its menu only if it can be removed.
+        return this.showMenu && this.canBeRemoved()
+    }
+
+    canBeRemoved() {
+        // Only non-empty folders can be removed
+        let appsInFolder = this.getAppIds();
+        return appsInFolder.length == 0;
+    }
+
     _onLabelUpdate(label, newText) {
         try {
             this._dirInfo.create_custom_with_name(newText);
@@ -2204,6 +2227,11 @@ var FolderIcon = GObject.registerClass({
         // Can't drag folders over other folders
         if (dest.folder)
             return false;
+
+        // Can't remove non-empty folders by throwing
+        // them onto the bin from the App Center icon.
+        if (dest.getId() == EOS_APP_CENTER_ID)
+            return this.canBeRemoved();
 
         return true;
     }
@@ -2690,6 +2718,10 @@ class AppCenterIcon extends AppIcon {
         return this.app.get_generic_name();
     }
 
+    canBeRemoved() {
+        return false;
+    }
+
     handleViewDragBegin() {
         this.iconState = AppCenterIconState.EMPTY_TRASH;
         this.replaceText(_("Delete"));
@@ -2702,7 +2734,9 @@ class AppCenterIcon extends AppIcon {
     }
 
     handleIconDrop(source) {
-        source.remove();
+        if (source.canBeRemoved())
+            source.remove();
+
         this.handleViewDragEnd();
         return true;
     }
