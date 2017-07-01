@@ -1646,15 +1646,18 @@ const ViewIconMenu = new Lang.Class({
         let ctxtMenuSection = this._source.getContextualMenu();
         if (ctxtMenuSection && !ctxtMenuSection.isEmpty()) {
             this.addMenuItem(ctxtMenuSection);
-            this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            if (this._source.canBeRemoved())
+                this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         }
 
-        // Add the "Remove from desktop" menu item at the end.
-        let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
-        this.addMenuItem(item);
-        item.connect('activate', Lang.bind(this, function() {
-            this._source.remove();
-        }));
+        if (this._source.canBeRemoved()) {
+            // Add the "Remove from desktop" menu item at the end.
+            let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
+            this.addMenuItem(item);
+            item.connect('activate', Lang.bind(this, function() {
+                this._source.remove();
+            }));
+        }
     },
 
     popup: function(activatingButton) {
@@ -1771,15 +1774,24 @@ const ViewIcon = new Lang.Class({
         throw new Error('Not implemented');
     },
 
+    hasMenu: function() {
+        return this.showMenu;
+    },
+
     getContextualMenu: function() {
         // No contextual menu by default;
         return null;
     },
 
+    canBeRemoved: function() {
+        // Icons are removable by default
+        return true;
+    },
+
     popupMenu: function() {
         this._removeMenuTimeout();
 
-        if (!this.showMenu)
+        if (!this.hasMenu())
             return true;
 
         this.actor.fake_release();
@@ -2023,6 +2035,17 @@ const FolderIcon = new Lang.Class({
         this._openSpaceForPopup();
     },
 
+    hasMenu: function() {
+        // A folder shows its menu only if it can be removed.
+        return this.showMenu && this.canBeRemoved()
+    },
+
+    canBeRemoved: function() {
+        // Only non-empty folders can be removed
+        let appsInFolder = this.getAppIds();
+        return appsInFolder.length == 0;
+    },
+
     _onLabelUpdate: function(label, newText) {
         try {
             this._dirInfo.create_custom_with_name(newText);
@@ -2155,6 +2178,11 @@ const FolderIcon = new Lang.Class({
         // Can't drag folders over other folders
         if (dest.folder)
             return false;
+
+        // Can't remove non-empty folders by throwing
+        // them onto the bin from the App Center icon.
+        if (dest.getId() == EOS_APP_CENTER_ID)
+            return this.canBeRemoved();
 
         return true;
     },
@@ -2671,6 +2699,10 @@ const AppCenterIcon = new Lang.Class({
         return _("More Apps");
     },
 
+    canBeRemoved: function() {
+        return false;
+    },
+
     handleViewDragBegin: function() {
         this.iconState = AppCenterIconState.EMPTY_TRASH;
         this.replaceText(_("Delete"));
@@ -2683,7 +2715,9 @@ const AppCenterIcon = new Lang.Class({
     },
 
     handleIconDrop: function(source) {
-        source.remove();
+        if (source.canBeRemoved())
+            source.remove();
+
         this.handleViewDragEnd();
         return true;
     }
