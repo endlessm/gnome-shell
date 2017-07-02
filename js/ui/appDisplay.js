@@ -2143,10 +2143,6 @@ const FolderIcon = new Lang.Class({
         return true;
     },
 
-    getDragActor: function() {
-        return this.view.createFolderIcon(this._iconSize);
-    },
-
     handleIconDrop: function(source) {
         // Move the source icon into this folder
         IconGridLayout.layout.appendIcon(source.getId(), this.getId());
