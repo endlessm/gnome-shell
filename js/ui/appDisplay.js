@@ -644,8 +644,7 @@ const AllView = new Lang.Class({
                 if (app)
                     icon = new AppIcon(app,
                                        { isDraggable: true,
-                                         parentView: this },
-                                       { editable: true });
+                                         parentView: this });
             }
 
             // Some apps defined by the icon grid layout might not be installed
@@ -1129,8 +1128,7 @@ const AllView = new Lang.Class({
             let app  = appSystem.lookup_app(source.getId());
             let icon = new AppIcon(app,
                                    { isDraggable: true,
-                                     parentView: this },
-                                   { editable: true });
+                                     parentView: this });
             this.addItem(icon);
         }
 
@@ -1902,8 +1900,7 @@ const ViewIcon = new Lang.Class({
     getDragActor: function() {
         let iconParams = { createIcon: Lang.bind(this, this._createIcon),
                            showLabel: (this.icon.label != null),
-                           setSizeManually: false,
-                           editable: true };
+                           setSizeManually: false };
 
         let icon = new IconGrid.BaseIcon(this.getName(), iconParams);
         icon.actor.add_style_class_name('dnd');
@@ -2037,8 +2034,7 @@ const FolderIcon = new Lang.Class({
 
             let icon = new AppIcon(app,
                                    { isDraggable: true,
-                                     parentView: this.view },
-                                   { editable: true });
+                                     parentView: this.view });
             this.view.addItem(icon);
         }).bind(this);
 
@@ -2328,8 +2324,7 @@ const AppIcon = new Lang.Class({
 
         let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
         iconParams = Params.parse(iconParams, { createIcon: Lang.bind(this, this._createIcon),
-                                                createExtraIcons: Lang.bind(this, this._createExtraIcons),
-                                                editable: true },
+                                                createExtraIcons: Lang.bind(this, this._createExtraIcons) },
                                   true);
         if (!iconParams)
             iconParams = {};
@@ -2548,8 +2543,7 @@ const AppCenterIcon = new Lang.Class({
                                showMenu: false,
                                parentView: parentView };
 
-        let iconParams = { createIcon: Lang.bind(this, this._createIcon),
-                           editable: false };
+        let iconParams = { createIcon: Lang.bind(this, this._createIcon) };
 
         let appSys = Shell.AppSystem.get_default();
         let app = appSys.lookup_app(EOS_APP_CENTER_ID);
