@@ -52,7 +52,7 @@ const BaseIcon = new Lang.Class({
 
         this.actor = new St.Bin({ style_class: styleClass,
                                   x_fill: true,
-                                  y_fill: true });
+                                  y_fill: false });
         this.actor._delegate = this;
         this.actor.connect('style-changed',
                            Lang.bind(this, this._onStyleChanged));
