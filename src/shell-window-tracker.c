@@ -865,6 +865,32 @@ shell_window_tracker_get_startup_sequences (ShellWindowTracker *self)
 }
 
 /**
+ * shell_window_tracker_is_window_interesting:
+ *
+ * The ShellWindowTracker associates certain kinds of windows with
+ * applications; however, others we don't want to
+ * appear in places where we want to give a list of windows
+ * for an application, such as the alt-tab dialog.
+ *
+ * An example of a window we don't want to show is the root
+ * desktop window.  We skip all override-redirect types, and also
+ * exclude other window types like tooltip explicitly, though generally
+ * most of these should be override-redirect.
+ * Side component windows are considered interesting so they can be handled
+ * by the window manager.
+ *
+ * Returns: %TRUE iff a window is "interesting"
+ */
+gboolean
+shell_window_tracker_is_window_interesting (MetaWindow *window)
+{
+  if (meta_window_is_skip_taskbar (window))
+    return FALSE;
+
+  return TRUE;
+}
+
+/**
  * shell_window_tracker_is_speedwagon_window:
  *
  * A speedwagon window is shown while an application is being launched.

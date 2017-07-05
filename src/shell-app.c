@@ -1050,7 +1050,7 @@ shell_app_is_interesting_window (MetaWindow *window)
   if (shell_window_tracker_is_speedwagon_window (window))
     return FALSE;
 
-  return !meta_window_is_skip_taskbar (window);
+  return shell_window_tracker_is_window_interesting (window);
 }
 
 void
@@ -1203,7 +1203,7 @@ shell_app_request_quit (ShellApp   *app)
     {
       MetaWindow *win = iter->data;
 
-      if (meta_window_is_skip_taskbar (win))
+      if (!shell_window_tracker_is_window_interesting (win))
         continue;
 
       meta_window_delete (win, shell_global_get_current_time (shell_global_get ()));

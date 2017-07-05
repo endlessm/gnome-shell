@@ -25,6 +25,8 @@ const char *_shell_window_tracker_get_app_context (ShellWindowTracker *tracker, 
 
 GSList *shell_window_tracker_get_startup_sequences (ShellWindowTracker *tracker);
 
+gboolean shell_window_tracker_is_window_interesting (MetaWindow *window);
+
 gboolean shell_window_tracker_is_speedwagon_window (MetaWindow *window);
 
 void shell_window_tracker_track_coding_app_window (ShellWindowTracker *tracker, MetaWindow *app_window);
