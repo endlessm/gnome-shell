@@ -1044,6 +1044,15 @@ shell_app_ensure_busy_watch (ShellApp *app)
                                        g_object_ref (app));
 }
 
+static gboolean
+shell_app_is_interesting_window (MetaWindow *window)
+{
+  if (shell_window_tracker_is_speedwagon_window (window))
+    return FALSE;
+
+  return !meta_window_is_skip_taskbar (window);
+}
+
 void
 _shell_app_add_window (ShellApp        *app,
                        MetaWindow      *window)
@@ -1065,7 +1074,7 @@ _shell_app_add_window (ShellApp        *app,
   shell_app_update_app_menu (app, window);
   shell_app_ensure_busy_watch (app);
 
-  if (!meta_window_is_skip_taskbar (window))
+  if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows++;
   else if (shell_window_tracker_is_speedwagon_window (window))
     app->running_state->speedwagon_windows++;
@@ -1092,7 +1101,7 @@ _shell_app_remove_window (ShellApp   *app,
   g_object_unref (window);
   app->running_state->windows = g_slist_remove (app->running_state->windows, window);
 
-  if (!meta_window_is_skip_taskbar (window))
+  if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows--;
   else if (shell_window_tracker_is_speedwagon_window (window))
     app->running_state->speedwagon_windows--;
