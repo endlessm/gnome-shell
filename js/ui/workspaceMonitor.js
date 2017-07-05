@@ -15,6 +15,9 @@ const WorkspaceMonitor = new Lang.Class({
         this._shellwm.connect('destroy', Lang.bind(this, this._windowDisappearing));
         this._shellwm.connect('destroy-completed', Lang.bind(this, this._updateOverview));
 
+        this._windowTracker = Shell.WindowTracker.get_default();
+        this._windowTracker.connect('tracked-windows-changed', Lang.bind(this, this._updateOverview));
+
         this._metaScreen = global.screen;
         this._metaScreen.connect('in-fullscreen-changed', Lang.bind(this, this._fullscreenChanged));
 
