@@ -29,6 +29,7 @@
  * Copyright Red Hat, Inc. 2006-2008
  */
 
+#define SIDE_COMPONENT_ROLE "eos-side-component"
 #define SPEEDWAGON_ROLE "eos-speedwagon"
 
 #define BUILDER_WINDOW "org.gnome.Builder"
@@ -51,6 +52,9 @@ struct _ShellWindowTracker
 
   /* <MetaWindow * window, ShellApp *app> */
   GHashTable *window_to_app;
+
+  /* <int, ShellApp *app> */
+  GHashTable *launched_pid_to_app;
 
   MetaWindow *coding_app;
 };
@@ -357,6 +361,10 @@ get_app_from_window_pid (ShellWindowTracker  *tracker,
     return NULL;
 
   result = shell_window_tracker_get_app_from_pid (tracker, pid);
+
+  if (result == NULL)
+    result = g_hash_table_lookup (tracker->launched_pid_to_app, GINT_TO_POINTER (pid));
+
   if (result != NULL)
     g_object_ref (result);
 
@@ -379,6 +387,10 @@ get_app_for_window (ShellWindowTracker    *tracker,
   ShellApp *result = NULL;
   MetaWindow *transient_for;
   const char *startup_id;
+
+  /* Side components don't have an associated app */
+  if (g_strcmp0 (meta_window_get_role (window), SIDE_COMPONENT_ROLE) == 0)
+    return NULL;
 
   /* We do want to associate the GNOME Builder window with
    * an open app of a coding session */
@@ -698,6 +710,8 @@ shell_window_tracker_init (ShellWindowTracker *self)
   self->window_to_app = g_hash_table_new_full (g_direct_hash, g_direct_equal,
                                                NULL, (GDestroyNotify) g_object_unref);
 
+  self->launched_pid_to_app = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) g_object_unref);
+
   screen = shell_global_get_screen (shell_global_get ());
 
   g_signal_connect (G_OBJECT (screen), "startup-sequence-changed",
@@ -713,6 +727,7 @@ shell_window_tracker_finalize (GObject *object)
   ShellWindowTracker *self = SHELL_WINDOW_TRACKER (object);
 
   g_hash_table_destroy (self->window_to_app);
+  g_hash_table_destroy (self->launched_pid_to_app);
 
   G_OBJECT_CLASS (shell_window_tracker_parent_class)->finalize(object);
 }
@@ -782,6 +797,39 @@ shell_window_tracker_get_app_from_pid (ShellWindowTracker *tracker,
 }
 
 static void
+on_child_exited (GPid      pid,
+                 gint      status,
+                 gpointer  unused_data)
+{
+  ShellWindowTracker *tracker;
+
+  tracker = shell_window_tracker_get_default ();
+
+  g_hash_table_remove (tracker->launched_pid_to_app, GINT_TO_POINTER((gint)pid));
+}
+
+void
+_shell_window_tracker_add_child_process_app (ShellWindowTracker *tracker,
+                                             GPid                pid,
+                                             ShellApp           *app)
+{
+  gpointer pid_ptr = GINT_TO_POINTER((int)pid);
+
+  if (g_hash_table_lookup (tracker->launched_pid_to_app, pid_ptr))
+    return;
+
+  g_hash_table_insert (tracker->launched_pid_to_app,
+                       pid_ptr,
+                       g_object_ref (app));
+  g_child_watch_add (pid, on_child_exited, NULL);
+  /* TODO: rescan unassociated windows
+   * Unlikely in practice that the launched app gets ahead of us
+   * enough to map an X window before we get scheduled after the fork(),
+   * but adding this note for future reference.
+   */
+}
+
+static void
 set_focus_app (ShellWindowTracker  *tracker,
                ShellApp            *new_focus_app)
 {
@@ -819,6 +867,41 @@ shell_window_tracker_get_startup_sequences (ShellWindowTracker *self)
   ShellGlobal *global = shell_global_get ();
   MetaScreen *screen = shell_global_get_screen (global);
   return meta_screen_get_startup_sequences (screen);
+}
+
+/**
+ * shell_window_tracker_is_window_interesting:
+ *
+ * The ShellWindowTracker associates certain kinds of windows with
+ * applications; however, others we don't want to
+ * appear in places where we want to give a list of windows
+ * for an application, such as the alt-tab dialog.
+ *
+ * An example of a window we don't want to show is the root
+ * desktop window.  We skip all override-redirect types, and also
+ * exclude other window types like tooltip explicitly, though generally
+ * most of these should be override-redirect.
+ * Side component windows are considered interesting so they can be handled
+ * by the window manager.
+ *
+ * Returns: %TRUE iff a window is "interesting"
+ */
+gboolean
+shell_window_tracker_is_window_interesting (MetaWindow *window)
+{
+  if (g_strcmp0 (meta_window_get_role (window), SIDE_COMPONENT_ROLE) == 0)
+    return TRUE;
+
+  if (meta_window_is_skip_taskbar (window))
+    return FALSE;
+
+  /* HACK: see https://github.com/endlessm/eos-shell/issues/548 and
+   * https://github.com/linuxmint/Cinnamon/issues/728
+   */
+  if (g_strcmp0 (meta_window_get_title (window), "JavaEmbeddedFrame") == 0)
+    return FALSE;
+
+  return TRUE;
 }
 
 /**

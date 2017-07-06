@@ -263,11 +263,13 @@ shell_app_get_name (ShellApp *app)
     return g_app_info_get_name (G_APP_INFO (app->info));
   else
     {
-      MetaWindow *window = window_backed_app_get_window (app);
       const char *name = NULL;
-
-      if (window)
-        name = meta_window_get_wm_class (window);
+      if (app->running_state)
+        {
+          MetaWindow *window = window_backed_app_get_window (app);
+          if (window)
+            name = meta_window_get_wm_class (window);
+        }
       if (!name)
         name = C_("program", "Unknown");
       return name;
@@ -1044,6 +1046,15 @@ shell_app_ensure_busy_watch (ShellApp *app)
                                        g_object_ref (app));
 }
 
+static gboolean
+shell_app_is_interesting_window (MetaWindow *window)
+{
+  if (shell_window_tracker_is_speedwagon_window (window))
+    return FALSE;
+
+  return shell_window_tracker_is_window_interesting (window);
+}
+
 void
 _shell_app_add_window (ShellApp        *app,
                        MetaWindow      *window)
@@ -1065,7 +1076,7 @@ _shell_app_add_window (ShellApp        *app,
   shell_app_update_app_menu (app, window);
   shell_app_ensure_busy_watch (app);
 
-  if (!meta_window_is_skip_taskbar (window))
+  if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows++;
   else if (shell_window_tracker_is_speedwagon_window (window))
     app->running_state->speedwagon_windows++;
@@ -1092,20 +1103,18 @@ _shell_app_remove_window (ShellApp   *app,
   g_object_unref (window);
   app->running_state->windows = g_slist_remove (app->running_state->windows, window);
 
-  if (!meta_window_is_skip_taskbar (window))
+  if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows--;
   else if (shell_window_tracker_is_speedwagon_window (window))
     app->running_state->speedwagon_windows--;
 
   if (app->running_state->windows == NULL)
-    {
-      g_clear_pointer (&app->running_state, unref_running_state);
-      shell_app_state_transition (app, SHELL_APP_STATE_STOPPED);
-    }
+    g_clear_pointer (&app->running_state, unref_running_state);
+
+  if (app->running_state == NULL)
+    shell_app_state_transition (app, SHELL_APP_STATE_STOPPED);
   else
-    {
-      shell_app_sync_running_state (app);
-    }
+    shell_app_sync_running_state (app);
 
   g_signal_emit (app, shell_app_signals[WINDOWS_CHANGED], 0);
 }
@@ -1194,7 +1203,7 @@ shell_app_request_quit (ShellApp   *app)
     {
       MetaWindow *win = iter->data;
 
-      if (meta_window_is_skip_taskbar (win))
+      if (!shell_window_tracker_is_window_interesting (win))
         continue;
 
       meta_window_delete (win, shell_global_get_current_time (shell_global_get ()));
@@ -1224,6 +1233,24 @@ app_child_setup (gpointer user_data)
     }
 }
 #endif
+
+static void
+_gather_pid_callback (GDesktopAppInfo   *gapp,
+                      GPid               pid,
+                      gpointer           data)
+{
+  ShellApp *app;
+  ShellWindowTracker *tracker;
+
+  g_return_if_fail (data != NULL);
+
+  app = SHELL_APP (data);
+  tracker = shell_window_tracker_get_default ();
+
+  _shell_window_tracker_add_child_process_app (tracker,
+                                               pid,
+                                               app);
+}
 
 /**
  * shell_app_launch:
@@ -1259,13 +1286,13 @@ shell_app_launch (ShellApp     *app,
 
   ret = g_desktop_app_info_launch_uris_as_manager (app->info, NULL,
                                                    context,
-                                                   G_SPAWN_SEARCH_PATH,
+                                                   G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
 #ifdef HAVE_SYSTEMD
                                                    app_child_setup, (gpointer)shell_app_get_id (app),
 #else
                                                    NULL, NULL,
 #endif
-                                                   NULL, NULL,
+                                                   _gather_pid_callback, app,
                                                    error);
   g_object_unref (context);
 
