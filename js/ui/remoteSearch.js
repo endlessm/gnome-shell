@@ -90,8 +90,9 @@ function loadRemoteSearchProviders(searchSettings, callback) {
                 return;
 
             let appInfo = null;
+            let desktopId = null;
             try {
-                let desktopId = keyfile.get_string(group, 'DesktopId');
+                desktopId = keyfile.get_string(group, 'DesktopId');
                 appInfo = Gio.DesktopAppInfo.new(desktopId);
             } catch (e) {
                 log('Ignoring search provider ' + path + ': missing DesktopId');
@@ -111,11 +112,15 @@ function loadRemoteSearchProviders(searchSettings, callback) {
                 remoteProvider = new RemoteSearchProvider(appInfo, busName, objectPath);
 
             remoteProvider.defaultEnabled = true;
-            try {
-                remoteProvider.defaultEnabled = !keyfile.get_boolean(group, 'DefaultDisabled');
-            } catch(e) {
-                // ignore error
-            }
+
+            // Work around problem with all Endless flatpak apps accidentally
+            // built with "DefaultDisabled=true"
+            if (!desktopId.startsWith('com.endlessm'))
+                try {
+                    remoteProvider.defaultEnabled = !keyfile.get_boolean(group, 'DefaultDisabled')
+                } catch(e) {
+                    // ignore error
+                }
 
             objectPaths[objectPath] = remoteProvider;
             loadedProviders.push(remoteProvider);
