@@ -540,10 +540,6 @@ const AllView = new Lang.Class({
         Main.overview.connect('item-drag-begin', Lang.bind(this, this._onDragBegin));
         Main.overview.connect('item-drag-end', Lang.bind(this, this._onDragEnd));
 
-        Main.overview.connect('hidden', Lang.bind(this,
-            function() {
-                this.goToPage(0);
-            }));
         this._grid.connect('space-opened', Lang.bind(this,
             function() {
                 let fadeEffect = this._scrollView.get_effect('fade');
