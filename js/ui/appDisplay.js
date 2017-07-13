@@ -18,6 +18,7 @@ const AppActivation = imports.ui.appActivation;
 const AppFavorites = imports.ui.appFavorites;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const BoxPointer = imports.ui.boxpointer;
+const CloseButton = imports.ui.closeButton;
 const DND = imports.ui.dnd;
 const EditableLabelMode = imports.ui.editableLabel.EditableLabelMode;
 const GrabHelper = imports.ui.grabHelper;
@@ -2185,7 +2186,7 @@ const AppFolderPopup = new Lang.Class({
         this.actor.add_actor(this._boxPointer.actor);
         this._boxPointer.bin.set_child(this._view.actor);
 
-        this.closeButton = Util.makeCloseButton(this._boxPointer);
+        this.closeButton = CloseButton.makeCloseButton(this._boxPointer);
         this.closeButton.connect('clicked', Lang.bind(this, this.popdown));
         this.actor.add_actor(this.closeButton);
 

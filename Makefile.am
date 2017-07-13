@@ -14,6 +14,8 @@ endif
 EXTRA_DIST =		\
 	.project	\
 	.settings	\
+	jasmine		\
+	jasmine.json	\
 	autogen.sh	\
 	tools/check-for-missing.py
 
@@ -33,3 +35,17 @@ distcheck-hook:
 	@$(srcdir)/tools/check-for-missing.py $(srcdir) $(distdir) $(DIST_EXCLUDE)
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-man
+
+AM_DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-man
+if EOS_ENABLE_COVERAGE
+AM_DISTCHECK_CONFIGURE_FLAGS += --enable-coverage --with-coverage-dir=@EOS_COVERAGE_DIR@
+endif EOS_ENABLE_COVERAGE
+
+AM_CFLAGS = @EOS_COVERAGE_CFLAGS@
+AM_LDFLAGS = @EOS_COVERAGE_LDFLAGS@
+
+coverage-cobertura:
+	$(MAKE) $(AM_MAKEFLAGS) -f tests/Makefile coverage-cobertura
+
+coverage-genhtml:
+	$(MAKE) $(AM_MAKEFLAGS) -f tests/Makefile coverage-genhtml

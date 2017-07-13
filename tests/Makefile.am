@@ -1,6 +1,13 @@
 noinst_SCRIPTS = run-test.sh
 EXTRA_DIST = run-test.sh.in
 
+JS_TESTS = \
+	unit/format_test.js				\
+	unit/insertSorted_test.js			\
+	unit/markup_test.js				\
+	unit/jsParse_test.js				\
+	unit/url_test.js
+
 TEST_JS =					\
 	interactive/background-repeat.js	\
 	interactive/background-size.js		\
@@ -25,21 +32,52 @@ TEST_JS =					\
 	testcommon/200-200.svg			\
 	testcommon/border-image.png		\
 	testcommon/face-plain.png		\
-	testcommon/ui.js                        \
-	unit/insertSorted.js			\
-	unit/markup.js				\
-	unit/jsParse.js				\
-	unit/url.js
+	testcommon/ui.js			\
+	$(JS_TESTS)				\
+	$(NULL)
+
 EXTRA_DIST += $(TEST_JS)
 
 TEST_MISC =					\
 	testcommon/test.css
 EXTRA_DIST += $(TEST_MISC)
 
-run-test.sh: run-test.sh.in
-	$(AM_V_GEN) sed \
-	    -e "s|@MUTTER_TYPELIB_DIR[@]|$(MUTTER_TYPELIB_DIR)|" \
-	    -e "s|@srcdir[@]|$(srcdir)|" \
-	    $< > $@ && chmod a+x $@
+TESTS = \
+  $(JS_TESTS) \
+  run_coverage.coverage \
+  $(NULL)
+TEST_EXTENSIONS = .js .coverage
 
-CLEANFILES = run-test.sh
+@EOS_COVERAGE_RULES@
+
+# Pass resource paths to EOS_JS_COVERAGE_FILES
+EOS_JS_COVERAGE_FILES = $(shell python -c "import xml.etree.ElementTree as ET; import sys; tree = ET.parse(\"$(abspath $(abs_top_srcdir)/js/js-resources.gresource.xml)\"); map(sys.stdout.write, ['resource:///org/gnome/shell/{0}\n'.format(e.text) for e in tree.getroot()[0]])")
+
+JS_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/config/tap-driver.sh
+JS_LOG_DRIVER_FLAGS = --comments
+# run-js-test is a binary that is linked to libgnome-shell and runs a GJS script;
+# libst isn't built as a shared library, so it's impossible to import the St-1.0
+# typelib directly from GJS. Unfortunately, this means we can't run tests by
+# just typing "jasmine" - we need the ./jasmine script.
+JS_LOG_COMPILER = $(top_builddir)/src/run-js-test
+AM_JS_LOG_FLAGS = \
+	$(JASMINE) \
+	--tap \
+	@JASMINE_REPORT_ARGUMENT@
+
+LOG_COMPILER = gtester
+AM_LOG_FLAGS = -k --verbose
+
+# Use locally built versions of Shell-1.0 and libraries; this may need to
+# be changed to AM_TESTS_ENVIRONMENT in a future version of Automake
+TESTS_ENVIRONMENT = \
+	export GJS_PATH='$(top_srcdir):$(top_srcdir)/js:$(top_srcdir)/tests/unit'; \
+	export GI_TYPELIB_PATH='$(top_builddir)/src:$(top_builddir)/src/gvc:$(MUTTER_TYPELIB_DIR):${GI_TYPELIB_PATH}'; \
+	export LD_LIBRARY_PATH='$(top_builddir)/src/:${GI_TYPELIB_PATH}'; \
+	export GSETTINGS_SCHEMA_DIR='$(top_builddir)/data'; \
+	$(NULL)
+
+clean-run-coverage:
+	rm -rf $(abs_top_builddir)/tests/run_coverage.coverage
+
+clean-local: clean-coverage clean-run-coverage

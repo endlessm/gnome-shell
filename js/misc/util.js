@@ -8,7 +8,6 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Json = imports.gi.Json;
-const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Params = imports.misc.params;
 
@@ -88,11 +87,11 @@ function findSearchUrls(terms) {
 //
 // Runs @argv in the background, handling any errors that occur
 // when trying to start the program.
-function spawn(argv) {
+function spawn(argv, errorNotifier) {
     try {
         trySpawn(argv);
     } catch (err) {
-        _handleSpawnError(argv[0], err);
+        _handleSpawnError(argv[0], err, errorNotifier);
     }
 }
 
@@ -101,12 +100,12 @@ function spawn(argv) {
 //
 // Runs @command_line in the background, handling any errors that
 // occur when trying to parse or start the program.
-function spawnCommandLine(command_line) {
+function spawnCommandLine(command_line, errorNotifier) {
     try {
         let [success, argv] = GLib.shell_parse_argv(command_line);
         trySpawn(argv);
     } catch (err) {
-        _handleSpawnError(command_line, err);
+        _handleSpawnError(command_line, err, errorNotifier);
     }
 }
 
@@ -114,7 +113,7 @@ function spawnCommandLine(command_line) {
 // @argv: an argv array
 //
 // Runs @argv as if it was an application, handling startup notification
-function spawnApp(argv) {
+function spawnApp(argv, errorNotifier) {
     try {
         let app = Gio.AppInfo.create_from_commandline(argv.join(' '), null,
                                                       Gio.AppInfoCreateFlags.SUPPORTS_STARTUP_NOTIFICATION);
@@ -122,7 +121,7 @@ function spawnApp(argv) {
         let context = global.create_app_launch_context(0, -1);
         app.launch([], context);
     } catch(err) {
-        _handleSpawnError(argv[0], err);
+        _handleSpawnError(argv[0], err, errorNotifier);
     }
 }
 
@@ -182,9 +181,9 @@ function trySpawnCommandLine(command_line) {
     trySpawn(argv);
 }
 
-function _handleSpawnError(command, err) {
+function _handleSpawnError(command, err, errorNotifier) {
     let title = _("Execution of “%s” failed:").format(command);
-    Main.notifyError(title, err.message);
+    errorNotifier(title, err.message);
 }
 
 function formatTime(time, params) {
@@ -334,59 +333,6 @@ function insertSorted(array, val, cmp) {
     array.splice(pos, 0, val);
 
     return pos;
-}
-
-const CloseButton = new Lang.Class({
-    Name: 'CloseButton',
-    Extends: St.Button,
-
-    _init: function(boxpointer) {
-        this.parent({ style_class: 'notification-close'});
-
-        // This is a bit tricky. St.Bin has its own x-align/y-align properties
-        // that compete with Clutter's properties. This should be fixed for
-        // Clutter 2.0. Since St.Bin doesn't define its own setters, the
-        // setters are a workaround to get Clutter's version.
-        this.set_x_align(Clutter.ActorAlign.END);
-        this.set_y_align(Clutter.ActorAlign.START);
-
-        // XXX Clutter 2.0 workaround: ClutterBinLayout needs expand
-        // to respect the alignments.
-        this.set_x_expand(true);
-        this.set_y_expand(true);
-
-        this._boxPointer = boxpointer;
-        if (boxpointer)
-            this._boxPointer.connect('arrow-side-changed', Lang.bind(this, this._sync));
-    },
-
-    _computeBoxPointerOffset: function() {
-        if (!this._boxPointer || !this._boxPointer.actor.get_stage())
-            return 0;
-
-        let side = this._boxPointer.arrowSide;
-        if (side == St.Side.TOP)
-            return this._boxPointer.getArrowHeight();
-        else
-            return 0;
-    },
-
-    _sync: function() {
-        let themeNode = this.get_theme_node();
-
-        let offY = this._computeBoxPointerOffset();
-        this.translation_x = themeNode.get_length('-shell-close-overlap-x')
-        this.translation_y = themeNode.get_length('-shell-close-overlap-y') + offY;
-    },
-
-    vfunc_style_changed: function() {
-        this._sync();
-        this.parent();
-    },
-});
-
-function makeCloseButton(boxpointer) {
-    return new CloseButton(boxpointer);
 }
 
 function ensureActorVisibleInScrollView(scrollView, actor) {

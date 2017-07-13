@@ -118,7 +118,7 @@ function createSettingsAction(label, device) {
 
     item.connect('activate', function() {
         Util.spawnApp(['gnome-control-center', 'network', 'show-device',
-                       device.get_path()]);
+                       device.get_path()], Main.notifyError);
     });
 
     return item;
@@ -567,7 +567,7 @@ const NMDeviceModem = new Lang.Class({
 
     _autoConnect: function() {
         Util.spawn(['gnome-control-center', 'network',
-                    'connect-3g', this._device.get_path()]);
+                    'connect-3g', this._device.get_path()], Main.notifyError);
     },
 
     destroy: function() {
@@ -942,7 +942,8 @@ const NMWirelessDialog = new Lang.Class({
                 // 802.1x-enabled APs require further configuration, so they're
                 // handled in gnome-control-center
                 Util.spawn(['gnome-control-center', 'network', 'connect-8021x-wifi',
-                            this._device.get_path(), accessPoints[0].dbus_path]);
+                            this._device.get_path(), accessPoints[0].dbus_path],
+                           Main.notifyError);
             } else {
                 let connection = new NetworkManager.Connection();
                 this._client.add_and_activate_connection(connection, this._device, accessPoints[0].dbus_path, null)
@@ -1505,7 +1506,7 @@ const NMVPNSection = new Lang.Class({
         } else {
             let connection = this._connections[0];
             Util.spawnApp(['gnome-control-center', 'network', 'show-device',
-                           connection.get_path()]);
+                           connection.get_path()], Main.notifyError);
         }
     },
 

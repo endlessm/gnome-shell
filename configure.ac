@@ -38,6 +38,9 @@ AC_PATH_PROG([XSLTPROC], [xsltproc])
 
 GLIB_GSETTINGS
 
+AC_REQUIRE_AUX_FILE([tap-driver.sh])
+AC_PATH_PROG([JASMINE], [jasmine])
+
 # Get a value to substitute into gnome-shell.in
 AM_PATH_PYTHON([3])
 AC_SUBST(PYTHON)
@@ -244,6 +247,9 @@ if test -z "$GDBUS_CODEGEN"; then
 fi
 
 AC_PATH_PROG([SASS],[sass],[])
+
+# Enable coverage reporting
+EOS_COVERAGE_REPORT([c js])
 
 AC_CONFIG_FILES([
   Makefile
