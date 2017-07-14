@@ -205,7 +205,7 @@ gnome_shell_CPPFLAGS = \
 # Here, and after, we repeat mutter and bluetooth libraries just for the rpath
 # The dependency is already pulled in by libtool
 gnome_shell_LDADD = libgnome-shell.la $(GNOME_SHELL_LIBS) $(MUTTER_LIBS)
-gnome_shell_LDFLAGS = -rpath $(MUTTER_TYPELIB_DIR)
+gnome_shell_LDFLAGS = -R $(MUTTER_TYPELIB_DIR)
 gnome_shell_DEPENDENCIES = libgnome-shell.la
 
 gnome_shell_extension_prefs_SOURCES = \
@@ -217,7 +217,7 @@ nodist_gnome_shell_extension_prefs_SOURCES = \
 	$(NULL)
 gnome_shell_extension_prefs_CPPFLAGS = $(gnome_shell_cflags)
 gnome_shell_extension_prefs_LDADD = $(GNOME_SHELL_LIBS)
-gnome_shell_extension_prefs_LDFLAGS = -rpath $(MUTTER_TYPELIB_DIR)
+gnome_shell_extension_prefs_LDFLAGS = -R $(MUTTER_TYPELIB_DIR)
 
 if HAVE_NETWORKMANAGER
 
@@ -231,7 +231,7 @@ nodist_gnome_shell_portal_helper_SOURCES = \
 	$(NULL)
 gnome_shell_portal_helper_CPPFLAGS = $(gnome_shell_cflags)
 gnome_shell_portal_helper_LDADD = $(GNOME_SHELL_LIBS)
-gnome_shell_portal_helper_LDFLAGS = -rpath $(MUTTER_TYPELIB_DIR)
+gnome_shell_portal_helper_LDFLAGS = -R $(MUTTER_TYPELIB_DIR)
 
 endif
 
@@ -249,6 +249,7 @@ libeos_shell_fx_la_LIBADD =	\
 
 libeos_shell_fx_la_LDFLAGS =	\
 	-avoid-version		\
+	-R $(MUTTER_TYPELIB_DIR) \
 	$(NULL)
 
 libeos_shell_fx_la_CPPFLAGS =	\
@@ -290,7 +291,7 @@ noinst_PROGRAMS += run-js-test
 
 run_js_test_CPPFLAGS = $(MUTTER_CFLAGS) $(gnome_shell_cflags)
 run_js_test_LDADD = libgnome-shell.la $(GNOME_SHELL_JS_LIBS) $(MUTTER_LIBS)
-run_js_test_LDFLAGS = -export-dynamic -rpath $(MUTTER_TYPELIB_DIR)
+run_js_test_LDFLAGS = -export-dynamic -R $(MUTTER_TYPELIB_DIR)
 
 run_js_test_SOURCES =			\
 	run-js-test.c
@@ -319,7 +320,11 @@ shell-enum-types.c: $(srcdir)/shell-enum-types.c.in stamp-shell-enum-types.h
 	rm -f $(@F).tmp
 EXTRA_DIST += shell-enum-types.c.in
 
-libgnome_shell_ldflags = -avoid-version
+libgnome_shell_ldflags = \
+	-avoid-version \
+	-R $(MUTTER_TYPELIB_DIR) \
+	$(NULL)
+
 libgnome_shell_libadd =		\
 	-lm			\
 	$(GNOME_SHELL_LIBS)	\
