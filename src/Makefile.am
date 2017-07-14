@@ -249,6 +249,7 @@ libeos_shell_fx_la_LIBADD =	\
 
 libeos_shell_fx_la_LDFLAGS =	\
 	-avoid-version		\
+	-R $(MUTTER_TYPELIB_DIR) \
 	$(NULL)
 
 libeos_shell_fx_la_CPPFLAGS =	\
