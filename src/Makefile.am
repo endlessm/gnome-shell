@@ -249,6 +249,7 @@ libeos_shell_fx_la_LIBADD =	\
 
 libeos_shell_fx_la_LDFLAGS =	\
 	-avoid-version		\
+	-R $(MUTTER_TYPELIB_DIR) \
 	$(NULL)
 
 libeos_shell_fx_la_CPPFLAGS =	\
@@ -319,7 +320,7 @@ shell-enum-types.c: $(srcdir)/shell-enum-types.c.in stamp-shell-enum-types.h
 	rm -f $(@F).tmp
 EXTRA_DIST += shell-enum-types.c.in
 
-libgnome_shell_ldflags = -avoid-version
+libgnome_shell_ldflags = -avoid-version -R $(MUTTER_TYPELIB_DIR)
 libgnome_shell_libadd =		\
 	-lm			\
 	$(GNOME_SHELL_LIBS)	\
