@@ -24,6 +24,7 @@ const GrabHelper = imports.ui.grabHelper;
 const IconGrid = imports.ui.iconGrid;
 const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
 const PopupMenu = imports.ui.popupMenu;
@@ -2311,6 +2312,21 @@ const AppFolderPopup = new Lang.Class({
     }
 });
 Signals.addSignalMethods(AppFolderPopup.prototype);
+
+const AppIconSourceActor = new Lang.Class({
+    Name: 'AppIconSourceActor',
+    Extends: MessageTray.SourceActor,
+
+    _init: function(source, size) {
+        this.parent(source, size);
+        this.setIcon(new St.Bin());
+    },
+
+    _shouldShowCount: function() {
+        // Always show the counter when there's at least one notification
+        return this.source.count > 0;
+    }
+});
 
 const AppIcon = new Lang.Class({
     Name: 'AppIcon',
