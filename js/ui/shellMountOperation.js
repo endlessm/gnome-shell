@@ -19,7 +19,7 @@ const Params = imports.misc.params;
 const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
 
-const LIST_ITEM_ICON_SIZE = 48;
+var LIST_ITEM_ICON_SIZE = 48;
 
 const REMEMBER_MOUNT_PASSWORD_KEY = 'remember-mount-password';
 
@@ -565,7 +565,7 @@ const GnomeShellMountOpIface = '<node> \
 </interface> \
 </node>';
 
-const ShellMountOperationType = {
+var ShellMountOperationType = {
     NONE: 0,
     ASK_PASSWORD: 1,
     ASK_QUESTION: 2,

@@ -28,19 +28,19 @@ const PadOsd = imports.ui.padOsd;
 const EdgeDragAction = imports.ui.edgeDragAction;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
-const NO_DEFAULT_MAXIMIZE_KEY = 'no-default-maximize';
-const MINIMIZE_WINDOW_ANIMATION_TIME = 0.25;
-const SHOW_SPEEDWAGON_ANIMATION_TIME = 0.3;
-const SHOW_WINDOW_ANIMATION_TIME = 0.15;
-const DIALOG_SHOW_WINDOW_ANIMATION_TIME = 0.1;
-const DESTROY_WINDOW_ANIMATION_TIME = 0.15;
-const DIALOG_DESTROY_WINDOW_ANIMATION_TIME = 0.1;
-const WINDOW_ANIMATION_TIME = 0.25;
-const DIM_BRIGHTNESS = -0.3;
-const DIM_TIME = 0.500;
-const UNDIM_TIME = 0.250;
+var NO_DEFAULT_MAXIMIZE_KEY = 'no-default-maximize';
+var MINIMIZE_WINDOW_ANIMATION_TIME = 0.25;
+var SHOW_SPEEDWAGON_ANIMATION_TIME = 0.3;
+var SHOW_WINDOW_ANIMATION_TIME = 0.15;
+var DIALOG_SHOW_WINDOW_ANIMATION_TIME = 0.1;
+var DESTROY_WINDOW_ANIMATION_TIME = 0.15;
+var DIALOG_DESTROY_WINDOW_ANIMATION_TIME = 0.1;
+var WINDOW_ANIMATION_TIME = 0.25;
+var DIM_BRIGHTNESS = -0.3;
+var DIM_TIME = 0.500;
+var UNDIM_TIME = 0.250;
 
-const ONE_SECOND = 1000; // in ms
+var ONE_SECOND = 1000; // in ms
 
 const GSD_WACOM_BUS_NAME = 'org.gnome.SettingsDaemon.Wacom';
 const GSD_WACOM_OBJECT_PATH = '/org/gnome/SettingsDaemon/Wacom';
@@ -263,7 +263,7 @@ function getWindowDimmer(actor) {
  * the main window of an application, and give the app a grace period
  * where it can map another window before we remove the workspace.
  */
-const LAST_WINDOW_GRACE_TIME = 1000;
+var LAST_WINDOW_GRACE_TIME = 1000;
 
 var WorkspaceTracker = new Lang.Class({
     Name: 'WorkspaceTracker',

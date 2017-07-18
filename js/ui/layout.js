@@ -20,23 +20,23 @@ const Monitor = imports.ui.monitor;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 
-const STARTUP_ANIMATION_TIME = 0.5;
-const KEYBOARD_ANIMATION_TIME = 0.15;
-const BACKGROUND_FADE_ANIMATION_TIME = 1.0;
+var STARTUP_ANIMATION_TIME = 0.5;
+var KEYBOARD_ANIMATION_TIME = 0.15;
+var BACKGROUND_FADE_ANIMATION_TIME = 1.0;
 
 // Gsettings keys to determine position of hot corner
 // and whether or not it is enabled.
-const HOT_CORNER_ENABLED_KEY = 'hot-corner-enabled';
-const HOT_CORNER_ON_RIGHT_KEY = 'hot-corner-on-right';
-const HOT_CORNER_ON_BOTTOM_KEY = 'hot-corner-on-bottom';
+var HOT_CORNER_ENABLED_KEY = 'hot-corner-enabled';
+var HOT_CORNER_ON_RIGHT_KEY = 'hot-corner-on-right';
+var HOT_CORNER_ON_BOTTOM_KEY = 'hot-corner-on-bottom';
 
 // Gsettings key for the size of the hot corner target.
 // When using a VirtualBox VM, may need to set to at least 3 pixels,
 // since the VM may "steal" two rows from the guest OS display.
-const HOT_CORNER_SIZE_KEY = 'hot-corner-size';
+var HOT_CORNER_SIZE_KEY = 'hot-corner-size';
 
-const HOT_CORNER_PRESSURE_THRESHOLD = 100; // pixels
-const HOT_CORNER_PRESSURE_TIMEOUT = 1000; // ms
+var HOT_CORNER_PRESSURE_THRESHOLD = 100; // pixels
+var HOT_CORNER_PRESSURE_TIMEOUT = 1000; // ms
 
 function isPopupMetaWindow(actor) {
     switch(actor.meta_window.get_window_type()) {

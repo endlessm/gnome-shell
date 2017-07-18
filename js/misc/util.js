@@ -15,7 +15,7 @@ const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Params = imports.misc.params;
 
-const SCROLL_TIME = 0.1;
+var SCROLL_TIME = 0.1;
 
 const FALLBACK_BROWSER_ID = 'chromium-browser.desktop';
 const GOOGLE_CHROME_ID = 'google-chrome.desktop';

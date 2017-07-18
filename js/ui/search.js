@@ -23,9 +23,9 @@ const Util = imports.misc.util;
 
 const SEARCH_PROVIDERS_SCHEMA = 'org.gnome.desktop.search-providers';
 
-const MAX_LIST_SEARCH_RESULTS_ROWS = 3;
-const MAX_GRID_SEARCH_RESULTS_ROWS = 1;
-const MAX_GRID_SEARCH_RESULTS_COLS = 8;
+var MAX_LIST_SEARCH_RESULTS_ROWS = 3;
+var MAX_GRID_SEARCH_RESULTS_ROWS = 1;
+var MAX_GRID_SEARCH_RESULTS_COLS = 8;
 
 var MaxWidthBin = new Lang.Class({
     Name: 'MaxWidthBin',

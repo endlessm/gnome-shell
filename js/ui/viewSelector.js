@@ -28,7 +28,7 @@ const EdgeDragAction = imports.ui.edgeDragAction;
 const IconGrid = imports.ui.iconGrid;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
-const PINCH_GESTURE_THRESHOLD = 0.7;
+var PINCH_GESTURE_THRESHOLD = 0.7;
 
 const SEARCH_ACTIVATION_TIMEOUT = 50;
 const SEARCH_METRIC_INACTIVITY_TIMEOUT_SECONDS = 3;
@@ -45,7 +45,7 @@ const DesktopSearchProvider = {
     MY_COMPUTER: 0,
 };
 
-const ViewPage = {
+var ViewPage = {
     WINDOWS: 1,
     APPS: 2
 };
