@@ -52,7 +52,7 @@ const EOS_ACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_ACTIVE_GRID_OPACITY;
 const EOS_INACTIVE_GRID_SATURATION = imports.ui.appDisplay.EOS_INACTIVE_GRID_SATURATION;
 const EOS_ACTIVE_GRID_SATURATION = imports.ui.appDisplay.EOS_ACTIVE_GRID_SATURATION;
 
-const ShellInfo = new Lang.Class({
+var ShellInfo = new Lang.Class({
     Name: 'ShellInfo',
 
     _init: function() {
@@ -121,7 +121,7 @@ const ShellInfo = new Lang.Class({
     }
 });
 
-const NoWindowsDialog = new Lang.Class({
+var NoWindowsDialog = new Lang.Class({
     Name: 'NoWindowsDialog',
     Extends: ModalDialog.ModalDialog,
 
@@ -170,7 +170,7 @@ const NoWindowsDialog = new Lang.Class({
     },
 });
 
-const Overview = new Lang.Class({
+var Overview = new Lang.Class({
     Name: 'Overview',
 
     _init: function() {

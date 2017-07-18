@@ -30,7 +30,7 @@ const State = {
     FADED_OUT: 4
 };
 
-const ModalDialog = new Lang.Class({
+var ModalDialog = new Lang.Class({
     Name: 'ModalDialog',
 
     _init: function(params) {

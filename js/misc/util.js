@@ -416,7 +416,7 @@ function insertSorted(array, val, cmp) {
     return pos;
 }
 
-const CloseButton = new Lang.Class({
+var CloseButton = new Lang.Class({
     Name: 'CloseButton',
     Extends: St.Button,
 
@@ -591,7 +591,7 @@ function getSearchEngineName() {
     return null;
 }
 
-const AppSettingsMonitor = new Lang.Class({
+var AppSettingsMonitor = new Lang.Class({
     Name: 'AppSettingsMonitor',
 
     _init: function(appId, schemaId) {

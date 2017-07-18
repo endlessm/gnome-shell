@@ -181,7 +181,7 @@ function checkForUpdates() {
     });
 }
 
-const InstallExtensionDialog = new Lang.Class({
+var InstallExtensionDialog = new Lang.Class({
     Name: 'InstallExtensionDialog',
     Extends: ModalDialog.ModalDialog,
 

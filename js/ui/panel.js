@@ -86,7 +86,7 @@ function _unpremultiply(color) {
  * this menu also handles startup notification for it.  So when we
  * have an active startup notification, we switch modes to display that.
  */
-const AppMenuButton = new Lang.Class({
+var AppMenuButton = new Lang.Class({
     Name: 'AppMenuButton',
     Extends: PanelMenu.Button,
 
@@ -402,7 +402,7 @@ const AppMenuButton = new Lang.Class({
 
 Signals.addSignalMethods(AppMenuButton.prototype);
 
-const ActivitiesButton = new Lang.Class({
+var ActivitiesButton = new Lang.Class({
     Name: 'ActivitiesButton',
     Extends: PanelMenu.Button,
 
@@ -490,7 +490,7 @@ const ActivitiesButton = new Lang.Class({
     }
 });
 
-const PanelCorner = new Lang.Class({
+var PanelCorner = new Lang.Class({
     Name: 'PanelCorner',
 
     _init: function(side) {
@@ -657,7 +657,7 @@ const PanelCorner = new Lang.Class({
     }
 });
 
-const AggregateLayout = new Lang.Class({
+var AggregateLayout = new Lang.Class({
     Name: 'AggregateLayout',
     Extends: Clutter.BoxLayout,
 
@@ -690,7 +690,7 @@ const AggregateLayout = new Lang.Class({
     }
 });
 
-const AggregateMenu = new Lang.Class({
+var AggregateMenu = new Lang.Class({
     Name: 'AggregateMenu',
     Extends: PanelMenu.Button,
 
@@ -846,7 +846,7 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'userMenu': UserMenu,
 };
 
-const Panel = new Lang.Class({
+var Panel = new Lang.Class({
     Name: 'Panel',
 
     _init : function() {

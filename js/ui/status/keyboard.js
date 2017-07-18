@@ -28,7 +28,7 @@ const InputSourceManagerIface = '<node> \
 </interface> \
 </node>';
 
-const LayoutMenuItem = new Lang.Class({
+var LayoutMenuItem = new Lang.Class({
     Name: 'LayoutMenuItem',
     Extends: PopupMenu.PopupBaseMenuItem,
 
@@ -43,7 +43,7 @@ const LayoutMenuItem = new Lang.Class({
     }
 });
 
-const InputSource = new Lang.Class({
+var InputSource = new Lang.Class({
     Name: 'InputSource',
 
     _init: function(type, id, displayName, shortName, index) {
@@ -84,7 +84,7 @@ const InputSource = new Lang.Class({
 });
 Signals.addSignalMethods(InputSource.prototype);
 
-const InputSourcePopup = new Lang.Class({
+var InputSourcePopup = new Lang.Class({
     Name: 'InputSourcePopup',
     Extends: SwitcherPopup.SwitcherPopup,
 
@@ -119,7 +119,7 @@ const InputSourcePopup = new Lang.Class({
     },
 });
 
-const InputSourceSwitcher = new Lang.Class({
+var InputSourceSwitcher = new Lang.Class({
     Name: 'InputSourceSwitcher',
     Extends: SwitcherPopup.SwitcherList,
 
@@ -145,7 +145,7 @@ const InputSourceSwitcher = new Lang.Class({
     }
 });
 
-const InputSourceSettings = new Lang.Class({
+var InputSourceSettings = new Lang.Class({
     Name: 'InputSourceSettings',
     Abstract: true,
 
@@ -183,7 +183,7 @@ const InputSourceSettings = new Lang.Class({
 });
 Signals.addSignalMethods(InputSourceSettings.prototype);
 
-const InputSourceSystemSettings = new Lang.Class({
+var InputSourceSystemSettings = new Lang.Class({
     Name: 'InputSourceSystemSettings',
     Extends: InputSourceSettings,
 
@@ -259,7 +259,7 @@ const InputSourceSystemSettings = new Lang.Class({
     }
 });
 
-const InputSourceSessionSettings = new Lang.Class({
+var InputSourceSessionSettings = new Lang.Class({
     Name: 'InputSourceSessionSettings',
     Extends: InputSourceSettings,
 
@@ -310,7 +310,7 @@ const InputSourceSessionSettings = new Lang.Class({
     }
 });
 
-const InputSourceManager = new Lang.Class({
+var InputSourceManager = new Lang.Class({
     Name: 'InputSourceManager',
 
     _init: function() {
@@ -827,7 +827,7 @@ function getInputSourceManager() {
     return _inputSourceManager;
 }
 
-const InputSourceIndicator = new Lang.Class({
+var InputSourceIndicator = new Lang.Class({
     Name: 'InputSourceIndicator',
     Extends: PanelMenu.Button,
 

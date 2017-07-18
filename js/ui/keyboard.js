@@ -61,7 +61,7 @@ const CaribouDaemonIface = '<node> \
 
 const CaribouDaemonProxy = Gio.DBusProxy.makeProxyWrapper(CaribouDaemonIface);
 
-const Key = new Lang.Class({
+var Key = new Lang.Class({
     Name: 'Key',
 
     _init : function(key) {
@@ -187,7 +187,7 @@ const Key = new Lang.Class({
 });
 Signals.addSignalMethods(Key.prototype);
 
-const Keyboard = new Lang.Class({
+var Keyboard = new Lang.Class({
     // HACK: we can't set Name, because it collides with Name dbus property
     // Name: 'Keyboard',
 
@@ -733,7 +733,7 @@ const Keyboard = new Lang.Class({
     }
 });
 
-const KeyboardSource = new Lang.Class({
+var KeyboardSource = new Lang.Class({
     Name: 'KeyboardSource',
     Extends: MessageTray.Source,
 
@@ -754,7 +754,7 @@ const KeyboardSource = new Lang.Class({
     }
 });
 
-const ShellWaylandAdapter = new Lang.Class({
+var ShellWaylandAdapter = new Lang.Class({
     Name: 'ShellWaylandAdapter',
     Extends: Caribou.XAdapter,
 

@@ -60,7 +60,7 @@ const CursorLocation = {
     EMPTY_AREA: 4
 }
 
-const BaseIcon = new Lang.Class({
+var BaseIcon = new Lang.Class({
     Name: 'BaseIcon',
 
     _init : function(label, params) {
@@ -322,7 +322,7 @@ function zoomOutActor(actor) {
                     });
 }
 
-const IconGrid = new Lang.Class({
+var IconGrid = new Lang.Class({
     Name: 'IconGrid',
 
     _init: function(params) {
@@ -946,7 +946,7 @@ const IconGrid = new Lang.Class({
 });
 Signals.addSignalMethods(IconGrid.prototype);
 
-const PaginatedIconGrid = new Lang.Class({
+var PaginatedIconGrid = new Lang.Class({
     Name: 'PaginatedIconGrid',
     Extends: IconGrid,
 

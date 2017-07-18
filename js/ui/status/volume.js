@@ -26,7 +26,7 @@ function getMixerControl() {
     return _mixerControl;
 }
 
-const StreamSlider = new Lang.Class({
+var StreamSlider = new Lang.Class({
     Name: 'StreamSlider',
 
     _init: function(control) {
@@ -153,7 +153,7 @@ const StreamSlider = new Lang.Class({
 });
 Signals.addSignalMethods(StreamSlider.prototype);
 
-const OutputStreamSlider = new Lang.Class({
+var OutputStreamSlider = new Lang.Class({
     Name: 'OutputStreamSlider',
     Extends: StreamSlider,
 
@@ -204,7 +204,7 @@ const OutputStreamSlider = new Lang.Class({
     }
 });
 
-const InputStreamSlider = new Lang.Class({
+var InputStreamSlider = new Lang.Class({
     Name: 'InputStreamSlider',
     Extends: StreamSlider,
 
@@ -247,7 +247,7 @@ const InputStreamSlider = new Lang.Class({
     }
 });
 
-const VolumeMenu = new Lang.Class({
+var VolumeMenu = new Lang.Class({
     Name: 'VolumeMenu',
     Extends: PopupMenu.PopupMenuSection,
 
@@ -301,7 +301,7 @@ const VolumeMenu = new Lang.Class({
     }
 });
 
-const Indicator = new Lang.Class({
+var Indicator = new Lang.Class({
     Name: 'VolumeIndicator',
     Extends: PanelMenu.SystemIndicator,
 

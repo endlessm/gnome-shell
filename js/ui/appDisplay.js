@@ -144,7 +144,7 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-const BaseAppView = new Lang.Class({
+var BaseAppView = new Lang.Class({
     Name: 'BaseAppView',
     Abstract: true,
 
@@ -467,7 +467,7 @@ const BaseAppView = new Lang.Class({
 });
 Signals.addSignalMethods(BaseAppView.prototype);
 
-const PageIndicatorsActor = new Lang.Class({
+var PageIndicatorsActor = new Lang.Class({
     Name:'PageIndicatorsActor',
     Extends: St.BoxLayout,
 
@@ -491,7 +491,7 @@ const PageIndicatorsActor = new Lang.Class({
     }
 });
 
-const PageIndicators = new Lang.Class({
+var PageIndicators = new Lang.Class({
     Name:'PageIndicators',
 
     _init: function() {
@@ -584,7 +584,7 @@ const PageIndicators = new Lang.Class({
 });
 Signals.addSignalMethods(PageIndicators.prototype);
 
-const AllViewContainer = new Lang.Class({
+var AllViewContainer = new Lang.Class({
     Name: 'AllViewContainer',
     Extends: St.Widget,
 
@@ -624,7 +624,7 @@ const AllViewContainer = new Lang.Class({
     }
 });
 
-const AllView = new Lang.Class({
+var AllView = new Lang.Class({
     Name: 'AllView',
     Extends: BaseAppView,
 
@@ -1382,7 +1382,7 @@ const AllView = new Lang.Class({
 });
 Signals.addSignalMethods(AllView.prototype);
 
-const FrequentView = new Lang.Class({
+var FrequentView = new Lang.Class({
     Name: 'FrequentView',
     Extends: BaseAppView,
 
@@ -1453,7 +1453,7 @@ const Views = {
     ALL: 0
 };
 
-const ControlsBoxLayout = Lang.Class({
+var ControlsBoxLayout = Lang.Class({
     Name: 'ControlsBoxLayout',
     Extends: Clutter.BoxLayout,
 
@@ -1478,7 +1478,7 @@ const ControlsBoxLayout = Lang.Class({
     }
 });
 
-const AppDisplay = new Lang.Class({
+var AppDisplay = new Lang.Class({
     Name: 'AppDisplay',
 
     _init: function() {
@@ -1520,7 +1520,7 @@ const AppDisplay = new Lang.Class({
     }
 })
 
-const AppSearchProvider = new Lang.Class({
+var AppSearchProvider = new Lang.Class({
     Name: 'AppSearchProvider',
 
     _init: function() {
@@ -1659,7 +1659,7 @@ const AppSearchProvider = new Lang.Class({
     }
 });
 
-const FolderView = new Lang.Class({
+var FolderView = new Lang.Class({
     Name: 'FolderView',
     Extends: BaseAppView,
 
@@ -2235,7 +2235,7 @@ const ViewIcon = new Lang.Class({
     }
 });
 
-const FolderIcon = new Lang.Class({
+var FolderIcon = new Lang.Class({
     Name: 'FolderIcon',
     Extends: ViewIcon,
 
@@ -2435,7 +2435,7 @@ const FolderIcon = new Lang.Class({
 });
 Signals.addSignalMethods(FolderIcon.prototype);
 
-const AppFolderPopup = new Lang.Class({
+var AppFolderPopup = new Lang.Class({
     Name: 'AppFolderPopup',
 
     _init: function(source, side) {
@@ -2596,7 +2596,7 @@ const AppFolderPopup = new Lang.Class({
 });
 Signals.addSignalMethods(AppFolderPopup.prototype);
 
-const AppIconSourceActor = new Lang.Class({
+var AppIconSourceActor = new Lang.Class({
     Name: 'AppIconSourceActor',
     Extends: MessageTray.SourceActor,
 
@@ -2611,7 +2611,7 @@ const AppIconSourceActor = new Lang.Class({
     }
 });
 
-const AppIcon = new Lang.Class({
+var AppIcon = new Lang.Class({
     Name: 'AppIcon',
     Extends: ViewIcon,
 
@@ -2844,7 +2844,7 @@ const AppCenterIconState = {
     FULL_TRASH: ViewIconState.NUM_STATES + 1
 };
 
-const AppCenterIcon = new Lang.Class({
+var AppCenterIcon = new Lang.Class({
     Name: 'AppCenterIcon',
     Extends: AppIcon,
 

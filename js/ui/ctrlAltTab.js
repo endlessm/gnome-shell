@@ -21,7 +21,7 @@ const SortGroup = {
     BOTTOM: 2
 };
 
-const CtrlAltTabManager = new Lang.Class({
+var CtrlAltTabManager = new Lang.Class({
     Name: 'CtrlAltTabManager',
 
     _init: function() {
@@ -137,7 +137,7 @@ const CtrlAltTabManager = new Lang.Class({
     }
 });
 
-const CtrlAltTabPopup = new Lang.Class({
+var CtrlAltTabPopup = new Lang.Class({
     Name: 'CtrlAltTabPopup',
     Extends: SwitcherPopup.SwitcherPopup,
 
@@ -168,7 +168,7 @@ const CtrlAltTabPopup = new Lang.Class({
     },
 });
 
-const CtrlAltTabSwitcher = new Lang.Class({
+var CtrlAltTabSwitcher = new Lang.Class({
     Name: 'CtrlAltTabSwitcher',
     Extends: SwitcherPopup.SwitcherList,
 

@@ -63,7 +63,7 @@ var AgentIface = '<node> \
   </interface> \
 </node>';
 
-const Indicator = new Lang.Class({
+var Indicator = new Lang.Class({
     Name: 'LocationIndicator',
     Extends: PanelMenu.SystemIndicator,
 
@@ -251,7 +251,7 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-const AppAuthorizer = new Lang.Class({
+var AppAuthorizer = new Lang.Class({
     Name: 'LocationAppAuthorizer',
 
     _init: function(desktopId,
@@ -373,7 +373,7 @@ const AppAuthorizer = new Lang.Class({
     },
 });
 
-const GeolocationDialog = new Lang.Class({
+var GeolocationDialog = new Lang.Class({
     Name: 'GeolocationDialog',
     Extends: ModalDialog.ModalDialog,
 
