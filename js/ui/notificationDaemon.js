@@ -6,8 +6,9 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
-const Shell = imports.gi.Shell;
 const Mainloop = imports.mainloop;
+const Shell = imports.gi.Shell;
+const Signals = imports.signals;
 const St = imports.gi.St;
 
 const Config = imports.misc.config;
@@ -667,7 +668,7 @@ const FdoApplicationIface = '<node> \
 const FdoApplicationProxy = Gio.DBusProxy.makeProxyWrapper(FdoApplicationIface);
 
 function objectPathFromAppId(appId) {
-    return '/' + appId.replace(/\./g, '/');
+    return '/' + appId.replace(/\./g, '/').replace(/-/g, '_');
 }
 
 function getPlatformData() {
@@ -684,12 +685,15 @@ const GtkNotificationDaemonAppSource = new Lang.Class({
     _init: function(appId) {
         this._appId = appId;
         this._objectPath = objectPathFromAppId(appId);
+        if (!GLib.Variant.is_object_path(this._objectPath))
+            throw new InvalidAppError();
 
         this._app = Shell.AppSystem.get_default().lookup_app(appId + '.desktop');
         if (!this._app)
             throw new InvalidAppError();
 
         this._notifications = {};
+        this._notificationsDestroyIds = {};
         this._notificationPending = false;
 
         this.parent(this._app.get_name());
@@ -726,12 +730,13 @@ const GtkNotificationDaemonAppSource = new Lang.Class({
     addNotification: function(notificationId, notificationParams, showBanner) {
         this._notificationPending = true;
 
-        if (this._notifications[notificationId])
-            this._notifications[notificationId].destroy();
+        let oldNotification = this._notifications[notificationId];
+        let oldNotificationDestroyId = this._notificationsDestroyIds[notificationId]
 
         let notification = new GtkNotificationDaemonNotification(this, notificationParams);
-        notification.connect('destroy', Lang.bind(this, function() {
+        this._notificationsDestroyIds[notificationId] = notification.connect('destroy', Lang.bind(this, function() {
             delete this._notifications[notificationId];
+            delete this._notificationsDestroyIds[notificationId];
         }));
         this._notifications[notificationId] = notification;
 
@@ -739,6 +744,11 @@ const GtkNotificationDaemonAppSource = new Lang.Class({
             this.notify(notification);
         else
             this.pushNotification(notification);
+
+        if (oldNotification) {
+            oldNotification.disconnect(oldNotificationDestroyId);
+            oldNotification.destroy();
+        }
 
         this._notificationPending = false;
     },
@@ -762,6 +772,10 @@ const GtkNotificationDaemonAppSource = new Lang.Class({
         }
         return [this._appId, notifications];
     },
+
+    get app() {
+        return this._app;
+    }
 });
 
 const GtkNotificationsIface = '<node> \
@@ -805,6 +819,7 @@ const GtkNotificationDaemon = new Lang.Class({
         source.connect('count-updated', Lang.bind(this, this._saveNotifications));
         Main.messageTray.add(source);
         this._sources[appId] = source;
+        this.emit('new-gtk-notification-source', source);
         return source;
     },
 
@@ -871,7 +886,16 @@ const GtkNotificationDaemon = new Lang.Class({
 
         invocation.return_value(null);
     },
+
+    getSourceFor: function(appId) {
+        if (this._sources[appId]) {
+            return this._sources[appId];
+        }
+        return null;
+    },
+
 });
+Signals.addSignalMethods(GtkNotificationDaemon.prototype);
 
 const NotificationDaemon = new Lang.Class({
     Name: 'NotificationDaemon',
@@ -880,4 +904,13 @@ const NotificationDaemon = new Lang.Class({
         this._fdoNotificationDaemon = new FdoNotificationDaemon();
         this._gtkNotificationDaemon = new GtkNotificationDaemon();
     },
+
+    get fdo() {
+        return this._fdoNotificationDaemon;
+    },
+
+    get gtk() {
+        return this._gtkNotificationDaemon;
+    },
+
 });
