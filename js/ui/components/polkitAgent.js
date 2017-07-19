@@ -118,7 +118,6 @@ var AuthenticationDialog = new Lang.Class({
 
         this._passwordBox.add(this._workSpinner.actor);
 
-        this.setInitialKeyFocus(this._passwordEntry);
         this._passwordBox.hide();
 
         this._errorMessageLabel = new St.Label({ style_class: 'prompt-dialog-error-label' });
