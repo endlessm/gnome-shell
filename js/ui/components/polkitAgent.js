@@ -106,7 +106,6 @@ var AuthenticationDialog = class extends ModalDialog.ModalDialog {
         this._workSpinner = new Animation.Spinner(WORK_SPINNER_ICON_SIZE, true);
         this._passwordBox.add(this._workSpinner.actor);
 
-        this.setInitialKeyFocus(this._passwordEntry);
         this._passwordBox.hide();
 
         this._errorMessageLabel = new St.Label({ style_class: 'prompt-dialog-error-label' });
