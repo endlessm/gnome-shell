@@ -18,13 +18,19 @@ function maybeCreateInactiveButton() {
     return null;
 }
 
+const DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD = 1024;
+
+function _primaryMonitorWidthPassesThreshold() {
+    return Main.layoutManager.primaryMonitor.width >= DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD;
+}
+
 function _checkIfDiscoveryFeedEnabled() {
     let supportedLanguages = global.settings.get_value('discovery-feed-languages').deep_unpack();
     let systemLanguages = GLib.get_language_names();
 
     let isEnabled = supportedLanguages.some(function(lang) {
         return systemLanguages.indexOf(lang) !== -1;
-    });
+    }) && _primaryMonitorWidthPassesThreshold();
 
     return isEnabled;
 }
