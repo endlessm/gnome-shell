@@ -1954,9 +1954,6 @@ const FolderIcon = new Lang.Class({
         this.actor.add_style_class_name('app-folder');
         this.actor.set_child(this.icon.actor);
 
-        // whether we need to update arrow side, position etc.
-        this._popupInvalidated = false;
-
         this.canDrop = true;
 
         this.view = new FolderView(this, this._dirInfo);
@@ -2101,23 +2098,30 @@ const FolderIcon = new Lang.Class({
     },
 
     _ensurePopup: function() {
-        if (this._popup && !this._popupInvalidated)
-            return;
         this._boxPointerArrowside = this._calculateBoxPointerArrowSide();
-        if (!this._popup) {
-            this._popup = new AppFolderPopup(this, this._boxPointerArrowside);
-            this._parentView.addFolderPopup(this._popup);
-            this._popup.connect('open-state-changed', Lang.bind(this,
-                function(popup, isOpen) {
-                    if (!isOpen)
-                        this.actor.checked = false;
-                }));
-        } else {
-            this._popup.updateArrowSide(this._boxPointerArrowside);
+
+        // FIXME: This is a terrible hack to workaround a problem with the popup's
+        // arrow, that gets misplaced when the popup has been created and hidden
+        // before for some reason. To avoid that for now, we always create a new
+        // popup here, and for that we first need to make sure that the FolderView's
+        // actor associated to it gets explicitly "orphaned" before creating the
+        // AppFolderPopup, not to see an open folder otherwise.
+        if (this._popup) {
+            let folderViewParent = this.view.actor.get_parent();
+            if (folderViewParent)
+                folderViewParent.remove_child (this.view.actor);
         }
+
+        this._popup = new AppFolderPopup(this, this._boxPointerArrowside);
+        this._parentView.addFolderPopup(this._popup);
+        this._popup.connect('open-state-changed', Lang.bind(this,
+            function(popup, isOpen) {
+                if (!isOpen)
+                    this.actor.checked = false;
+            }));
+
         this._updatePopupSize();
         this._updatePopupPosition();
-        this._popupInvalidated = false;
     },
 
     adaptToSize: function(width, height) {
@@ -2125,7 +2129,6 @@ const FolderIcon = new Lang.Class({
         this._parentAvailableHeight = height;
         if(this._popup)
             this.view.adaptToSize(width, height);
-        this._popupInvalidated = true;
     },
 
     canDragOver: function(dest) {
