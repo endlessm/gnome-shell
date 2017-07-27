@@ -39,24 +39,41 @@ const EndlessButton = new Lang.Class({
             this._labelOffsetY = this._label.get_theme_node().get_length('-label-offset-y');
         }));
 
-        let pageChangedId = Main.overview.connect('page-changed', Lang.bind(this, this._updateHoverLabel));
+        let pageChangedId = Main.overview.connect('page-changed', Lang.bind(this, this._onOverviewPageChanged));
+        let showingId = Main.overview.connect('showing', Lang.bind(this, this._onOverviewShowing));
+        let hidingId = Main.overview.connect('hiding', Lang.bind(this, this._onOverviewHiding));
 
         this.actor.connect('destroy', Lang.bind(this, function() {
             Main.overview.disconnect(pageChangedId);
+            Main.overview.disconnect(showingId);
+            Main.overview.disconnect(hidingId);
         }));
 
-        this._updateHoverLabel();
+        this._updateHoverLabel(false);
     },
 
-    _updateHoverLabel: function() {
+    _updateHoverLabel: function(hiding) {
         let viewSelector = Main.overview.viewSelector;
         let newText = _("Show Desktop");
 
-        if (viewSelector &&
+        if (!hiding &&
+            viewSelector &&
             viewSelector.getActivePage() === ViewSelector.ViewPage.APPS)
             newText = _("Show Apps");
 
         this._label.text = newText;
+    },
+
+    _onOverviewPageChanged: function() {
+        this._updateHoverLabel(false);
+    },
+
+    _onOverviewShowing: function() {
+        this._updateHoverLabel(false);
+    },
+
+    _onOverviewHiding: function() {
+        this._updateHoverLabel(true);
     },
 
     // overrides default implementation from PanelMenu.Button
