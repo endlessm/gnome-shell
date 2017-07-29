@@ -102,7 +102,7 @@ const EndlessButton = new Lang.Class({
             // Update the tooltip position
             let monitor = Main.layoutManager.findMonitorForActor(this._label);
             let iconMidpoint = this.actor.get_transformed_position()[0] + this.actor.width / 2;
-            this._label.translation_x = Math.floor(iconMidpoint - this._label.width / 2) + monitor.x + this._labelOffsetX;
+            this._label.translation_x = Math.floor(iconMidpoint - this._label.width / 2) + this._labelOffsetX;
             this._label.translation_y = Math.floor(this.actor.get_transformed_position()[1] - this._labelOffsetY);
 
             // Clip left edge to be the left edge of the screen
