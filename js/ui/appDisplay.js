@@ -1626,12 +1626,6 @@ const FolderView = new Lang.Class({
 
     getViewId: function() {
         return this._folderIcon.getId();
-    },
-
-    canDropAt: function(x, y, canDropPastEnd) {
-        // FIXME: Temporarily disable dragging elements around inside a
-        // folder, as it's causing the GrabHelper to crash for some reason.
-        return [-1, IconGrid.CursorLocation.DEFAULT];
     }
 });
 
