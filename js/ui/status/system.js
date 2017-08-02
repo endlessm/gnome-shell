@@ -2,28 +2,18 @@
 
 const AccountsService = imports.gi.AccountsService;
 const Clutter = imports.gi.Clutter;
-const Gdm = imports.gi.Gdm;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
-const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
+const GObject = imports.gi.GObject;
 
 const BoxPointer = imports.ui.boxpointer;
-const GnomeSession = imports.misc.gnomeSession;
-const LoginManager = imports.misc.loginManager;
+const SystemActions = imports.misc.systemActions;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-
-const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
-const LOGIN_SCREEN_SCHEMA = 'org.gnome.login-screen';
-const DISABLE_USER_SWITCH_KEY = 'disable-user-switching';
-const DISABLE_LOCK_SCREEN_KEY = 'disable-lock-screen';
-const DISABLE_LOG_OUT_KEY = 'disable-log-out';
-const DISABLE_RESTART_KEY = 'disable-restart-buttons';
-const ALWAYS_SHOW_LOG_OUT_KEY = 'always-show-log-out';
 
 const AltSwitcher = new Lang.Class({
     Name: 'AltSwitcher',
@@ -151,40 +141,17 @@ const Indicator = new Lang.Class({
     _init: function() {
         this.parent();
 
-        this._loginScreenSettings = new Gio.Settings({ schema_id: LOGIN_SCREEN_SCHEMA });
-        this._lockdownSettings = new Gio.Settings({ schema_id: LOCKDOWN_SCHEMA });
+        let userManager = AccountsService.UserManager.get_default();
+        this._user = userManager.get_user(GLib.get_user_name());
 
-        this._session = new GnomeSession.SessionManager();
-        this._loginManager = LoginManager.getLoginManager();
-        this._monitorManager = Meta.MonitorManager.get();
-        this._haveShutdown = true;
-        this._haveSuspend = true;
-
-        this._userManager = AccountsService.UserManager.get_default();
-        this._user = this._userManager.get_user(GLib.get_user_name());
+        this._systemActions = new SystemActions.getDefault();
 
         this._createSubMenu();
 
-        this._userManager.connect('notify::is-loaded',
-                                  Lang.bind(this, this._updateMultiUser));
-        this._userManager.connect('notify::has-multiple-users',
-                                  Lang.bind(this, this._updateMultiUser));
-        this._userManager.connect('user-added',
-                                  Lang.bind(this, this._updateMultiUser));
-        this._userManager.connect('user-removed',
-                                  Lang.bind(this, this._updateMultiUser));
-        this._lockdownSettings.connect('changed::' + DISABLE_USER_SWITCH_KEY,
-                                       Lang.bind(this, this._updateMultiUser));
-        this._lockdownSettings.connect('changed::' + DISABLE_LOG_OUT_KEY,
-                                       Lang.bind(this, this._updateMultiUser));
-        this._lockdownSettings.connect('changed::' + DISABLE_LOCK_SCREEN_KEY,
-                                       Lang.bind(this, this._updateLockScreen));
-        global.settings.connect('changed::' + ALWAYS_SHOW_LOG_OUT_KEY,
-                                Lang.bind(this, this._updateMultiUser));
-        this._updateSwitchUser();
-        this._updateMultiUser();
-        this._updateLockScreen();
-
+        this._loginScreenItem.actor.connect('notify::visible',
+                                            () => { this._updateMultiUser(); });
+        this._logoutItem.actor.connect('notify::visible',
+                                       () => { this._updateMultiUser(); });
         // Whether shutdown is available or not depends on both lockdown
         // settings (disable-log-out) and Polkit policy - the latter doesn't
         // notify, so we update the menu item each time the menu opens or
@@ -194,14 +161,10 @@ const Indicator = new Lang.Class({
                 if (!open)
                     return;
 
-                this._updateHaveShutdown();
-                this._updateHaveSuspend();
+                this._systemActions.forceUpdate();
             }));
-        this._lockdownSettings.connect('changed::' + DISABLE_LOG_OUT_KEY,
-                                       Lang.bind(this, this._updateHaveShutdown));
 
-        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
-        this._sessionUpdated();
+        this._updateMultiUser();
     },
 
     _updateActionsVisibility: function() {
@@ -211,42 +174,11 @@ const Indicator = new Lang.Class({
         this._actionsItem.actor.visible = visible;
     },
 
-    _sessionUpdated: function() {
-        this._updateLockScreen();
-        this._updatePowerOff();
-        this._updateSuspend();
-        this._updateMultiUser();
-        this._updateActionsVisibility();
-    },
-
     _updateMultiUser: function() {
-        let shouldShowInMode = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
-        let hasSwitchUser = this._updateSwitchUser();
-        let hasLogout = this._updateLogout();
+        let hasSwitchUser = this._loginScreenItem.actor.visible;
+        let hasLogout = this._logoutItem.actor.visible;
 
-        this._switchUserSubMenu.actor.visible = shouldShowInMode && (hasSwitchUser || hasLogout);
-    },
-
-    _updateSwitchUser: function() {
-        let allowSwitch = !this._lockdownSettings.get_boolean(DISABLE_USER_SWITCH_KEY);
-        let multiUser = this._userManager.can_switch() && this._userManager.has_multiple_users;
-
-        let visible = allowSwitch && multiUser;
-        this._loginScreenItem.actor.visible = visible;
-        return visible;
-    },
-
-    _updateLogout: function() {
-        let allowLogout = !this._lockdownSettings.get_boolean(DISABLE_LOG_OUT_KEY);
-        let alwaysShow = global.settings.get_boolean(ALWAYS_SHOW_LOG_OUT_KEY);
-        let systemAccount = this._user.system_account;
-        let localAccount = this._user.local_account;
-        let multiUser = this._userManager.has_multiple_users;
-        let multiSession = Gdm.get_session_ids().length > 1;
-
-        let visible = allowLogout && (alwaysShow || multiUser || multiSession || systemAccount || !localAccount);
-        this._logoutItem.actor.visible = visible;
-        return visible;
+        this._switchUserSubMenu.actor.visible = hasSwitchUser || hasLogout;
     },
 
     _updateSwitchUserSubMenu: function() {
@@ -306,49 +238,6 @@ const Indicator = new Lang.Class({
         actors.forEach(function(actor) { actor.set_size(width, -1); });
     },
 
-    _updateLockScreen: function() {
-        let showLock = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
-        let allowLockScreen = !this._lockdownSettings.get_boolean(DISABLE_LOCK_SCREEN_KEY);
-        this._lockScreenAction.visible = showLock && allowLockScreen && LoginManager.canLock();
-        this._updateActionsVisibility();
-    },
-
-    _updateHaveShutdown: function() {
-        this._session.CanShutdownRemote(Lang.bind(this, function(result, error) {
-            if (error)
-                return;
-
-            this._haveShutdown = result[0];
-            this._updatePowerOff();
-        }));
-    },
-
-    _updatePowerOff: function() {
-        let disabled = Main.sessionMode.isLocked ||
-                       (Main.sessionMode.isGreeter &&
-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
-        this._powerOffAction.visible = this._haveShutdown && !disabled;
-        this._updateActionsVisibility();
-    },
-
-    _updateHaveSuspend: function() {
-        this._loginManager.canSuspend(Lang.bind(this,
-            function(canSuspend, needsAuth) {
-                this._haveSuspend = canSuspend;
-                this._suspendNeedsAuth = needsAuth;
-                this._updateSuspend();
-            }));
-    },
-
-    _updateSuspend: function() {
-        let disabled = (Main.sessionMode.isLocked &&
-                        this._suspendNeedsAuth) ||
-                       (Main.sessionMode.isGreeter &&
-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
-        this._suspendAction.visible = this._haveSuspend && !disabled;
-        this._updateActionsVisibility();
-    },
-
     _createActionButton: function(accessibleName) {
         let box = new St.BoxLayout({ vertical: true,
                                      style_class: 'system-menu-action-container' });
@@ -398,6 +287,7 @@ const Indicator = new Lang.Class({
     },
 
     _createSubMenu: function() {
+        let bindFlags = GObject.BindingFlags.DEFAULT | GObject.BindingFlags.SYNC_CREATE;
         let item;
 
         this._switchUserSubMenu = new PopupMenu.PopupSubMenuMenuItem('', true);
@@ -418,11 +308,19 @@ const Indicator = new Lang.Class({
         item.connect('activate', Lang.bind(this, this._onLoginScreenActivate));
         this._switchUserSubMenu.menu.addMenuItem(item);
         this._loginScreenItem = item;
+        this._systemActions.bind_property('can-switch-user',
+                                          this._loginScreenItem.actor,
+                                          'visible',
+                                          bindFlags);
 
         item = new PopupMenu.PopupMenuItem(_("Log Out"));
         item.connect('activate', Lang.bind(this, this._onQuitSessionActivate));
         this._switchUserSubMenu.menu.addMenuItem(item);
         this._logoutItem = item;
+        this._systemActions.bind_property('can-logout',
+                                          this._logoutItem.actor,
+                                          'visible',
+                                          bindFlags);
 
         this._switchUserSubMenu.menu.addSettingsAction(_("Account Settings"),
                                                        'gnome-user-accounts-panel.desktop');
@@ -444,57 +342,61 @@ const Indicator = new Lang.Class({
                                                                      _("Lock"),
                                                                      this._onLockScreenClicked);
         item.actor.add(this._lockScreenAction, { expand: true, x_fill: false });
+        this._systemActions.bind_property('can-lock-screen',
+                                          this._lockScreenAction,
+                                          'visible',
+                                          bindFlags);
 
         this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic',
                                                                   _("Suspend"),
                                                                   this._onSuspendClicked);
+        this._systemActions.bind_property('can-suspend',
+                                          this._suspendAction,
+                                          'visible',
+                                          bindFlags);
 
         this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic',
                                                                    _("Power Off"),
                                                                    this._onPowerOffClicked);
+        this._systemActions.bind_property('can-power-off',
+                                          this._powerOffAction,
+                                          'visible',
+                                          bindFlags);
 
         this._altSwitcher = new AltSwitcher(this._powerOffAction, this._suspendAction);
         item.actor.add(this._altSwitcher.actor, { expand: true, x_fill: false });
 
         this._actionsItem = item;
         this.menu.addMenuItem(item);
-    },
 
-    _onSettingsClicked: function() {
-        this.menu.itemActivated();
-        let app = Shell.AppSystem.get_default().lookup_app('gnome-control-center.desktop');
-        Main.overview.hide();
-        app.activate();
+        this._lockScreenAction.connect('notify::visible',
+                                       () => { this._updateActionsVisibility(); });
+        this._altSwitcher.actor.connect('notify::visible',
+                                        () => { this._updateActionsVisibility(); });
     },
 
     _onLockScreenClicked: function() {
         this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
-        Main.screenShield.lock(true);
+        this._systemActions.activateLockScreen();
     },
 
     _onLoginScreenActivate: function() {
         this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
-        if (Main.screenShield)
-            Main.screenShield.lock(false);
-
-        Clutter.threads_add_repaint_func_full(Clutter.RepaintFlags.POST_PAINT, function() {
-            Gdm.goto_login_session_sync(null);
-            return false;
-        });
+        this._systemActions.activateSwitchUser();
     },
 
     _onQuitSessionActivate: function() {
-        this.menu.itemActivated();
-        this._session.LogoutRemote(0);
+        this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this._systemActions.activateLogout();
     },
 
     _onPowerOffClicked: function() {
-        this.menu.itemActivated();
-        this._session.ShutdownRemote(0);
+        this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this._systemActions.activatePowerOff();
     },
 
     _onSuspendClicked: function() {
-        this.menu.itemActivated();
-        this._loginManager.suspend();
-    },
+        this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this._systemActions.activateSuspend();
+    }
 });
