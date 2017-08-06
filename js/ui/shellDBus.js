@@ -499,6 +499,10 @@ const AppStoreIface = '<node> \
 <method name="AddAppIfNotVisible"> \
     <arg type="s" direction="in" name="id" /> \
 </method> \
+<method name="ReplaceApplication"> \
+    <arg type="s" direction="in" name="originalId" /> \
+    <arg type="s" direction="in" name="replacementId" /> \
+</method> \
 <method name="RemoveApplication"> \
     <arg type="s" direction="in" name="id" /> \
 </method> \
@@ -518,6 +522,17 @@ const AppStoreIface = '<node> \
 </signal> \
 </interface> \
 </node>';
+
+function _iconIsVisibleOnDesktop(id) {
+    let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+    return visibleIcons.indexOf(id) !== -1;
+}
+
+function _reportAppAddedMetric(id) {
+    let eventRecorder = EosMetrics.EventRecorder.get_default();
+    let appId = new GLib.Variant('s', id);
+    eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
+}
 
 var AppStoreService = new Lang.Class({
     Name: 'AppStoreServiceDBus',
@@ -539,19 +554,28 @@ var AppStoreService = new Lang.Class({
     },
 
     AddAppIfNotVisible: function(id) {
-        let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
-        let isIconVisible = visibleIcons.indexOf(id) !== -1;
-
-        if (!isIconVisible) {
-            let eventRecorder = EosMetrics.EventRecorder.get_default();
-            let appId = new GLib.Variant('s', id);
-            eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
-        }
-
         if (IconGridLayout.layout.iconIsFolder(id))
             return;
 
-        IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+        if (!_iconIsVisibleOnDesktop(id)) {
+            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+            _reportAppAddedMetric(id);
+        }
+    },
+
+    ReplaceApplication: function(originalId, replacementId) {
+        // Can't replace a folder
+        if (IconGridLayout.layout.iconIsFolder(originalId))
+            return;
+
+        // We can just replace the app icon directly now,
+        // since the replace operation degenerates to
+        // append if the source icon was not available
+        IconGridLayout.layout.replaceIcon(originalId, replacementId, IconGridLayout.DESKTOP_GRID_ID);
+
+        // We only care about reporting a metric if the replacement id was visible
+        if (!_iconIsVisibleOnDesktop(replacementId))
+            _reportAppAddedMetric(replacementId);
     },
 
     RemoveApplication: function(id) {
