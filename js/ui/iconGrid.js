@@ -2,6 +2,7 @@
 
 const Clutter = imports.gi.Clutter;
 const Gtk = imports.gi.Gtk;
+const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
@@ -49,6 +50,9 @@ const NUDGE_RETURN_ANIMATION_TYPE = 'easeOutQuint';
 const NUDGE_RETURN_DURATION = 0.3;
 
 const NUDGE_FACTOR = 0.2;
+
+const SHUFFLE_ANIMATION_TIME = 0.250;
+const SHUFFLE_ANIMATION_OPACITY = 255;
 
 const CursorLocation = {
     DEFAULT: 0,
@@ -768,6 +772,91 @@ const IconGrid = new Lang.Class({
             this._animateNudge(rightItem, NUDGE_ANIMATION_TYPE, NUDGE_DURATION,
                                rtl ? Math.floor(-this._hItemSize * NUDGE_FACTOR) : Math.floor(this._hItemSize * NUDGE_FACTOR));
         }
+    },
+
+    animateShuffling: function(changedItems, removedItems, originalItemData, callback) {
+        let children = this._grid.get_children();
+        let node = this._grid.get_theme_node();
+        let contentBox = node.get_content_box(this._grid.allocation);
+
+        let movementMatrix = {};
+        // Find out where icons need to move
+        for (let sourceIndex in changedItems) {
+            let targetIndex = changedItems[sourceIndex];
+            let sourceActor = children[sourceIndex];
+            let actorOffset;
+
+            if (targetIndex >= children.length) {
+                // calculate the position of the new slot
+                let oldBox = sourceActor.allocation;
+                let newBox = this._calculateChildBox(sourceActor, sourceActor.x, sourceActor.y, box);
+                actorOffset = [newBox.x1 - oldBox.x1, newBox.y1 - oldBox.y1];
+            } else {
+                actorOffset = this._findActorOffset(sourceActor, children[targetIndex]);
+            }
+
+            movementMatrix[sourceIndex] = actorOffset;
+        }
+
+        // Make the original icon look like it fell into its place
+        let [originalIndex, dndDropPosition] = originalItemData;
+        let originalIcon = children[originalIndex];
+        if (originalIndex in movementMatrix) {
+            let oldIcon = children[originalIndex];
+            let newIcon = children[changedItems[originalIndex]];
+
+            // We need to know what the coordinates of the icon center are
+            dndDropPosition[0] -= Math.floor(oldIcon.get_size()[0] / 2);
+            dndDropPosition[1] -= Math.floor(oldIcon.get_size()[1] / 2);
+
+            // Draw it at the location where DnD accept occured
+            let releaseOffset = this._findRelativeOffset(oldIcon, dndDropPosition);
+            oldIcon.translation_x = releaseOffset[0];
+            oldIcon.translation_y = releaseOffset[1];
+
+            movementMatrix[originalIndex] = this._findActorOffset(oldIcon, newIcon);
+        }
+
+        // Move icons that need animating
+        for (let sourceIndex in changedItems)
+            this._moveIcon(children[sourceIndex], movementMatrix[sourceIndex]);
+
+        // Hide any removed icons (only temporary)
+        for (let removedIndex in removedItems)
+            children[removedItems[removedIndex]].opacity = 0;
+
+        // Make sure that everything gets redrawn after the animation
+        Mainloop.timeout_add(SHUFFLE_ANIMATION_TIME * 1000 * St.get_slow_down_factor(), callback);
+    },
+
+    _findRelativeOffset: function(source, targetCoords) {
+        let [x2, y2] = targetCoords;
+
+        let [x1, y1] = source.get_transformed_position();
+        x1 = x1 - source.translation_x;
+        y1 = y1 - source.translation_y;
+
+        return [x2-x1, y2-y1];
+    },
+
+    _findActorOffset: function(source, target) {
+        let [x, y] = target.get_transformed_position();
+        x = x - target.translation_x;
+        y = y - target.translation_y;
+
+        return this._findRelativeOffset(source, [x, y]);
+    },
+
+    _moveIcon: function(icon, destPoint) {
+        Tweener.removeTweens(icon);
+
+        icon.opacity = SHUFFLE_ANIMATION_OPACITY;
+
+        Tweener.addTween(icon, { translation_x: destPoint[0],
+                                 translation_y: destPoint[1],
+                                 time: SHUFFLE_ANIMATION_TIME,
+                                 transition: 'easeInOutCubic'
+                                });
     },
 
     removeNudgeTransforms: function() {
