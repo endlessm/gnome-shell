@@ -800,6 +800,13 @@ const IconGrid = new Lang.Class({
         return -1;
     },
 
+    // This function is overriden by the PaginatedIconGrid subclass so we can
+    // take into account the extra space when dragging from a folder
+    _calculateDndRow: function(y) {
+        let rowHeight = this._getVItemSize() + this._getSpacing();
+        return Math.floor(y / rowHeight);
+    },
+
     // Returns the drop point index or -1 if we can't drop there
     canDropAt: function(x, y, canDropPastEnd) {
         let [ok, sx, sy] = this.actor.transform_stage_point(x, y);
@@ -815,8 +822,7 @@ const IconGrid = new Lang.Class({
         else if (this._xAlign == St.Align.END)
             usedWidth -= this._leftPadding;
 
-        let rowHeight = this._vItemSize + this._getSpacing();
-        let row = Math.floor(sy / rowHeight);
+        let row = this._calculateDndRow(sy);
 
         // Correct sx to handle the left padding
         // to correctly calculate the column
@@ -950,6 +956,7 @@ const PaginatedIconGrid = new Lang.Class({
         this._spaceBetweenPages = 0;
         this._childrenPerPage = 0;
         this._maxRowsPerPage = 0;
+        this._extraSpaceData = null;
     },
 
     _getPreferredHeight: function (grid, forWidth, alloc) {
@@ -1048,6 +1055,23 @@ const PaginatedIconGrid = new Lang.Class({
         this._maxRowsPerPage = this.rowsForHeight(availHeightPerPage);
     },
 
+    _calculateDndRow: function(y) {
+        let row = this.parent(y);
+
+        // If there's no extra space, just return the current value and maintain
+        // the same behavior when without a folder opened.
+        if (!this._extraSpaceData)
+            return row;
+
+        let [ baseRow, nRowsUp, nRowsDown ] = this._extraSpaceData;
+        let newRow = row + nRowsUp;
+
+        if (row > baseRow)
+            newRow -= nRowsDown;
+
+        return newRow;
+    },
+
     adaptToSize: function(availWidth, availHeight) {
         this.parent(availWidth, availHeight);
         this._computePages(availWidth, availHeight);
@@ -1131,6 +1155,11 @@ const PaginatedIconGrid = new Lang.Class({
         let childrenUp = children.splice(pageOffset,
                                          nRowsAbove * childrenPerRow);
 
+        // Store the resulting calculations so that we can properly take
+        // the open space when dragging icons over the icon grid from a
+        // folder popup.
+        this._extraSpaceData = [ sourceRow, nRowsUp, nRowsDown ];
+
         // Special case: On the last row with no rows below the icon,
         // there's no need to move any rows either up or down
         if (childrenDown.length == 0 && nRowsUp == 0) {
@@ -1168,6 +1197,7 @@ const PaginatedIconGrid = new Lang.Class({
 
     closeExtraSpace: function() {
         if (!this._translatedChildren || !this._translatedChildren.length) {
+            this._extraSpaceData = null;
             this.emit('space-closed');
             return;
         }
@@ -1181,6 +1211,7 @@ const PaginatedIconGrid = new Lang.Class({
                                transition: 'easeInOutQuad',
                                onComplete: Lang.bind(this,
                                    function() {
+                                       this._extraSpaceData = null;
                                        this.emit('space-closed');
                                    })
                              });
