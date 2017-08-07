@@ -961,6 +961,7 @@ var PaginatedIconGrid = GObject.registerClass({
         this._spaceBetweenPages = 0;
         this._childrenPerPage = 0;
         this._maxRowsPerPage = 0;
+        this._extraSpaceData = null;
     }
 
     vfunc_get_preferred_height(_forWidth) {
@@ -1150,6 +1151,11 @@ var PaginatedIconGrid = GObject.registerClass({
         let childrenUp = children.splice(pageOffset,
                                          nRowsAbove * childrenPerRow);
 
+        // Store the resulting calculations so that we can properly take
+        // the open space when dragging icons over the icon grid from a
+        // folder popup.
+        this._extraSpaceData = [ sourceRow, nRowsUp, nRowsDown ];
+
         // Special case: On the last row with no rows below the icon,
         // there's no need to move any rows either up or down
         if (childrenDown.length == 0 && nRowsUp == 0) {
@@ -1185,6 +1191,7 @@ var PaginatedIconGrid = GObject.registerClass({
 
     closeExtraSpace() {
         if (!this._translatedChildren || !this._translatedChildren.length) {
+            this._extraSpaceData = null;
             this.emit('space-closed');
             return;
         }
@@ -1196,8 +1203,28 @@ var PaginatedIconGrid = GObject.registerClass({
                 translation_y: 0,
                 duration: EXTRA_SPACE_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD,
-                onComplete: () => this.emit('space-closed')
             });
         }
+
+        // This is not entirely correct since we should ideally do
+        // this on onComplete, but in our current implementation of
+        // folders and DnD it can happen that the actor of the icons
+        // we are moving back into their position get destroyed before
+        // the tween completes (e.g. dragging icons out of folders),
+        // meaning that the onComplete callback is never called, and
+        // leaving this in an inconsistent state.
+        //
+        // As a temporary solution for now, let's assume that the folder
+        // will be closed after EXTRA_SPACE_ANIMATION_TIME and reset the
+        // status + emit the space-closed signal only once at that point.
+        GLib.timeout_add_seconds(
+            GLib.PRIORITY_DEFAULT,
+            EXTRA_SPACE_ANIMATION_TIME * St.get_slow_down_factor(),
+            () => {
+                this._extraSpaceData = null;
+                this.emit('space-closed');
+                return GLib.SOURCE_REMOVE;
+            }
+        );
     }
 });
