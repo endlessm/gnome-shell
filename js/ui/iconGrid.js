@@ -1,7 +1,9 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
@@ -777,6 +779,13 @@ var IconGrid = new Lang.Class({
         return -1;
     },
 
+    // This function is overriden by the PaginatedIconGrid subclass so we can
+    // take into account the extra space when dragging from a folder
+    _calculateDndRow: function(y) {
+        let rowHeight = this._getVItemSize() + this._getSpacing();
+        return Math.floor(y / rowHeight);
+    },
+
     // Returns the drop point index or -1 if we can't drop there
     canDropAt: function(x, y, canDropPastEnd) {
         let [ok, sx, sy] = this.actor.transform_stage_point(x, y);
@@ -792,8 +801,7 @@ var IconGrid = new Lang.Class({
         else if (this._xAlign == St.Align.END)
             usedWidth -= this._leftPadding;
 
-        let rowHeight = this._vItemSize + this._getSpacing();
-        let row = Math.floor(sy / rowHeight);
+        let row = this._calculateDndRow(sy);
 
         // Correct sx to handle the left padding
         // to correctly calculate the column
@@ -927,6 +935,7 @@ var PaginatedIconGrid = new Lang.Class({
         this._spaceBetweenPages = 0;
         this._childrenPerPage = 0;
         this._maxRowsPerPage = 0;
+        this._extraSpaceData = null;
     },
 
     _getPreferredHeight: function (grid, forWidth, alloc) {
@@ -1025,6 +1034,23 @@ var PaginatedIconGrid = new Lang.Class({
         this._maxRowsPerPage = this.rowsForHeight(availHeightPerPage);
     },
 
+    _calculateDndRow: function(y) {
+        let row = this.parent(y);
+
+        // If there's no extra space, just return the current value and maintain
+        // the same behavior when without a folder opened.
+        if (!this._extraSpaceData)
+            return row;
+
+        let [ baseRow, nRowsUp, nRowsDown ] = this._extraSpaceData;
+        let newRow = row + nRowsUp;
+
+        if (row > baseRow)
+            newRow -= nRowsDown;
+
+        return newRow;
+    },
+
     adaptToSize: function(availWidth, availHeight) {
         this.parent(availWidth, availHeight);
         this._computePages(availWidth, availHeight);
@@ -1108,6 +1134,11 @@ var PaginatedIconGrid = new Lang.Class({
         let childrenUp = children.splice(pageOffset,
                                          nRowsAbove * childrenPerRow);
 
+        // Store the resulting calculations so that we can properly take
+        // the open space when dragging icons over the icon grid from a
+        // folder popup.
+        this._extraSpaceData = [ sourceRow, nRowsUp, nRowsDown ];
+
         // Special case: On the last row with no rows below the icon,
         // there's no need to move any rows either up or down
         if (childrenDown.length == 0 && nRowsUp == 0) {
@@ -1145,6 +1176,7 @@ var PaginatedIconGrid = new Lang.Class({
 
     closeExtraSpace: function() {
         if (!this._translatedChildren || !this._translatedChildren.length) {
+            this._extraSpaceData = null;
             this.emit('space-closed');
             return;
         }
@@ -1155,13 +1187,26 @@ var PaginatedIconGrid = new Lang.Class({
             Tweener.addTween(this._translatedChildren[i],
                              { translation_y: 0,
                                time: EXTRA_SPACE_ANIMATION_TIME,
-                               transition: 'easeInOutQuad',
-                               onComplete: Lang.bind(this,
-                                   function() {
-                                       this.emit('space-closed');
-                                   })
+                               transition: 'easeInOutQuad'
                              });
         }
+
+        // This is not entirely correct since we should ideally do
+        // this on onComplete, but in our current implementation of
+        // folders and DnD it can happen that the actor of the icons
+        // we are moving back into their position get destroyed before
+        // the tween completes (e.g. dragging icons out of folders),
+        // meaning that the onComplete callback is never called, and
+        // leaving this in an inconsistent state.
+        //
+        // As a temporary solution for now, let's assume that the folder
+        // will be closed after EXTRA_SPACE_ANIMATION_TIME and reset the
+        // status + emit the space-closed signal only once at that point.
+        Mainloop.timeout_add_seconds(EXTRA_SPACE_ANIMATION_TIME * St.get_slow_down_factor(), () => {
+            this._extraSpaceData = null;
+            this.emit('space-closed');
+            return GLib.SOURCE_REMOVE;
+        });
     }
 });
 Signals.addSignalMethods(PaginatedIconGrid.prototype);
