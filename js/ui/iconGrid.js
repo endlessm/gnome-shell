@@ -1,7 +1,8 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { Clutter, GObject, Meta, St } = imports.gi;
+const { Clutter, GLib, GObject, Meta, St } = imports.gi;
 
+const Mainloop = imports.mainloop;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 const Main = imports.ui.main;
@@ -759,6 +760,13 @@ var IconGrid = GObject.registerClass({
         return -1;
     }
 
+    // This function is overriden by the PaginatedIconGrid subclass so we can
+    // take into account the extra space when dragging from a folder
+    _calculateDndRow(y) {
+        let rowHeight = this._getVItemSize() + this._getSpacing();
+        return Math.floor(y / rowHeight);
+    }
+
     // Returns the drop point index or -1 if we can't drop there
     canDropAt(x, y, canDropPastEnd) {
         let [ok, sx, sy] = this.transform_stage_point(x, y);
@@ -774,8 +782,7 @@ var IconGrid = GObject.registerClass({
         else if (this._xAlign == St.Align.END)
             usedWidth -= this._leftPadding;
 
-        let rowHeight = this._vItemSize + this._getSpacing();
-        let row = Math.floor(sy / rowHeight);
+        let row = this._calculateDndRow(sy);
 
         // Correct sx to handle the left padding
         // to correctly calculate the column
@@ -908,6 +915,7 @@ var PaginatedIconGrid = GObject.registerClass({
         this._spaceBetweenPages = 0;
         this._childrenPerPage = 0;
         this._maxRowsPerPage = 0;
+        this._extraSpaceData = null;
     }
 
     vfunc_get_preferred_height(forWidth) {
@@ -1008,6 +1016,23 @@ var PaginatedIconGrid = GObject.registerClass({
         this._maxRowsPerPage = this.rowsForHeight(availHeightPerPage);
     }
 
+    _calculateDndRow(y) {
+        let row = super._calculateDndRow(y);
+
+        // If there's no extra space, just return the current value and maintain
+        // the same behavior when without a folder opened.
+        if (!this._extraSpaceData)
+            return row;
+
+        let [ baseRow, nRowsUp, nRowsDown ] = this._extraSpaceData;
+        let newRow = row + nRowsUp;
+
+        if (row > baseRow)
+            newRow -= nRowsDown;
+
+        return newRow;
+    }
+
     adaptToSize(availWidth, availHeight) {
         super.adaptToSize(availWidth, availHeight);
         this._computePages(availWidth, availHeight);
@@ -1088,6 +1113,11 @@ var PaginatedIconGrid = GObject.registerClass({
         let childrenUp = children.splice(pageOffset,
                                          nRowsAbove * childrenPerRow);
 
+        // Store the resulting calculations so that we can properly take
+        // the open space when dragging icons over the icon grid from a
+        // folder popup.
+        this._extraSpaceData = [ sourceRow, nRowsUp, nRowsDown ];
+
         // Special case: On the last row with no rows below the icon,
         // there's no need to move any rows either up or down
         if (childrenDown.length == 0 && nRowsUp == 0) {
@@ -1122,6 +1152,7 @@ var PaginatedIconGrid = GObject.registerClass({
 
     closeExtraSpace() {
         if (!this._translatedChildren || !this._translatedChildren.length) {
+            this._extraSpaceData = null;
             this.emit('space-closed');
             return;
         }
@@ -1133,8 +1164,24 @@ var PaginatedIconGrid = GObject.registerClass({
                              { translation_y: 0,
                                time: EXTRA_SPACE_ANIMATION_TIME,
                                transition: 'easeInOutQuad',
-                               onComplete: () => { this.emit('space-closed'); }
                              });
         }
+
+        // This is not entirely correct since we should ideally do
+        // this on onComplete, but in our current implementation of
+        // folders and DnD it can happen that the actor of the icons
+        // we are moving back into their position get destroyed before
+        // the tween completes (e.g. dragging icons out of folders),
+        // meaning that the onComplete callback is never called, and
+        // leaving this in an inconsistent state.
+        //
+        // As a temporary solution for now, let's assume that the folder
+        // will be closed after EXTRA_SPACE_ANIMATION_TIME and reset the
+        // status + emit the space-closed signal only once at that point.
+        Mainloop.timeout_add_seconds(EXTRA_SPACE_ANIMATION_TIME * St.get_slow_down_factor(), () => {
+            this._extraSpaceData = null;
+            this.emit('space-closed');
+            return GLib.SOURCE_REMOVE;
+        });
     }
 });
