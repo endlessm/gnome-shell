@@ -490,6 +490,10 @@ const AppStoreIface = '<node> \
 <method name="AddAppIfNotVisible"> \
     <arg type="s" direction="in" name="id" /> \
 </method> \
+<method name="ReplaceApplication"> \
+    <arg type="s" direction="in" name="originalId" /> \
+    <arg type="s" direction="in" name="replacementId" /> \
+</method> \
 <method name="RemoveApplication"> \
     <arg type="s" direction="in" name="id" /> \
 </method> \
@@ -540,6 +544,21 @@ const AppStoreService = new Lang.Class({
         let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
         if (visibleIcons.indexOf(id) == -1)
             IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+    },
+
+    ReplaceApplication: function(originalId, replacementId) {
+        let eventRecorder = EosMetrics.EventRecorder.get_default();
+        let appId = new GLib.Variant('s', replacementId);
+        eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
+
+        // Can't replace a folder
+        if (IconGridLayout.layout.iconIsFolder(originalId))
+            return;
+
+        // We can just replace the app icon directly now,
+        // since the replace operation degenerates to
+        // append if the source icon was not available
+        IconGridLayout.layout.replaceIcon(originalId, replacementId, IconGridLayout.DESKTOP_GRID_ID);
     },
 
     RemoveApplication: function(id) {
