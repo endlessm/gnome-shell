@@ -105,6 +105,13 @@ const EOS_DRAG_OVER_FOLDER_OPACITY = 128;
 
 const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
 
+const EOS_ICON_ANIMATION_TIME = 0.6;
+const EOS_ICON_ANIMATION_DELAY = 0.3;
+const EOS_ICON_ANIMATION_TRANSLATION = 50;
+
+const EOS_NEW_ICON_ANIMATION_TIME = 0.5;
+const EOS_NEW_ICON_ANIMATION_DELAY = 0.7;
+
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
     if (!categoriesStr)
@@ -227,6 +234,25 @@ const BaseAppView = new Lang.Class({
         return [movedList, removedList];
     },
 
+    _findAddedIcons: function() {
+        let oldItemLayout = this._allItems.map(function(icon) { return icon.getId(); });
+        if (oldItemLayout.length === 0) return [];
+
+        let newItemLayout = this.getLayoutIds();
+        newItemLayout = this._trimInvisible(newItemLayout);
+
+        let addedIds = [];
+        for (let newItemIdx in newItemLayout) {
+            let newItem = newItemLayout[newItemIdx];
+            let oldItemIdx = oldItemLayout.indexOf(newItem);
+
+            if (oldItemIdx < 0)
+                addedIds.push(newItem);
+        }
+
+        return addedIds;
+    },
+
     animateMovement: function() {
         let [movedList, removedList] = this._findIconChanges();
         this._grid.animateShuffling(movedList,
@@ -291,6 +317,8 @@ const BaseAppView = new Lang.Class({
         if (!this.iconsNeedRedraw())
             return;
 
+        let addedIds = this._findAddedIcons();
+
         this.removeAll();
 
         let ids = this.getLayoutIds();
@@ -308,6 +336,9 @@ const BaseAppView = new Lang.Class({
 
             if (isHidden)
                 iconActor.hide();
+
+            if (addedIds.indexOf(itemId) != -1)
+                icon.scheduleScaleIn();
 
             this.addItem(icon);
         }
@@ -772,7 +803,14 @@ const AllView = new Lang.Class({
 
     _redisplay: function() {
         if (this.getAllItems().length == 0) {
-            this.addIcons();
+            if (Main.layoutManager.startingUp) {
+                this.addIcons(true);
+
+                Main.layoutManager.connect('startup-complete',
+                                           Lang.bind(this, this._animateIconsIn));
+            } else {
+                this.addIcons();
+            }
         } else {
             let animateView = this._repositionedView;
             if (!animateView)
@@ -783,6 +821,22 @@ const AllView = new Lang.Class({
             animateView.animateMovement();
         }
     },
+
+    _animateIconsIn: function() {
+        let allItems = this.getAllItems();
+        for (let icon of allItems) {
+            icon.actor.opacity = 0;
+            icon.actor.translation_y = EOS_ICON_ANIMATION_TRANSLATION;
+            icon.actor.show();
+
+            Tweener.addTween(icon.actor, {
+                translation_y: 0,
+                opacity: 255,
+                time: EOS_ICON_ANIMATION_TIME,
+                delay: EOS_ICON_ANIMATION_DELAY
+            });
+        }
+     },
 
     _itemNameChanged: function(item) {
         // If an item's name changed, we can pluck it out of where it's
@@ -1926,6 +1980,8 @@ const ViewIcon = new Lang.Class({
         this.canDrop = false;
         this.blockHandler = false;
 
+        this._scaleInId = 0;
+
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
         this._iconState = ViewIconState.NORMAL;
@@ -1988,6 +2044,8 @@ const ViewIcon = new Lang.Class({
     },
 
     _onDestroy: function() {
+        this._unscheduleScaleIn();
+
         this.actor._delegate = null;
         this._removeMenuTimeout();
     },
@@ -2109,6 +2167,47 @@ const ViewIcon = new Lang.Class({
             return new St.Icon({ icon_size: this._iconSize });
 
         return this._createIconFunc(this._iconSize);
+    },
+
+    _scaleIn: function() {
+        this.actor.scale_x = 0;
+        this.actor.scale_y = 0;
+        this.actor.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
+
+        Tweener.addTween(this.actor, {
+            scale_x: 1,
+            scale_y: 1,
+            time: EOS_NEW_ICON_ANIMATION_TIME,
+            delay: EOS_NEW_ICON_ANIMATION_DELAY,
+            transition: function(t, b, c, d) {
+                // Similar to easeOutElastic, but less aggressive.
+                t /= d;
+                let p = 0.5;
+                return b + c * (Math.pow(2, -11 * t) * Math.sin(2 * Math.PI * (t - p / 4) / p) + 1);
+            }
+        });
+    },
+
+    _unscheduleScaleIn: function() {
+        if (this._scaleInId != 0) {
+            Main.overview.disconnect(this._scaleInId);
+            this._scaleInId = 0;
+        }
+    },
+
+    scheduleScaleIn: function() {
+        if (this._scaleInId != 0)
+            return;
+
+        if (Main.overview.visible) {
+            this._scaleIn();
+            return;
+        }
+
+        this._scaleInId = Main.overview.connect('shown', Lang.bind(this, function() {
+            this._unscheduleScaleIn();
+            this._scaleIn();
+        }));
     },
 
     remove: function() {
