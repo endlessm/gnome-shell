@@ -507,6 +507,12 @@ const ViewsClone = new Lang.Class({
                       reactive: false,
                       opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY });
 
+        // Ensure the cloned grid is scrolled to the same page as the original one
+        let originalGridContainer = appDisplay.gridContainer;
+        let originalAdjustment = originalGridContainer.scrollView.vscroll.adjustment;
+        let cloneAdjustment = appGridContainer.scrollView.vscroll.adjustment;
+        originalAdjustment.bind_property('value', cloneAdjustment, 'value', GObject.BindingFlags.SYNC_CREATE);
+
         this._saturation = new Clutter.DesaturateEffect({ factor: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
                                                           enabled: false });
         iconGridClone.add_effect(this._saturation);

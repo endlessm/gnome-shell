@@ -974,6 +974,10 @@ const AppDisplay = new Lang.Class({
         return this._allView.adaptToSize(width, height);
     },
 
+    get gridContainer() {
+        return this._allView.actor;
+    },
+
     get gridActor() {
         return this._allView.gridActor;
     }
