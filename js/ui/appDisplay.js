@@ -237,7 +237,61 @@ const BaseAppView = new Lang.Class({
         this.repositionedIconData = [ null, null ];
     },
 
+    iconsNeedRedraw: function() {
+        // Check if the icons moved around
+        let [movedList, removedList] = this._findIconChanges();
+        let movedLength = Object.keys(movedList).length;
+        if (movedLength > 0 || removedList.length > 0)
+            return true;
+
+        // Create a map from app ids to icon objects
+        let iconTable = {};
+        for (let idx in this._allItems)
+            iconTable[this._allItems[idx].getId()] = this._allItems[idx];
+
+        let layoutIds = this.getLayoutIds();
+
+        // Iterate through all visible icons
+        for (let itemId of layoutIds) {
+            let item = this._createItemForId(itemId);
+            if (!item)
+                continue;
+
+            // The App Center icon cannot be changed or renamed
+            if (item == this._appCenterItem)
+                continue;
+
+            let currentIcon = iconTable[itemId];
+            if (!currentIcon)
+                return true; // This icon is new
+
+            let isFolder = IconGridLayout.layout.iconIsFolder(itemId);
+            let oldIconInfo = null;
+            let newIconInfo = null;
+
+            if (isFolder) {
+                oldIconInfo = currentIcon.folder.get_icon();
+                newIconInfo = item.get_icon();
+            } else if (currentIcon.app) {
+                let appInfo = currentIcon.app.get_app_info();
+                oldIconInfo = appInfo.get_icon();
+                newIconInfo = item.get_app_info().get_icon();
+            }
+
+            // The icon image changed
+            if (newIconInfo && !newIconInfo.equal(oldIconInfo))
+                return true;
+        }
+
+        return false;
+    },
+
     addIcons: function(isHidden) {
+        // Don't do anything if we don't have more up-to-date information, since
+        // re-adding icons unnecessarily can cause UX problems
+        if (!this.iconsNeedRedraw())
+            return;
+
         this.removeAll();
 
         let ids = this.getLayoutIds();
