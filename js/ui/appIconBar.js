@@ -728,6 +728,13 @@ const ScrolledIconList = new Lang.Class({
         let node = this._container.get_theme_node();
 
         this._iconSize = node.get_length('-icon-size');
+
+        // The theme will give us an already-scaled size, but both ScrolledIconList and
+        // the instances of AppIconButton expect the unscaled versions, since the underlying
+        // machinery will scale things later on as needed. Thus, we need to unscale it.
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        this._iconSize /= scaleFactor;
+
         this._taskbarApps.forEach(Lang.bind(this, function(appButton, app) {
             appButton.setIconSize(this._iconSize);
         }));
