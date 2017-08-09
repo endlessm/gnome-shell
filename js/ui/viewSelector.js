@@ -348,8 +348,6 @@ const ViewsDisplay = new Lang.Class({
         this._enterSearchTimeoutId = 0;
         this._localSearchMetricTimeoutId = 0;
 
-        this._discoveryFeedButton = DiscoveryFeedButton.maybeCreateButton();
-
         this._appDisplay = new AppDisplay.AppDisplay()
 
         this._searchResults = new Search.SearchResults();
@@ -387,7 +385,7 @@ const ViewsDisplay = new Lang.Class({
         this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
 
         this.actor = new ViewsDisplayContainer(this.entry,
-                                               this._discoveryFeedButton,
+                                               DiscoveryFeedButton.maybeCreateButton(),
                                                this._appDisplay,
                                                this._searchResults);
     },
