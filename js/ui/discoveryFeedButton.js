@@ -30,7 +30,7 @@ function _checkIfDiscoveryFeedEnabled() {
 
     let isEnabled = supportedLanguages.some(function(lang) {
         return systemLanguages.indexOf(lang) !== -1;
-    }) && _primaryMonitorWidthPassesThreshold();
+    });
 
     return isEnabled;
 }
@@ -60,11 +60,21 @@ const DiscoveryFeedButton = new Lang.Class({
         this.parent({ name: 'discovery-feed',
                       style_class: 'discovery-feed-button',
                       x_align: Clutter.ActorAlign.CENTER,
-                      y_align: Clutter.ActorAlign.CENTER });
+                      y_align: Clutter.ActorAlign.CENTER,
+                      visible: _primaryMonitorWidthPassesThreshold() });
+
+        Main.layoutManager.connect('monitors-changed', Lang.bind(this, function() {
+            this.visible = _primaryMonitorWidthPassesThreshold();
+        }));
     }
 });
 
 function determineAllocationWithinBox(discoveryFeedButton, box, availWidth) {
+    // If we would not show the feed button because the monitor
+    // is too small, just return box directly
+    if (!_primaryMonitorWidthPassesThreshold())
+      return box;
+
     let discoveryFeedButtonHeight = discoveryFeedButton.get_preferred_height(availWidth)[1];
     let discoveryFeedButtonBox = box.copy();
     let x1 = (availWidth - discoveryFeedButton.get_width()) * 0.5;
