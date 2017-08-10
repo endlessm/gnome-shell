@@ -1485,7 +1485,7 @@ const FolderView = new Lang.Class({
             let bin;
             if (i < numItems) {
                 let texture = this._allItems[i].app.create_icon_texture(subSize);
-                bin = new St.Bin({ child: texture });
+                bin = new St.Bin({ child: texture, width: subSize, height: subSize });
             } else {
                 bin = new St.Bin({ width: subSize, height: subSize });
             }
