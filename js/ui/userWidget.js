@@ -35,6 +35,10 @@ const Avatar = new Lang.Class({
                                   reactive: params.reactive,
                                   width: this._iconSize * scaleFactor,
                                   height: this._iconSize * scaleFactor });
+
+        // Monitor the scaling factor to make sure we recreate the avatar when needed.
+        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        themeContext.connect('notify::scale-factor', Lang.bind(this, this.update));
     },
 
     setSensitive: function(sensitive) {
@@ -47,12 +51,17 @@ const Avatar = new Lang.Class({
         if (iconFile && !GLib.file_test(iconFile, GLib.FileTest.EXISTS))
             iconFile = null;
 
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         if (iconFile) {
             let file = Gio.File.new_for_path(iconFile);
             this.actor.child = null;
             this.actor.style = 'background-image: url("%s");'.format(iconFile);
+            this.actor.set_size(this._iconSize * scaleFactor, this._iconSize * scaleFactor);
         } else {
             this.actor.style = null;
+
+            // StIcon will consider the scaling factor internally when setting
+            // the icon-size property, no need to explicitly handle that here.
             this.actor.child = new St.Icon({ icon_name: 'avatar-default-symbolic',
                                              icon_size: this._iconSize });
         }
