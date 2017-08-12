@@ -92,6 +92,8 @@ const EOS_ACTIVE_GRID_TRANSITION = 'easeInQuad';
 const EOS_INACTIVE_GRID_SATURATION = 1;
 const EOS_ACTIVE_GRID_SATURATION = 0;
 
+const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
+
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
     if (!categoriesStr)
@@ -1030,6 +1032,8 @@ const AppSearchProvider = new Lang.Class({
             'com.endlessm.Coding.Chatbox.desktop',
             'eos-shell-extension-prefs.desktop'
         ];
+        let replacementMap = {};
+
         groups.forEach(function(group) {
             group = group.filter(function(appID) {
                 let app = Gio.DesktopAppInfo.new(appID);
@@ -1044,7 +1048,15 @@ const AppSearchProvider = new Lang.Class({
                 if (!codingEnabled && codingApps.indexOf(appID) > -1)
                     return false;
 
-                return app && app.should_show();
+                if (app && app.should_show()) {
+                    let replacedByID = app.get_string(EOS_REPLACED_BY_KEY);
+                    if (replacedByID)
+                        replacementMap[appID] = replacedByID;
+
+                    return true;
+                }
+
+                return false;
             });
             results = results.concat(group.sort(function(a, b) {
                 return usage.compare('', a, b);
@@ -1063,6 +1075,24 @@ const AppSearchProvider = new Lang.Class({
 
             return 0;
         });
+
+        // perform replacements by removing replaceable apps
+        results = results.filter(function(appID) {
+            let replacedByID = replacementMap[appID];
+
+            // this app does not specify any replacements, show it
+            if (!replacedByID)
+                return true;
+
+            // the specified replacement is not installed, show it
+            let replacedByApp = Gio.DesktopAppInfo.new(replacedByID);
+            if (!replacedByApp)
+                return true;
+
+            // the specified replacement is installed, hide it
+            return false;
+        });
+
         callback(results);
     },
 
