@@ -533,6 +533,9 @@ const Overview = new Lang.Class({
         if (this.isDummy)
             return;
 
+        if (Main.workspaceMonitor.hasActiveWindows)
+            return;
+
         this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
     },
 
