@@ -69,7 +69,10 @@ const WindowMenuItem = new Lang.Class({
         let clone = new Clutter.Clone({ source: windowActor.get_texture() });
         let cloneW = clone.width;
         let cloneH = clone.height;
-        let scale = Math.min(maxW / cloneW, maxH / cloneH);
+
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        let scale = Math.min(maxW / cloneW, maxH / cloneH) * scaleFactor;
+
         clone.set_size(Math.round(cloneW * scale), Math.round(cloneH * scale));
 
         this.cloneBin = new St.Bin({ child: clone,
@@ -77,7 +80,9 @@ const WindowMenuItem = new Lang.Class({
         this.actor.add_child(this.cloneBin, { align: St.Align.MIDDLE });
 
         this.label = new St.Label({ text: window.title,
-                                    style_class: 'panel-window-menu-item-label' });
+                                    style_class: 'panel-window-menu-item-label',
+                                    y_align: Clutter.ActorAlign.CENTER,
+                                    y_expand: true });
 
         this.actor.add_child(this.label);
         this.actor.label_actor = this.label;
