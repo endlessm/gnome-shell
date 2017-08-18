@@ -365,7 +365,7 @@ INTROSPECTION_GIRS += ShellMenu-0.1.gir
 CLEANFILES += ShellMenu-0.1.gir
 
 Shell-0.1.gir: gnome-shell St-1.0.gir ShellMenu-0.1.gir
-Shell_0_1_gir_INCLUDES = Clutter-1.0 ClutterX11-1.0 Meta-3.0 Soup-2.4
+Shell_0_1_gir_INCLUDES = Clutter-0 ClutterX11-0 Meta-0 Soup-2.4
 if HAVE_NETWORKMANAGER
 Shell_0_1_gir_INCLUDES += NetworkManager-1.0 NMClient-1.0
 endif
@@ -380,7 +380,7 @@ INTROSPECTION_GIRS += Shell-0.1.gir
 CLEANFILES += Shell-0.1.gir
 
 St-1.0.gir: libst-1.0.la
-St_1_0_gir_INCLUDES = Clutter-1.0 Gtk-3.0
+St_1_0_gir_INCLUDES = Clutter-0 Gtk-3.0
 St_1_0_gir_CFLAGS = $(st_cflags) -DST_COMPILATION
 St_1_0_gir_LIBS = libst-1.0.la
 St_1_0_gir_FILES = $(filter-out %-private.h $(st_non_gir_sources), $(addprefix $(srcdir)/,$(st_source_h))) \
@@ -389,7 +389,7 @@ INTROSPECTION_GIRS += St-1.0.gir
 CLEANFILES += St-1.0.gir
 
 EndlessShellFX-1.0.gir: libeos-shell-fx.la
-EndlessShellFX_1_0_gir_INCLUDES = Clutter-1.0
+EndlessShellFX_1_0_gir_INCLUDES = Clutter-0
 EndlessShellFX_1_0_gir_CFLAGS = $(EOS_SHELL_FX_CFLAGS) -I $(srcdir)
 EndlessShellFX_1_0_gir_LIBS = libeos-shell-fx.la
 EndlessShellFX_1_0_gir_FILES = $(libeos_shell_fx_la_SOURCES)
