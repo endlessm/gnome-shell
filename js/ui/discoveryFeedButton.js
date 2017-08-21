@@ -58,9 +58,10 @@ const DiscoveryFeedButton = new Lang.Class({
 
     _init: function() {
         this.parent({ name: 'discovery-feed',
+                      child: new St.Icon({ icon_name: 'go-down-symbolic',
+                                           icon_size: 16,
+                                           style_class: 'discovery-feed-icon ' }),
                       style_class: 'discovery-feed-button',
-                      x_align: Clutter.ActorAlign.CENTER,
-                      y_align: Clutter.ActorAlign.CENTER,
                       visible: _primaryMonitorWidthPassesThreshold() });
 
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, function() {
