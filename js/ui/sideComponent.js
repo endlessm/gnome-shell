@@ -37,8 +37,8 @@ function shouldHideOtherWindows (metaWindow) {
  */
 function launchedFromDesktop (metaWindow) {
     return isSideComponentWindow(metaWindow) &&
-        metaWindow.get_wm_class() == 'Eos-app-store' &&
-        Main.appStore.launchedFromDesktop;
+        ((metaWindow.get_wm_class == 'Eos-app-store' && Main.appStore.launchedFromDesktop) ||
+         (isDiscoveryFeedWindow(metaWindow) && Main.discoveryFeed.launchedFromDesktop));
 };
 
 /**
