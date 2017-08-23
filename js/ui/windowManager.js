@@ -817,6 +817,34 @@ const DesktopOverlay = new Lang.Class({
         Main.layoutManager.setOverlayRegion(region);
     },
 
+    _repositionOverlay: function() {
+        let overlayWindow = this._overlayActor.meta_window;
+        let monitorIdx = overlayWindow.get_monitor();
+        let monitor = Main.layoutManager.monitors[monitorIdx];
+        if (!monitor)
+            return;
+
+        // The width and height of the overlay need to be the width and height
+        // of the workArea. We already capture inputs correctly
+        // outside the overlay window by setting the region of the
+        // layoutManager overlay, so it is safe to just take up the
+        // entire workArea.
+        let workArea = Main.layoutManager.getWorkAreaForMonitor(monitorIdx);
+        this.width = workArea.width;
+        this.height = workArea.height;
+        this.y = this._overlayActor.y;
+
+        if (this._overlayActor.x <= monitor.x)
+            this.x = monitor.x + monitor.width - this.width;
+        else
+            this.x = monitor.x;
+    },
+
+    _recalculateOverlay: function() {
+        this._repositionOverlay();
+        this._rebuildRegion();
+    },
+
     _findTransientActor: function(actor) {
         for (let i = 0; i < this._transientActors.length; i++) {
             let actorData = this._transientActors[i];
@@ -852,14 +880,14 @@ const DesktopOverlay = new Lang.Class({
         let actorData = {};
         actorData.actor = actor;
         actorData.visibleId = actor.connect('notify::visible',
-                                            Lang.bind(this, this._rebuildRegion));
+                                            Lang.bind(this, this._recalculateOverlay));
         actorData.allocationId = actor.connect('notify::allocation',
-                                               Lang.bind(this, this._rebuildRegion));
+                                               Lang.bind(this, this._recalculateOverlay));
         actorData.destroyId = actor.connect('destroy',
                                             Lang.bind(this, this._untrackTransientActor));
 
         this._transientActors.push(actorData);
-        this._rebuildRegion();
+        this._recalculateOverlay();
     },
 
     _untrackActor: function() {
@@ -898,26 +926,11 @@ const DesktopOverlay = new Lang.Class({
 
     _trackActor: function() {
         let overlayWindow = this._overlayActor.meta_window;
-        let monitorIdx = overlayWindow.get_monitor();
-        let monitor = Main.layoutManager.monitors[monitorIdx];
-        if (!monitor)
-            return;
-
-        // cover other windows with an invisible overlay at the side of the SideComponent
-        let workArea = Main.layoutManager.getWorkAreaForMonitor(monitorIdx);
-        this.width = monitor.width - this._overlayActor.width;
-        this.height = workArea.height;
-        this.y = this._overlayActor.y;
-
-        if (this._overlayActor.x <= monitor.x)
-            this.x = monitor.x + monitor.width - this.width;
-        else
-            this.x = monitor.x;
 
         this._visibleId = this._overlayActor.connect('notify::visible',
-                                                     Lang.bind(this, this._rebuildRegion));
+                                                     Lang.bind(this, this._recalculateOverlay));
         this._allocationId = this._overlayActor.connect('notify::allocation',
-                                                        Lang.bind(this, this._rebuildRegion));
+                                                        Lang.bind(this, this._recalculateOverlay));
         this._actorDestroyId = this._overlayActor.connect('destroy',
                                                           Lang.bind(this, this._untrackActor));
 
@@ -939,7 +952,7 @@ const DesktopOverlay = new Lang.Class({
                 this._trackTransientActor(transientActor);
         }));
 
-        this._rebuildRegion();
+        this._recalculateOverlay();
     },
 
     _setOverlayActor: function(actor) {
