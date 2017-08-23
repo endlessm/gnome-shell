@@ -67,6 +67,14 @@ const DiscoveryFeedButton = new Lang.Class({
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, function() {
             this.visible = _primaryMonitorWidthPassesThreshold();
         }));
+    },
+
+    changeVisbilityState: function(value) {
+        // Helper function to ensure that visibility is set correctly,
+        // consumers of this button should use this function as opposed
+        // to mutating 'visible' directly, since it prevents the
+        // button from appearing in cases where it should not.
+        this.visible = value && _primaryMonitorWidthPassesThreshold();
     }
 });
 
