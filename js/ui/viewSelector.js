@@ -256,7 +256,7 @@ const ViewsDisplayLayout = new Lang.Class({
         this._searchResultsActor.opacity = v * 255;
 
         if (this._discoveryFeedButton) {
-            this._discoveryFeedButton.visible = v != 1;
+            this._discoveryFeedButton.changeVisbilityState(v != 1);
             this._discoveryFeedButton.opacity = (1 - v) * 255;
         }
 
