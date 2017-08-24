@@ -324,7 +324,7 @@ const RemoteSearchProvider = new Lang.Class({
     activateAppContext: function() {
         let app = Shell.AppSystem.get_default().lookup_app(this.appInfo.get_id());
         let context = new AppActivation.AppActivationContext(app);
-        context.activate();
+        context.showSplash();
     }
 });
 
