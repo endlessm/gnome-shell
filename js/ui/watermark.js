@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
@@ -11,7 +12,7 @@ const Monitor = imports.ui.monitor;
 const Tweener = imports.ui.tweener;
 
 const WATERMARK_SCHEMA = 'org.gnome.shell.watermark';
-const WATERMARK_CUSTOM_BRANDING_FILE = '/var/eos-image-defaults/branding/gnome-shell.conf';
+const WATERMARK_CUSTOM_BRANDING_FILE = Config.LOCALSTATEDIR + '/lib/eos-image-defaults/branding/gnome-shell.conf';
 
 const Watermark = new Lang.Class({
     Name: 'Watermark',
