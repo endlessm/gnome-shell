@@ -21,6 +21,7 @@ const Watermark = new Lang.Class({
         this._bgManager = bgManager;
 
         this._watermarkFile = null;
+        this._forceWatermarkVisible = false;
 
         this._settings = new Gio.Settings({ schema_id: WATERMARK_SCHEMA });
 
@@ -89,9 +90,13 @@ const Watermark = new Lang.Class({
         let brandingFile = this._loadBrandingFile();
 
         // If there's no GSettings file, but there is a custom file, use
-        // the custom file instead
-        if (!filename && brandingFile)
+        // the custom file instead and make sure it is visible
+        if (!filename && brandingFile) {
             filename = brandingFile;
+            this._forceWatermarkVisible = true;
+        } else {
+            this._forceWatermarkVisible = false;
+        }
 
         let file = Gio.File.new_for_commandline_arg(filename);
         if (this._watermarkFile && this._watermarkFile.equal(file))
@@ -166,7 +171,8 @@ const Watermark = new Lang.Class({
         let file = Gio.File.new_for_commandline_arg(defaultUri.deep_unpack());
 
         let visible;
-        if (this._settings.get_boolean('watermark-always-visible'))
+        if (this._forceWatermarkVisible ||
+            this._settings.get_boolean('watermark-always-visible'))
             visible = true;
         else if (background._file)
             visible = background._file.equal(file);
