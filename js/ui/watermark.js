@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
@@ -11,7 +12,7 @@ const Monitor = imports.ui.monitor;
 const Tweener = imports.ui.tweener;
 
 const WATERMARK_SCHEMA = 'org.gnome.shell.watermark';
-const WATERMARK_CUSTOM_BRANDING_FILE = '/var/eos-image-defaults/branding/gnome-shell.conf';
+const WATERMARK_CUSTOM_BRANDING_FILE = Config.LOCALSTATEDIR + '/lib/eos-image-defaults/branding/gnome-shell.conf';
 
 const Watermark = new Lang.Class({
     Name: 'Watermark',
@@ -20,6 +21,7 @@ const Watermark = new Lang.Class({
         this._bgManager = bgManager;
 
         this._watermarkFile = null;
+        this._forceWatermarkVisible = false;
 
         this._settings = new Gio.Settings({ schema_id: WATERMARK_SCHEMA });
 
@@ -88,9 +90,13 @@ const Watermark = new Lang.Class({
         let brandingFile = this._loadBrandingFile();
 
         // If there's no GSettings file, but there is a custom file, use
-        // the custom file instead
-        if (!filename && brandingFile)
+        // the custom file instead and make sure it is visible
+        if (!filename && brandingFile) {
             filename = brandingFile;
+            this._forceWatermarkVisible = true;
+        } else {
+            this._forceWatermarkVisible = false;
+        }
 
         let file = Gio.File.new_for_commandline_arg(filename);
         if (this._watermarkFile && this._watermarkFile.equal(file))
@@ -165,7 +171,8 @@ const Watermark = new Lang.Class({
         let file = Gio.File.new_for_commandline_arg(defaultUri.deep_unpack());
 
         let visible;
-        if (this._settings.get_boolean('watermark-always-visible'))
+        if (this._forceWatermarkVisible ||
+            this._settings.get_boolean('watermark-always-visible'))
             visible = true;
         else if (background._file)
             visible = background._file.equal(file);
