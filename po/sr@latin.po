@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-29 16:06-0700\n"
-"PO-Revision-Date: 2017-06-29 23:07+0000\n"
+"POT-Creation-Date: 2017-08-31 14:35-0700\n"
+"PO-Revision-Date: 2017-08-31 21:39+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/endless-mobile-inc/gnome-shell/language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -614,7 +614,7 @@ msgid "Forgot password?"
 msgstr ""
 
 #: js/gdm/authPrompt.js:194 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:179
+#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:185
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:195
 #: js/ui/shellMountOperation.js:399 js/ui/status/network.js:926
 #: js/ui/forceAppExitDialog.js:78
@@ -813,32 +813,29 @@ msgstr "Zabrani pristup"
 msgid "Grant Access"
 msgstr "Dozvoli pristup"
 
-#: js/ui/appDisplay.js:896
+#: js/ui/appDisplay.js:1229
 msgid "Frequently used applications will appear here"
 msgstr "Često korišćeni programi će se pojaviti ovde"
 
-#: js/ui/appDisplay.js:1126
+#: js/ui/appDisplay.js:1487
 msgid "No apps in this folder! To add an app, drag it onto the folder."
 msgstr ""
 
-#: js/ui/appDisplay.js:1933
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1648
+msgid "Remove from desktop"
+msgstr ""
+
+#: js/ui/appDisplay.js:2529
 msgid "New Window"
 msgstr "Novi prozor"
 
-#: js/ui/appDisplay.js:1961 js/ui/dash.js:289
-msgid "Remove from Favorites"
-msgstr "Ukloni iz omiljenih"
-
-#: js/ui/appDisplay.js:1967
-msgid "Add to Favorites"
-msgstr "Dodaj u omiljene"
-
-#: js/ui/appDisplay.js:1977
-msgid "Show Details"
-msgstr "Prikaži detalje"
-
-#: js/ui/appDisplay.js:2027
+#: js/ui/appDisplay.js:2633
 msgid "More Apps"
+msgstr ""
+
+#: js/ui/appDisplay.js:2642
+msgid "Delete"
 msgstr ""
 
 #: js/ui/audioDeviceSelection.js:59
@@ -861,19 +858,19 @@ msgstr "Slušalice sa mikrofonom"
 msgid "Microphone"
 msgstr "Mikrofon"
 
-#: js/ui/backgroundMenu.js:21
+#: js/ui/backgroundMenu.js:22
 msgid "Change Background…"
 msgstr "Izmeni pozadinu…"
 
-#: js/ui/backgroundMenu.js:24
+#: js/ui/backgroundMenu.js:25
 msgid "Add App"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:30
+#: js/ui/backgroundMenu.js:31
 msgid "Add Website"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:34
+#: js/ui/backgroundMenu.js:35
 msgid "Add Folder"
 msgstr ""
 
@@ -993,7 +990,7 @@ msgstr "Spoljni uređaj je isključen"
 msgid "Open with %s"
 msgstr "Otvori programom %s"
 
-#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:315
+#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:330
 msgid "Password:"
 msgstr "Lozinka:"
 
@@ -1079,15 +1076,15 @@ msgstr "Potrebna je lozinka za povezivanje na „%s“."
 msgid "Network Manager"
 msgstr "Upravnik mreže"
 
-#: js/ui/components/polkitAgent.js:60
+#: js/ui/components/polkitAgent.js:65
 msgid "Authentication Required"
 msgstr "Potrebna je prijava"
 
-#: js/ui/components/polkitAgent.js:102
+#: js/ui/components/polkitAgent.js:103
 msgid "Administrator"
 msgstr "Administrator"
 
-#: js/ui/components/polkitAgent.js:182
+#: js/ui/components/polkitAgent.js:188
 msgid "Authenticate"
 msgstr "Potvrdi identitet"
 
@@ -1095,17 +1092,21 @@ msgstr "Potvrdi identitet"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:301 js/ui/shellMountOperation.js:383
+#: js/ui/components/polkitAgent.js:316 js/ui/shellMountOperation.js:383
 msgid "Sorry, that didn't work. Please try again."
 msgstr "Pogrešili ste! Pokušajte ponovo."
 
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:605
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:619
 msgid "Windows"
 msgstr "Prozori"
 
 #: js/ui/dash.js:250 js/ui/dash.js:291
 msgid "Show Applications"
 msgstr "Prikaži programe"
+
+#: js/ui/dash.js:289
+msgid "Remove from Favorites"
+msgstr "Ukloni iz omiljenih"
 
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
@@ -1372,15 +1373,15 @@ msgstr "Nepoznat naslov"
 msgid "Media"
 msgstr "Mediji"
 
-#: js/ui/overview.js:89
+#: js/ui/overview.js:116
 msgid "Undo"
 msgstr "Opozovi"
 
-#: js/ui/overview.js:107
+#: js/ui/overview.js:134
 msgid "No apps are open"
 msgstr ""
 
-#: js/ui/overview.js:175
+#: js/ui/overview.js:202
 msgid "Overview"
 msgstr "Pregled"
 
@@ -1913,7 +1914,7 @@ msgstr "Prijavite se kao drugi korisnik"
 msgid "Unlock Window"
 msgstr "Otključaj prozor"
 
-#: js/ui/viewSelector.js:609
+#: js/ui/viewSelector.js:623
 msgid "Applications"
 msgstr "Programi"
 
@@ -2049,28 +2050,28 @@ msgstr[2] ""
 msgid "System Sounds"
 msgstr "Sistemski zvuci"
 
-#: src/main.c:350
+#: src/main.c:358
 msgid "Print version"
 msgstr "Ispisuje izdanje"
 
-#: src/main.c:356
+#: src/main.c:364
 msgid "Mode used by GDM for login screen"
 msgstr "Koji režim koristi GDM za ekran prijavljivanja"
 
-#: src/main.c:362
+#: src/main.c:370
 msgid "Use a specific mode, e.g. \"gdm\" for login screen"
 msgstr "Koristi naročit režim, npr. „gdm“ za ekran prijavljivanja"
 
-#: src/main.c:368
+#: src/main.c:376
 msgid "List possible modes"
 msgstr "Ispisuje moguće režime"
 
-#: src/shell-app.c:272
+#: src/shell-app.c:274
 msgctxt "program"
 msgid "Unknown"
 msgstr "Nepoznat"
 
-#: src/shell-app.c:528
+#: src/shell-app.c:530
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "Nisam uspeo da pokrenem „%s“"
@@ -2087,23 +2088,23 @@ msgstr "Lozinka ne može biti prazna"
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Korisnik je odbacio prozorče za potvrđivanje identiteta"
 
-#: js/ui/appIconBar.js:204
+#: js/ui/appIconBar.js:209
 msgid "Other workspaces"
 msgstr ""
 
-#: js/ui/appIconBar.js:213
+#: js/ui/appIconBar.js:218
 msgid "Current workspace"
 msgstr ""
 
-#: js/ui/appIconBar.js:282
+#: js/ui/appIconBar.js:287
 msgid "Pin to Taskbar"
 msgstr ""
 
-#: js/ui/appIconBar.js:286
+#: js/ui/appIconBar.js:291
 msgid "Unpin from Taskbar"
 msgstr ""
 
-#: js/ui/appIconBar.js:302
+#: js/ui/appIconBar.js:307
 #, javascript-format
 msgid "Quit %s"
 msgstr ""
@@ -2112,11 +2113,11 @@ msgstr ""
 msgid "Endless Button"
 msgstr ""
 
-#: js/ui/endlessButton.js:53
+#: js/ui/endlessButton.js:57
 msgid "Show Desktop"
 msgstr ""
 
-#: js/ui/endlessButton.js:57
+#: js/ui/endlessButton.js:62
 msgid "Show Apps"
 msgstr ""
 
@@ -2150,12 +2151,12 @@ msgstr ""
 msgid "Disable Hot Corner"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:248
+#: js/ui/iconGridLayout.js:273
 #, javascript-format
 msgid "%s has been deleted"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:445
+#: js/ui/iconGridLayout.js:471
 msgid "New Folder"
 msgstr ""
 

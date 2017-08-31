@@ -5,15 +5,15 @@
 # Translators:
 # e2f_vn_c4 <leo.nguyen@expertrans.com>, 2016
 # Trung Ngô <ndtrung4419@gmail.com>, 2011
-# Roddy Shuler <roddy@endlessm.com>, 2016
+# Roddy Shuler <roddy@endlessm.com>, 2016-2017
 # Trần Ngọc Quân <vnwildman@gmail.com>, 2015-2016
 # Trung Ngô <ndtrung4419@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-29 16:06-0700\n"
-"PO-Revision-Date: 2017-06-29 23:08+0000\n"
+"POT-Creation-Date: 2017-08-31 14:35-0700\n"
+"PO-Revision-Date: 2017-08-31 21:46+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/endless-mobile-inc/gnome-shell/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -615,7 +615,7 @@ msgid "Forgot password?"
 msgstr "Quên mật khẩu?"
 
 #: js/gdm/authPrompt.js:194 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:179
+#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:185
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:195
 #: js/ui/shellMountOperation.js:399 js/ui/status/network.js:926
 #: js/ui/forceAppExitDialog.js:78
@@ -814,33 +814,30 @@ msgstr "Từ chối truy cập"
 msgid "Grant Access"
 msgstr "Cấp quyền truy cập"
 
-#: js/ui/appDisplay.js:896
+#: js/ui/appDisplay.js:1229
 msgid "Frequently used applications will appear here"
 msgstr "Những ứng dụng hay dùng sẽ xuất hiện ở đây"
 
-#: js/ui/appDisplay.js:1126
+#: js/ui/appDisplay.js:1487
 msgid "No apps in this folder! To add an app, drag it onto the folder."
 msgstr "Không có ứng dụng nào trong thư mục này! Để thêm ứng dụng, hãy kéo ứng dụng vào thư mục."
 
-#: js/ui/appDisplay.js:1933
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1648
+msgid "Remove from desktop"
+msgstr "Xóa khỏi màn hình"
+
+#: js/ui/appDisplay.js:2529
 msgid "New Window"
 msgstr "Cửa sổ mới"
 
-#: js/ui/appDisplay.js:1961 js/ui/dash.js:289
-msgid "Remove from Favorites"
-msgstr "Bỏ khỏi danh sách ưa thích"
-
-#: js/ui/appDisplay.js:1967
-msgid "Add to Favorites"
-msgstr "Đánh dấu ưa thích"
-
-#: js/ui/appDisplay.js:1977
-msgid "Show Details"
-msgstr "Hiện chi tiết"
-
-#: js/ui/appDisplay.js:2027
+#: js/ui/appDisplay.js:2633
 msgid "More Apps"
 msgstr "Các Ứng dụng khác"
+
+#: js/ui/appDisplay.js:2642
+msgid "Delete"
+msgstr "Xóa"
 
 #: js/ui/audioDeviceSelection.js:59
 msgid "Select Audio Device"
@@ -862,19 +859,19 @@ msgstr "Bộ tai nghe + micrô"
 msgid "Microphone"
 msgstr "Micrô"
 
-#: js/ui/backgroundMenu.js:21
+#: js/ui/backgroundMenu.js:22
 msgid "Change Background…"
 msgstr "Đổi ảnh nền…"
 
-#: js/ui/backgroundMenu.js:24
+#: js/ui/backgroundMenu.js:25
 msgid "Add App"
 msgstr "Thêm Ứng dụng"
 
-#: js/ui/backgroundMenu.js:30
+#: js/ui/backgroundMenu.js:31
 msgid "Add Website"
 msgstr "Thêm Trang web"
 
-#: js/ui/backgroundMenu.js:34
+#: js/ui/backgroundMenu.js:35
 msgid "Add Folder"
 msgstr "Thêm Thư mục"
 
@@ -994,7 +991,7 @@ msgstr "Ổ ngoài đã ngắt kết nối"
 msgid "Open with %s"
 msgstr "Mở bằng %s"
 
-#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:315
+#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:330
 msgid "Password:"
 msgstr "Mật khẩu:"
 
@@ -1080,15 +1077,15 @@ msgstr "Cần mật khẩu để kết nối đến “%s”."
 msgid "Network Manager"
 msgstr "Trình quản lý mạng"
 
-#: js/ui/components/polkitAgent.js:60
+#: js/ui/components/polkitAgent.js:65
 msgid "Authentication Required"
 msgstr "Cần xác thực"
 
-#: js/ui/components/polkitAgent.js:102
+#: js/ui/components/polkitAgent.js:103
 msgid "Administrator"
 msgstr "Quản trị"
 
-#: js/ui/components/polkitAgent.js:182
+#: js/ui/components/polkitAgent.js:188
 msgid "Authenticate"
 msgstr "Xác thực"
 
@@ -1096,17 +1093,21 @@ msgstr "Xác thực"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:301 js/ui/shellMountOperation.js:383
+#: js/ui/components/polkitAgent.js:316 js/ui/shellMountOperation.js:383
 msgid "Sorry, that didn't work. Please try again."
 msgstr "Rất tiếc, không được. Vui lòng thử lại."
 
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:605
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:619
 msgid "Windows"
 msgstr "Cửa sổ"
 
 #: js/ui/dash.js:250 js/ui/dash.js:291
 msgid "Show Applications"
 msgstr "Hiện ứng dụng"
+
+#: js/ui/dash.js:289
+msgid "Remove from Favorites"
+msgstr "Bỏ khỏi danh sách ưa thích"
 
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
@@ -1363,15 +1364,15 @@ msgstr "Chưa biết tiêu đề"
 msgid "Media"
 msgstr "Đa phương tiện"
 
-#: js/ui/overview.js:89
+#: js/ui/overview.js:116
 msgid "Undo"
 msgstr "Hoàn lại"
 
-#: js/ui/overview.js:107
+#: js/ui/overview.js:134
 msgid "No apps are open"
 msgstr "Không có ứng dụng nào đang mở"
 
-#: js/ui/overview.js:175
+#: js/ui/overview.js:202
 msgid "Overview"
 msgstr "Tổng quan"
 
@@ -1898,7 +1899,7 @@ msgstr "Đăng nhập người dùng khác"
 msgid "Unlock Window"
 msgstr "Bỏ khóa cửa sổ"
 
-#: js/ui/viewSelector.js:609
+#: js/ui/viewSelector.js:623
 msgid "Applications"
 msgstr "Ứng dụng"
 
@@ -2028,28 +2029,28 @@ msgstr[0] "%u đầu vào"
 msgid "System Sounds"
 msgstr "Âm thanh hệ thống"
 
-#: src/main.c:350
+#: src/main.c:358
 msgid "Print version"
 msgstr "Hiển thị phiên bản"
 
-#: src/main.c:356
+#: src/main.c:364
 msgid "Mode used by GDM for login screen"
 msgstr "Chế độ được dùng bởi GDM cho màn hình đăng nhập"
 
-#: src/main.c:362
+#: src/main.c:370
 msgid "Use a specific mode, e.g. \"gdm\" for login screen"
 msgstr "Dùng chế độ đặc biệt, ví dụ “gdm” cho màn hình đăng nhập"
 
-#: src/main.c:368
+#: src/main.c:376
 msgid "List possible modes"
 msgstr "Danh sách chế độ có thể"
 
-#: src/shell-app.c:272
+#: src/shell-app.c:274
 msgctxt "program"
 msgid "Unknown"
 msgstr "Chưa biết"
 
-#: src/shell-app.c:528
+#: src/shell-app.c:530
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "Gặp lỗi khi khởi chạy “%s”"
@@ -2066,23 +2067,23 @@ msgstr "Mật khẩu không thể để trống"
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Hộp thoại xác thực bị người dùng bỏ qua"
 
-#: js/ui/appIconBar.js:204
+#: js/ui/appIconBar.js:209
 msgid "Other workspaces"
 msgstr "Các vùng làm việc khác"
 
-#: js/ui/appIconBar.js:213
+#: js/ui/appIconBar.js:218
 msgid "Current workspace"
 msgstr "Vùng làm việc hiện tại"
 
-#: js/ui/appIconBar.js:282
+#: js/ui/appIconBar.js:287
 msgid "Pin to Taskbar"
 msgstr "Ghim vào Thanh tác vụ"
 
-#: js/ui/appIconBar.js:286
+#: js/ui/appIconBar.js:291
 msgid "Unpin from Taskbar"
 msgstr "Bỏ ghim khỏi Thanh tác vụ"
 
-#: js/ui/appIconBar.js:302
+#: js/ui/appIconBar.js:307
 #, javascript-format
 msgid "Quit %s"
 msgstr "Thoát %s"
@@ -2091,11 +2092,11 @@ msgstr "Thoát %s"
 msgid "Endless Button"
 msgstr "Nút Endless"
 
-#: js/ui/endlessButton.js:53
+#: js/ui/endlessButton.js:57
 msgid "Show Desktop"
 msgstr "Hiển thị Màn hình nền"
 
-#: js/ui/endlessButton.js:57
+#: js/ui/endlessButton.js:62
 msgid "Show Apps"
 msgstr "Hiển thị Ứng dụng"
 
@@ -2129,12 +2130,12 @@ msgstr "Kích hoạt Hot Corner"
 msgid "Disable Hot Corner"
 msgstr "Vô hiệu hóa Hot Corner"
 
-#: js/ui/iconGridLayout.js:248
+#: js/ui/iconGridLayout.js:273
 #, javascript-format
 msgid "%s has been deleted"
 msgstr "%s đã được xóa"
 
-#: js/ui/iconGridLayout.js:445
+#: js/ui/iconGridLayout.js:471
 msgid "New Folder"
 msgstr "Thư mục Mới"
 

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-29 16:06-0700\n"
-"PO-Revision-Date: 2017-06-29 23:07+0000\n"
+"POT-Creation-Date: 2017-08-31 14:35-0700\n"
+"PO-Revision-Date: 2017-08-31 21:39+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/endless-mobile-inc/gnome-shell/language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -611,7 +611,7 @@ msgid "Forgot password?"
 msgstr ""
 
 #: js/gdm/authPrompt.js:194 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:179
+#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:185
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:195
 #: js/ui/shellMountOperation.js:399 js/ui/status/network.js:926
 #: js/ui/forceAppExitDialog.js:78
@@ -810,32 +810,29 @@ msgstr "Diùlt an t-inntrigeadh"
 msgid "Grant Access"
 msgstr "Ceadaich an t-inntrigeadh"
 
-#: js/ui/appDisplay.js:896
+#: js/ui/appDisplay.js:1229
 msgid "Frequently used applications will appear here"
 msgstr "Nochdaidh aplacaidean a chleachdas tu gu tric an-seo"
 
-#: js/ui/appDisplay.js:1126
+#: js/ui/appDisplay.js:1487
 msgid "No apps in this folder! To add an app, drag it onto the folder."
 msgstr ""
 
-#: js/ui/appDisplay.js:1933
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1648
+msgid "Remove from desktop"
+msgstr ""
+
+#: js/ui/appDisplay.js:2529
 msgid "New Window"
 msgstr "Uinneag ùr"
 
-#: js/ui/appDisplay.js:1961 js/ui/dash.js:289
-msgid "Remove from Favorites"
-msgstr "Thoir air falbh o na h-annsachdan"
-
-#: js/ui/appDisplay.js:1967
-msgid "Add to Favorites"
-msgstr "Cuir ris na h-annsachdan"
-
-#: js/ui/appDisplay.js:1977
-msgid "Show Details"
-msgstr "Seall am mion-fhiosrachadh"
-
-#: js/ui/appDisplay.js:2027
+#: js/ui/appDisplay.js:2633
 msgid "More Apps"
+msgstr ""
+
+#: js/ui/appDisplay.js:2642
+msgid "Delete"
 msgstr ""
 
 #: js/ui/audioDeviceSelection.js:59
@@ -858,19 +855,19 @@ msgstr "Headset"
 msgid "Microphone"
 msgstr "Micreofon"
 
-#: js/ui/backgroundMenu.js:21
+#: js/ui/backgroundMenu.js:22
 msgid "Change Background…"
 msgstr "Atharraich an cùlaibh…"
 
-#: js/ui/backgroundMenu.js:24
+#: js/ui/backgroundMenu.js:25
 msgid "Add App"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:30
+#: js/ui/backgroundMenu.js:31
 msgid "Add Website"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:34
+#: js/ui/backgroundMenu.js:35
 msgid "Add Folder"
 msgstr ""
 
@@ -990,7 +987,7 @@ msgstr "Chaidh draibh a-muigh a dhì-cheangal"
 msgid "Open with %s"
 msgstr "Fosgail le %s"
 
-#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:315
+#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:330
 msgid "Password:"
 msgstr "Facal-faire:"
 
@@ -1076,15 +1073,15 @@ msgstr "tha feum air facal-faire airson ceangal ri “%s”."
 msgid "Network Manager"
 msgstr "Manaidsear nan lìonra"
 
-#: js/ui/components/polkitAgent.js:60
+#: js/ui/components/polkitAgent.js:65
 msgid "Authentication Required"
 msgstr "Tha feum air dearbhadh"
 
-#: js/ui/components/polkitAgent.js:102
+#: js/ui/components/polkitAgent.js:103
 msgid "Administrator"
 msgstr "Rianaire"
 
-#: js/ui/components/polkitAgent.js:182
+#: js/ui/components/polkitAgent.js:188
 msgid "Authenticate"
 msgstr "Dearbhaich"
 
@@ -1092,17 +1089,21 @@ msgstr "Dearbhaich"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:301 js/ui/shellMountOperation.js:383
+#: js/ui/components/polkitAgent.js:316 js/ui/shellMountOperation.js:383
 msgid "Sorry, that didn't work. Please try again."
 msgstr "Tha sinn duilich ach cha do dh'obraich seo. Am feuch thu ris a-rithist?"
 
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:605
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:619
 msgid "Windows"
 msgstr "Uinneagan"
 
 #: js/ui/dash.js:250 js/ui/dash.js:291
 msgid "Show Applications"
 msgstr "Seall na aplacaidean"
+
+#: js/ui/dash.js:289
+msgid "Remove from Favorites"
+msgstr "Thoir air falbh o na h-annsachdan"
 
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
@@ -1374,15 +1375,15 @@ msgstr "Tiotal nach aithne dhuinn"
 msgid "Media"
 msgstr "Meadhanan"
 
-#: js/ui/overview.js:89
+#: js/ui/overview.js:116
 msgid "Undo"
 msgstr "Neo-dhèan"
 
-#: js/ui/overview.js:107
+#: js/ui/overview.js:134
 msgid "No apps are open"
 msgstr ""
 
-#: js/ui/overview.js:175
+#: js/ui/overview.js:202
 msgid "Overview"
 msgstr "Foir-shealladh"
 
@@ -1918,7 +1919,7 @@ msgstr "Clàraich an-steach mar chleachdaiche eile"
 msgid "Unlock Window"
 msgstr "Thoir a' ghlas far na h-uinneige"
 
-#: js/ui/viewSelector.js:609
+#: js/ui/viewSelector.js:623
 msgid "Applications"
 msgstr "Aplacaidean"
 
@@ -2057,28 +2058,28 @@ msgstr[3] "%u ion-chur"
 msgid "System Sounds"
 msgstr "Fuaimean an t-siostaim"
 
-#: src/main.c:350
+#: src/main.c:358
 msgid "Print version"
 msgstr "Seall an tionndadh"
 
-#: src/main.c:356
+#: src/main.c:364
 msgid "Mode used by GDM for login screen"
 msgstr "Am modh a chleachdas GDM airson na sgrìn clàraidh a-steach"
 
-#: src/main.c:362
+#: src/main.c:370
 msgid "Use a specific mode, e.g. \"gdm\" for login screen"
 msgstr "Cleachd modh sònraichte airson na sgrìn clàraidh a-steach, can \"gdm\""
 
-#: src/main.c:368
+#: src/main.c:376
 msgid "List possible modes"
 msgstr "Seall liosta dhe na modhan a tha ann"
 
-#: src/shell-app.c:272
+#: src/shell-app.c:274
 msgctxt "program"
 msgid "Unknown"
 msgstr "Chan eil fhios"
 
-#: src/shell-app.c:528
+#: src/shell-app.c:530
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "Cha b' urrainn dhuinn “%s” a chur gu dol"
@@ -2095,23 +2096,23 @@ msgstr "Chan fhaod am facal-faire a bhith bàn"
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Leig an cleachdaiche an dearbhaidh seachad"
 
-#: js/ui/appIconBar.js:204
+#: js/ui/appIconBar.js:209
 msgid "Other workspaces"
 msgstr ""
 
-#: js/ui/appIconBar.js:213
+#: js/ui/appIconBar.js:218
 msgid "Current workspace"
 msgstr ""
 
-#: js/ui/appIconBar.js:282
+#: js/ui/appIconBar.js:287
 msgid "Pin to Taskbar"
 msgstr ""
 
-#: js/ui/appIconBar.js:286
+#: js/ui/appIconBar.js:291
 msgid "Unpin from Taskbar"
 msgstr ""
 
-#: js/ui/appIconBar.js:302
+#: js/ui/appIconBar.js:307
 #, javascript-format
 msgid "Quit %s"
 msgstr ""
@@ -2120,11 +2121,11 @@ msgstr ""
 msgid "Endless Button"
 msgstr ""
 
-#: js/ui/endlessButton.js:53
+#: js/ui/endlessButton.js:57
 msgid "Show Desktop"
 msgstr ""
 
-#: js/ui/endlessButton.js:57
+#: js/ui/endlessButton.js:62
 msgid "Show Apps"
 msgstr ""
 
@@ -2158,12 +2159,12 @@ msgstr ""
 msgid "Disable Hot Corner"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:248
+#: js/ui/iconGridLayout.js:273
 #, javascript-format
 msgid "%s has been deleted"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:445
+#: js/ui/iconGridLayout.js:471
 msgid "New Folder"
 msgstr ""
 
