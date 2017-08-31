@@ -5,7 +5,7 @@
 # Translators:
 # Andika Triwidada <andika@gmail.com>, 2010-2014
 # dirgita <dirgitadevina@yahoo.co.id>, 2011-2012,2014
-# Hartono <hartono.s10@gmail.com>, 2016
+# Hartono <hartono.s10@gmail.com>, 2016-2017
 # Roddy Shuler <roddy@endlessm.com>, 2016-2017
 # Septira Taruna <septira@endlessm.com>, 2017
 # Wibiharto <wibinem@yahoo.com>, 2011
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-29 16:06-0700\n"
-"PO-Revision-Date: 2017-06-29 23:08+0000\n"
+"POT-Creation-Date: 2017-08-31 14:35-0700\n"
+"PO-Revision-Date: 2017-08-31 21:46+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/endless-mobile-inc/gnome-shell/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -616,7 +616,7 @@ msgid "Forgot password?"
 msgstr "Lupa kata sandi?"
 
 #: js/gdm/authPrompt.js:194 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:179
+#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:185
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:195
 #: js/ui/shellMountOperation.js:399 js/ui/status/network.js:926
 #: js/ui/forceAppExitDialog.js:78
@@ -815,33 +815,30 @@ msgstr "Tolak Akses"
 msgid "Grant Access"
 msgstr "Beri Akses"
 
-#: js/ui/appDisplay.js:896
+#: js/ui/appDisplay.js:1229
 msgid "Frequently used applications will appear here"
 msgstr "Aplikasi yang sering dipakai akan muncul di sini"
 
-#: js/ui/appDisplay.js:1126
+#: js/ui/appDisplay.js:1487
 msgid "No apps in this folder! To add an app, drag it onto the folder."
 msgstr "Tidak ada aplikasi di folder ini! Untuk menambahkan aplikasi, seret ke dalam folder."
 
-#: js/ui/appDisplay.js:1933
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1648
+msgid "Remove from desktop"
+msgstr "Hapus dari desktop"
+
+#: js/ui/appDisplay.js:2529
 msgid "New Window"
 msgstr "Jendela Baru"
 
-#: js/ui/appDisplay.js:1961 js/ui/dash.js:289
-msgid "Remove from Favorites"
-msgstr "Hapus dari Favorit"
-
-#: js/ui/appDisplay.js:1967
-msgid "Add to Favorites"
-msgstr "Tambah ke Favorit"
-
-#: js/ui/appDisplay.js:1977
-msgid "Show Details"
-msgstr "Tampilkan Rincian"
-
-#: js/ui/appDisplay.js:2027
+#: js/ui/appDisplay.js:2633
 msgid "More Apps"
 msgstr "Aplikasi Lainnya"
+
+#: js/ui/appDisplay.js:2642
+msgid "Delete"
+msgstr "Hapus"
 
 #: js/ui/audioDeviceSelection.js:59
 msgid "Select Audio Device"
@@ -863,19 +860,19 @@ msgstr "Headset"
 msgid "Microphone"
 msgstr "Mikrofon"
 
-#: js/ui/backgroundMenu.js:21
+#: js/ui/backgroundMenu.js:22
 msgid "Change Background…"
 msgstr "Ubah Latar Belakang…"
 
-#: js/ui/backgroundMenu.js:24
+#: js/ui/backgroundMenu.js:25
 msgid "Add App"
 msgstr "Tambah Aplikasi"
 
-#: js/ui/backgroundMenu.js:30
+#: js/ui/backgroundMenu.js:31
 msgid "Add Website"
 msgstr "Tambah Website"
 
-#: js/ui/backgroundMenu.js:34
+#: js/ui/backgroundMenu.js:35
 msgid "Add Folder"
 msgstr "Tambah Folder"
 
@@ -995,7 +992,7 @@ msgstr "Drive eksternal terputus"
 msgid "Open with %s"
 msgstr "Buka dengan %s"
 
-#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:315
+#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:330
 msgid "Password:"
 msgstr "Kata Sandi:"
 
@@ -1081,15 +1078,15 @@ msgstr "Perlu suatu sandi untuk menyambung ke \"%s\"."
 msgid "Network Manager"
 msgstr "Manajer Jaringan"
 
-#: js/ui/components/polkitAgent.js:60
+#: js/ui/components/polkitAgent.js:65
 msgid "Authentication Required"
 msgstr "Diperlukan Otentikasi"
 
-#: js/ui/components/polkitAgent.js:102
+#: js/ui/components/polkitAgent.js:103
 msgid "Administrator"
 msgstr "Administrator"
 
-#: js/ui/components/polkitAgent.js:182
+#: js/ui/components/polkitAgent.js:188
 msgid "Authenticate"
 msgstr "Otentikasi"
 
@@ -1097,17 +1094,21 @@ msgstr "Otentikasi"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:301 js/ui/shellMountOperation.js:383
+#: js/ui/components/polkitAgent.js:316 js/ui/shellMountOperation.js:383
 msgid "Sorry, that didn't work. Please try again."
 msgstr "Maaf, tidak berhasil. Silakan coba lagi."
 
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:605
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:619
 msgid "Windows"
 msgstr "Jendela"
 
 #: js/ui/dash.js:250 js/ui/dash.js:291
 msgid "Show Applications"
 msgstr "Tampilkan Aplikasi"
+
+#: js/ui/dash.js:289
+msgid "Remove from Favorites"
+msgstr "Hapus dari Favorit"
 
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
@@ -1364,15 +1365,15 @@ msgstr "Judul tak dikenal"
 msgid "Media"
 msgstr "Media"
 
-#: js/ui/overview.js:89
+#: js/ui/overview.js:116
 msgid "Undo"
 msgstr "Batal"
 
-#: js/ui/overview.js:107
+#: js/ui/overview.js:134
 msgid "No apps are open"
 msgstr "Tidak ada aplikasi yang terbuka"
 
-#: js/ui/overview.js:175
+#: js/ui/overview.js:202
 msgid "Overview"
 msgstr "Gambaran"
 
@@ -1899,7 +1900,7 @@ msgstr "Masuk sebagai pengguna lain"
 msgid "Unlock Window"
 msgstr "Buka Kunci Jendela"
 
-#: js/ui/viewSelector.js:609
+#: js/ui/viewSelector.js:623
 msgid "Applications"
 msgstr "Aplikasi"
 
@@ -1910,7 +1911,7 @@ msgstr "'%s' siap"
 
 #: js/ui/windowManager.js:73
 msgid "Do you want to keep these display settings?"
-msgstr "Apakah Anda ingin menyimpan pengaturan display ini?"
+msgstr "Apakah Anda ingin menyimpan pengaturan layar ini?"
 
 #. Translators: this and the following message should be limited in lenght,
 #. to avoid ellipsizing the labels.
@@ -2001,13 +2002,13 @@ msgstr "Pindahkan ke Monitor Kanan"
 
 #: src/calendar-server/evolution-calendar.desktop.in:3
 msgid "Evolution Calendar"
-msgstr "Kalender Evolution"
+msgstr "Kalender Evolusi"
 
 #. Translators: Do NOT translate or transliterate this text (this is an icon
 #. file name)!
 #: src/calendar-server/evolution-calendar.desktop.in:6
 msgid "evolution"
-msgstr "evolution"
+msgstr "evolusi"
 
 #. translators:
 #. * The number of sound outputs on a particular device
@@ -2029,28 +2030,28 @@ msgstr[0] "%u Input"
 msgid "System Sounds"
 msgstr "Suara Sistem"
 
-#: src/main.c:350
+#: src/main.c:358
 msgid "Print version"
 msgstr "Versi cetak"
 
-#: src/main.c:356
+#: src/main.c:364
 msgid "Mode used by GDM for login screen"
 msgstr "Mode yang dipakai oleh GDM untuk layar login"
 
-#: src/main.c:362
+#: src/main.c:370
 msgid "Use a specific mode, e.g. \"gdm\" for login screen"
 msgstr "Menggunakan mode tertentu, misalnya \"gdm\" untuk layar login"
 
-#: src/main.c:368
+#: src/main.c:376
 msgid "List possible modes"
 msgstr "Menampilkan mode yang ada"
 
-#: src/shell-app.c:272
+#: src/shell-app.c:274
 msgctxt "program"
 msgid "Unknown"
 msgstr "Tak dikenal"
 
-#: src/shell-app.c:528
+#: src/shell-app.c:530
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "Gagal menjalankan \"%s\""
@@ -2067,23 +2068,23 @@ msgstr "Kata sandi tidak boleh kosong"
 msgid "Authentication dialog was dismissed by the user"
 msgstr "Dialog otentikasi ditolak oleh pengguna"
 
-#: js/ui/appIconBar.js:204
+#: js/ui/appIconBar.js:209
 msgid "Other workspaces"
 msgstr "Layar kerja lainnya"
 
-#: js/ui/appIconBar.js:213
+#: js/ui/appIconBar.js:218
 msgid "Current workspace"
 msgstr "Layar kerja saat ini"
 
-#: js/ui/appIconBar.js:282
+#: js/ui/appIconBar.js:287
 msgid "Pin to Taskbar"
 msgstr "Sematkan ke Taskbar"
 
-#: js/ui/appIconBar.js:286
+#: js/ui/appIconBar.js:291
 msgid "Unpin from Taskbar"
 msgstr "Lepaskan dari Taskbar"
 
-#: js/ui/appIconBar.js:302
+#: js/ui/appIconBar.js:307
 #, javascript-format
 msgid "Quit %s"
 msgstr "Keluar %s"
@@ -2092,11 +2093,11 @@ msgstr "Keluar %s"
 msgid "Endless Button"
 msgstr "Tombol Endless"
 
-#: js/ui/endlessButton.js:53
+#: js/ui/endlessButton.js:57
 msgid "Show Desktop"
 msgstr "Tampilkan Desktop"
 
-#: js/ui/endlessButton.js:57
+#: js/ui/endlessButton.js:62
 msgid "Show Apps"
 msgstr "Tampilkan Aplikasi"
 
@@ -2130,12 +2131,12 @@ msgstr "Aktifkan Pojok Aktif"
 msgid "Disable Hot Corner"
 msgstr "Nonaktifkan Pojok Aktif"
 
-#: js/ui/iconGridLayout.js:248
+#: js/ui/iconGridLayout.js:273
 #, javascript-format
 msgid "%s has been deleted"
 msgstr "%s telah dihapus"
 
-#: js/ui/iconGridLayout.js:445
+#: js/ui/iconGridLayout.js:471
 msgid "New Folder"
 msgstr "Folder Baru"
 

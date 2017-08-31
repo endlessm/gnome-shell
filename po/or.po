@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2017-06-29 16:06-0700\n"
-"PO-Revision-Date: 2017-06-29 23:07+0000\n"
+"POT-Creation-Date: 2017-08-31 14:35-0700\n"
+"PO-Revision-Date: 2017-08-31 21:39+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Oriya (http://www.transifex.com/endless-mobile-inc/gnome-shell/language/or/)\n"
 "MIME-Version: 1.0\n"
@@ -611,7 +611,7 @@ msgid "Forgot password?"
 msgstr ""
 
 #: js/gdm/authPrompt.js:194 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:179
+#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:185
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:195
 #: js/ui/shellMountOperation.js:399 js/ui/status/network.js:926
 #: js/ui/forceAppExitDialog.js:78
@@ -810,32 +810,29 @@ msgstr ""
 msgid "Grant Access"
 msgstr ""
 
-#: js/ui/appDisplay.js:896
+#: js/ui/appDisplay.js:1229
 msgid "Frequently used applications will appear here"
 msgstr "ବାରମ୍ବାର ବ୍ୟବହୃତ ପ୍ରୟୋଗଗୁଡ଼ିକ ଏଠାରେ ଦୃଶ୍ୟମାନ ହେବ"
 
-#: js/ui/appDisplay.js:1126
+#: js/ui/appDisplay.js:1487
 msgid "No apps in this folder! To add an app, drag it onto the folder."
 msgstr ""
 
-#: js/ui/appDisplay.js:1933
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1648
+msgid "Remove from desktop"
+msgstr ""
+
+#: js/ui/appDisplay.js:2529
 msgid "New Window"
 msgstr "ନୂତନ ୱିଣ୍ଡୋ"
 
-#: js/ui/appDisplay.js:1961 js/ui/dash.js:289
-msgid "Remove from Favorites"
-msgstr "ମନପସନ୍ଦଗୁଡ଼ିକ ମଧ୍ଯରୁ କାଢ଼ନ୍ତୁ"
-
-#: js/ui/appDisplay.js:1967
-msgid "Add to Favorites"
-msgstr "ମନପସନ୍ଦ ମଧ୍ଯରେ ଯୋଗକରନ୍ତୁ"
-
-#: js/ui/appDisplay.js:1977
-msgid "Show Details"
-msgstr "ବିସ୍ତୃତ ବିବରଣୀ ଦର୍ଶାନ୍ତୁ"
-
-#: js/ui/appDisplay.js:2027
+#: js/ui/appDisplay.js:2633
 msgid "More Apps"
+msgstr ""
+
+#: js/ui/appDisplay.js:2642
+msgid "Delete"
 msgstr ""
 
 #: js/ui/audioDeviceSelection.js:59
@@ -858,19 +855,19 @@ msgstr ""
 msgid "Microphone"
 msgstr "ମାଇକ୍ରଫୋନ"
 
-#: js/ui/backgroundMenu.js:21
+#: js/ui/backgroundMenu.js:22
 msgid "Change Background…"
 msgstr "ପୃଷ୍ଠଭୂମିକୁ ପରିବର୍ତ୍ତନ କରନ୍ତୁ…"
 
-#: js/ui/backgroundMenu.js:24
+#: js/ui/backgroundMenu.js:25
 msgid "Add App"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:30
+#: js/ui/backgroundMenu.js:31
 msgid "Add Website"
 msgstr ""
 
-#: js/ui/backgroundMenu.js:34
+#: js/ui/backgroundMenu.js:35
 msgid "Add Folder"
 msgstr ""
 
@@ -990,7 +987,7 @@ msgstr "ବାହ୍ୟ ଡ୍ରାଇଭ ସଂଯକ୍ତ ଅଛି"
 msgid "Open with %s"
 msgstr "%s ସହିତ ଖୋଲନ୍ତୁ"
 
-#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:315
+#: js/ui/components/keyring.js:120 js/ui/components/polkitAgent.js:330
 msgid "Password:"
 msgstr "ପ୍ରବେଶ ସଙ୍କେତ:"
 
@@ -1076,15 +1073,15 @@ msgstr "“%s” ସହିତ ସଂଯୁକ୍ତ ହେବା ପାଇଁ �
 msgid "Network Manager"
 msgstr "ନେଟୱର୍କ ପରିଚାଳକ"
 
-#: js/ui/components/polkitAgent.js:60
+#: js/ui/components/polkitAgent.js:65
 msgid "Authentication Required"
 msgstr "ବୈଧିକରଣ ଆବଶ୍ୟକ"
 
-#: js/ui/components/polkitAgent.js:102
+#: js/ui/components/polkitAgent.js:103
 msgid "Administrator"
 msgstr "ପ୍ରଶାସକ"
 
-#: js/ui/components/polkitAgent.js:182
+#: js/ui/components/polkitAgent.js:188
 msgid "Authenticate"
 msgstr "ବୈଧିକୃତ"
 
@@ -1092,17 +1089,21 @@ msgstr "ବୈଧିକୃତ"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:301 js/ui/shellMountOperation.js:383
+#: js/ui/components/polkitAgent.js:316 js/ui/shellMountOperation.js:383
 msgid "Sorry, that didn't work. Please try again."
 msgstr "ଦୁଖିତଃ, ତାହା କାର୍ଯ୍ୟକାରୀ ହେଲା ନହିଁ। ଦୟାକରି ପୁଣିଥରେ ଚେଷ୍ଟା କରନ୍ତୁ।"
 
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:605
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:619
 msgid "Windows"
 msgstr "Windows"
 
 #: js/ui/dash.js:250 js/ui/dash.js:291
 msgid "Show Applications"
 msgstr "ପ୍ରୟୋଗଗୁଡ଼ିକୁ ଦର୍ଶାନ୍ତୁ"
+
+#: js/ui/dash.js:289
+msgid "Remove from Favorites"
+msgstr "ମନପସନ୍ଦଗୁଡ଼ିକ ମଧ୍ଯରୁ କାଢ଼ନ୍ତୁ"
 
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
@@ -1364,15 +1365,15 @@ msgstr ""
 msgid "Media"
 msgstr ""
 
-#: js/ui/overview.js:89
+#: js/ui/overview.js:116
 msgid "Undo"
 msgstr "ପଦକ୍ଷେପ ବାତିଲ କରନ୍ତୁ"
 
-#: js/ui/overview.js:107
+#: js/ui/overview.js:134
 msgid "No apps are open"
 msgstr ""
 
-#: js/ui/overview.js:175
+#: js/ui/overview.js:202
 msgid "Overview"
 msgstr "ସମୀକ୍ଷା"
 
@@ -1902,7 +1903,7 @@ msgstr "ଅନ୍ୟ ଏକ ଚାଳକ ଭାବରେ ଲଗଇନ କରନ�
 msgid "Unlock Window"
 msgstr "ୱିଣ୍ଡୋକୁ ଖୋଲନ୍ତୁ"
 
-#: js/ui/viewSelector.js:609
+#: js/ui/viewSelector.js:623
 msgid "Applications"
 msgstr "ପ୍ରୟୋଗଗୁଡ଼ିକ"
 
@@ -2035,28 +2036,28 @@ msgstr[1] "%u ନିବେଶଗୁଡ଼ିକ"
 msgid "System Sounds"
 msgstr "ତନ୍ତ୍ର ଧ୍ୱନି"
 
-#: src/main.c:350
+#: src/main.c:358
 msgid "Print version"
 msgstr "ମୁଦ୍ରଣ ସଂସ୍କରଣ"
 
-#: src/main.c:356
+#: src/main.c:364
 msgid "Mode used by GDM for login screen"
 msgstr "ଲଗଇନ ପରଦା ପାଇଁ ବ୍ୟବହୃତ GDM"
 
-#: src/main.c:362
+#: src/main.c:370
 msgid "Use a specific mode, e.g. \"gdm\" for login screen"
 msgstr "ଏକ ନିର୍ଦ୍ଦିଷ୍ଟ ଧାରା ବ୍ୟବହାର କରନ୍ତୁ, ଯେପରିକି ଲଗଇନ ପରଦା ପାଇଁ \"gdm\""
 
-#: src/main.c:368
+#: src/main.c:376
 msgid "List possible modes"
 msgstr "ସମ୍ଭାବ୍ୟ ଧାରାଗୁଡ଼ିକୁ ତାଲିକାଭୁକ୍ତ କରନ୍ତୁ"
 
-#: src/shell-app.c:272
+#: src/shell-app.c:274
 msgctxt "program"
 msgid "Unknown"
 msgstr "ଅଜଣା"
 
-#: src/shell-app.c:528
+#: src/shell-app.c:530
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "“%s” କୁ ଆରମ୍ଭ କରିବାରେ ବିଫଳ"
@@ -2073,23 +2074,23 @@ msgstr "ପ୍ରବେଶ ସଙ୍କେତଟି ଖାଲି ହୋଇ ପ�
 msgid "Authentication dialog was dismissed by the user"
 msgstr "ବୈଧିକରଣ ସଂଳାପଟି ଚାଳକ ଦ୍ୱାରା ବାତିଲ ହୋଇଛି"
 
-#: js/ui/appIconBar.js:204
+#: js/ui/appIconBar.js:209
 msgid "Other workspaces"
 msgstr ""
 
-#: js/ui/appIconBar.js:213
+#: js/ui/appIconBar.js:218
 msgid "Current workspace"
 msgstr ""
 
-#: js/ui/appIconBar.js:282
+#: js/ui/appIconBar.js:287
 msgid "Pin to Taskbar"
 msgstr ""
 
-#: js/ui/appIconBar.js:286
+#: js/ui/appIconBar.js:291
 msgid "Unpin from Taskbar"
 msgstr ""
 
-#: js/ui/appIconBar.js:302
+#: js/ui/appIconBar.js:307
 #, javascript-format
 msgid "Quit %s"
 msgstr ""
@@ -2098,11 +2099,11 @@ msgstr ""
 msgid "Endless Button"
 msgstr ""
 
-#: js/ui/endlessButton.js:53
+#: js/ui/endlessButton.js:57
 msgid "Show Desktop"
 msgstr ""
 
-#: js/ui/endlessButton.js:57
+#: js/ui/endlessButton.js:62
 msgid "Show Apps"
 msgstr ""
 
@@ -2136,12 +2137,12 @@ msgstr ""
 msgid "Disable Hot Corner"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:248
+#: js/ui/iconGridLayout.js:273
 #, javascript-format
 msgid "%s has been deleted"
 msgstr ""
 
-#: js/ui/iconGridLayout.js:445
+#: js/ui/iconGridLayout.js:471
 msgid "New Folder"
 msgstr ""
 
