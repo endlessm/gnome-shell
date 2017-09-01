@@ -175,7 +175,6 @@ const AuthPrompt = new Lang.Class({
         this._defaultButtonWell.add_child(this._spinner.actor);
 
         this._customerSupportEmail = null;
-        this._customerSupportPhoneNumber = null;
 
         this._displayingPasswordHint = false;
         this._passwordResetCode = null;
@@ -596,13 +595,12 @@ const AuthPrompt = new Lang.Class({
     },
 
     _ensureCustomerSupportData: function() {
-        if (this._customerSupportPhoneNumber && this._customerSupportEmail)
+        if (this._customerSupportEmail)
             return true;
 
         const CUSTOMER_SUPPORT_FILENAME = 'vendor-customer-support.ini';
         const CUSTOMER_SUPPORT_GROUP_NAME = 'Customer Support';
         const CUSTOMER_SUPPORT_KEY_EMAIL = 'Email';
-        const CUSTOMER_SUPPORT_KEY_PHONE = 'Phone';
 
         try {
             let keyFile = new GLib.KeyFile();
@@ -611,17 +609,12 @@ const AuthPrompt = new Lang.Class({
             this._customerSupportEmail = keyFile.get_locale_string(CUSTOMER_SUPPORT_GROUP_NAME,
                                                                    CUSTOMER_SUPPORT_KEY_EMAIL,
                                                                    null);
-            // These control characters are to prevent the phone number from
-            // being reversed in RTL locales.
-            this._customerSupportPhoneNumber = '\u202a%s\u202c'.format(keyFile.get_locale_string(CUSTOMER_SUPPORT_GROUP_NAME,
-                                                                                                 CUSTOMER_SUPPORT_KEY_PHONE,
-                                                                                                 null));
         } catch (e) {
             logError(e, 'Failed to read customer support data');
             return false;
         }
 
-        return this._customerSupportEmail && this._customerSupportPhoneNumber;
+        return this._customerSupportEmail ? true : false;
     },
 
     _generateResetCode: function() {
@@ -667,10 +660,9 @@ const AuthPrompt = new Lang.Class({
         // Translators: During a password reset, prompt for the "secret code" provided by customer support.
         this.setQuestion(_("Enter unlock code provided by customer support:"));
         this.setMessage(
-            // Translators: Password reset. The first %s is a verification code, the second is one or more phone numbers, and the third is an email.
-            _("Please inform customer support of your verification code %s by calling %s or emailing %s. The code will remain valid until you click Cancel or turn off your computer.").format(
+            // Translators: Password reset. The first %s is a verification code and the second is an email.
+            _("Please inform customer support of your verification code %s by emailing %s. The code will remain valid until you click Cancel or turn off your computer.").format(
                 this._passwordResetCode,
-                this._customerSupportPhoneNumber,
                 this._customerSupportEmail));
 
         // Translators: Button on login dialog, after clicking Forgot Password?
