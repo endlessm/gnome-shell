@@ -698,25 +698,6 @@ const AuthPrompt = new Lang.Class({
         if (policy == 0)
             return;
 
-        // Only allow password reset on nonfree Endless images. Image is nonfree
-        // if the eos-image-version xattr of /sysroot begins with "eosnonfree-".
-        //
-        // FIXME: Remove this logic and replace it with a configuration file
-        // under /var/lib/eos-image-defaults. https://phabricator.endlessm.com/T17245
-        if (policy == -1) {
-            try {
-                let file = Gio.file_new_for_path('/sysroot');
-                let fileInfo = file.query_info('xattr::eos-image-version', Gio.FileQueryInfoFlags.NONE, null);
-                let imageVersion = fileInfo.get_attribute_as_string('xattr::eos-image-version');
-
-                if (imageVersion == null || !imageVersion.startsWith('eosnonfree-'))
-                    return;
-            } catch(e) {
-                logError(e, 'Failed to determine if password reset is allowed');
-                return;
-            }
-        }
-
         // There's got to be a better way to get our pid in gjs?
         let credentials = new Gio.Credentials();
         let pid = credentials.get_unix_pid();
