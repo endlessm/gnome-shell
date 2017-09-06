@@ -1390,7 +1390,6 @@ const AppSearchProvider = new Lang.Class({
             'eos-shell-extension-prefs.desktop'
         ];
         let replacementMap = {};
-        let seenAppIDs = new Set();
 
         groups.forEach(function(group) {
             group = group.filter(function(appID) {
@@ -1407,8 +1406,6 @@ const AppSearchProvider = new Lang.Class({
                     return false;
 
                 if (app && app.should_show()) {
-                    seenAppIDs.add(appID);
-
                     let replacedByID = app.get_string(EOS_REPLACED_BY_KEY);
                     if (replacedByID)
                         replacementMap[appID] = replacedByID;
@@ -1445,7 +1442,8 @@ const AppSearchProvider = new Lang.Class({
                 return true;
 
             // the specified replacement is not installed, show it
-            if (!seenAppIDs.has(replacedByID))
+            let replacedByApp = Gio.DesktopAppInfo.new(replacedByID);
+            if (!replacedByApp)
                 return true;
 
             // the specified replacement is installed, hide it
