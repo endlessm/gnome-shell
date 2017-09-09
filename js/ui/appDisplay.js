@@ -1389,6 +1389,10 @@ const AppSearchProvider = new Lang.Class({
             'com.endlessm.Coding.Chatbox.desktop',
             'eos-shell-extension-prefs.desktop'
         ];
+        let evergreenApps = [
+            'com.endlessm.quote_of_the_day.en.desktop',
+            'com.endlessm.word_of_the_day.en.desktop'
+        ];
         let replacementMap = {};
 
         groups.forEach(function(group) {
@@ -1403,6 +1407,10 @@ const AppSearchProvider = new Lang.Class({
 
                 // exclude coding related apps if coding game is not enabled
                 if (!codingEnabled && codingApps.indexOf(appID) > -1)
+                    return false;
+
+                // exclude "evergreen" apps, since they may not have NoDisplay=true
+                if (evergreenApps.indexOf(appID) > -1)
                     return false;
 
                 if (app && app.should_show()) {
