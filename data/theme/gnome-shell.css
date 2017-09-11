@@ -1964,9 +1964,113 @@ stage {
     margin-bottom: 0px;
 }
 
+#appIconBar {
+    padding-left: 2px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+#appIconBarContainer {
+    spacing: 10px;
+
+    min-height: 40px;
+}
+
+.app-bar-nav-icon {
+    icon-size: 16px;
+    color: #555;
+    transition-duration: 100ms;
+}
+
+.app-bar-nav-button:active .app-bar-nav-icon,
+.app-bar-nav-button:hover:active  .app-bar-nav-icon {
+    color: #383838;
+}
+
+.app-bar-nav-button:hover .app-bar-nav-icon {
+    color: #aaa;
+}
+
+.app-icon-bar.panel-button {
+    -minimum-hpadding: 6px;
+    -natural-hpadding: 6px;
+}
+
+.app-icon-hover-label {
+    -label-offset-y: 37px;
+    font-size: 11pt;
+    font-weight: bold;
+    border: 1px solid black;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 4px;
+}
+
+.app-icon-menu,
+.panel-menu {
+    -boxpointer-gap: 4px;
+}
+
+#panel {
+  height: 40px;
+}
+
 #panel .clock-display {
     font-size: 14px;
     font-weight: bold;
+}
+
+#panel .panel-button {
+    -natural-hpadding: 6px;
+    -minimum-hpadding: 6px;
+}
+
+.popup-menu.panel-menu {
+    -boxpointer-gap: 0px;
+    margin-bottom: 0px;
+}
+
+.panel-window-menu-item-clone:indented {
+    padding-left: 6px;
+}
+
+.panel-window-menu-item-label {
+    max-width: 256px;
+}
+
+.panel-window-menu-workspace-label {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #999;
+}
+
+.app-icon-button {
+    background: none;
+}
+
+.app-icon-button:highlighted {
+    background-image: url("resource:///org/gnome/shell/theme/mini-icon-active-indicator.png");
+    background-position: 2px 34px;
+}
+
+.scrolled-icon-container {
+    -icon-size: 24px;
+    height: 30px;
+    spacing: 10px;
+}
+
+.scrolled-icon-spacer {
+    padding-right: 10px;
+}
+
+.scrolled-icon-spacer:rtl {
+    padding-left: 10px;
+}
+
+.scrolled-icon-list.hfade {
+    -st-hfade-offset: 10px;
 }
 
 .popup-menu-boxpointer,
