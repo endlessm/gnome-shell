@@ -14,6 +14,7 @@ const Atk = imports.gi.Atk;
 const AppDisplay = imports.ui.appDisplay;
 const DND = imports.ui.dnd;
 const IconGrid = imports.ui.iconGrid;
+const InternetSearch = imports.ui.internetSearch;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
 const RemoteSearch = imports.ui.remoteSearch;
@@ -428,6 +429,11 @@ const SearchResults = new Lang.Class({
         this._cancellable = new Gio.Cancellable();
 
         this._registerProvider(new AppDisplay.AppSearchProvider());
+
+        this._internetProvider = InternetSearch.getInternetSearchProvider();
+        if (this._internetProvider)
+            this._registerProvider(this._internetProvider);
+
         this._reloadRemoteProviders();
     },
 
