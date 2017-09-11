@@ -94,6 +94,44 @@ var AppActivationContext = new Lang.Class({
             this.showSplash();
     },
 
+    // Activate an app via a D-Bus call and keep track of its splash screen
+    // if we had to open a new window for it. Otherwise, if there were
+    // windows already open, just do the D-Bus call
+    activateViaDBusCall: function(busName, path, interfaceName, method, args, done) {
+        Gio.bus_get(Gio.BusType.SESSION, null, (source, result) => {
+            let bus = null;
+            try {
+                bus = Gio.bus_get_finish(result);
+            } catch (error) {
+                done(error, null);
+                return;
+            }
+
+            let proxy = new Gio.DBusProxy({
+                g_bus_type: Gio.BusType.SESSION,
+                g_connection: bus,
+                g_default_timeout: GLib.MAXINT32,
+                g_flags: Gio.DBusProxyFlags.NONE,
+                g_interface_name: interfaceName,
+                g_name: busName,
+                g_object_path: path
+            });
+
+            let invoke = (() => {
+                proxy.call(method, args, Gio.DBusCallFlags.NONE, -1, null, function(source, result) {
+                    try {
+                        done(null, proxy.call_finish(result));
+                    } catch (error) {
+                        done(error, null);
+                    }
+                });
+            });
+
+            this.showSplash();
+            invoke();
+        });
+    },
+
     activate: function(event, timestamp) {
         let modifiers = event ? event.get_state() : 0;
 
