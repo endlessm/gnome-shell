@@ -12,6 +12,7 @@ const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 
 const AltTab = imports.ui.altTab;
+const ForceAppExitDialog = imports.ui.forceAppExitDialog;
 const WorkspaceSwitcherPopup = imports.ui.workspaceSwitcherPopup;
 const Main = imports.ui.main;
 const ModalDialog = imports.ui.modalDialog;
@@ -915,6 +916,13 @@ const WindowManager = new Lang.Class({
                                         Shell.ActionMode.UNLOCK_SCREEN |
                                         Shell.ActionMode.LOGIN_SCREEN,
                                         Lang.bind(this, this._startA11ySwitcher));
+
+        this.addKeybinding('show-force-app-exit-dialog',
+                           new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
+                           Meta.KeyBindingFlags.NONE,
+                           Shell.ActionMode.NORMAL |
+                           Shell.ActionMode.OVERVIEW,
+                           Lang.bind(this, this._showForceAppExitDialog));
 
         this.addKeybinding('pause-resume-tweens',
                            new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
@@ -1882,6 +1890,14 @@ const WindowManager = new Lang.Class({
 
     _startA11ySwitcher : function(display, screen, window, binding) {
         Main.ctrlAltTabManager.popup(binding.is_reversed(), binding.get_name(), binding.get_mask());
+    },
+
+    _showForceAppExitDialog: function() {
+        if (!Main.sessionMode.hasOverview)
+            return;
+
+        let dialog = new ForceAppExitDialog.ForceAppExitDialog();
+        dialog.open();
     },
 
     _toggleAppMenu : function(display, screen, window, event, binding) {
