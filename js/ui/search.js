@@ -5,6 +5,7 @@ const Signals = imports.signals;
 
 const AppDisplay = imports.ui.appDisplay;
 const IconGrid = imports.ui.iconGrid;
+const InternetSearch = imports.ui.internetSearch;
 const Main = imports.ui.main;
 const RemoteSearch = imports.ui.remoteSearch;
 const Util = imports.misc.util;
@@ -431,6 +432,11 @@ var SearchResults = class {
         this._cancellable = new Gio.Cancellable();
 
         this._registerProvider(new AppDisplay.AppSearchProvider());
+
+        this._internetProvider = InternetSearch.getInternetSearchProvider();
+        if (this._internetProvider)
+            this._registerProvider(this._internetProvider);
+
         this._reloadRemoteProviders();
     }
 
