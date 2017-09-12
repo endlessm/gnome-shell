@@ -137,6 +137,21 @@ var AuthPrompt = new Lang.Class({
                                         y_fill: true,
                                         y_align: St.Align.START });
 
+        let passwordHintLabel = new St.Label({ text: _("Show password hint"),
+                                               style_class: 'login-dialog-password-recovery-link' });
+        this._passwordHintButton = new St.Button({ style_class: 'login-dialog-password-recovery-button',
+                                                   button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+                                                   can_focus: true,
+                                                   child: passwordHintLabel,
+                                                   reactive: true,
+                                                   x_align: St.Align.START,
+                                                   x_fill: true,
+                                                   visible: false });
+        this.actor.add(this._passwordHintButton,
+                       { x_fill: false,
+                         x_align: St.Align.START });
+        this._passwordHintButton.connect('clicked', Lang.bind(this, this._showPasswordHint));
+
         let passwordResetLabel = new St.Label({ text: _("Forgot password?"),
                                                 style_class: 'login-dialog-password-recovery-link' });
         this._passwordResetButton = new St.Button({ style_class: 'login-dialog-password-recovery-button',
@@ -228,8 +243,10 @@ var AuthPrompt = new Lang.Class({
         this._entry.clutter_text.connect('text-changed',
                                          Lang.bind(this, function() {
                                              if (this._passwordResetCode == null) {
-                                                 if (!this._userVerifier.hasPendingMessages)
+                                                 if (!this._userVerifier.hasPendingMessages &&
+                                                     !this._displayingPasswordHint) {
                                                      this._fadeOutMessage();
+                                                 }
                                                  this._updateNextButtonSensitivity(this._entry.text.length > 0 || this.verificationStatus == AuthPromptStatus.VERIFYING);
                                              } else {
                                                 // Password unlock code must contain the right number of digits, and only digits.
@@ -307,7 +324,12 @@ var AuthPrompt = new Lang.Class({
         this.setActorInDefaultButtonWell(null);
         this.verificationStatus = AuthPromptStatus.VERIFICATION_FAILED;
 
-        this._maybeShowPasswordResetButton();
+        let userManager = AccountsService.UserManager.get_default();
+        let user = userManager.get_user(this._username);
+        if (user.get_password_hint().length > 0)
+            this._passwordHintButton.show();
+        else
+            this._maybeShowPasswordResetButton();
     },
 
     _onVerificationComplete: function() {
@@ -458,6 +480,8 @@ var AuthPrompt = new Lang.Class({
         } else {
             this._message.opacity = 0;
         }
+
+        this._displayingPasswordHint = false;
     },
 
     _updateNextButtonSensitivity: function(sensitive) {
@@ -509,6 +533,7 @@ var AuthPrompt = new Lang.Class({
         this.setUser(null);
         this.stopSpinning();
 
+        this._passwordHintButton.visible = false;
         this._passwordResetButton.visible = false;
         this._passwordResetCode = null;
 
@@ -760,6 +785,15 @@ var AuthPrompt = new Lang.Class({
          this._entry.text = null;
          this.updateSensitivity(true);
          this._message.text = _("Your unlock code was incorrect. Please try again.");
+    },
+
+    _showPasswordHint: function() {
+        let userManager = AccountsService.UserManager.get_default();
+        let user = userManager.get_user(this._username);
+        this.setMessage(user.get_password_hint());
+        this._displayingPasswordHint = true;
+        this._passwordHintButton.hide();
+        this._maybeShowPasswordResetButton();
     }
 });
 Signals.addSignalMethods(AuthPrompt.prototype);
