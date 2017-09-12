@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { Clutter, GLib, Meta, Shell, St } = imports.gi;
+const { Clutter, GLib, Meta, Pango, Shell, St } = imports.gi;
 const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 
@@ -10,6 +10,7 @@ const LayoutManager = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const ModalDialog = imports.ui.modalDialog;
 const Monitor = imports.ui.monitor;
 const OverviewControls = imports.ui.overviewControls;
 const Params = imports.misc.params;
@@ -28,6 +29,8 @@ var SHADE_ANIMATION_TIME = .20;
 var DND_WINDOW_SWITCH_TIMEOUT = 750;
 
 var OVERVIEW_ACTIVATION_TIMEOUT = 0.5;
+
+var NO_WINDOWS_OPEN_DIALOG_TIMEOUT = 2000; // ms
 
 var ShellInfo = class {
     constructor() {
@@ -95,10 +98,58 @@ var ShellInfo = class {
     }
 };
 
+var NoWindowsDialog = class extends ModalDialog.ModalDialog {
+    constructor() {
+        super({ styleClass: 'prompt-dialog',
+                shellReactive: true,
+                destroyOnClose: false });
+
+        this._timeoutId = 0;
+
+        let descriptionLabel = new St.Label({ style_class: 'prompt-dialog-headline headline',
+                                              text: _('No apps are open') });
+        descriptionLabel.clutter_text.line_wrap = true;
+        descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
+        this.contentLayout.add(descriptionLabel,
+                               { x_fill: false,
+                                 y_fill: false,
+                                 x_align: St.Align.MIDDLE,
+                                 y_align: St.Align.MIDDLE });
+
+        this._group.connect('key-press-event', (event) => {
+            this.close(global.get_current_time());
+            return Clutter.EVENT_PROPAGATE;
+        });
+    }
+
+    show() {
+        if (this._timeoutId != 0)
+            Mainloop.source_remove(this._timeoutId);
+
+        this._timeoutId =
+            Mainloop.timeout_add(NO_WINDOWS_OPEN_DIALOG_TIMEOUT, () => {
+                this.hide();
+                return GLib.SOURCE_REMOVE;
+            });
+        this.open(global.get_current_time());
+    }
+
+    hide() {
+        if (this._timeoutId != 0) {
+            Mainloop.source_remove(this._timeoutId);
+            this._timeoutId = 0;
+        }
+        this.close(global.get_current_time());
+    }
+};
+
 var Overview = class {
     constructor() {
         this._overviewCreated = false;
         this._initCalled = false;
+
+        this._noWindowsDialog = new NoWindowsDialog();
 
         Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
@@ -492,6 +543,11 @@ var Overview = class {
             return;
         }
 
+        if (!Main.workspaceMonitor.hasActiveWindows) {
+            this._noWindowsDialog.show();
+            return;
+        }
+
         if (!Main.workspaceMonitor.hasVisibleWindows) {
             // There are active windows but all of them are hidden, so activate
             // the most recently used one before hiding the overview.
@@ -509,8 +565,17 @@ var Overview = class {
         if (this.isDummy)
             return;
 
-        if (!this.visible ||
-            this.viewSelector.getActivePage() !== ViewSelector.ViewPage.WINDOWS) {
+        if (!this.visible) {
+            this.showWindows();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasActiveWindows) {
+            this._noWindowsDialog.show();
+            return;
+        }
+
+        if (this.viewSelector.getActivePage() !== ViewSelector.ViewPage.WINDOWS) {
             this.showWindows();
             return;
         }
@@ -664,6 +729,9 @@ var Overview = class {
         }
 
         this._shown = false;
+
+        // Hide the 'No windows dialog' in case it is open
+        this._noWindowsDialog.hide();
 
         this._animateNotVisible();
         this._syncGrab();
