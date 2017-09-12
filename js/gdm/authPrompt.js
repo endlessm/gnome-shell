@@ -144,6 +144,23 @@ export const AuthPrompt = GObject.registerClass({
         this._message.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.add_child(this._message);
 
+        const passwordHintLabel = new St.Label({
+            text: _('Show password hint'),
+            style_class: 'login-dialog-password-recovery-label',
+        });
+        this._passwordHintButton = new St.Button({
+            style_class: 'login-dialog-password-recovery-button',
+            button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+            can_focus: true,
+            child: passwordHintLabel,
+            reactive: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
+            visible: false,
+        });
+        this.add_child(this._passwordHintButton);
+        this._passwordHintButton.connect('clicked', this._showPasswordHint.bind(this));
+
         const passwordResetLabel = new St.Label({
             text: _('Forgot password?'),
             style_class: 'login-dialog-password-recovery-label',
@@ -258,7 +275,8 @@ export const AuthPrompt = GObject.registerClass({
         [this._textEntry, this._passwordEntry].forEach(entry => {
             entry.clutter_text.connect('text-changed', () => {
                 if (!this._passwordResetCode) {
-                    if (!this._userVerifier.hasPendingMessages)
+                    if (!this._userVerifier.hasPendingMessages &&
+                        !this._displayingPasswordHint)
                         this._fadeOutMessage();
 
                     this._canActivateNext =
@@ -456,7 +474,12 @@ export const AuthPrompt = GObject.registerClass({
         if (wasQueryingService)
             wiggle(this._entry);
 
-        this._maybeShowPasswordResetButton();
+        const userManager = AccountsService.UserManager.get_default();
+        const user = userManager.get_user(this._username);
+        if (user.get_password_hint().length > 0)
+            this._passwordHintButton.show();
+        else
+            this._maybeShowPasswordResetButton();
     }
 
     _onVerificationComplete() {
@@ -632,6 +655,8 @@ export const AuthPrompt = GObject.registerClass({
             this._message.opacity = 0;
         }
 
+        this._displayingPasswordHint = false;
+
         wiggle(this._message, wiggleParameters);
     }
 
@@ -692,6 +717,7 @@ export const AuthPrompt = GObject.registerClass({
         this._updateEntry(true);
         this.stopSpinning();
 
+        this._passwordHintButton.visible = false;
         this._passwordResetButton.visible = false;
         this._passwordResetCode = null;
 
@@ -923,5 +949,18 @@ export const AuthPrompt = GObject.registerClass({
         this._entry.text = null;
         this.updateSensitivity(true);
         this._message.text = _('Your unlock code was incorrect. Please try again.');
+    }
+
+    _showPasswordHint() {
+        const userManager = AccountsService.UserManager.get_default();
+        const user = userManager.get_user(this._username);
+
+        this.setMessage(
+            GdmUtil.PASSWORD_SERVICE_NAME,
+            user.get_password_hint(),
+            GdmUtil.MessageType.HINT);
+        this._displayingPasswordHint = true;
+        this._passwordHintButton.hide();
+        this._maybeShowPasswordResetButton();
     }
 });
