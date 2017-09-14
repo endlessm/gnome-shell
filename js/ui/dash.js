@@ -343,7 +343,8 @@ const DashActor = new Lang.Class({
         let layout = new Clutter.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
         this.parent({ name: 'dash',
                       layout_manager: layout,
-                      clip_to_allocation: true });
+                      clip_to_allocation: true,
+                      visible: false });
     },
 
     vfunc_allocate: function(box, flags) {
@@ -413,8 +414,6 @@ const Dash = new Lang.Class({
         this._showAppsIcon.childOpacity = 255;
         this._showAppsIcon.icon.setIconSize(this.iconSize);
         this._hookUpLabel(this._showAppsIcon);
-
-        this.showAppsButton = this._showAppsIcon.toggleButton;
 
         this._container.add_actor(this._showAppsIcon);
 

@@ -1682,7 +1682,9 @@ const AppIcon = new Lang.Class({
     },
 
     getDragActor: function() {
-        return this.app.create_icon_texture(Main.overview.dashIconSize);
+        // This is a temporary change not to depend on the dash while
+        // we don't implement our own Drag'n'Drop mechanism in EOS.
+        return this.app.create_icon_texture(IconGrid.ICON_SIZE);
     },
 
     // Returns the original actor that should align with the actor
