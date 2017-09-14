@@ -70,6 +70,12 @@ const AltSwitcher = new Lang.Class({
         }
 
         let childShown = this.actor.get_child();
+
+        // We can hit a point where neither the standard nor the
+        // alternate child is visible, so exit cleanly in that case.
+        if (!childToShow)
+            return;
+
         if (childShown != childToShow) {
             if (childShown) {
                 if (childShown.fake_release)
@@ -344,27 +350,51 @@ const Indicator = new Lang.Class({
     },
 
     _createActionButton: function(accessibleName) {
+        let box = new St.BoxLayout({ vertical: true,
+                                     style_class: 'system-menu-action-container' });
         let button = new St.Button({ reactive: true,
                                      can_focus: true,
                                      track_hover: true,
+                                     x_expand: false,
+                                     x_align: Clutter.ActorAlign.CENTER,
                                      accessible_name: accessibleName,
                                      style_class: 'system-menu-action' });
-        return button;
+        box.add(button, { expand: true, x_fill: false });
+
+        let label = new St.Label({ text: accessibleName,
+                                   x_align: Clutter.ActorAlign.CENTER,
+                                   style_class: 'system-menu-action-desc' });
+        box.add(label);
+
+        box._button = button;
+        box._label = label;
+
+        return box;
     },
 
-    _createActionButtonForIconName: function(iconName, accessibleName) {
-        let button = this._createActionButton(accessibleName);
-        button.child = new St.Icon({ icon_name: iconName });
-        return button;
+    _createActionButtonForIconName: function(iconName, accessibleName, callback) {
+        let box = this._createActionButton(accessibleName);
+        let button = box._button
+        button.child = new St.Icon({ icon_name: iconName, x_expand: false });
+
+        if (callback)
+            button.connect('clicked', Lang.bind(this, callback));
+
+        return box;
     },
 
-    _createActionButtonForIconPath: function(iconPath, accessibleName) {
+    _createActionButtonForIconPath: function(iconPath, accessibleName, callback) {
         let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell' + iconPath);
         let gicon = new Gio.FileIcon({ file: iconFile });
 
-        let button = this._createActionButton(accessibleName);
-        button.child = new St.Icon({ gicon: gicon });
-        return button;
+        let box = this._createActionButton(accessibleName);
+        let button = box._button;
+        button.child = new St.Icon({ gicon: gicon, x_expand: false });
+
+        if (callback)
+            button.connect('clicked', Lang.bind(this, callback));
+
+        return box;
     },
 
     _createSubMenu: function() {
@@ -378,8 +408,10 @@ const Indicator = new Lang.Class({
         // or notify::width without creating layout cycles, simply update the
         // label whenever the menu is opened.
         this.menu.connect('open-state-changed', Lang.bind(this, function(menu, isOpen) {
-            if (isOpen)
+            if (isOpen) {
                 this._updateSwitchUserSubMenu();
+                this._updateActionsSubMenu();
+            }
         }));
 
         item = new PopupMenu.PopupMenuItem(_("Switch User"));
@@ -403,19 +435,23 @@ const Indicator = new Lang.Class({
         item = new PopupMenu.PopupBaseMenuItem({ reactive: false,
                                                  can_focus: false });
 
-        this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png', _("Log Out"));
-        this._logoutAction.connect('clicked', Lang.bind(this, this._onQuitSessionActivate));
+        this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png',
+                                                                 _("Log Out"),
+                                                                 this._onQuitSessionActivate);
         item.actor.add(this._logoutAction, { expand: true, x_fill: false });
 
-        this._lockScreenAction = this._createActionButtonForIconName('changes-prevent-symbolic', _("Lock"));
-        this._lockScreenAction.connect('clicked', Lang.bind(this, this._onLockScreenClicked));
+        this._lockScreenAction = this._createActionButtonForIconName('changes-prevent-symbolic',
+                                                                     _("Lock"),
+                                                                     this._onLockScreenClicked);
         item.actor.add(this._lockScreenAction, { expand: true, x_fill: false });
 
-        this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic', _("Suspend"));
-        this._suspendAction.connect('clicked', Lang.bind(this, this._onSuspendClicked));
+        this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic',
+                                                                  _("Suspend"),
+                                                                  this._onSuspendClicked);
 
-        this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic', _("Power Off"));
-        this._powerOffAction.connect('clicked', Lang.bind(this, this._onPowerOffClicked));
+        this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic',
+                                                                   _("Power Off"),
+                                                                   this._onPowerOffClicked);
 
         this._altSwitcher = new AltSwitcher(this._powerOffAction, this._suspendAction);
         item.actor.add(this._altSwitcher.actor, { expand: true, x_fill: false });
