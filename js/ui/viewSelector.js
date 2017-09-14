@@ -216,7 +216,7 @@ var ViewSelector = class {
                               Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
                               Shell.ActionMode.NORMAL |
                               Shell.ActionMode.OVERVIEW,
-                              this._toggleAppsPage.bind(this));
+                              Main.overview.toggleApps.bind(this));
 
         Main.wm.addKeybinding('toggle-overview',
                               new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
@@ -253,11 +253,6 @@ var ViewSelector = class {
             Main.overview.show();
     }
 
-    _toggleAppsPage() {
-        this._showAppsButton.checked = !this._showAppsButton.checked;
-        Main.overview.show();
-    }
-
     showApps() {
         this._showAppsButton.checked = true;
         Main.overview.show();
@@ -266,11 +261,8 @@ var ViewSelector = class {
     show() {
         this.reset();
         this._workspacesDisplay.show(true);
-        this._activePage = null;
-        this._showPage(this._appsPage);
 
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeOutDesktop();
+        this._showPage(this._appsPage);
     }
 
     animateFromOverview() {
@@ -281,9 +273,6 @@ var ViewSelector = class {
         this._workspacesDisplay.animateFromOverview(this._activePage != this._workspacesPage);
 
         this._showAppsButton.checked = false;
-
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeInDesktop();
     }
 
     setWorkspacesFullGeometry(geom) {
@@ -591,6 +580,17 @@ var ViewSelector = class {
         return Clutter.EVENT_PROPAGATE;
     }
 
+    _pageFromViewPage(viewPage) {
+        let page;
+
+        if (viewPage == ViewPage.WINDOWS)
+            page = this._workspacesPage;
+        else
+            page = this._appsPage;
+
+        return page;
+    }
+
     getActivePage() {
         if (this._activePage == this._workspacesPage)
             return ViewPage.WINDOWS;
@@ -598,6 +598,10 @@ var ViewSelector = class {
             return ViewPage.APPS;
         else
             return ViewPage.SEARCH;
+    }
+
+    setActivePage(viewPage) {
+        this._showPage(this._pageFromViewPage(viewPage));
     }
 
     fadeIn() {
