@@ -2313,3 +2313,37 @@ stage {
 .view-source-icon {
   color: #222;
   icon-size: 30px; }
+
+/* Icon Grid labels */
+.overview-icon-label {
+    width: 118px;
+    text-shadow: black 0px 2px 2px;
+
+    border: none;
+    background-color: transparent;
+}
+
+.overview-icon-label:focus {
+    border-radius: 4px;
+    background-gradient-start: rgb(200,200,200);
+    background-gradient-end: white;
+    background-gradient-direction: vertical;
+
+    color: #555;
+    caret-color: #555;
+    selected-color: white;
+
+    box-shadow: inset 0px 1px 2px rgba(0,0,0,0.6);
+}
+
+.overview-icon-label:highlighted,
+.overview-icon-label:focus:highlighted {
+    border-radius: 4px;
+    background-color: #d2d2d2;
+    background-gradient-direction: none;
+
+    color: #333;
+
+    box-shadow: none;
+    text-shadow: none;
+}
