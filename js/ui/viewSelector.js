@@ -267,11 +267,10 @@ const ViewSelector = new Lang.Class({
         Main.overview.show();
     },
 
-    show: function() {
+    show: function(viewPage) {
         this.reset();
         this._activePage = null;
-
-        this._showPage(this._appsPage);
+        this._showPage(this._pageFromViewPage(viewPage));
         this._workspacesDisplay.show(true);
     },
 
