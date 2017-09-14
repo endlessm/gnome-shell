@@ -375,6 +375,7 @@ const ViewsDisplay = new Lang.Class({
 
         this._searchResults = new Search.SearchResults();
         this._searchResults.connect('search-progress-updated', Lang.bind(this, this._updateSpinner));
+        this._searchResults.connect('search-close-clicked', Lang.bind(this, this._resetSearch));
 
         // Since the entry isn't inside the results container we install this
         // dummy widget as the last results container child so that we can

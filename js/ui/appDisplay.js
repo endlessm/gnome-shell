@@ -13,6 +13,7 @@ const St = imports.gi.St;
 const Mainloop = imports.mainloop;
 const Atk = imports.gi.Atk;
 
+const AppActivation = imports.ui.appActivation;
 const AppFavorites = imports.ui.appFavorites;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const BoxPointer = imports.ui.boxpointer;
@@ -1073,9 +1074,11 @@ const AppSearchProvider = new Lang.Class({
         this.getInitialResultSet(terms, callback, cancellable);
     },
 
-    createResultObject: function (resultMeta) {
-        let app = this._appSys.lookup_app(resultMeta['id']);
-        return new AppIcon(app);
+    activateResult: function(appId) {
+        let event = Clutter.get_current_event();
+        let app = this._appSys.lookup_app(appId);
+        let activationContext = new AppActivation.AppActivationContext(app);
+        activationContext.activate(event);
     }
 });
 
