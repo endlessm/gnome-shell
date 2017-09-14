@@ -236,7 +236,7 @@ var ViewSelector = new Lang.Class({
                               Meta.KeyBindingFlags.NONE,
                               Shell.ActionMode.NORMAL |
                               Shell.ActionMode.OVERVIEW,
-                              Lang.bind(this, this._toggleAppsPage));
+                              Main.overview.toggleApps.bind(this));
 
         Main.wm.addKeybinding('toggle-overview',
                               new Gio.Settings({ schema_id: SHELL_KEYBINDINGS_SCHEMA }),
@@ -273,11 +273,6 @@ var ViewSelector = new Lang.Class({
             Main.overview.show();
     },
 
-    _toggleAppsPage: function() {
-        this._showAppsButton.checked = !this._showAppsButton.checked;
-        Main.overview.show();
-    },
-
     showApps: function() {
         this._showAppsButton.checked = true;
         Main.overview.show();
@@ -286,11 +281,8 @@ var ViewSelector = new Lang.Class({
     show: function() {
         this.reset();
         this._workspacesDisplay.show(true);
-        this._activePage = null;
-        this._showPage(this._appsPage);
 
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeOutDesktop();
+        this._showPage(this._appsPage);
     },
 
     animateFromOverview: function() {
@@ -301,9 +293,6 @@ var ViewSelector = new Lang.Class({
         this._workspacesDisplay.animateFromOverview(this._activePage != this._workspacesPage);
 
         this._showAppsButton.checked = false;
-
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeInDesktop();
     },
 
     setWorkspacesFullGeometry: function(geom) {
@@ -608,6 +597,17 @@ var ViewSelector = new Lang.Class({
         return Clutter.EVENT_PROPAGATE;
     },
 
+    _pageFromViewPage: function(viewPage) {
+        let page;
+
+        if (viewPage == ViewPage.WINDOWS)
+            page = this._workspacesPage;
+        else
+            page = this._appsPage;
+
+        return page;
+    },
+
     getActivePage: function() {
         if (this._activePage == this._workspacesPage)
             return ViewPage.WINDOWS;
@@ -615,6 +615,10 @@ var ViewSelector = new Lang.Class({
             return ViewPage.APPS;
         else
             return ViewPage.SEARCH;
+    },
+
+    setActivePage: function(viewPage) {
+        this._showPage(this._pageFromViewPage(viewPage));
     },
 
     fadeIn: function() {
