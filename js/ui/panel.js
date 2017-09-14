@@ -18,6 +18,7 @@ const Animation = imports.ui.animation;
 const Config = imports.misc.config;
 const CtrlAltTab = imports.ui.ctrlAltTab;
 const DND = imports.ui.dnd;
+const GnomeSession = imports.misc.gnomeSession;
 const Overview = imports.ui.overview;
 const PopupMenu = imports.ui.popupMenu;
 const PanelMenu = imports.ui.panelMenu;
@@ -757,6 +758,34 @@ const AggregateMenu = new Lang.Class({
     },
 });
 
+const PowerMenu = new Lang.Class({
+    Name: 'PowerMenuButton',
+    Extends: PanelMenu.SingleIconButton,
+
+    _init: function() {
+        this.parent(0.0, C_("Power menu", "Power"), false);
+
+        this.actor.accessible_role = Atk.Role.PUSH_BUTTON;
+
+        this._session = new GnomeSession.SessionManager();
+
+        let icon = new Gio.ThemedIcon({ name: 'system-shutdown-symbolic' });
+        this.setIcon(icon, PANEL_ICON_SIZE);
+
+        this.actor.add_style_class_name('powermenu');
+    },
+
+    _onEvent: function(actor, event) {
+        if (this.menu &&
+            (event.type() == Clutter.EventType.TOUCH_BEGIN ||
+             event.type() == Clutter.EventType.BUTTON_PRESS)) {
+            this._session.ShutdownRemote(0);
+        }
+
+        return Clutter.EVENT_PROPAGATE;
+    }
+});
+
 const PANEL_ITEM_IMPLEMENTATIONS = {
     'activities': ActivitiesButton,
     'aggregateMenu': AggregateMenu,
@@ -765,6 +794,7 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'a11y': imports.ui.status.accessibility.ATIndicator,
     'a11yGreeter': imports.ui.status.accessibility.ATGreeterIndicator,
     'keyboard': imports.ui.status.keyboard.InputSourceIndicator,
+    'powerMenu': PowerMenu,
 };
 
 const Panel = new Lang.Class({
