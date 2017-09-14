@@ -1998,6 +1998,7 @@ stage {
 }
 
 .app-icon-hover-label {
+    -label-offset-x: 4px;
     -label-offset-y: 37px;
     font-size: 11pt;
     font-weight: bold;
@@ -2137,4 +2138,31 @@ stage {
 .system-menu-action-desc {
     color: #ccc;
     font-size: 9pt;
+}
+
+#panel .endless-button,
+#panel.solid .endless-button {
+    color: #d1d1d1;
+    min-height: 40px;
+    min-width: 60px;
+    padding: 0px;
+}
+
+#panel .endless-button {
+    background-color: rgba(27, 27, 27, 0.66);
+    transition-duration: 300ms;
+}
+
+#panel.solid .endless-button {
+    background-color: #1b1b1b;
+    transition-duration: 500ms;
+}
+
+#panel .endless-button:hover,
+#panel.solid .endless-button:hover {
+    color: #f15a22;
+}
+
+#panel .endless-button .single-icon-button {
+    icon-size: 34px;
 }

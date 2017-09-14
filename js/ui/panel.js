@@ -847,6 +847,7 @@ const PowerMenu = new Lang.Class({
 });
 
 const PANEL_ITEM_IMPLEMENTATIONS = {
+    'endlessButton': imports.ui.endlessButton.EndlessButton,
     'activities': ActivitiesButton,
     'aggregateMenu': AggregateMenu,
     'appIcons': imports.ui.appIconBar.AppIconBar,
