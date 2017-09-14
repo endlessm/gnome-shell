@@ -101,7 +101,7 @@ const _modes = {
                      'appStore'],
 
         panel: {
-            left: ['appIcons'],
+            left: ['endlessButton', 'appIcons'],
             center: [],
             right: ['a11y', 'keyboard', 'aggregateMenu', 'dateMenu',
                     'userMenu']
