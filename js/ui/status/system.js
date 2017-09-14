@@ -156,7 +156,6 @@ var Indicator = new Lang.Class({
 
     _updateActionsVisibility: function() {
         let visible = (this._settingsAction.visible ||
-                       this._orientationLockAction.visible ||
                        this._lockScreenAction.visible ||
                        this._altSwitcher.actor.visible);
 
@@ -274,21 +273,6 @@ var Indicator = new Lang.Class({
         this._settingsAction.connect('clicked', () => { this._onSettingsClicked(); });
         item.actor.add(this._settingsAction, { expand: true, x_fill: false });
 
-        this._orientationLockAction = this._createActionButton('', _("Orientation Lock"));
-        this._orientationLockAction.connect('clicked', () => {
-            this.menu.itemActivated(BoxPointer.PopupAnimation.NONE),
-            this._systemActions.activateLockOrientation();
-        });
-        item.actor.add(this._orientationLockAction, { expand: true, x_fill: false });
-        this._systemActions.bind_property('can-lock-orientation',
-                                          this._orientationLockAction,
-                                          'visible',
-                                          bindFlags);
-        this._systemActions.bind_property('orientation-lock-icon',
-                                          this._orientationLockAction.child,
-                                          'icon-name',
-                                          bindFlags);
-
         this._lockScreenAction = this._createActionButton('changes-prevent-symbolic', _("Lock"));
         this._lockScreenAction.connect('clicked', () => {
             this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
@@ -329,8 +313,6 @@ var Indicator = new Lang.Class({
 
         this._settingsAction.connect('notify::visible',
                                      () => { this._updateActionsVisibility(); });
-        this._orientationLockAction.connect('notify::visible',
-                                            () => { this._updateActionsVisibility(); });
         this._lockScreenAction.connect('notify::visible',
                                        () => { this._updateActionsVisibility(); });
         this._altSwitcher.actor.connect('notify::visible',
