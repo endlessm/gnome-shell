@@ -503,10 +503,6 @@ const AllView = new Lang.Class({
         this._availWidth = 0;
         this._availHeight = 0;
 
-        Main.overview.connect('hidden', Lang.bind(this,
-            function() {
-                this.goToPage(0);
-            }));
         this._grid.connect('space-opened', Lang.bind(this,
             function() {
                 let fadeEffect = this._scrollView.get_effect('fade');
