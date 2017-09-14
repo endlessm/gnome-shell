@@ -386,8 +386,6 @@ const Indicator = new Lang.Class({
         this._user.connect('notify::is-loaded', Lang.bind(this, this._updateSwitchUserSubMenu));
         this._user.connect('changed', Lang.bind(this, this._updateSwitchUserSubMenu));
 
-        this.menu.addMenuItem(this._switchUserSubMenu);
-
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         item = new PopupMenu.PopupBaseMenuItem({ reactive: false,

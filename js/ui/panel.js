@@ -742,7 +742,7 @@ const AggregateMenu = new Lang.Class({
         this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
         let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
-        this.menu.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
+        this._settingsItem = this.menu.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
             this.menu.close(BoxPointer.PopupAnimation.NONE);
             Main.overview.hide();
 
@@ -752,6 +752,10 @@ const AggregateMenu = new Lang.Class({
         }), gicon);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        // We need to monitor the session to know when to show/hide the settings item
+        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
+        this._sessionUpdated();
 
         if (this._network) {
             this.menu.addMenuItem(this._network.menu);
@@ -774,6 +778,43 @@ const AggregateMenu = new Lang.Class({
         menuLayout.addSizeChild(this._orientation.menu.actor);
         menuLayout.addSizeChild(this._rfkill.menu.actor);
         menuLayout.addSizeChild(this._power.menu.actor);
+    },
+
+    _sessionUpdated: function() {
+        this._settingsItem.actor.visible = Main.sessionMode.allowSettings;
+    }
+});
+
+const UserMenu = new Lang.Class({
+    Name: 'UserMenu',
+    Extends: PanelMenu.Button,
+
+    _init: function() {
+        this.parent(0.0, C_("User menu", "User Menu"), false);
+
+        this.actor.accessible_role = Atk.Role.MENU;
+
+        let menuLayout = new AggregateLayout();
+        this.menu.box.set_layout_manager(menuLayout);
+        this.menu.actor.add_style_class_name('aggregate-menu');
+
+        this._userMenu = new imports.ui.userMenu.UserMenu();
+        this.actor.add_child(this._userMenu.panelBox);
+        this.menu.addMenuItem(this._userMenu.menu);
+
+        let systemIndicator = new imports.ui.status.system.Indicator();
+        this.menu.addMenuItem(systemIndicator.menu);
+
+        menuLayout.addSizeChild(systemIndicator.menu.actor);
+
+        // We need to monitor the session to know when to show the button
+        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
+        this._sessionUpdated();
+    },
+
+    _sessionUpdated: function() {
+        this.actor.visible = !Main.sessionMode.isGreeter;
+        this.setSensitive(!Main.sessionMode.isLocked);
     }
 });
 
@@ -815,6 +856,7 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'a11yGreeter': imports.ui.status.accessibility.ATGreeterIndicator,
     'keyboard': imports.ui.status.keyboard.InputSourceIndicator,
     'powerMenu': PowerMenu,
+    'userMenu': UserMenu,
 };
 
 const Panel = new Lang.Class({
