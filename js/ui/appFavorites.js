@@ -45,9 +45,18 @@ const AppFavorites = new Lang.Class({
     Name: 'AppFavorites',
 
     FAVORITE_APPS_KEY: 'favorite-apps',
+    TASKBAR_PINS_KEY_DEPRECATED: 'taskbar-pins',
 
     _init: function() {
         this._favorites = {};
+
+        // Handle deprecated taskbar-pins key gracefully, if present.
+        let oldIds = global.settings.get_strv(this.TASKBAR_PINS_KEY_DEPRECATED);
+        if (oldIds.length > 0) {
+            global.settings.set_strv(this.FAVORITE_APPS_KEY, oldIds);
+            global.settings.set_strv(this.TASKBAR_PINS_KEY_DEPRECATED, []);
+        }
+
         global.settings.connect('changed::' + this.FAVORITE_APPS_KEY, Lang.bind(this, this._onFavsChanged));
         this.reload();
     },
