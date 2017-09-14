@@ -25,17 +25,6 @@ const DISABLE_LOG_OUT_KEY = 'disable-log-out';
 const DISABLE_RESTART_KEY = 'disable-restart-buttons';
 const ALWAYS_SHOW_LOG_OUT_KEY = 'always-show-log-out';
 
-const SENSOR_BUS_NAME = 'net.hadess.SensorProxy';
-const SENSOR_OBJECT_PATH = '/net/hadess/SensorProxy';
-
-const SensorProxyInterface = '<node> \
-<interface name="net.hadess.SensorProxy"> \
-  <property name="HasAccelerometer" type="b" access="read"/> \
-</interface> \
-</node>';
-
-const SensorProxy = Gio.DBusProxy.makeProxyWrapper(SensorProxyInterface);
-
 const AltSwitcher = new Lang.Class({
     Name: 'AltSwitcher',
 
@@ -128,6 +117,24 @@ const AltSwitcher = new Lang.Class({
         this._flipped = !this._flipped;
         this._sync();
         return true;
+    },
+
+    getWidth: function() {
+        let standardVisible = this._standard.visible;
+        let alternateVisible = this._alternate.visible;
+
+        this._standard.visible = true;
+        this._alternate.visible = false;
+        let width = this._standard.get_size()[0];
+
+        this._standard.visible = false;
+        this._alternate.visible = true;
+        width = Math.max(width, this._alternate.get_size()[0]);
+
+        this._standard.visible = standardVisible;
+        this._alternate.visible = alternateVisible;
+
+        return width;
     }
 });
 
@@ -140,7 +147,6 @@ const Indicator = new Lang.Class({
 
         this._loginScreenSettings = new Gio.Settings({ schema_id: LOGIN_SCREEN_SCHEMA });
         this._lockdownSettings = new Gio.Settings({ schema_id: LOCKDOWN_SCHEMA });
-        this._orientationSettings = new Gio.Settings({ schema_id: 'org.gnome.settings-daemon.peripherals.touchscreen' });
 
         this._session = new GnomeSession.SessionManager();
         this._loginManager = LoginManager.getLoginManager();
@@ -188,39 +194,12 @@ const Indicator = new Lang.Class({
         this._lockdownSettings.connect('changed::' + DISABLE_LOG_OUT_KEY,
                                        Lang.bind(this, this._updateHaveShutdown));
 
-        this._orientationSettings.connect('changed::orientation-lock',
-                                          Lang.bind(this, this._updateOrientationLock));
-        Main.layoutManager.connect('monitors-changed',
-                                   Lang.bind(this, this._updateOrientationLock));
-        Gio.DBus.system.watch_name(SENSOR_BUS_NAME,
-                                   Gio.BusNameWatcherFlags.NONE,
-                                   Lang.bind(this, this._sensorProxyAppeared),
-                                   Lang.bind(this, function() {
-                                       this._sensorProxy = null;
-                                       this._updateOrientationLock();
-                                   }));
-        this._updateOrientationLock();
-
         Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
         this._sessionUpdated();
     },
 
-    _sensorProxyAppeared: function() {
-        this._sensorProxy = new SensorProxy(Gio.DBus.system, SENSOR_BUS_NAME, SENSOR_OBJECT_PATH,
-            Lang.bind(this, function(proxy, error) {
-                if (error) {
-                    log(error.message);
-                    return;
-                }
-                this._sensorProxy.connect('g-properties-changed',
-                                          Lang.bind(this, this._updateOrientationLock));
-                this._updateOrientationLock();
-            }));
-    },
-
     _updateActionsVisibility: function() {
         let visible = (this._settingsAction.visible ||
-                       this._orientationLockAction.visible ||
                        this._lockScreenAction.visible ||
                        this._altSwitcher.actor.visible);
 
@@ -299,18 +278,28 @@ const Indicator = new Lang.Class({
         }
     },
 
-    _updateOrientationLock: function() {
-        if (this._sensorProxy)
-            this._orientationLockAction.visible = this._sensorProxy.HasAccelerometer &&
-                                                  this._monitorManager.get_is_builtin_display_on();
-        else
-            this._orientationLockAction.visible = false;
+    _updateActionsSubMenu: function() {
+        let actors = [this._logoutAction, this._lockScreenAction,
+                      this._altSwitcher.actor];
 
-        let locked = this._orientationSettings.get_boolean('orientation-lock');
-        let icon = this._orientationLockAction.child;
-        icon.icon_name = locked ? 'rotation-locked-symbolic' : 'rotation-allowed-symbolic';
+        // First, reset any size we may have previously forced
+        actors.forEach(function(actor) { actor.set_width(-1); });
 
-        this._updateActionsVisibility();
+        // Now, calculate the largest visible label
+        let width = actors.filter(function(actor) {
+            return actor.is_visible();
+        }).reduce(Lang.bind(this, function(acc, actor) {
+            let actorWidth;
+            if (actor == this._altSwitcher.actor)
+                actorWidth = this._altSwitcher.getWidth();
+            else
+                actorWidth = actor.get_size()[0];
+
+            return Math.max(acc, actorWidth);
+        }), 0);
+
+        // Set it on all actors
+        actors.forEach(function(actor) { actor.set_size(width, -1); });
     },
 
     _updateLockScreen: function() {
@@ -408,10 +397,6 @@ const Indicator = new Lang.Class({
         this._settingsAction.connect('clicked', Lang.bind(this, this._onSettingsClicked));
         item.actor.add(this._settingsAction, { expand: true, x_fill: false });
 
-        this._orientationLockAction = this._createActionButton('', _("Orientation Lock"));
-        this._orientationLockAction.connect('clicked', Lang.bind(this, this._onOrientationLockClicked));
-        item.actor.add(this._orientationLockAction, { expand: true, x_fill: false });
-
         this._lockScreenAction = this._createActionButton('changes-prevent-symbolic', _("Lock"));
         this._lockScreenAction.connect('clicked', Lang.bind(this, this._onLockScreenClicked));
         item.actor.add(this._lockScreenAction, { expand: true, x_fill: false });
@@ -434,13 +419,6 @@ const Indicator = new Lang.Class({
         let app = Shell.AppSystem.get_default().lookup_app('gnome-control-center.desktop');
         Main.overview.hide();
         app.activate();
-    },
-
-    _onOrientationLockClicked: function() {
-        this.menu.itemActivated();
-        let locked = this._orientationSettings.get_boolean('orientation-lock');
-        this._orientationSettings.set_boolean('orientation-lock', !locked);
-        this._updateOrientationLock();
     },
 
     _onLockScreenClicked: function() {
