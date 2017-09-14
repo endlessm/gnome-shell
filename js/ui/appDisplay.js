@@ -198,6 +198,18 @@ const BaseAppView = new Lang.Class({
         this.emit('view-loaded');
     },
 
+    indexOf: function(icon) {
+        return this._grid.indexOf(icon.actor);
+    },
+
+    getIconForIndex: function(index) {
+        return this._allItems[index];
+    },
+
+    canDropAt: function(x, y, canDropPastEnd) {
+        return this._grid.canDropAt(x, y, canDropPastEnd);
+    },
+
     _selectAppInternal: function(id) {
         if (this._items[id])
             this._items[id].actor.navigate_focus(null, Gtk.DirectionType.TAB_FORWARD, false);
@@ -459,6 +471,8 @@ const AllView = new Lang.Class({
                     { minRows: EOS_DESKTOP_MIN_ROWS });
 
         this.actor = new AllViewContainer(this._grid.actor);
+        this.actor._delegate = this;
+
         this._scrollView = this.actor.scrollView;
         this._stack = this.actor.stack;
         this._stackBox = this.actor.stackBox;
@@ -511,9 +525,19 @@ const AllView = new Lang.Class({
 
         this._displayingPopup = false;
 
+        this._currentPopup = null;
+
+        this._dragView = null;
+        this._dragIcon = null;
+        this._insertIdx = -1;
+        this._onIconIdx = -1;
+        this._lastCursorLocation = -1;
+
         this._availWidth = 0;
         this._availHeight = 0;
 
+        Main.overview.connect('item-drag-begin', Lang.bind(this, this._onDragBegin));
+        Main.overview.connect('item-drag-end', Lang.bind(this, this._onDragEnd));
         this._grid.connect('space-opened', Lang.bind(this,
             function() {
                 let fadeEffect = this._scrollView.get_effect('fade');
@@ -616,7 +640,8 @@ const AllView = new Lang.Class({
                 let app = appSys.lookup_app(itemId);
                 if (app)
                     icon = new AppIcon(app,
-                                       { isDraggable: favoritesWritable },
+                                       { isDraggable: favoritesWritable,
+                                         parentView: this },
                                        null);
             }
 
@@ -796,6 +821,240 @@ const AllView = new Lang.Class({
         }
 
         return Clutter.EVENT_PROPAGATE;
+    },
+
+    getViewId: function() {
+        return IconGridLayout.DESKTOP_GRID_ID;
+    },
+
+    _positionReallyMoved: function() {
+        if (this._insertIdx == -1)
+            return false;
+
+        // If we're immediately right of the original position,
+        // we didn't really move
+        if ((this._insertIdx == this._originalIdx ||
+             this._insertIdx == this._originalIdx + 1) &&
+            this._dragView == this._dragIcon.parentView)
+            return false;
+
+        return true;
+    },
+
+    _resetDragViewState: function() {
+        this._insertIdx = -1;
+        this._onIconIdx = -1;
+        this._lastCursorLocation = -1;
+        this._dragView = null;
+    },
+
+    _setupDragState: function(source) {
+        if (!source || !source.parentView)
+            return;
+
+        if (!source.handleViewDragBegin)
+            return;
+
+        this._dragIcon = source;
+        this._originalIdx = source.parentView.indexOf(source);
+
+        this._dragMonitor = {
+            dragMotion: Lang.bind(this, this._onDragMotion)
+        };
+        DND.addDragMonitor(this._dragMonitor);
+
+        this._resetDragViewState();
+
+        source.handleViewDragBegin();
+    },
+
+    _clearDragState: function(source) {
+        if (!source || !source.parentView)
+            return;
+
+        if (!source.handleViewDragEnd)
+            return;
+
+        this._dragIcon = null;
+        this._originalIdx = -1;
+
+        if (this._dragMonitor) {
+            DND.removeDragMonitor(this._dragMonitor);
+            this._dragMonitor = null;
+        }
+
+        this._resetDragViewState();
+
+        source.handleViewDragEnd();
+    },
+
+    _onDragBegin: function(overview, source) {
+        // Save the currently dragged item info
+        this._setupDragState(source);
+
+        // Hide the event blocker in all cases to allow for dash DnD
+        this._eventBlocker.hide();
+    },
+
+    _onDragEnd: function(overview, source) {
+        this._eventBlocker.show();
+        this._clearDragState(source);
+    },
+
+    _onDragMotion: function(dragEvent) {
+        // Handle motion over grid
+        let dragView = null;
+
+        if (this._dragIcon.parentView.actor.contains(dragEvent.targetActor))
+            dragView = this._dragIcon.parentView;
+        else if (this.actor.contains(dragEvent.targetActor))
+            dragView = this;
+
+        if (dragView != this._dragView) {
+            if (this._dragView && this._onIconIdx > -1)
+                this._setDragHoverState(false);
+
+            this._resetDragViewState();
+            this._dragView = dragView;
+        }
+
+        if (!this._dragView)
+            return DND.DragMotionResult.CONTINUE;
+
+        let draggingWithinFolder =
+            this._currentPopup && (this._dragView == this._dragIcon.parentView);
+        let canDropPastEnd = draggingWithinFolder;
+
+        // Ask grid can we drop here
+        let [idx, cursorLocation] = this._dragView.canDropAt(dragEvent.x,
+                                                             dragEvent.y,
+                                                             canDropPastEnd);
+
+        let onIcon = (cursorLocation == IconGrid.CursorLocation.ON_ICON);
+        let isNewPosition = (!onIcon && idx != this._insertIdx) ||
+            (cursorLocation != this._lastCursorLocation);
+
+        // If we are not over our last hovered icon, remove its hover state
+        if (this._onIconIdx != -1 &&
+            ((idx != this._onIconIdx) || !onIcon)) {
+            this._setDragHoverState(false);
+            dragEvent.dragActor.opacity = EOS_ACTIVE_GRID_OPACITY;
+        }
+
+        // Update our insert/hover index and the last cursor location
+        this._lastCursorLocation = cursorLocation;
+        if (onIcon) {
+            this._onIconIdx = idx;
+            this._insertIdx = -1;
+
+            let hoverResult = this._getDragHoverResult();
+            if (hoverResult == DND.DragMotionResult.MOVE_DROP) {
+                // If we are hovering over a drop target, set its hover state
+                this._setDragHoverState(true);
+                dragEvent.dragActor.opacity = DRAG_OVER_FOLDER_OPACITY;
+            }
+
+            return hoverResult;
+        }
+
+        // Dropping in a space between icons
+        this._onIconIdx = -1;
+        this._insertIdx = idx;
+
+        // Propagate the signal in any case when moving icons
+        return DND.DragMotionResult.CONTINUE;
+    },
+
+    _setDragHoverState: function(state) {
+        let viewIcon = this._dragView.getIconForIndex(this._onIconIdx);
+
+        if (viewIcon && this._dragIcon.canDragOver(viewIcon))
+            viewIcon.setDragHoverState(state);
+    },
+
+    _getDragHoverResult: function() {
+        // If we are hovering over our own icon placeholder, ignore it
+        if (this._onIconIdx == this._originalIdx &&
+            this._dragView == this._dragIcon.parentView)
+            return DND.DragMotionResult.NO_DROP;
+
+        let validHoverDrop = false;
+        let viewIcon = this._dragView.getIconForIndex(this._onIconIdx);
+
+        // We can only move applications into folders or the app store
+        if (viewIcon)
+            validHoverDrop = viewIcon.canDrop && this._dragIcon.canDragOver(viewIcon);
+
+        if (validHoverDrop)
+            return DND.DragMotionResult.MOVE_DROP;
+
+        return DND.DragMotionResult.CONTINUE;
+    },
+
+    acceptDrop: function(source, actor, x, y, time) {
+        let position = [x, y];
+
+        // This makes sure that if we dropped an icon outside of the grid,
+        // we use the root grid as our target. This can only happen when
+        // dragging an icon out of a folder
+        if (this._dragView == null)
+            this._dragView = this;
+
+        let droppedOutsideOfFolder = this._currentPopup && (this._dragView != this._dragIcon.parentView);
+        let dropIcon = this._dragView.getIconForIndex(this._onIconIdx);
+        let droppedOnAppOutsideOfFolder = droppedOutsideOfFolder && dropIcon && !dropIcon.canDrop;
+
+        if (this._onIconIdx != -1 && !droppedOnAppOutsideOfFolder) {
+            // Find out what icon the drop is under
+            if (!dropIcon || !dropIcon.canDrop)
+                return false;
+
+            if (!source.canDragOver(dropIcon))
+                return false;
+
+            let accepted  = dropIcon.handleIconDrop(source);
+            if (!accepted)
+                return false;
+
+            if (this._currentPopup) {
+                this._eventBlocker.reactive = false;
+                this._currentPopup.popdown();
+            }
+
+            return true;
+        }
+
+        // If we are not dropped outside of a folder (allowed move) and we're
+        // outside of the grid area, or didn't actually change position, ignore
+        // the request to move
+        if (!this._positionReallyMoved() && !droppedOutsideOfFolder)
+            return false;
+
+        // If we are not over an icon but within the grid, shift the
+        // grid around to accomodate it
+        let icon = this._dragView.getIconForIndex(this._insertIdx);
+        let insertId = icon ? icon.getId() : null;
+        let folderId = this._dragView.getViewId();
+
+        // If we dropped the icon outside of the folder, close the popup and
+        // add the icon to the main view
+        if (droppedOutsideOfFolder) {
+            source.blockHandler = true;
+            this._eventBlocker.reactive = false;
+            this._currentPopup.popdown();
+
+            // Append the inserted app to the end of the grid
+            let appSystem = Shell.AppSystem.get_default();
+            let app  = appSystem.lookup_app(source.getId());
+            let icon = new AppIcon(app,
+                                   { isDraggable: true,
+                                     parentView: this },
+                                   null);
+            this.addItem(icon);
+        }
+
+        IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
+        return true;
     },
 
     addFolderPopup: function(popup) {
@@ -1141,9 +1400,10 @@ const FolderView = new Lang.Class({
     Name: 'FolderView',
     Extends: BaseAppView,
 
-    _init: function(dirInfo) {
+    _init: function(folderIcon, dirInfo) {
         this.parent(null, null);
 
+        this._folderIcon = folderIcon;
         this._dirInfo = dirInfo;
 
         // If it not expand, the parent doesn't take into account its preferred_width when allocating
@@ -1256,6 +1516,10 @@ const FolderView = new Lang.Class({
 
     setPaddingOffsets: function(offset) {
         this._offsetForEachSide = offset;
+    },
+
+    getViewId: function() {
+        return this._folderIcon.getId();
     }
 });
 
@@ -1271,7 +1535,8 @@ const ViewIcon = new Lang.Class({
     _init: function(params, buttonParams, iconParams) {
         params = Params.parse(params,
                               { isDraggable: true,
-                                showMenu: true },
+                                showMenu: true,
+                                parentView: null },
                               true);
         buttonParams = Params.parse(buttonParams,
                                     { style_class: 'app-well-app',
@@ -1290,6 +1555,7 @@ const ViewIcon = new Lang.Class({
                                   true);
 
         this.showMenu = params.showMenu;
+        this.parentView = params.parentView;
 
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
@@ -1298,6 +1564,12 @@ const ViewIcon = new Lang.Class({
         this.actor = new St.Button(buttonParams);
         this.actor._delegate = this;
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
+
+        this._createIconFunc = iconParams['createIcon'];
+        iconParams['createIcon'] = Lang.bind(this, this._createIconBase);
+
+        // Used to save the text when setting up the DnD placeholder.
+        this._origText = null;
 
         this.icon = new IconGrid.BaseIcon(this.getName(), iconParams);
         if (iconParams['showLabel'] && iconParams['editable']) {
@@ -1349,8 +1621,40 @@ const ViewIcon = new Lang.Class({
         return this._createIconFunc(this._iconSize);
     },
 
+    replaceText: function(newText) {
+        if (this.icon.label) {
+            this._origText = this.icon.label.text;
+            this.icon.label.text = newText;
+        }
+    },
+
+    restoreText: function() {
+        if (this._origText) {
+            this.icon.label.text = this._origText;
+            this._origText = null;
+        }
+    },
+
+    handleViewDragBegin: function() {
+        this.iconState = ViewIconState.DND_PLACEHOLDER;
+        this.replaceText(null);
+    },
+
+    handleViewDragEnd: function() {
+        this.iconState = ViewIconState.NORMAL;
+        this.restoreText();
+    },
+
     prepareForDrag: function() {
         throw new Error('Not implemented');
+    },
+
+    setDragHoverState: function(state) {
+        this.icon.actor.set_hover(state);
+    },
+
+    canDragOver: function(dest) {
+        return false;
     },
 
     getDragActor: function() {
@@ -1382,7 +1686,8 @@ const FolderIcon = new Lang.Class({
     Extends: ViewIcon,
 
     _init: function(id, parentView) {
-        let viewIconParams = { isDraggable: true };
+        let viewIconParams = { isDraggable: true,
+                               parentView: parentView };
         let buttonParams = { button_mask: St.ButtonMask.ONE,
                              toggle_mode: true };
         let iconParams = { createIcon: Lang.bind(this, this._createIcon),
@@ -1396,13 +1701,16 @@ const FolderIcon = new Lang.Class({
         this._name = this._dirInfo.get_name();
 
         this.parent(viewIconParams, buttonParams, iconParams);
+
         this.actor.add_style_class_name('app-folder');
         this.actor.set_child(this.icon.actor);
 
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
 
-        this.view = new FolderView(this._dirInfo);
+        this.canDrop = true;
+
+        this.view = new FolderView(this, this._dirInfo);
 
         this.actor.connect('clicked', Lang.bind(this,
             function() {
@@ -1421,6 +1729,10 @@ const FolderIcon = new Lang.Class({
 
     getName: function() {
         return this._name;
+    },
+
+    getId: function() {
+        return this._dirInfo.get_id();
     },
 
     getAppIds: function() {
@@ -1465,7 +1777,10 @@ const FolderIcon = new Lang.Class({
             if (!app.get_app_info().should_show())
                 return;
 
-            let icon = new AppIcon(app, null, null);
+            let icon = new AppIcon(app,
+                                   { isDraggable: true,
+                                     parentView: this.view },
+                                   null);
             this.view.addItem(icon);
         }).bind(this);
 
@@ -1555,6 +1870,24 @@ const FolderIcon = new Lang.Class({
     },
 
     prepareForDrag: function() {
+    },
+
+    canDragOver: function(dest) {
+        // Can't drag folders over other folders
+        if (dest.folder)
+            return false;
+
+        return true;
+    },
+
+    handleIconDrop: function(source) {
+        // Move the source icon into this folder
+        IconGridLayout.layout.appendIcon(source.getId(), this.getId());
+        return true;
+    },
+
+    get folder() {
+        return this._dirInfo;
     }
 });
 Signals.addSignalMethods(FolderIcon.prototype);
@@ -1746,9 +2079,9 @@ const AppIcon = new Lang.Class({
         this._sourceAddedId = 0;
 
         let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
-        let iconParams = Params.parse(iconParams, { createIcon: Lang.bind(this, this._createIcon),
-                                                    createExtraIcons: Lang.bind(this, this._createExtraIcons) },
-                                      true);
+        iconParams = Params.parse(iconParams, { createIcon: Lang.bind(this, this._createIcon),
+                                                createExtraIcons: Lang.bind(this, this._createExtraIcons) },
+                                  true);
         if (!iconParams)
             iconParams = {};
 
@@ -1967,6 +2300,10 @@ const AppIcon = new Lang.Class({
 
     prepareForDrag: function() {
         this._removeMenuTimeout();
+    },
+
+    canDragOver: function(dest) {
+        return true;
     },
 
     getDragActor: function() {

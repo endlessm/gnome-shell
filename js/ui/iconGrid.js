@@ -36,6 +36,19 @@ const AnimationDirection = {
 const APPICON_ANIMATION_OUT_SCALE = 3;
 const APPICON_ANIMATION_OUT_TIME = 0.25;
 
+// Endless-specific definitions below this point
+
+const LEFT_DIVIDER_LEEWAY = 30;
+const RIGHT_DIVIDER_LEEWAY = 30;
+
+const CursorLocation = {
+    DEFAULT: 0,
+    ON_ICON: 1,
+    START_EDGE: 2,
+    END_EDGE: 3,
+    EMPTY_AREA: 4
+}
+
 const BaseIcon = new Lang.Class({
     Name: 'BaseIcon',
 
@@ -317,6 +330,9 @@ const IconGrid = new Lang.Class({
         this._fillParent = params.fillParent;
         this._padWithSpacing = params.padWithSpacing;
 
+        this._leftPadding = 0;
+        this._allocatedColumns = 0;
+
         this.topPadding = 0;
         this.bottomPadding = 0;
         this.rightPadding = 0;
@@ -429,6 +445,10 @@ const IconGrid = new Lang.Class({
             case St.Align.END:
                 leftEmptySpace = availWidth - usedWidth;
         }
+
+        // Store some information about the allocated layout
+        this._leftPadding = leftEmptySpace;
+        this._allocatedColumns = nColumns;
 
         let x = box.x1 + leftEmptySpace + this.leftPadding;
         let y = box.y1 + this.topPadding;
@@ -714,6 +734,154 @@ const IconGrid = new Lang.Class({
     adaptToSize: function(availWidth, availHeight) {
         this._fixedHItemSize = this._hItemSize;
         this._fixedVItemSize = this._vItemSize;
+    },
+
+    // DnD support
+
+    indexOf: function(item) {
+        let children = this._grid.get_children();
+        for (let i = 0; i < children.length; i++) {
+            if (item == children[i])
+                return i;
+        }
+
+        return -1;
+    },
+
+    // Returns the drop point index or -1 if we can't drop there
+    canDropAt: function(x, y, canDropPastEnd) {
+        let [ok, sx, sy] = this.actor.transform_stage_point(x, y);
+        if (!ok)
+            return [-1, CursorLocation.DEFAULT];
+
+        let [sw, sh] = this.actor.get_transformed_size();
+        let usedWidth = sw;
+
+        // Undo the align translation from _allocate()
+        if (this._xAlign == St.Align.MIDDLE)
+            usedWidth -= 2 * this._leftPadding;
+        else if (this._xAlign == St.Align.END)
+            usedWidth -= this._leftPadding;
+
+        let rowHeight = this._vItemSize + this._getSpacing();
+        let row = Math.floor(sy / rowHeight);
+
+        // Correct sx to handle the left padding
+        // to correctly calculate the column
+        let rtl = (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL);
+        let gridX = sx - this._leftPadding;
+        if (rtl)
+            gridX = usedWidth - gridX;
+
+        let columnWidth = this._getHItemSize() + this._getSpacing();
+        let column = Math.floor(gridX / columnWidth);
+
+        // If we're outside of the grid, we are in an invalid drop location
+        if (gridX < 0 || gridX > usedWidth)
+            return [-1, CursorLocation.DEFAULT];
+
+        let children = this._grid.get_children();
+        let childIdx = Math.min((row * this._allocatedColumns) + column, children.length);
+
+        // If we're above the grid vertically,
+        // we are in an invalid drop location
+        if (childIdx < 0)
+            return [-1, CursorLocation.DEFAULT];
+
+        // If we're past the last visible element in the grid,
+        // we might be allowed to drop there.
+        if (childIdx >= children.length) {
+            if (canDropPastEnd)
+                return [children.length, CursorLocation.EMPTY_AREA];
+
+            return [-1, CursorLocation.DEFAULT];
+        }
+
+        let child = children[childIdx];
+        let [childMinWidth, childMinHeight, childNaturalWidth, childNaturalHeight] = child.get_preferred_size();
+
+        // This is the width of the cell that contains the icon
+        // (excluding spacing between cells)
+        let childIconWidth = Math.max(this._getHItemSize(), childNaturalWidth);
+
+        // Calculate the original position of the child icon (prior to nudging)
+        let cx;
+        if (rtl)
+            cx = this._leftPadding + usedWidth - (column * columnWidth) - childIconWidth;
+        else
+            cx = this._leftPadding + (column * columnWidth);
+
+        // childIconWidth is used to determine whether or not a drag point
+        // is inside the icon or the divider.
+
+        // Reduce the size of the icon area further by only having it start
+        // further in.  If the drop point is in those initial pixels
+        // then the drop point is the current icon
+        //
+        // Increasing cx and decreasing childIconWidth gives a greater priority
+        // to rearranging icons on the desktop vs putting them into folders
+        // Decreasing cx and increasing childIconWidth gives a greater priority
+        // to putting icons in folders vs rearranging them on the desktop
+        let iconLeftX = cx + LEFT_DIVIDER_LEEWAY;
+        let iconRightX = cx + childIconWidth - RIGHT_DIVIDER_LEEWAY;
+        let leftEdge = this._leftPadding + LEFT_DIVIDER_LEEWAY;
+        let rightEdge = this._leftPadding + usedWidth - RIGHT_DIVIDER_LEEWAY;
+
+        let dropIdx;
+        let cursorLocation;
+
+        if (sx < iconLeftX) {
+            // We are to the left of the icon target
+            if (sx < leftEdge) {
+                // We are before the leftmost icon on the grid
+                if (rtl) {
+                    dropIdx = childIdx + 1;
+                    cursorLocation = CursorLocation.END_EDGE;
+                } else {
+                    dropIdx = childIdx;
+                    cursorLocation = CursorLocation.START_EDGE;
+                }
+            } else {
+                // We are between the previous icon (next in RTL) and this one
+                if (rtl)
+                    dropIdx = childIdx + 1;
+                else
+                    dropIdx = childIdx;
+
+                cursorLocation = CursorLocation.DEFAULT;
+            }
+        } else if (sx >= iconRightX) {
+            // We are to the right of the icon target
+            if (childIdx >= children.length - (canDropPastEnd ? 0 : 1)) {
+                // We are beyond the last valid icon
+                // (to the right of the app store / trash can, if present)
+                dropIdx = -1;
+                cursorLocation = CursorLocation.DEFAULT;
+            } else if (sx >= rightEdge) {
+                // We are beyond the rightmost icon on the grid
+                if (rtl) {
+                    dropIdx = childIdx;
+                    cursorLocation = CursorLocation.START_EDGE;
+                } else {
+                    dropIdx = childIdx + 1;
+                    cursorLocation = CursorLocation.END_EDGE;
+                }
+            } else {
+                // We are between this icon and the next one (previous in RTL)
+                if (rtl)
+                    dropIdx = childIdx;
+                else
+                    dropIdx = childIdx + 1;
+
+                cursorLocation = CursorLocation.DEFAULT;
+            }
+        } else {
+            // We are over the icon target area
+            dropIdx = childIdx;
+            cursorLocation = CursorLocation.ON_ICON;
+        }
+
+        return [dropIdx, cursorLocation];
     }
 });
 Signals.addSignalMethods(IconGrid.prototype);
@@ -764,6 +932,10 @@ const PaginatedIconGrid = new Lang.Class({
             case St.Align.END:
                 leftEmptySpace = availWidth - usedWidth;
         }
+
+        // Store some information about the allocated layout
+        this._leftPadding = leftEmptySpace;
+        this._allocatedColumns = nColumns;
 
         let x = box.x1 + leftEmptySpace + this.leftPadding;
         let y = box.y1 + this.topPadding;
