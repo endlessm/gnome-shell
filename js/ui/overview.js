@@ -21,6 +21,7 @@ const OverviewControls = imports.ui.overviewControls;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
+const ViewSelector = imports.ui.viewSelector;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
 
 // Time for initial animation going into Overview mode
@@ -270,13 +271,6 @@ const Overview = new Lang.Class({
         this._shellInfo.setMessage(text, options);
     },
 
-    _onPageChanged: function() {
-        // SideComponent hooks on this signal but can't connect directly to
-        // viewSelector since it won't be created at the time the component
-        // is enabled, so rely on the overview and re-issue it from here.
-        this.emit('page-changed');
-    },
-
     _onDragBegin: function() {
         this._inXdndDrag = true;
 
@@ -453,6 +447,27 @@ const Overview = new Lang.Class({
         this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
     },
 
+    _showOrSwitchPage: function(page) {
+        if (this.visible)
+            this.viewSelector.setActivePage(page);
+        else
+            this.show();
+    },
+
+    showApps: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
+    },
+
+    showWindows: function() {
+        if (this.isDummy)
+            return;
+
+        this._showOrSwitchPage(ViewSelector.ViewPage.WINDOWS);
+    },
+
     fadeInDesktop: function() {
             this._desktopFade.opacity = 0;
             this._desktopFade.show();
@@ -478,6 +493,29 @@ const Overview = new Lang.Class({
                            time: ANIMATION_TIME,
                            transition: 'easeOutQuad'
                          });
+    },
+
+    toggleApps: function() {
+        if (this.isDummy)
+            return;
+
+        if (!this.visible ||
+            this.viewSelector.getActivePage() !== ViewSelector.ViewPage.APPS) {
+            this.showApps();
+            return;
+        }
+
+        if (!Main.workspaceMonitor.hasVisibleWindows) {
+            // There are active windows but all of them are hidden, so activate
+            // the most recently used one before hiding the overview.
+            let appSystem = Shell.AppSystem.get_default();
+            let runningApps = appSystem.get_running();
+            if (runningApps.length > 0)
+                runningApps[0].activate();
+        }
+
+        // Toggle to the currently open window
+        this.hide();
     },
 
     // Checks if the Activities button is currently sensitive to

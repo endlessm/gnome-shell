@@ -269,13 +269,10 @@ const ViewSelector = new Lang.Class({
 
     show: function() {
         this.reset();
-        this._workspacesDisplay.show(true);
         this._activePage = null;
 
         this._showPage(this._appsPage);
-
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeOutDesktop();
+        this._workspacesDisplay.show(true);
     },
 
     animateFromOverview: function() {
@@ -584,6 +581,17 @@ const ViewSelector = new Lang.Class({
         return Clutter.EVENT_PROPAGATE;
     },
 
+    _pageFromViewPage: function(viewPage) {
+        let page;
+
+        if (viewPage == ViewPage.WINDOWS)
+            page = this._workspacesPage;
+        else
+            page = this._appsPage;
+
+        return page;
+    },
+
     getActivePage: function() {
         if (this._activePage == this._workspacesPage)
             return ViewPage.WINDOWS;
@@ -591,6 +599,10 @@ const ViewSelector = new Lang.Class({
             return ViewPage.APPS;
         else
             return ViewPage.SEARCH;
+    },
+
+    setActivePage: function(viewPage) {
+        this._showPage(this._pageFromViewPage(viewPage));
     },
 
     fadeIn: function() {
