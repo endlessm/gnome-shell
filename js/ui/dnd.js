@@ -94,6 +94,7 @@ const _Draggable = new Lang.Class({
             this.disconnectAll();
         }));
         this._onEventId = null;
+        this._touchSequence = null;
 
         this._restoreOnSuccess = params.restoreOnSuccess;
         this._dragActorMaxSize = params.dragActorMaxSize;
