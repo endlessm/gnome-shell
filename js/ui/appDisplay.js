@@ -1,6 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const Gdk = imports.gi.Gdk;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
@@ -1610,6 +1611,52 @@ const FolderView = new Lang.Class({
     }
 });
 
+const ViewIconMenu = new Lang.Class({
+    Name: 'ViewIconMenu',
+    Extends: PopupMenu.PopupMenu,
+
+    _init: function(source) {
+        let side = St.Side.LEFT;
+        if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
+            side = St.Side.RIGHT;
+
+        this.parent(source.actor, 0.5, side);
+
+        // We want to keep the item hovered while the menu is up
+        this.blockSourceEvents = true;
+
+        this._source = source;
+
+        this.actor.add_style_class_name('app-well-menu');
+
+        // Chain our visibility and lifecycle to that of the source
+        source.actor.connect('notify::mapped', Lang.bind(this, function () {
+            if (!source.actor.mapped)
+                this.close();
+        }));
+        source.actor.connect('destroy', Lang.bind(this, this.destroy));
+
+        Main.uiGroup.add_actor(this.actor);
+    },
+
+    redisplay: function() {
+        this.removeAll();
+
+        // First get a contextual submenu from the specific ViewIcon.
+        let ctxtMenuSection = this._source.getContextualMenu();
+        if (ctxtMenuSection && !ctxtMenuSection.isEmpty()) {
+            this.addMenuItem(ctxtMenuSection);
+            this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        }
+    },
+
+    popup: function(activatingButton) {
+        this.redisplay();
+        this.open();
+    }
+});
+Signals.addSignalMethods(ViewIconMenu.prototype);
+
 const ViewIconState = {
     NORMAL: 0,
     DND_PLACEHOLDER: 1,
@@ -1669,10 +1716,22 @@ const ViewIcon = new Lang.Class({
 
         this.actor.label_actor = this.icon.label;
 
+        this._menu = null;
+        this._menuManager = new PopupMenu.PopupMenuManager(this);
+        this._menuTimeoutId = 0;
+
+        this.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
+        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+        this.actor.connect('touch-event', Lang.bind(this, this._onTouchEvent));
+        this.actor.connect('clicked', Lang.bind(this, this._onClicked));
+        this.actor.connect('popup-menu', Lang.bind(this, this._onKeyboardPopupMenu));
+
+        this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
+
         if (params.isDraggable) {
             this._draggable = DND.makeDraggable(this.actor);
             this._draggable.connect('drag-begin', Lang.bind(this, function() {
-                this.prepareForDrag();
+                this._removeMenuTimeout();
                 Main.overview.beginItemDrag(this);
             }));
             this._draggable.connect('drag-cancelled', Lang.bind(this, function() {
@@ -1698,6 +1757,106 @@ const ViewIcon = new Lang.Class({
 
     _onDestroy: function() {
         this.actor._delegate = null;
+        this._removeMenuTimeout();
+    },
+
+    activate: function (button) {
+        throw new Error('Not implemented');
+    },
+
+    getContextualMenu: function() {
+        // No contextual menu by default;
+        return null;
+    },
+
+    popupMenu: function() {
+        this._removeMenuTimeout();
+
+        if (!this.showMenu)
+            return true;
+
+        this.actor.fake_release();
+
+        if (this._draggable)
+            this._draggable.fakeRelease();
+
+        if (!this._menu) {
+            this._menu = new ViewIconMenu(this);
+            this._menu.connect('open-state-changed', Lang.bind(this, function(menu, isPoppedUp) {
+                if (!isPoppedUp)
+                    this._onMenuPoppedDown();
+            }));
+            let id = Main.overview.connect('hiding', Lang.bind(this, function() { this._menu.close(); }));
+            this.actor.connect('destroy', function() {
+                Main.overview.disconnect(id);
+            });
+
+            this._menuManager.addMenu(this._menu);
+        }
+
+        this.emit('menu-state-changed', true);
+
+        this.actor.set_hover(true);
+        this._menu.popup();
+        this._menuManager.ignoreRelease();
+        this.emit('sync-tooltip');
+
+        return false;
+    },
+
+    _onMenuPoppedDown: function() {
+        this.actor.sync_hover();
+        this.emit('menu-state-changed', false);
+    },
+
+    _onLeaveEvent: function(actor, event) {
+        this.actor.fake_release();
+        this._removeMenuTimeout();
+    },
+
+    _removeMenuTimeout: function() {
+        if (this._menuTimeoutId > 0) {
+            Mainloop.source_remove(this._menuTimeoutId);
+            this._menuTimeoutId = 0;
+        }
+    },
+
+    _setPopupTimeout: function() {
+        this._removeMenuTimeout();
+        this._menuTimeoutId = Mainloop.timeout_add(MENU_POPUP_TIMEOUT, Lang.bind(this, function() {
+            this._menuTimeoutId = 0;
+            this.popupMenu();
+            return GLib.SOURCE_REMOVE;
+        }));
+        GLib.Source.set_name_by_id(this._menuTimeoutId, '[gnome-shell] this.popupMenu');
+    },
+
+    _onButtonPress: function(actor, event) {
+        let button = event.get_button();
+        if (button == Gdk.BUTTON_PRIMARY) {
+            this._setPopupTimeout();
+        } else if (button == Gdk.BUTTON_SECONDARY) {
+            this.popupMenu();
+            return Clutter.EVENT_STOP;
+        }
+        return Clutter.EVENT_PROPAGATE;
+    },
+
+    _onTouchEvent: function (actor, event) {
+        if (event.type() == Clutter.EventType.TOUCH_BEGIN)
+            this._setPopupTimeout();
+
+        return Clutter.EVENT_PROPAGATE;
+    },
+
+    _onClicked: function(actor, button) {
+        this._removeMenuTimeout();
+        this.activate(button);
+    },
+
+    _onKeyboardPopupMenu: function() {
+        this.popupMenu();
+        this._menu.actor.navigate_focus(null, Gtk.DirectionType.TAB_FORWARD, false);
     },
 
     _createIconBase: function(iconSize) {
@@ -1754,10 +1913,6 @@ const ViewIcon = new Lang.Class({
             this.iconState = ViewIconState.NORMAL;
             this.resetDnDPlaceholder();
         }
-    },
-
-    prepareForDrag: function() {
-        throw new Error('Not implemented');
     },
 
     setDragHoverState: function(state) {
@@ -1832,12 +1987,6 @@ const FolderIcon = new Lang.Class({
 
         this.view = new FolderView(this, this._dirInfo);
 
-        this.actor.connect('clicked', Lang.bind(this,
-            function() {
-                this._ensurePopup();
-                this.view.actor.vscroll.adjustment.value = 0;
-                this._openSpaceForPopup();
-            }));
         this.actor.connect('notify::mapped', Lang.bind(this,
             function() {
                 if (!this.actor.mapped && this._popup)
@@ -1859,6 +2008,12 @@ const FolderIcon = new Lang.Class({
         return this.view.getAllItems().map(function(item) {
             return item.id;
         });
+    },
+
+    activate: function (button) {
+        this._ensurePopup();
+        this.view.actor.vscroll.adjustment.value = 0;
+        this._openSpaceForPopup();
     },
 
     _onLabelUpdate: function(label, newText) {
@@ -1987,9 +2142,6 @@ const FolderIcon = new Lang.Class({
         if(this._popup)
             this.view.adaptToSize(width, height);
         this._popupInvalidated = true;
-    },
-
-    prepareForDrag: function() {
     },
 
     canDragOver: function(dest) {
@@ -2220,18 +2372,8 @@ const AppIcon = new Lang.Class({
         this.actor.set_child(this._iconContainer);
         this._iconContainer.add_child(this._dot);
 
-        this.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
-        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
-        this.actor.connect('touch-event', Lang.bind(this, this._onTouchEvent));
-        this.actor.connect('clicked', Lang.bind(this, this._onClicked));
-        this.actor.connect('popup-menu', Lang.bind(this, this._onKeyboardPopupMenu));
-
-        this._menu = null;
-        this._menuManager = new PopupMenu.PopupMenuManager(this);
-
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
 
-        this._menuTimeoutId = 0;
         this._stateChangedId = this.app.connect('notify::state', Lang.bind(this,
             function () {
                 this._updateRunningStyle();
@@ -2288,13 +2430,6 @@ const AppIcon = new Lang.Class({
         this.icon.reloadIcon();
     },
 
-    _removeMenuTimeout: function() {
-        if (this._menuTimeoutId > 0) {
-            Mainloop.source_remove(this._menuTimeoutId);
-            this._menuTimeoutId = 0;
-        }
-    },
-
     _updateRunningStyle: function() {
         if (this.app.state != Shell.AppState.STOPPED)
             this._dot.show();
@@ -2302,109 +2437,8 @@ const AppIcon = new Lang.Class({
             this._dot.hide();
     },
 
-    _setPopupTimeout: function() {
-        this._removeMenuTimeout();
-        this._menuTimeoutId = Mainloop.timeout_add(MENU_POPUP_TIMEOUT,
-            Lang.bind(this, function() {
-                this._menuTimeoutId = 0;
-                this.popupMenu();
-                return GLib.SOURCE_REMOVE;
-            }));
-        GLib.Source.set_name_by_id(this._menuTimeoutId, '[gnome-shell] this.popupMenu');
-    },
-
-    _onLeaveEvent: function(actor, event) {
-        this.actor.fake_release();
-        this._removeMenuTimeout();
-    },
-
-    _onButtonPress: function(actor, event) {
-        let button = event.get_button();
-        if (button == 1) {
-            this._setPopupTimeout();
-        } else if (button == 3) {
-            this.popupMenu();
-            return Clutter.EVENT_STOP;
-        }
-        return Clutter.EVENT_PROPAGATE;
-    },
-
-    _onTouchEvent: function (actor, event) {
-        if (event.type() == Clutter.EventType.TOUCH_BEGIN)
-            this._setPopupTimeout();
-
-        return Clutter.EVENT_PROPAGATE;
-    },
-
-    _onClicked: function(actor, button) {
-        this._removeMenuTimeout();
-        this.activate(button);
-    },
-
-    _onKeyboardPopupMenu: function() {
-        this.popupMenu();
-        this._menu.actor.navigate_focus(null, Gtk.DirectionType.TAB_FORWARD, false);
-    },
-
     getId: function() {
         return this.app.get_id();
-    },
-
-    popupMenu: function() {
-        this._removeMenuTimeout();
-
-        if (!this.showMenu)
-            return true;
-
-        this.actor.fake_release();
-
-        if (this._draggable)
-            this._draggable.fakeRelease();
-
-        if (!this._menu) {
-            this._menu = new AppIconMenu(this);
-            this._menu.connect('activate-window', Lang.bind(this, function (menu, window) {
-                this.activateWindow(window);
-            }));
-            this._menu.connect('open-state-changed', Lang.bind(this, function (menu, isPoppedUp) {
-                if (!isPoppedUp)
-                    this._onMenuPoppedDown();
-            }));
-            let id = Main.overview.connect('hiding', Lang.bind(this, function () { this._menu.close(); }));
-            this.actor.connect('destroy', function() {
-                Main.overview.disconnect(id);
-            });
-
-            this._menuManager.addMenu(this._menu);
-        }
-
-        this.emit('menu-state-changed', true);
-
-        this.actor.set_hover(true);
-        this._menu.popup();
-        this._menuManager.ignoreRelease();
-        this.emit('sync-tooltip');
-
-        return false;
-    },
-
-    activateWindow: function(metaWindow) {
-        if (metaWindow) {
-            Main.activateWindow(metaWindow);
-        } else {
-            Main.overview.hide();
-        }
-    },
-
-    _onMenuPoppedDown: function() {
-        this.actor.sync_hover();
-        this.emit('menu-state-changed', false);
-    },
-
-    activate: function (button) {
-        let event = Clutter.get_current_event();
-        let activationContext = new AppActivation.AppActivationContext(this.app);
-        activationContext.activate(event);
     },
 
     animateLaunch: function() {
@@ -2418,8 +2452,135 @@ const AppIcon = new Lang.Class({
         this.app.open_new_window(params.workspace);
     },
 
-    prepareForDrag: function() {
-        this._removeMenuTimeout();
+    activateWindow: function(metaWindow) {
+        if (metaWindow)
+            Main.activateWindow(metaWindow);
+        else
+            Main.overview.hide();
+    },
+
+    activate: function (button) {
+        let event = Clutter.get_current_event();
+        let activationContext = new AppActivation.AppActivationContext(this.app);
+        activationContext.activate(event);
+    },
+
+    getContextualMenu: function() {
+        let menu = new PopupMenu.PopupMenuSection();
+
+        let windows = this.app.get_windows().filter(function(w) {
+            return !w.skip_taskbar;
+        });
+
+        // Display the app windows menu items and the separator between windows
+        // of the current desktop and other windows.
+        let activeWorkspace = global.screen.get_active_workspace();
+        let separatorShown = windows.length > 0 && windows[0].get_workspace() != activeWorkspace;
+
+        for (let i = 0; i < windows.length; i++) {
+            let window = windows[i];
+            if (!separatorShown && window.get_workspace() != activeWorkspace) {
+                this._appendSeparator();
+                separatorShown = true;
+            }
+
+            let item = new PopupMenu.PopupMenuItem(window.title);
+            menu.addMenuItem(item);
+            item.connect('activate', Lang.bind(this, function() {
+                this.activateWindow(window);
+            }));
+        }
+
+        if (this.app.is_window_backed())
+            return menu;
+
+        menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        let appInfo = this.app.get_app_info();
+        let actions = appInfo.list_actions();
+        if (this.app.can_open_new_window() &&
+            actions.indexOf('new-window') == -1) {
+
+            this._newWindowMenuItem = new PopupMenu.PopupMenuItem(_("New Window"));
+            menu.addMenuItem(this._newWindowMenuItem);
+
+            this._newWindowMenuItem.connect('activate', Lang.bind(this, function() {
+                if (this.app.state == Shell.AppState.STOPPED)
+                    this.animateLaunch();
+
+                this.app.open_new_window(-1);
+                this.activateWindow(null);
+            }));
+            menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        }
+
+        if (discreteGpuAvailable &&
+            this.app.state == Shell.AppState.STOPPED &&
+            actions.indexOf('activate-discrete-gpu') == -1) {
+            this._onDiscreteGpuMenuItem = this._appendMenuItem(_("Launch using Dedicated Graphics Card"));
+            this._onDiscreteGpuMenuItem.connect('activate', Lang.bind(this, function() {
+                if (this.app.state == Shell.AppState.STOPPED)
+                    this._source.animateLaunch();
+
+                this.app.launch(0, -1, true);
+                this.emit('activate-window', null);
+            }));
+        }
+
+        for (let i = 0; i < actions.length; i++) {
+            let action = actions[i];
+            let item = new PopupMenu.PopupMenuItem(appInfo.get_action_name(action));
+            menu.addMenuItem(item);
+            item.connect('activate', Lang.bind(this, function(emitter, event) {
+                this.app.launch_action(action, event.get_time(), -1);
+                this.activateWindow(null);
+            }));
+        }
+
+        if (global.settings.is_writable('favorite-apps')) {
+            menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+            let isFavorite = AppFavorites.getAppFavorites().isFavorite(this.app.get_id());
+
+            if (isFavorite) {
+                let item = new PopupMenu.PopupMenuItem(_("Remove from Favorites"));
+                menu.addMenuItem(item);
+                item.connect('activate', Lang.bind(this, function() {
+                    let favs = AppFavorites.getAppFavorites();
+                    favs.removeFavorite(this.app.get_id());
+                }));
+            } else {
+                let item = new PopupMenu.PopupMenuItem(_("Add to Favorites"));
+                menu.addMenuItem(item);
+                item.connect('activate', Lang.bind(this, function() {
+                    let favs = AppFavorites.getAppFavorites();
+                    favs.addFavorite(this.app.get_id());
+                }));
+            }
+        }
+
+        if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop')) {
+            menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            let item = new PopupMenu.PopupMenuItem(_("Show Details"));
+            menu.addMenuItem(item);
+            item.connect('activate', Lang.bind(this, function() {
+                let id = this.app.get_id();
+                let args = GLib.Variant.new('(ss)', [id, '']);
+                Gio.DBus.get(Gio.BusType.SESSION, null,
+                    function(o, res) {
+                        let bus = Gio.DBus.get_finish(res);
+                        bus.call('org.gnome.Software',
+                                 '/org/gnome/Software',
+                                 'org.gtk.Actions', 'Activate',
+                                 GLib.Variant.new('(sava{sv})',
+                                                  ['details', [args], null]),
+                                 null, 0, -1, null, null);
+                        Main.overview.hide();
+                    });
+            }));
+        }
+
+        return menu;
     },
 
     prepareDndPlaceholder: function() {
@@ -2445,161 +2606,6 @@ const AppIcon = new Lang.Class({
     },
 });
 Signals.addSignalMethods(AppIcon.prototype);
-
-const AppIconMenu = new Lang.Class({
-    Name: 'AppIconMenu',
-    Extends: PopupMenu.PopupMenu,
-
-    _init: function(source) {
-        let side = St.Side.LEFT;
-        if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
-            side = St.Side.RIGHT;
-
-        this.parent(source.actor, 0.5, side);
-
-        // We want to keep the item hovered while the menu is up
-        this.blockSourceEvents = true;
-
-        this._source = source;
-
-        this.actor.add_style_class_name('app-well-menu');
-
-        // Chain our visibility and lifecycle to that of the source
-        source.actor.connect('notify::mapped', Lang.bind(this, function () {
-            if (!source.actor.mapped)
-                this.close();
-        }));
-        source.actor.connect('destroy', Lang.bind(this, this.destroy));
-
-        Main.uiGroup.add_actor(this.actor);
-    },
-
-    _redisplay: function() {
-        this.removeAll();
-
-        let windows = this._source.app.get_windows().filter(function(w) {
-            return !w.skip_taskbar;
-        });
-
-        // Display the app windows menu items and the separator between windows
-        // of the current desktop and other windows.
-        let activeWorkspace = global.screen.get_active_workspace();
-        let separatorShown = windows.length > 0 && windows[0].get_workspace() != activeWorkspace;
-
-        for (let i = 0; i < windows.length; i++) {
-            let window = windows[i];
-            if (!separatorShown && window.get_workspace() != activeWorkspace) {
-                this._appendSeparator();
-                separatorShown = true;
-            }
-            let item = this._appendMenuItem(window.title);
-            item.connect('activate', Lang.bind(this, function() {
-                this.emit('activate-window', window);
-            }));
-        }
-
-        if (!this._source.app.is_window_backed()) {
-            this._appendSeparator();
-
-            let appInfo = this._source.app.get_app_info();
-            let actions = appInfo.list_actions();
-            if (this._source.app.can_open_new_window() &&
-                actions.indexOf('new-window') == -1) {
-                this._newWindowMenuItem = this._appendMenuItem(_("New Window"));
-                this._newWindowMenuItem.connect('activate', Lang.bind(this, function() {
-                    if (this._source.app.state == Shell.AppState.STOPPED)
-                        this._source.animateLaunch();
-
-                    this._source.app.open_new_window(-1);
-                    this.emit('activate-window', null);
-                }));
-                this._appendSeparator();
-            }
-
-            if (discreteGpuAvailable &&
-                this._source.app.state == Shell.AppState.STOPPED &&
-                actions.indexOf('activate-discrete-gpu') == -1) {
-                this._onDiscreteGpuMenuItem = this._appendMenuItem(_("Launch using Dedicated Graphics Card"));
-                this._onDiscreteGpuMenuItem.connect('activate', Lang.bind(this, function() {
-                    if (this._source.app.state == Shell.AppState.STOPPED)
-                        this._source.animateLaunch();
-
-                    this._source.app.launch(0, -1, true);
-                    this.emit('activate-window', null);
-                }));
-            }
-
-            for (let i = 0; i < actions.length; i++) {
-                let action = actions[i];
-                let item = this._appendMenuItem(appInfo.get_action_name(action));
-                item.connect('activate', Lang.bind(this, function(emitter, event) {
-                    this._source.app.launch_action(action, event.get_time(), -1);
-                    this.emit('activate-window', null);
-                }));
-            }
-
-            let canFavorite = global.settings.is_writable('favorite-apps');
-
-            if (canFavorite) {
-                this._appendSeparator();
-
-                let isFavorite = AppFavorites.getAppFavorites().isFavorite(this._source.app.get_id());
-
-                if (isFavorite) {
-                    let item = this._appendMenuItem(_("Remove from Favorites"));
-                    item.connect('activate', Lang.bind(this, function() {
-                        let favs = AppFavorites.getAppFavorites();
-                        favs.removeFavorite(this._source.app.get_id());
-                    }));
-                } else {
-                    let item = this._appendMenuItem(_("Add to Favorites"));
-                    item.connect('activate', Lang.bind(this, function() {
-                        let favs = AppFavorites.getAppFavorites();
-                        favs.addFavorite(this._source.app.get_id());
-                    }));
-                }
-            }
-
-            if (Shell.AppSystem.get_default().lookup_app('org.gnome.Software.desktop')) {
-                this._appendSeparator();
-                let item = this._appendMenuItem(_("Show Details"));
-                item.connect('activate', Lang.bind(this, function() {
-                    let id = this._source.app.get_id();
-                    let args = GLib.Variant.new('(ss)', [id, '']);
-                    Gio.DBus.get(Gio.BusType.SESSION, null,
-                        function(o, res) {
-                            let bus = Gio.DBus.get_finish(res);
-                            bus.call('org.gnome.Software',
-                                     '/org/gnome/Software',
-                                     'org.gtk.Actions', 'Activate',
-                                     GLib.Variant.new('(sava{sv})',
-                                                      ['details', [args], null]),
-                                     null, 0, -1, null, null);
-                            Main.overview.hide();
-                        });
-                }));
-            }
-        }
-    },
-
-    _appendSeparator: function () {
-        let separator = new PopupMenu.PopupSeparatorMenuItem();
-        this.addMenuItem(separator);
-    },
-
-    _appendMenuItem: function(labelText) {
-        // FIXME: app-well-menu-item style
-        let item = new PopupMenu.PopupMenuItem(labelText);
-        this.addMenuItem(item);
-        return item;
-    },
-
-    popup: function(activatingButton) {
-        this._redisplay();
-        this.open();
-    }
-});
-Signals.addSignalMethods(AppIconMenu.prototype);
 
 const AppCenterIconState = {
     EMPTY_TRASH: ViewIconState.NUM_STATES,
