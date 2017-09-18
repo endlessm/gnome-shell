@@ -404,11 +404,11 @@ const ControlsLayout = new Lang.Class({
 const ControlsManager = new Lang.Class({
     Name: 'ControlsManager',
 
-    _init: function(searchEntry) {
+    _init: function() {
         this._thumbnailsBox = new WorkspaceThumbnail.ThumbnailsBox();
         this._thumbnailsSlider = new ThumbnailsSlider(this._thumbnailsBox);
 
-        this.viewSelector = new ViewSelector.ViewSelector(searchEntry);
+        this.viewSelector = new ViewSelector.ViewSelector();
         this.viewSelector.connect('page-changed', Lang.bind(this, this._setVisibility));
         this.viewSelector.connect('page-empty', Lang.bind(this, this._onPageEmpty));
 
