@@ -39,7 +39,7 @@ endif
 	$(AM_V_GEN) $(MSGFMT) --desktop --template $(builddir)/$< \
 	                      -d $(top_srcdir)/po -o $@
 
-rulesdir = $(sysconfdir)/polkit-1/rules.d
+rulesdir = $(datadir)/polkit-1/rules.d
 rules_DATA = 40-gdm.rules
 
 introspectiondir = $(datadir)/dbus-1/interfaces
