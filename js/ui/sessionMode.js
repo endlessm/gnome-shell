@@ -98,10 +98,10 @@ const _modes = {
         components: Config.HAVE_NETWORKMANAGER ?
                     ['networkAgent', 'polkitAgent', 'telepathyClient',
                      'keyring', 'autorunManager', 'automountManager',
-                     'appStore'] :
+                     'appStore', 'discoveryFeed'] :
                     ['polkitAgent', 'telepathyClient',
                      'keyring', 'autorunManager', 'automountManager',
-                     'appStore'],
+                     'appStore', 'discoveryFeed'],
 
         panel: {
             left: ['endlessButton', 'appIcons'],

@@ -26,7 +26,8 @@ function isSideComponentWindow (metaWindow) {
  * @return: whether other windows should be hidden while this one is open
  */
 function shouldHideOtherWindows (metaWindow) {
-    return isSideComponentWindow(metaWindow);
+    return isSideComponentWindow(metaWindow) &&
+        Main.discoveryFeed.launchedFromDesktop;
 };
 
 /**
@@ -36,8 +37,17 @@ function shouldHideOtherWindows (metaWindow) {
  */
 function launchedFromDesktop (metaWindow) {
     return isSideComponentWindow(metaWindow) &&
-        metaWindow.get_wm_class() == 'Eos-app-store' &&
-        Main.appStore.launchedFromDesktop;
+        ((metaWindow.get_wm_class == 'Eos-app-store' && Main.appStore.launchedFromDesktop) ||
+         (isDiscoveryFeedWindow(metaWindow) && Main.discoveryFeed.launchedFromDesktop));
+};
+
+/**
+ * isDiscoveryFeedWindow:
+ * @metaWindow: an instance of #Meta.Window
+ * @return: whether the #Meta.Window is from the DiscoveryFeed application
+ */
+function isDiscoveryFeedWindow (metaWindow) {
+    return metaWindow && (metaWindow.get_wm_class() == 'Com.endlessm.DiscoveryFeed');
 };
 
 const SideComponent = new Lang.Class({
