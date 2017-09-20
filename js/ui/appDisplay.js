@@ -31,8 +31,11 @@ const OverviewControls = imports.ui.overviewControls;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 const Workspace = imports.ui.workspace;
+const Search = imports.ui.search;
+const System = imports.ui.status.system;
 const Params = imports.misc.params;
 const Util = imports.misc.util;
+const SystemActions = imports.misc.systemActions;
 
 const MAX_APPLICATION_WORK_MILLIS = 75;
 const MENU_POPUP_TIMEOUT = 600;
@@ -1372,19 +1375,35 @@ const AppSearchProvider = new Lang.Class({
         this.id = 'applications';
         this.isRemoteProvider = false;
         this.canLaunchSearch = false;
+
+        this._systemActions = new SystemActions.getDefault();
     },
 
     getResultMetas: function(apps, callback) {
         let metas = [];
-        for (let i = 0; i < apps.length; i++) {
-            let app = this._appSys.lookup_app(apps[i]);
-            metas.push({ 'id': app.get_id(),
-                         'name': app.get_name(),
-                         'createIcon': function(size) {
-                             return app.create_icon_texture(size);
-                         }
-                       });
+        for (let id of apps) {
+            if (id.endsWith('.desktop')) {
+                let app = this._appSys.lookup_app(id);
+
+                metas.push({ 'id': app.get_id(),
+                             'name': app.get_name(),
+                             'createIcon': function(size) {
+                                 return app.create_icon_texture(size);
+                           }
+                });
+            } else {
+                let name = this._systemActions.getName(id);
+                let iconName = this._systemActions.getIconName(id);
+
+                let createIcon = size => new St.Icon({ icon_name: iconName,
+                                                       width: size,
+                                                       height: size,
+                                                       style_class: 'system-action-icon' });
+
+                metas.push({ id, name, createIcon });
+            }
         }
+
         callback(metas);
     },
 
@@ -1463,6 +1482,8 @@ const AppSearchProvider = new Lang.Class({
             return false;
         });
 
+        results = results.concat(this._systemActions.getMatchingActions(terms));
+
         callback(results);
     },
 
@@ -1475,6 +1496,13 @@ const AppSearchProvider = new Lang.Class({
         let app = this._appSys.lookup_app(appId);
         let activationContext = new AppActivation.AppActivationContext(app);
         activationContext.activate(event);
+    },
+
+    createResultObject: function (resultMeta) {
+        // We only use this code path for SystemActions which, from the point
+        // of view of this method, are those NOT referenced with desktop IDs.
+        if (!resultMeta.id.endsWith('.desktop'))
+            return new SystemActionIcon(this, resultMeta);
     }
 });
 
@@ -2677,5 +2705,15 @@ const AppCenterIcon = new Lang.Class({
 
         this.handleViewDragEnd();
         return true;
+    }
+});
+
+var SystemActionIcon = new Lang.Class({
+    Name: 'SystemActionIcon',
+    Extends: Search.GridSearchResult,
+
+    activate: function() {
+        SystemActions.getDefault().activateAction(this.metaInfo['id']);
+        Main.overview.hide();
     }
 });
