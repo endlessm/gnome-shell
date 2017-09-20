@@ -1514,11 +1514,6 @@ const FolderView = new Lang.Class({
         Util.ensureActorVisibleInScrollView(this.actor, actor);
     },
 
-    // Overriden from BaseAppView
-    animate: function(animationDirection) {
-        this._grid.animatePulse(animationDirection);
-    },
-
     createFolderIcon: function(size) {
         let layout = new Clutter.GridLayout();
         let icon = new St.Widget({ layout_manager: layout,
