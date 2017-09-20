@@ -28,6 +28,7 @@ const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
+const ViewSelector = imports.ui.viewSelector;
 const Workspace = imports.ui.workspace;
 const Search = imports.ui.search;
 const System = imports.ui.status.system;
@@ -2017,6 +2018,6 @@ var SystemActionIcon = new Lang.Class({
 
     activate: function() {
         SystemActions.getDefault().activateAction(this.metaInfo['id']);
-        Main.overview.hide();
+        Main.overview.viewSelector.show(ViewSelector.ViewPage.APPS);
     }
 });
