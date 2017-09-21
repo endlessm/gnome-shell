@@ -9,6 +9,7 @@ const Animation = imports.ui.animation;
 const Batch = imports.gdm.batch;
 const Config = imports.misc.config;
 const GdmUtil = imports.gdm.util;
+const Keyboard = imports.ui.status.keyboard;
 const Params = imports.misc.params;
 const ShellEntry = imports.ui.shellEntry;
 const UserWidget = imports.ui.userWidget;
@@ -115,6 +116,10 @@ var AuthPrompt = class {
                          y_fill: false,
                          x_align: St.Align.START });
 
+        // for setting passwords we enable a password mode for kbd layouts
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceManager.passwordModeEnabled = true;
+
         this._entry.grab_key_focus();
 
         this._message = new St.Label({ opacity: 0,
@@ -186,6 +191,7 @@ var AuthPrompt = class {
     _onDestroy() {
         this._userVerifier.destroy();
         this._userVerifier = null;
+        this._inputSourceManager.passwordModeEnabled = false;
     }
 
     _initButtons() {

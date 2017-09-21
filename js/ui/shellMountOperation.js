@@ -6,11 +6,13 @@ const Signals = imports.signals;
 
 const Animation = imports.ui.animation;
 const CheckBox = imports.ui.checkBox;
+const Keyboard = imports.ui.status.keyboard;
 const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
 const Params = imports.misc.params;
+const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
 
 const { loadInterfaceXML } = imports.misc.fileUtils;
@@ -362,15 +364,24 @@ var ShellMountPasswordDialog = GObject.registerClass({
         this._workSpinner = new Animation.Spinner(WORK_SPINNER_ICON_SIZE, true);
         this._passwordEntry.secondary_icon = this._workSpinner.actor;
 
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
+
         if (rtl) {
             layout.attach(this._passwordEntry, 0, 1, 1, 1);
             layout.attach(this._passwordLabel, 1, 1, 1, 1);
+            layout.attach(this._inputSourceIndicator.container, 2, 1, 1, 1);
         } else {
-            layout.attach(this._passwordLabel, 0, 1, 1, 1);
-            layout.attach(this._passwordEntry, 1, 1, 1, 1);
+            layout.attach(this._inputSourceIndicator.container, 0, 1, 1, 1);
+            layout.attach(this._passwordLabel, 1, 1, 1, 1);
+            layout.attach(this._passwordEntry, 2, 1, 1, 1);
         }
 
         content.messageBox.add(grid);
+
+        let manager = new PopupMenu.PopupMenuManager(this._inputSourceIndicator.container);
+        manager.addMenu(this._inputSourceIndicator.menu);
+        this._inputSourceManager.passwordModeEnabled = true;
 
         this._errorMessageLabel = new St.Label({ style_class: 'prompt-dialog-error-label',
                                                  text: _("Sorry, that didn’t work. Please try again.") });
@@ -419,10 +430,12 @@ var ShellMountPasswordDialog = GObject.registerClass({
     }
 
     _onCancelButton() {
+        this._inputSourceManager.passwordModeEnabled = false;
         this.emit('response', -1, '', false, false, false, 0);
     }
 
     _onUnlockButton() {
+        this._inputSourceManager.passwordModeEnabled = false;
         this._onEntryActivate();
     }
 

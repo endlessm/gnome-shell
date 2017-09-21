@@ -7,7 +7,9 @@ const { AccountsService, Clutter, Gio, GLib,
 const Animation = imports.ui.animation;
 const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
+const Keyboard = imports.ui.status.keyboard;
 const ModalDialog = imports.ui.modalDialog;
+const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
 const UserWidget = imports.ui.userWidget;
 
@@ -109,6 +111,12 @@ var AuthenticationDialog = GObject.registerClass({
         this._passwordEntry.clutter_text.connect('activate', this._onEntryActivate.bind(this));
         this._passwordBox.add(this._passwordEntry,
                               { expand: true });
+
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
+        this._passwordBox.add(this._inputSourceIndicator.container);
+        let manager = new PopupMenu.PopupMenuManager(this._inputSourceIndicator.container);
+        manager.addMenu(this._inputSourceIndicator.menu);
 
         this._workSpinner = new Animation.Spinner(WORK_SPINNER_ICON_SIZE, true);
         this._passwordBox.add(this._workSpinner.actor);
@@ -276,6 +284,7 @@ var AuthenticationDialog = GObject.registerClass({
         else
             this._passwordEntry.clutter_text.set_password_char('\u25cf'); // ● U+25CF BLACK CIRCLE
 
+        this._inputSourceManager.passwordModeEnabled = true;
         this._passwordBox.show();
         this._passwordEntry.set_text('');
         this._passwordEntry.grab_key_focus();
@@ -303,6 +312,7 @@ var AuthenticationDialog = GObject.registerClass({
 
     _destroySession() {
         if (this._session) {
+            this._inputSourceManager.passwordModeEnabled = false;
             if (!this._completed)
                 this._session.cancel();
             this._completed = false;
