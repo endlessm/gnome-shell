@@ -11,11 +11,13 @@ const St = imports.gi.St;
 const Shell = imports.gi.Shell;
 
 const CheckBox = imports.ui.checkBox;
+const Keyboard = imports.ui.status.keyboard;
 const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
 const Params = imports.misc.params;
+const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
 
 var LIST_ITEM_ICON_SIZE = 48;
@@ -324,6 +326,13 @@ var ShellMountPasswordDialog = new Lang.Class({
         this._passwordBox.add(this._passwordEntry, {expand: true });
         this.setInitialKeyFocus(this._passwordEntry);
 
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
+        this._passwordBox.add(this._inputSourceIndicator.container);
+        let manager = new PopupMenu.PopupMenuManager({ actor: this._inputSourceIndicator.container });
+        manager.addMenu(this._inputSourceIndicator.menu);
+        this._inputSourceManager.passwordModeEnabled = true;
+
         this._errorMessageLabel = new St.Label({ style_class: 'prompt-dialog-error-label',
                                                  text: _("Sorry, that didn’t work. Please try again.") });
         this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
@@ -359,10 +368,12 @@ var ShellMountPasswordDialog = new Lang.Class({
     },
 
     _onCancelButton: function() {
+        this._inputSourceManager.passwordModeEnabled = false;
         this.emit('response', -1, '', false);
     },
 
     _onUnlockButton: function() {
+        this._inputSourceManager.passwordModeEnabled = false;
         this._onEntryActivate();
     },
 
