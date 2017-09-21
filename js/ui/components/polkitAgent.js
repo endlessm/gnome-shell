@@ -6,7 +6,9 @@ const { AccountsService, Clutter, GLib,
 
 const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
+const Keyboard = imports.ui.status.keyboard;
 const ModalDialog = imports.ui.modalDialog;
+const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
 const UserWidget = imports.ui.userWidget;
 const Util = imports.misc.util;
@@ -85,6 +87,11 @@ var AuthenticationDialog = GObject.registerClass({
             vertical: true,
         });
 
+        const entryBox = new St.BoxLayout({
+            style_class: 'prompt-dialog-password-layout',
+        });
+        passwordBox.add_child(entryBox);
+
         this._passwordEntry = new St.PasswordEntry({
             style_class: 'prompt-dialog-password-entry',
             text: "",
@@ -97,7 +104,19 @@ var AuthenticationDialog = GObject.registerClass({
         this._passwordEntry.bind_property('reactive',
             this._passwordEntry.clutter_text, 'editable',
             GObject.BindingFlags.SYNC_CREATE);
-        passwordBox.add_child(this._passwordEntry);
+
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
+
+        const manager = new PopupMenu.PopupMenuManager(this._inputSourceIndicator.container);
+        manager.addMenu(this._inputSourceIndicator.menu);
+
+        entryBox.add_child(this._passwordEntry);
+        entryBox.add_child(this._inputSourceIndicator.container);
+
+        this._passwordEntry.bind_property('visible',
+            entryBox, 'visible',
+            GObject.BindingFlags.DEFAULT | GObject.BindingFlags.SYNC_CREATE);
 
         let warningBox = new St.BoxLayout({ vertical: true });
 
@@ -278,6 +297,7 @@ var AuthenticationDialog = GObject.registerClass({
 
         this._passwordEntry.password_visible = echoOn;
 
+        this._inputSourceManager.passwordModeEnabled = true;
         this._passwordEntry.show();
         this._passwordEntry.set_text('');
         this._passwordEntry.reactive  = true;
@@ -311,6 +331,8 @@ var AuthenticationDialog = GObject.registerClass({
             this._session.disconnect(this._sessionRequestId);
             this._session.disconnect(this._sessionShowErrorId);
             this._session.disconnect(this._sessionShowInfoId);
+
+            this._inputSourceManager.passwordModeEnabled = false;
 
             if (!this._completed)
                 this._session.cancel();
