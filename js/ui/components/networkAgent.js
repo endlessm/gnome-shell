@@ -5,6 +5,7 @@ const { Clutter, Gio, GLib, GObject, NM, Pango, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
 const Config = imports.misc.config;
+const Keyboard = imports.ui.status.keyboard;
 const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -28,6 +29,12 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             this._content = contentOverride;
         else
             this._content = this._getContent();
+
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
+        let manager = new PopupMenu.PopupMenuManager({ actor: this._inputSourceIndicator.container });
+        manager.addMenu(this._inputSourceIndicator.menu);
+        this._inputSourceManager.passwordModeEnabled = true;
 
         let icon = new Gio.ThemedIcon({ name: 'dialog-password-symbolic' });
         let contentParams = { icon,
@@ -86,11 +93,21 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             }
 
             if (rtl) {
-                layout.attach(secret.entry, 0, pos, 1, 1);
-                layout.attach(label, 1, pos, 1, 1);
+                let j = 0;
+                // Some network dialogs have several password entries and
+                // we only want to attach the kbd layout switcher left of the first entry
+                if (i === 0) {
+                    layout.attach(this._inputSourceIndicator.container, j, pos, 1, 1);
+                    j++;
+                }
+                layout.attach(secret.entry, j, pos, 1, 1);
+                layout.attach(label, j+1, pos, 1, 1);
             } else {
                 layout.attach(label, 0, pos, 1, 1);
                 layout.attach(secret.entry, 1, pos, 1, 1);
+                // We only want to attach the kbd layout switcher right to the first entry
+                if (i === 0)
+                    layout.attach(this._inputSourceIndicator.container, 2, pos, 1, 1);
             }
             pos++;
 
@@ -147,6 +164,8 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
                 this._agent.set_password(this._requestId, secret.key, secret.value);
         }
 
+        this._inputSourceManager.passwordModeEnabled = false;
+
         if (valid) {
             this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
             this.close(global.get_current_time());
@@ -155,6 +174,8 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
     }
 
     cancel() {
+        this._inputSourceManager.passwordModeEnabled = false;
+
         this._agent.respond(this._requestId, Shell.NetworkAgentResponse.USER_CANCELED);
         this.close(global.get_current_time());
     }

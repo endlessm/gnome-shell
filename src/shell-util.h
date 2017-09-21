@@ -68,6 +68,10 @@ gboolean shell_util_stop_systemd_unit  (const char  *unit,
 
 void shell_util_sd_notify (void);
 
+gboolean shell_util_needs_secondary_layout (const char *layouts,
+                                            const char *variants,
+                                            const char *options);
+
 G_END_DECLS
 
 #endif /* __SHELL_UTIL_H__ */
