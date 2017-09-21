@@ -22,6 +22,12 @@ const Util = imports.misc.util;
 const INPUT_SOURCE_TYPE_XKB = 'xkb';
 const INPUT_SOURCE_TYPE_IBUS = 'ibus';
 
+const InputSourceManagerIface = '<node> \
+<interface name="org.gnome.Shell.InputSourceManager"> \
+<property name="PasswordModeEnabled" type="b" access="readwrite" /> \
+</interface> \
+</node>';
+
 var LayoutMenuItem = new Lang.Class({
     Name: 'LayoutMenuItem',
     Extends: PopupMenu.PopupBaseMenuItem,
@@ -317,6 +323,11 @@ var InputSourceManager = new Lang.Class({
         this._ibusSources = {};
 
         this._currentSource = null;
+        this._needsFallbackSource = false;
+        this._passwordModeEnabled = false;
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(InputSourceManagerIface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/InputSourceManager');
+        Gio.DBus.session.own_name('org.gnome.Shell.InputSourceManager', Gio.BusNameOwnerFlags.REPLACE, null, null);
 
         // All valid input sources currently in the gsettings
         // KEY_INPUT_SOURCES list ordered by most recently used
@@ -480,6 +491,45 @@ var InputSourceManager = new Lang.Class({
             this._updateMruSettings();
     },
 
+    get PasswordModeEnabled() {
+        return this.passwordModeEnabled;
+    },
+
+    set PasswordModeEnabled(enable) {
+        this.passwordModeEnabled = enable;
+    },
+
+    get passwordModeEnabled() {
+        return this._passwordModeEnabled;
+    },
+
+    set passwordModeEnabled(enable) {
+        if (this._passwordModeEnabled === enable)
+            return;
+
+        this._passwordModeEnabled = enable;
+        this._syncPasswordMode();
+    },
+
+    _syncPasswordMode: function() {
+        if (!this._passwordModeEnabled) {
+            if (this._needsFallbackSource) {
+                this._needsFallbackSource = false;
+                this._currentSource = null;
+            }
+            this._updateInputSources();
+            return;
+        }
+
+        let hasLatinLayout = this._mruSources.some((src) => {
+            return this._keyboardManager.isLatinLayout(src.id);
+        });
+        if (!hasLatinLayout) {
+            this._needsFallbackSource = true;
+            this._updateInputSources();
+        }
+    },
+
     _updateMruSources: function() {
         let sourcesList = [];
         for (let i in this._inputSources)
@@ -526,6 +576,10 @@ var InputSourceManager = new Lang.Class({
     },
 
     _inputSourcesChanged: function() {
+        this._updateInputSources();
+    },
+
+    _updateInputSources: function() {
         let sources = this._settings.inputSources;
         let nSources = sources.length;
 
@@ -564,7 +618,7 @@ var InputSourceManager = new Lang.Class({
                 infosList.push({ type: type, id: id, displayName: displayName, shortName: shortName });
         }
 
-        if (infosList.length == 0) {
+        if (infosList.length == 0 || this._needsFallbackSource) {
             let type = INPUT_SOURCE_TYPE_XKB;
             let id = KeyboardManager.DEFAULT_LAYOUT;
             let [ , displayName, shortName, , ] = this._xkbInfo.get_layout_info(id);
@@ -779,11 +833,12 @@ var InputSourceIndicator = new Lang.Class({
     Name: 'InputSourceIndicator',
     Extends: PanelMenu.Button,
 
-    _init: function() {
+    _init: function(parent, showLayout = true) {
         this.parent(0.0, _("Keyboard"));
 
         this._menuItems = {};
         this._indicatorLabels = {};
+        this._showLayoutItem = null;
 
         this._container = new Shell.GenericContainer();
         this._container.connect('get-preferred-width', Lang.bind(this, this._containerGetPreferredWidth));
@@ -802,8 +857,10 @@ var InputSourceIndicator = new Lang.Class({
         this.menu.addMenuItem(this._propSection);
         this._propSection.actor.hide();
 
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this._showLayoutItem = this.menu.addAction(_("Show Keyboard Layout"), Lang.bind(this, this._showLayout));
+        if (showLayout) {
+            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            this._showLayoutItem = this.menu.addAction(_("Show Keyboard Layout"), this._showLayout.bind(this));
+        }
 
         Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
         this._sessionUpdated();
@@ -819,7 +876,8 @@ var InputSourceIndicator = new Lang.Class({
         // but at least for now it is used as "allow popping up windows
         // from shell menus"; we can always add a separate sessionMode
         // option if need arises.
-        this._showLayoutItem.actor.visible = Main.sessionMode.allowSettings;
+        if (this._showLayoutItem)
+            this._showLayoutItem.actor.visible = Main.sessionMode.allowSettings;
     },
 
     _sourcesChanged: function() {

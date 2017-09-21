@@ -110,6 +110,9 @@ eosmetrics_dep = dependency('eosmetrics-0')
 libwobbly_dep = dependency('libwindowfx_wobbly')
 libeos_shell_fx_deps = [mutter_dep, gdk_pixbuf_dep, libwobbly_dep]
 
+# Endless-specific: Required for keyboard layout switcher in password entries
+xkbcommon_dep = dependency('xkbcommon')
+
 nm_deps = []
 enable_networkmanager = get_option('enable-networkmanager')
 if enable_networkmanager != 'no'
