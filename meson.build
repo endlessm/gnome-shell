@@ -107,6 +107,9 @@ if enable_recorder
   recorder_deps += [gst_dep, gst_base_dep, gtk_dep, x11_dep]
 endif
 
+# Endless-specific: Required for keyboard layout switcher in password entries
+xkbcommon_dep = dependency('xkbcommon')
+
 nm_deps = []
 if get_option('networkmanager')
   nm_deps += dependency('libnm', version: nm_req)
