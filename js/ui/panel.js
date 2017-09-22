@@ -809,8 +809,9 @@ var Panel = new Lang.Class({
         }));
 
         Main.layoutManager.panelBox.add(this.actor);
-        Main.ctrlAltTabManager.addGroup(this.actor, _("Top Bar"), 'focus-top-bar-symbolic',
-                                        { sortGroup: CtrlAltTab.SortGroup.TOP });
+        Main.ctrlAltTabManager.addGroup(this.actor, _("Bottom Bar"), 'focus-top-bar-symbolic',
+                                        { sortGroup: CtrlAltTab.SortGroup.TOP,
+                                          flipVertical: true });
 
         Main.sessionMode.connect('updated', Lang.bind(this, this._updatePanel));
 
