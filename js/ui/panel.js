@@ -961,8 +961,8 @@ const Panel = new Lang.Class({
             childBox.x2 = allocWidth;
         } else {
             childBox.x1 = 0;
-            childBox.x2 = Math.max(0, Math.min(Math.floor(sideWidth),
-                                               leftNaturalWidth));
+            childBox.x2 = Math.min(Math.floor(sideWidth),
+                                   leftNaturalWidth);
         }
         this._leftBox.allocate(childBox, flags);
 
