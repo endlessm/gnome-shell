@@ -262,13 +262,11 @@ shell_app_get_name (ShellApp *app)
     return g_app_info_get_name (G_APP_INFO (app->info));
   else
     {
+      MetaWindow *window = window_backed_app_get_window (app);
       const char *name = NULL;
-      if (app->running_state)
-        {
-          MetaWindow *window = window_backed_app_get_window (app);
-          if (window)
-            name = meta_window_get_wm_class (window);
-        }
+
+      if (window)
+        name = meta_window_get_wm_class (window);
       if (!name)
         name = C_("program", "Unknown");
       return name;
