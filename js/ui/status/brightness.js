@@ -41,7 +41,13 @@ const Indicator = new Lang.Class({
 
         this._slider = new Slider.Slider(0);
         this._slider.connect('value-changed', Lang.bind(this, this._sliderChanged));
+        this._slider.connect('drag-begin', Lang.bind(this, this._sliderDragBegan));
+        this._slider.connect('drag-end', Lang.bind(this, this._sliderDragEnded));
+
         this._slider.actor.accessible_name = _("Brightness");
+
+        this._sliderIsDragging = false;
+        this._sliderValue = this._proxy.Brightness / 100.0;
 
         let icon = new St.Icon({ icon_name: 'display-brightness-symbolic',
                                  style_class: 'popup-menu-icon' });
@@ -56,9 +62,28 @@ const Indicator = new Lang.Class({
 
     },
 
-    _sliderChanged: function(slider, value) {
-        let percent = value * 100;
+    _updateBrightness: function() {
+        let percent = this._sliderValue * 100;
         this._proxy.Brightness = percent;
+    },
+
+    _sliderChanged: function(slider, value) {
+        this._sliderValue = value;
+
+        // It's ok to change the brightness here only if the slider didn't
+        // change because of a mouse dragging event (e.g. keyboard), otherwise
+        // it could push changes faster than how they can actually be handled.
+        if (!this._sliderIsDragging)
+            this._updateBrightness();
+    },
+
+    _sliderDragBegan: function(slider) {
+        this._sliderIsDragging = true;
+    },
+
+    _sliderDragEnded: function(slider) {
+        this._updateBrightness();
+        this._sliderIsDragging = false;
     },
 
     _sync: function() {
