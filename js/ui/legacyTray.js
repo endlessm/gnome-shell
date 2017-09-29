@@ -239,7 +239,8 @@ const LegacyTray = new Lang.Class({
         let allowed = Main.sessionMode.hasNotifications;
         let hasIcons = this._iconBox.get_n_children() > 0;
         let inOverview = Main.overview.visible && !Main.overview.animationInProgress;
-        let inFullscreen = Main.layoutManager.primaryMonitor.inFullscreen;
+        let inFullscreen = Main.layoutManager.primaryMonitor ?
+            Main.layoutManager.primaryMonitor.inFullscreen : false;
         this.actor.visible = allowed && hasIcons && !inOverview && !inFullscreen;
 
         if (!hasIcons)

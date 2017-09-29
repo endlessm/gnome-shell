@@ -457,6 +457,9 @@ const Overview = new Lang.Class({
     },
 
     _relayout: function () {
+        if (!Main.layoutManager.primaryMonitor)
+            return;
+
         // To avoid updating the position and size of the workspaces
         // we just hide the overview. The positions will be updated
         // when it is next shown.
@@ -466,6 +469,9 @@ const Overview = new Lang.Class({
     },
 
     _relayoutNoHide: function () {
+        if (!Main.layoutManager.primaryMonitor)
+            return;
+
         let workArea = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
 
         this._coverPane.set_position(0, workArea.y);
