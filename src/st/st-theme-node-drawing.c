@@ -2505,7 +2505,7 @@ st_theme_node_paint (StThemeNode           *node,
   allocation.x2 = width;
   allocation.y2 = height;
 
-  if (width <= 0 || height <= 0)
+  if (width <= 0 || height <= 0 || isnan (width) || isnan (height))
     return;
 
   /* Check whether we need to recreate the textures of the paint
