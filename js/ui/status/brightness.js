@@ -39,6 +39,11 @@ const Indicator = new Lang.Class({
         this._item = new PopupMenu.PopupBaseMenuItem({ activate: false });
         this.menu.addMenuItem(this._item);
 
+        this._item.actor.connect('notify::mapped', () => {
+            if (this._item.actor.mapped)
+                this._slider.setValue(this._proxy.Brightness / 100.0);
+        });
+
         this._slider = new Slider.Slider(0);
         this._slider.connect('value-changed', Lang.bind(this, this._sliderChanged));
         this._slider.actor.accessible_name = _("Brightness");
@@ -64,7 +69,5 @@ const Indicator = new Lang.Class({
     _sync: function() {
         let visible = this._proxy.Brightness >= 0;
         this._item.actor.visible = visible;
-        if (visible)
-            this._slider.setValue(this._proxy.Brightness / 100.0);
-    },
+    }
 });
