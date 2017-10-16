@@ -1430,10 +1430,6 @@ const AppSearchProvider = new Lang.Class({
                 let isLink = appID.startsWith(EOS_LINK_PREFIX);
                 let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
 
-                // exclude links that are not part of the desktop grid
-                if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
-                    return false;
-
                 // exclude coding related apps if coding game is not enabled
                 if (!codingEnabled && codingApps.indexOf(appID) > -1)
                     return false;
