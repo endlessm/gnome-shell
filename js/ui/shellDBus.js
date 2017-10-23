@@ -534,16 +534,19 @@ const AppStoreService = new Lang.Class({
     },
 
     AddAppIfNotVisible: function(id) {
-        let eventRecorder = EosMetrics.EventRecorder.get_default();
-        let appId = new GLib.Variant('s', id);
-        eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
+        let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+        let isIconVisible = visibleIcons.indexOf(id) !== -1;
+
+        if (!isIconVisible) {
+            let eventRecorder = EosMetrics.EventRecorder.get_default();
+            let appId = new GLib.Variant('s', id);
+            eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
+        }
 
         if (IconGridLayout.layout.iconIsFolder(id))
             return;
 
-        let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
-        if (visibleIcons.indexOf(id) == -1)
-            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+        IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
     },
 
     ReplaceApplication: function(originalId, replacementId) {
