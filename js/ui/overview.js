@@ -731,29 +731,25 @@ const Overview = new Lang.Class({
         // the hidden state
         this._toggleToHidden = true;
 
-        this._coverPane.raise_top();
-        this._coverPane.show();
-        this.emit('showing');
-
-        if (Main.layoutManager.startingUp || this.opacityPrepared) {
-            this._overview.opacity = EOS_ACTIVE_GRID_OPACITY;
-            this.opacityPrepared = false;
-            this._showDone();
-            return;
-        }
-
         if (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS)
             this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
         else
             this._overview.opacity = 0;
 
+        // We don't want to run any animation when the overview is either
+        // starting up or the opacity that we should be tweening it the
+        // one from the clone is the one from the clone.
+        let animationTime = (Main.layoutManager.startingUp || this.opacityPrepared) ? 0 : ANIMATION_TIME;
         Tweener.addTween(this._overview,
                          { opacity: EOS_ACTIVE_GRID_OPACITY,
                            transition: 'easeOutQuad',
-                           time: ANIMATION_TIME,
+                           time: animationTime,
                            onComplete: this._showDone,
                            onCompleteScope: this
                          });
+        this._coverPane.raise_top();
+        this._coverPane.show();
+        this.emit('showing');
     },
 
     _showDone: function() {
@@ -768,6 +764,8 @@ const Overview = new Lang.Class({
 
         this._syncGrab();
         global.sync_pointer();
+
+        this.opacityPrepared = false;
     },
 
     // hide:
@@ -806,34 +804,26 @@ const Overview = new Lang.Class({
 
         this.animationInProgress = true;
         this.visibleTarget = false;
-        this.emit('hiding');
 
+        // This needs to be checked before calling animateFromOverview().
         let hidingFromApps = (this.viewSelector.getActivePage() == ViewSelector.ViewPage.APPS);
-        if (hidingFromApps)
-            this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
-
-        if (hidingFromApps) {
-            // When we're hiding from the apps page, we want to instantaneously
-            // switch to the application, so don't fade anything. We'll tween
-            // the grid clone in the background separately - see comment in
-            // viewSelector.js::ViewsClone.
-            this._hideDone();
-            return;
-        }
 
         this.viewSelector.animateFromOverview();
 
-        // Make other elements fade out.
+        // Make other elements fade out, unless we're hiding from the Apps view
+        // in which case we want to cut it short, as we did in the older shell.
+        let animationTime = hidingFromApps ? 0 : ANIMATION_TIME;
         Tweener.addTween(this._overview,
                          { opacity: 0,
                            transition: 'easeOutQuad',
-                           time: ANIMATION_TIME,
+                           time: animationTime,
                            onComplete: this._hideDone,
                            onCompleteScope: this
                          });
 
         this._coverPane.raise_top();
         this._coverPane.show();
+        this.emit('hiding');
     },
 
     _hideDone: function() {

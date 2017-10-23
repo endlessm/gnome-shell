@@ -747,7 +747,7 @@ const ViewSelector = new Lang.Class({
 
     show: function(viewPage) {
         this._clearSearch();
-        this._workspacesDisplay.show(true);
+        this._workspacesDisplay.show(viewPage == ViewPage.APPS);
 
         this._showPage(this._pageFromViewPage(viewPage));
     },
