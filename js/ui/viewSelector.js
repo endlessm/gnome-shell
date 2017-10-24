@@ -758,11 +758,6 @@ const ViewSelector = new Lang.Class({
         this._workspacesPage.opacity = 255;
 
         this._workspacesDisplay.animateFromOverview(this._activePage != this._workspacesPage);
-
-        this._showPage(this._workspacesPage);
-
-        if (!this._workspacesDisplay.activeWorkspaceHasMaximizedWindows())
-            Main.overview.fadeInDesktop();
     },
 
     setWorkspacesFullGeometry: function(geom) {
