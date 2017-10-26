@@ -754,7 +754,7 @@ const ViewSelector = new Lang.Class({
         this._clearSearch();
         this._workspacesDisplay.show(viewPage == ViewPage.APPS);
 
-        this._showPage(this._pageFromViewPage(viewPage));
+        this._showPage(this._pageFromViewPage(viewPage), viewPage == ViewPage.APPS);
     },
 
     animateFromOverview: function() {
@@ -816,12 +816,12 @@ const ViewSelector = new Lang.Class({
                            time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
                            transition: 'easeOutQuad',
                            onComplete: Lang.bind(this, function() {
-                               this._animateIn(oldPage);
+                               this._animateIn(oldPage, true);
                            })
                          });
     },
 
-    _animateIn: function(oldPage) {
+    _animateIn: function(oldPage, doFadeAnimation) {
         if (oldPage)
             oldPage.hide();
 
@@ -833,22 +833,33 @@ const ViewSelector = new Lang.Class({
             // Restore opacity, in case we animated via _fadePageOut
             this._activePage.opacity = 255;
             this.appDisplay.animate(IconGrid.AnimationDirection.IN);
-        } else {
+        } else if (doFadeAnimation) {
             this._fadePageIn();
+        } else {
+            // Not using a fading animation, but we still need
+            // to set the final opacity value for the page.
+            this._activePage.opacity = 255;
         }
     },
 
-    _animateOut: function(page) {
+    _animateOut: function(page, doFadeAnimation) {
         let oldPage = page;
         if (page == this._appsPage &&
             this._activePage == this._workspacesPage &&
             !Main.overview.animationInProgress) {
             this.appDisplay.animate(IconGrid.AnimationDirection.OUT, Lang.bind(this,
                 function() {
-                    this._animateIn(oldPage)
+                    this._animateIn(oldPage, doFadeAnimation)
                 }));
-        } else {
+        } else if (doFadeAnimation) {
             this._fadePageOut(page);
+        } else {
+            // Not using a fading animation, but we still need
+            // to set the final opacity value for the page.
+            page.opacity = 0;
+
+            // Chain into _animateIn to show the active page.
+            this._animateIn(oldPage, doFadeAnimation);
         }
     },
 
@@ -859,7 +870,7 @@ const ViewSelector = new Lang.Class({
         this.emit('page-changed');
     },
 
-    _showPage: function(page) {
+    _showPage: function(page, doFadeAnimation) {
         if (!Main.overview.visible)
             return;
 
@@ -871,9 +882,9 @@ const ViewSelector = new Lang.Class({
         this._pageChanged();
 
         if (oldPage)
-            this._animateOut(oldPage)
+            this._animateOut(oldPage, doFadeAnimation)
         else
-            this._animateIn();
+            this._animateIn(null, doFadeAnimation);
     },
 
     _a11yFocusPage: function(page) {
@@ -930,7 +941,7 @@ const ViewSelector = new Lang.Class({
     },
 
     setActivePage: function(viewPage) {
-        this._showPage(this._pageFromViewPage(viewPage));
+        this._showPage(this._pageFromViewPage(viewPage), viewPage == ViewPage.APPS);
     },
 
     fadeIn: function() {
