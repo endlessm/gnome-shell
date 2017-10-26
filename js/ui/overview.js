@@ -526,13 +526,7 @@ const Overview = new Lang.Class({
     },
 
     _onStartupCompleted: function() {
-        if (this.isDummy)
-            return;
-
-        if (Main.workspaceMonitor.hasActiveWindows)
-            return;
-
-        this._showOrSwitchPage(ViewSelector.ViewPage.APPS);
+        this.showApps();
     },
 
     _showOrSwitchPage: function(page) {
