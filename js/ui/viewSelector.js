@@ -692,10 +692,10 @@ var ViewSelector = new Lang.Class({
         let layoutViewsClone = new ViewsClone(this, this._viewsDisplay, false);
         Main.layoutManager.setViewsClone(layoutViewsClone);
 
-        let overviewViewsClone = new ViewsClone(this, this._viewsDisplay, true);
-        Main.overview.setViewsClone(overviewViewsClone);
+        this._overviewViewsClone = new ViewsClone(this, this._viewsDisplay, true);
+        Main.overview.setViewsClone(this._overviewViewsClone);
         this._appsPage.bind_property('visible',
-                                     overviewViewsClone, 'visible',
+                                     this._overviewViewsClone, 'visible',
                                      GObject.BindingFlags.SYNC_CREATE |
                                      GObject.BindingFlags.INVERT_BOOLEAN);
     },
@@ -722,7 +722,7 @@ var ViewSelector = new Lang.Class({
         if (!Main.layoutManager.startingUp)
             this._workspacesDisplay.show(viewPage == ViewPage.APPS);
 
-        this._showPage(this._pageFromViewPage(viewPage));
+        this._showPage(this._pageFromViewPage(viewPage), false);
     },
 
     animateFromOverview: function() {
@@ -769,54 +769,24 @@ var ViewSelector = new Lang.Class({
         return page;
     },
 
-    _fadePageIn: function() {
-        Tweener.addTween(this._activePage,
-                         { opacity: 255,
-                           time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
-                           transition: 'easeOutQuad'
-                         });
-    },
-
-    _fadePageOut: function(page) {
-        let oldPage = page;
-        Tweener.addTween(page,
-                         { opacity: 0,
-                           time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this, function() {
-                               this._animateIn(oldPage);
-                           })
-                         });
-    },
-
-    _animateIn: function(oldPage) {
-        if (oldPage)
+    _fadePageIn: function(oldPage, doFadeAnimation) {
+        if (oldPage) {
+            oldPage.opacity = 0;
             oldPage.hide();
+        }
 
         this.emit('page-empty');
 
         this._activePage.show();
 
-        if (this._activePage == this._appsPage && oldPage == this._workspacesPage) {
-            // Restore opacity, in case we animated via _fadePageOut
+        if (doFadeAnimation) {
+            Tweener.addTween(this._activePage,
+                { opacity: 255,
+                  time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
+                  transition: 'easeOutQuad'
+                });
+        } else {
             this._activePage.opacity = 255;
-            this.appDisplay.animate(IconGrid.AnimationDirection.IN);
-        } else {
-            this._fadePageIn();
-        }
-    },
-
-    _animateOut: function(page) {
-        let oldPage = page;
-        if (page == this._appsPage &&
-            this._activePage == this._workspacesPage &&
-            !Main.overview.animationInProgress) {
-            this.appDisplay.animate(IconGrid.AnimationDirection.OUT, Lang.bind(this,
-                function() {
-                    this._animateIn(oldPage)
-                }));
-        } else {
-            this._fadePageOut(page);
         }
     },
 
@@ -827,10 +797,7 @@ var ViewSelector = new Lang.Class({
         this._pageChanged();
     },
 
-    _showPage: function(page) {
-        if (!Main.overview.visible)
-            return;
-
+    _showPage: function(page, doFadeAnimation) {
         if (page == this._activePage)
             return;
 
@@ -838,10 +805,51 @@ var ViewSelector = new Lang.Class({
         this._activePage = page;
         this.emit('page-changed');
 
-        if (oldPage)
-            this._animateOut(oldPage)
-        else
-            this._animateIn();
+        if (oldPage && doFadeAnimation) {
+            // When fading to the apps page, tween the opacity of the
+            // clone instead, and set the apps page to full solid immediately
+            if (page == this._appsPage) {
+                page.opacity = 255;
+                this._overviewViewsClone.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+                this._overviewViewsClone.saturation = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
+                Tweener.addTween(this._overviewViewsClone,
+                                 { opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
+                                   saturation: AppDisplay.EOS_ACTIVE_GRID_SATURATION,
+                                   time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
+                                   transition: 'easeOutQuad',
+                                   onComplete: function() {
+                                       this._overviewViewsClone.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
+                                       this._overviewViewsClone.saturation = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
+                                   },
+                                   onCompleteScope: this });
+            }
+
+            // When fading from the apps page, tween the opacity of the
+            // clone instead. The code in this._fadePageIn() will hide
+            // the actual page immediately
+            if (oldPage == this._appsPage) {
+                this._overviewViewsClone.opacity = AppDisplay.EOS_ACTIVE_GRID_OPACITY;
+                this._overviewViewsClone.saturation = AppDisplay.EOS_ACTIVE_GRID_SATURATION;
+                Tweener.addTween(this._overviewViewsClone,
+                                 { opacity: AppDisplay.EOS_INACTIVE_GRID_OPACITY,
+                                   saturation: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
+                                   time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
+                                   transition: 'easeOutQuad' });
+                this._fadePageIn(oldPage, doFadeAnimation);
+            } else {
+                Tweener.addTween(oldPage,
+                                 { opacity: 0,
+                                   time: OverviewControls.SIDE_CONTROLS_ANIMATION_TIME,
+                                   transition: 'easeOutQuad',
+                                   onComplete: function() {
+                                       this._fadePageIn(oldPage, doFadeAnimation);
+                                   },
+                                   onCompleteScope: this
+                                 });
+            }
+        } else {
+            this._fadePageIn(oldPage, doFadeAnimation);
+        }
     },
 
     _a11yFocusPage: function(page) {
@@ -898,7 +906,7 @@ var ViewSelector = new Lang.Class({
     },
 
     setActivePage: function(viewPage) {
-        this._showPage(this._pageFromViewPage(viewPage));
+        this._showPage(this._pageFromViewPage(viewPage), true);
     },
 
     fadeIn: function() {
