@@ -1579,16 +1579,13 @@ const WindowManager = new Lang.Class({
                          });
         } else {
             let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
-            let xDest = monitor.x + actor.x;
-            let yDest = monitor.y + monitor.height;
             if (!monitor) {
                 this._minimizeWindowDone(shellwm, actor);
                 return;
             }
 
             Tweener.addTween(actor,
-                             { x: xDest,
-                               y: yDest,
+                             { y: monitor.y + monitor.height,
                                time: MINIMIZE_WINDOW_ANIMATION_TIME,
                                transition: 'easeOutQuad',
                                onComplete: this._minimizeWindowDone,
@@ -1650,14 +1647,14 @@ const WindowManager = new Lang.Class({
                 return;
             }
 
+            actor.set_position(actor.x, monitor.y + monitor.height);
+
             let rect = actor.meta_window.get_frame_rect();
             let [xDest, yDest] = [rect.x, rect.y];
 
-            actor.set_position(monitor.x + rect.x, monitor.y + monitor.height);
             actor.show();
             Tweener.addTween(actor,
-                             { x: xDest,
-                               y: yDest,
+                             { y: yDest,
                                time: MINIMIZE_WINDOW_ANIMATION_TIME,
                                transition: 'easeOutQuad',
                                onComplete: this._unminimizeWindowDone,
