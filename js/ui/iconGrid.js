@@ -786,13 +786,36 @@ const IconGrid = new Lang.Class({
             let sourceActor = children[sourceIndex];
             let actorOffset;
 
-            if (targetIndex >= children.length) {
-                // calculate the position of the new slot
-                let oldBox = sourceActor.allocation;
-                let newBox = this._calculateChildBox(sourceActor, sourceActor.x, sourceActor.y, box);
-                actorOffset = [newBox.x1 - oldBox.x1, newBox.y1 - oldBox.y1];
-            } else {
+            // There are two relevant cases:
+            //  1. We want to move icons between well-known positions. This usually
+            //     happens when the user moves an icon to inside a folder, and we
+            //     have to move the icons back.
+            //  2. We don't know the position. This happens when moving from inside
+            //     a folder to the main grid. The icons will be pushed forward by
+            //     one position, and the last icon will go to the unknown position.
+            if (targetIndex < children.length) {
+
+                // Case 1: we already have a previously allocated position. Just use that.
                 actorOffset = this._findActorOffset(sourceActor, children[targetIndex]);
+            } else {
+
+                // Case 2: We don't know where the icons should be moved to. Here,
+                // the solution is to create a temporary actor, allocate it, get
+                // the new position and then remove this temporary actor from the
+                // grid.
+                let stubWidget = new St.Widget({ visible: true,
+                                                 width: this._getHItemSize(),
+                                                 height: this._getVItemSize() });
+
+                this._grid.insert_child_at_index(stubWidget, -1);
+                this._allocate(this._grid, contentBox, 0);
+
+                // calculate the position of the new slot
+                actorOffset = this._findActorOffset(sourceActor, stubWidget);
+
+                // Remove the temporary actor from the grid
+                this._grid.remove_child(stubWidget);
+                this._allocate(this._grid, contentBox, 0);
             }
 
             movementMatrix[sourceIndex] = actorOffset;

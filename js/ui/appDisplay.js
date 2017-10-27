@@ -232,8 +232,7 @@ const BaseAppView = new Lang.Class({
         this._grid.animateShuffling(movedList,
                                     removedList,
                                     this.repositionedIconData,
-                                    Lang.bind(this, this.addIcons)
-                                   );
+                                    Lang.bind(this, this.addIcons));
         this.repositionedIconData = [ null, null ];
     },
 
@@ -752,6 +751,17 @@ const AllView = new Lang.Class({
     loadGrid: function() {
         this._maybeAddAppCenterIcon();
         this.parent();
+    },
+
+    getLayoutIds: function() {
+        let layoutIds = this.parent();
+
+        // AllView also has the App Center icon appended at the end of the list.
+        // For Drag n' Drop work correctly, we must take this icon into account
+        // when calculating the diff between before and after the DnD.
+        layoutIds.push(EOS_APP_CENTER_ID);
+
+        return layoutIds;
     },
 
     removeAll: function() {
@@ -1300,15 +1310,6 @@ const AllView = new Lang.Class({
             source.blockHandler = true;
             this._eventBlocker.reactive = false;
             this._currentPopup.popdown();
-
-            // Append the inserted app to the end of the grid
-            let appSystem = Shell.AppSystem.get_default();
-            let app  = appSystem.lookup_app(source.getId());
-            let icon = new AppIcon(app,
-                                   { isDraggable: true,
-                                     parentView: this },
-                                   null);
-            this.addItem(icon);
         }
 
         IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
