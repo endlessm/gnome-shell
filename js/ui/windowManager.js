@@ -1044,6 +1044,7 @@ const WindowManager = new Lang.Class({
         this._shellwm.connect('kill-switch-workspace', Lang.bind(this, this._switchWorkspaceDone));
         this._shellwm.connect('kill-window-effects', Lang.bind(this, function (shellwm, actor) {
             this._minimizeWindowDone(shellwm, actor);
+            this._unminimizeWindowDone(shellwm, actor);
             this._mapWindowDone(shellwm, actor);
             this._destroyWindowDone(shellwm, actor);
             this._sizeChangeWindowDone(shellwm, actor);
@@ -1618,7 +1619,9 @@ const WindowManager = new Lang.Class({
         let types = [Meta.WindowType.NORMAL,
                      Meta.WindowType.MODAL_DIALOG,
                      Meta.WindowType.DIALOG];
-        if (!this._shouldAnimateActor(actor, types)) {
+
+        // If the overview is visible, we will handle the animation here.
+        if (!this._shouldAnimateActor(actor, types) && !Main.overview.visible) {
             shellwm.completed_unminimize(actor);
             return;
         }
