@@ -627,6 +627,8 @@ const LayoutManager = new Lang.Class({
         this._systemBackground.actor.destroy();
         this._systemBackground = null;
 
+        this._startingUp = false;
+
         this.keyboardBox.show();
 
         if (!Main.sessionMode.isGreeter) {
@@ -637,7 +639,6 @@ const LayoutManager = new Lang.Class({
         this._queueUpdateRegions();
 
         this.emit('startup-complete');
-        this._startingUp = false;
     },
 
     showKeyboard: function () {
