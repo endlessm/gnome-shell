@@ -266,7 +266,9 @@ const OverviewEntry = new Lang.Class({
     },
 
     _onMapped: function() {
-        if (this.mapped) {
+        // The entry might get mapped because of the clone, so we also
+        // have to check if the actual overview actor is visible.
+        if (this.mapped && Main.layoutManager.overviewGroup.visible) {
             // Enable 'find-as-you-type'
             this._capturedEventId = global.stage.connect('captured-event',
                                  Lang.bind(this, this._onCapturedEvent));
