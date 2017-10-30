@@ -833,9 +833,9 @@ const IconGrid = new Lang.Class({
             dndDropPosition[1] -= Math.floor(oldIcon.get_size()[1] / 2);
 
             // Draw it at the location where DnD accept occured
-            let releaseOffset = this._findRelativeOffset(oldIcon, dndDropPosition);
-            oldIcon.translation_x = releaseOffset[0];
-            oldIcon.translation_y = releaseOffset[1];
+            //let releaseOffset = this._findRelativeOffset(oldIcon, dndDropPosition);
+            //oldIcon.translation_x = releaseOffset[0];
+            //oldIcon.translation_y = releaseOffset[1];
 
             movementMatrix[originalIndex] = this._findActorOffset(oldIcon, newIcon);
         }
