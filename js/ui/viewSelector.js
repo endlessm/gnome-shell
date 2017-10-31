@@ -679,7 +679,7 @@ const ViewSelector = new Lang.Class({
 
                 // Make sure to hide the overview immediately if we're starting up
                 // coming from a previous session with apps running and visible.
-                if (Main.layoutManager.startingUp && Main.workspaceMonitor.hasVisibleWindows)
+                if (!Main.overview.shownOnce && Main.workspaceMonitor.hasVisibleWindows)
                     Main.overview.hide();
             }));
 

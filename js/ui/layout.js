@@ -1013,10 +1013,6 @@ const LayoutManager = new Lang.Class({
         // We don't update the stage input region while in a modal,
         // so queue an update now.
         this._queueUpdateRegions();
-    },
-
-    get startingUp() {
-        return this._startingUp;
     }
 });
 Signals.addSignalMethods(LayoutManager.prototype);
