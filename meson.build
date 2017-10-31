@@ -118,13 +118,7 @@ enable_networkmanager = get_option('enable-networkmanager')
 if enable_networkmanager != 'no'
   want_networkmanager = enable_networkmanager == 'yes'
 
-  nm_deps += dependency('libnm-glib',
-    version: nm_req, required: want_networkmanager
-  )
-  nm_deps += dependency('libnm-util',
-    version: nm_req, required: want_networkmanager
-  )
-  nm_deps += dependency('libnm-gtk',
+  nm_deps += dependency('libnm',
     version: nm_req, required: want_networkmanager
   )
   nm_deps += dependency('libsecret-1',
