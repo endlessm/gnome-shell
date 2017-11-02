@@ -316,7 +316,7 @@ const Overview = new Lang.Class({
         this._overview.add_actor(this._panelGhost);
 
         this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
-        Main.layoutManager.connect('startup-complete', Lang.bind(this, this._onStartupCompleted));
+        Main.layoutManager.connect('startup-prepared', Lang.bind(this, this._onStartupPrepared));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
         this._relayoutNoHide();
     },
@@ -525,7 +525,7 @@ const Overview = new Lang.Class({
         this.viewSelector.focusSearch();
     },
 
-    _onStartupCompleted: function() {
+    _onStartupPrepared: function() {
         this.showApps();
     },
 
