@@ -226,7 +226,6 @@ const Overview = new Lang.Class({
         this._toggleToHidden = false;   // Whether to hide the overview when either toggle function is called
         this._targetPage = null;        // do we have a target page to animate to?
         this._modal = false;            // have a modal grab
-        this._shownOnce = false;         // useful for handling events relevant only the first time it's shown
         this.animationInProgress = false;
         this.visibleTarget = false;
         this.opacityPrepared = false;
@@ -317,7 +316,7 @@ const Overview = new Lang.Class({
         this._overview.add_actor(this._panelGhost);
 
         this.viewSelector.connect('page-changed', Lang.bind(this, this._onPageChanged));
-        Main.layoutManager.connect('startup-complete', Lang.bind(this, this._onStartupCompleted));
+        Main.layoutManager.connect('startup-prepared', Lang.bind(this, this._onStartupPrepared));
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._relayout));
         this._relayoutNoHide();
     },
@@ -526,7 +525,7 @@ const Overview = new Lang.Class({
         this.viewSelector.focusSearch();
     },
 
-    _onStartupCompleted: function() {
+    _onStartupPrepared: function() {
         this.showApps();
     },
 
@@ -730,7 +729,7 @@ const Overview = new Lang.Class({
         this._coverPane.show();
         this.emit('showing');
 
-        if (!this._shownOnce || this.opacityPrepared) {
+        if (Main.layoutManager.startingUp || this.opacityPrepared) {
             this._overview.opacity = EOS_ACTIVE_GRID_OPACITY;
             this.opacityPrepared = false;
             this._showDone();
@@ -757,10 +756,6 @@ const Overview = new Lang.Class({
         this._coverPane.hide();
 
         this.emit('shown');
-
-        // This variable should only be false right after starting up.
-        this._shownOnce = true;
-
         // Handle any calls to hide* while we were showing
         if (!this._shown)
             this._animateNotVisible();
@@ -874,10 +869,6 @@ const Overview = new Lang.Class({
 
     getActivePage: function() {
         return this.viewSelector.getActivePage();
-    },
-
-    get shownOnce() {
-        return this._shownOnce;
     }
 });
 Signals.addSignalMethods(Overview.prototype);
