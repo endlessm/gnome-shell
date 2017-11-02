@@ -2677,7 +2677,7 @@ const AppCenterIcon = new Lang.Class({
     },
 
     getName: function() {
-        return _("More Apps");
+        return this.app.get_generic_name();
     },
 
     canBeRemoved: function() {
