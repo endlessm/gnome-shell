@@ -960,7 +960,7 @@ const AllView = new Lang.Class({
 
         if (this._dragIcon.parentView.actor.contains(dragEvent.targetActor))
             dragView = this._dragIcon.parentView;
-        else if (this.actor.contains(dragEvent.targetActor))
+        else
             dragView = this;
 
         if (dragView != this._dragView) {
