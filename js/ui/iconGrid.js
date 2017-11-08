@@ -1328,6 +1328,18 @@ const PaginatedIconGrid = new Lang.Class({
                                    })
                              });
         }
+    },
+
+    animateShuffling: function(changedItems, removedItems, originalItemData, callback) {
+        // If we try to animate the shuffling before the onComplete callbacks in
+        // closeExtraSpace are called, they are cancelled and we never get to clean
+        // this._extraSpaceData. So, force the cleanup here.
+        if (this._extraSpaceData) {
+            this._extraSpaceData = null;
+            this.emit('space-closed');
+        }
+
+        this.parent(changedItems, removedItems, originalItemData, callback);
     }
 });
 Signals.addSignalMethods(PaginatedIconGrid.prototype);
