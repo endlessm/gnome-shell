@@ -206,8 +206,7 @@ const BaseAppView = new Lang.Class({
 
     _trimInvisible: function(items) {
         let appSystem = Shell.AppSystem.get_default();
-        return items.filter(Lang.bind(this,
-            function(itemId) {
+        return items.filter(Lang.bind(this, function(itemId) {
                 return IconGridLayout.layout.iconIsFolder(itemId) || appSystem.lookup_app(itemId) || (itemId == EOS_APP_CENTER_ID);
             }));
     },
@@ -242,8 +241,7 @@ const BaseAppView = new Lang.Class({
         newItemLayout = this._trimInvisible(newItemLayout);
 
         let addedIds = [];
-        for (let newItemIdx in newItemLayout) {
-            let newItem = newItemLayout[newItemIdx];
+        for (let newItem of newItemLayout) {
             let oldItemIdx = oldItemLayout.indexOf(newItem);
 
             if (oldItemIdx < 0)
@@ -271,8 +269,8 @@ const BaseAppView = new Lang.Class({
 
         // Create a map from app ids to icon objects
         let iconTable = {};
-        for (let idx in this._allItems)
-            iconTable[this._allItems[idx].getId()] = this._allItems[idx];
+        for (let item of this._allItems)
+            iconTable[item.getId()] = item;
 
         let layoutIds = this.getLayoutIds();
 
@@ -876,22 +874,22 @@ const AllView = new Lang.Class({
 
         let itemId = item.get_id();
 
-        if (IconGridLayout.layout.iconIsFolder(itemId)) {
-            let icon = new FolderIcon(item, this);
-            icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
-            this.folderIcons.push(icon);
-            if (this._addedFolderId == itemId) {
-                this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
-                this._addedFolderId = null;
-            }
-
-            return icon;
+        if (!IconGridLayout.layout.iconIsFolder(itemId)) {
+            return new AppIcon(item,
+                               { isDraggable: true,
+                                 parentView: this },
+                               null);
         }
 
-        return new AppIcon(item,
-                           { isDraggable: true,
-                             parentView: this },
-                           null);
+        let icon = new FolderIcon(item, this);
+        icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
+        this.folderIcons.push(icon);
+        if (this._addedFolderId == itemId) {
+            this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
+            this._addedFolderId = null;
+        }
+
+        return icon;
     },
 
     _maybeAddAppCenterIcon: function() {

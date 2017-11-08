@@ -845,8 +845,8 @@ const IconGrid = new Lang.Class({
             this._moveIcon(children[sourceIndex], movementMatrix[sourceIndex]);
 
         // Hide any removed icons (only temporary)
-        for (let removedIndex in removedItems)
-            children[removedItems[removedIndex]].opacity = 0;
+        for (let removedItem of removedItems)
+            children[removedItem].opacity = 0;
 
         // Make sure that everything gets redrawn after the animation
         Mainloop.timeout_add(SHUFFLE_ANIMATION_TIME * 1000 * St.get_slow_down_factor(), callback);
