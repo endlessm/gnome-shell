@@ -587,14 +587,14 @@ const AllView = new Lang.Class({
         this._redisplayWorkId = Main.initializeDeferredWork(this.actor, Lang.bind(this, this._redisplay));
 
         Shell.AppSystem.get_default().connect('installed-changed', Lang.bind(this, function() {
-            Main.queueDeferredWork(this._redisplayWorkId);
+            this._redisplay();
         }));
 
         IconGridLayout.layout.connect('changed', Lang.bind(this, function() {
-            Main.queueDeferredWork(this._redisplayWorkId);
+            this._redisplay();
         }));
         global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, Lang.bind(this, function() {
-            Main.queueDeferredWork(this._redisplayWorkId);
+            this._redisplay();
         }));
 
         this._addedFolderId = null;
