@@ -219,6 +219,7 @@ const RunDialog = new Lang.Class({
                     command = exec + ' ' + exec_arg + ' ' + input;
                 }
                 Util.trySpawnCommandLine(command);
+                Main.overview.hide();
             } catch (e) {
                 // Mmmh, that failed - see if @input matches an existing file
                 let path = null;
@@ -235,6 +236,7 @@ const RunDialog = new Lang.Class({
                     try {
                         Gio.app_info_launch_default_for_uri(file.get_uri(),
                                                             global.create_app_launch_context(0, -1));
+                        Main.overview.hide();
                     } catch (e) {
                         // The exception from gjs contains an error string like:
                         //     Error invoking Gio.app_info_launch_default_for_uri: No application
