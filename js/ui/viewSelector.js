@@ -542,14 +542,14 @@ const ViewsClone = new Lang.Class({
         let cloneAdjustment = appGridContainer.scrollView.vscroll.adjustment;
         originalAdjustment.bind_property('value', cloneAdjustment, 'value', GObject.BindingFlags.SYNC_CREATE);
 
-        this._saturation = new Clutter.DesaturateEffect({ factor: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
-                                                          enabled: false });
-        iconGridClone.add_effect(this._saturation);
-
         if (discoveryFeedButton)
             this.add_child(discoveryFeedButton);
         this.add_child(entry);
         this.add_child(appGridContainer);
+
+        this._saturation = new Clutter.DesaturateEffect({ factor: AppDisplay.EOS_INACTIVE_GRID_SATURATION,
+                                                          enabled: false });
+        this.add_effect(this._saturation);
 
         let workareaConstraint = new Monitor.MonitorConstraint({ primary: true,
                                                                  work_area: true });
