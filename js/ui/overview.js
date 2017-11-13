@@ -49,6 +49,8 @@ const NO_WINDOWS_OPEN_DIALOG_TIMEOUT = 2000; // ms
 // safely imported, or figure out what's wrong with importing appDisplay.
 const EOS_INACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_INACTIVE_GRID_OPACITY;
 const EOS_ACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_ACTIVE_GRID_OPACITY;
+const EOS_INACTIVE_GRID_SATURATION = imports.ui.appDisplay.EOS_INACTIVE_GRID_SATURATION;
+const EOS_ACTIVE_GRID_SATURATION = imports.ui.appDisplay.EOS_ACTIVE_GRID_SATURATION;
 
 const ShellInfo = new Lang.Class({
     Name: 'ShellInfo',
@@ -205,6 +207,12 @@ const Overview = new Lang.Class({
         this._overview.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
         this._overview._delegate = this;
         this._allMonitorsGroup.add_actor(this._overview);
+
+        // this effect takes care of animating the saturation when entering
+        // or leaving the overview
+        this._overviewSaturation = new Clutter.DesaturateEffect({ factor: EOS_ACTIVE_GRID_SATURATION,
+                                                                  enabled: false });
+        this._overview.add_effect(this._overviewSaturation);
 
         // The main Background actors are inside global.window_group which are
         // hidden when displaying the overview, so we create a new
@@ -746,6 +754,18 @@ const Overview = new Lang.Class({
                            transition: 'easeOutQuad',
                            time: ANIMATION_TIME,
                            onComplete: this._showDone,
+                           onCompleteScope: this
+                         });
+
+        this._overviewSaturation.factor = EOS_INACTIVE_GRID_SATURATION;
+        this._overviewSaturation.enabled = true;
+        Tweener.addTween(this._overviewSaturation,
+                         { factor: EOS_ACTIVE_GRID_SATURATION,
+                           transition: 'easeOutQuad',
+                           time: ANIMATION_TIME,
+                           onComplete: function() {
+                               this._overviewSaturation.enabled = false;
+                           },
                            onCompleteScope: this
                          });
     },
