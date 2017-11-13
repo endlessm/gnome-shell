@@ -555,12 +555,6 @@ const ViewsClone = new Lang.Class({
                                                                  work_area: true });
         this.add_constraint(workareaConstraint);
 
-        Main.layoutManager.connect('startup-complete', Lang.bind(this, function() {
-            this.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
-            this._saturation.factor = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
-            this._saturation.enabled = this._forOverview;
-        }));
-
         Main.overview.connect('showing', Lang.bind(this, function() {
             this.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
             this._saturation.factor = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
