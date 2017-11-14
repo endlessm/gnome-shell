@@ -545,22 +545,16 @@ const AppStoreService = new Lang.Class({
     },
 
     AddAppIfNotVisible: function(id) {
-        let iconWasVisible = _iconIsVisibleOnDesktop(id);
-
         if (IconGridLayout.layout.iconIsFolder(id))
             return;
 
-        IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
-
-        if (!iconWasVisible)
+        if (!_iconIsVisibleOnDesktop(id)) {
+            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
             _reportAppAddedMetric(id);
+        }
     },
 
     ReplaceApplication: function(originalId, replacementId) {
-        // We only care about reporting a metric if the replacement id was
-        // visible
-        let iconWasVisible = _iconIsVisibleOnDesktop(replacementId);
-
         // Can't replace a folder
         if (IconGridLayout.layout.iconIsFolder(originalId))
             return;
@@ -570,7 +564,8 @@ const AppStoreService = new Lang.Class({
         // append if the source icon was not available
         IconGridLayout.layout.replaceIcon(originalId, replacementId, IconGridLayout.DESKTOP_GRID_ID);
 
-        if (!iconWasVisible)
+        // We only care about reporting a metric if the replacement id was visible
+        if (!_iconIsVisibleOnDesktop(replacementId))
             _reportAppAddedMetric(replacementId);
     },
 
