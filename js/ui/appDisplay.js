@@ -1700,6 +1700,35 @@ const FolderView = new Lang.Class({
 
         this.addIcons();
         this.updateNoAppsLabelVisibility();
+
+        this.actor.connect('notify::mapped', Lang.bind(this, function(actor) {
+            // HACK!!! The only way to make the folder popover get the correct
+            // sizing is by removing and readding all the icons. To not hit the
+            // performance too badly, only do that when absolutely necessary.
+            if (!this.actor.mapped)
+                return;
+
+            this._redisplay();
+        }));
+
+        IconGridLayout.layout.connect('changed', Lang.bind(this, function() {
+            // AllView only checks for the toplevel icons. When dragging an icon
+            // from inside a folder to another folder, AllView won't be modified
+            // and this.iconsNeedRedraw() returns false. Thus, we have to manually
+            // update the folders too.
+            if (!this.iconsNeedRedraw())
+                return;
+
+            this._redisplay();
+
+            this._folderIcon.icon.reloadIcon();
+        }));
+    },
+
+    _redisplay: function() {
+        this.removeAll();
+        this.addIcons();
+        this.updateNoAppsLabelVisibility();
     },
 
     _createItemIcon: function(item) {
