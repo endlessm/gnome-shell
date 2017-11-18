@@ -12,6 +12,8 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Config = imports.misc.config;
+const InputSourceIndicator = imports.ui.status.keyboard.InputSourceIndicator;
+const InputSourceManager = imports.ui.status.keyboard;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
@@ -37,6 +39,12 @@ const NetworkSecretDialog = new Lang.Class({
             this._content = contentOverride;
         else
             this._content = this._getContent();
+
+        this._inputSourceManager = InputSourceManager.getInputSourceManager();
+        this._inputSourceIndicator = new InputSourceIndicator(this, false);
+        let manager = new PopupMenu.PopupMenuManager({ actor: this._inputSourceIndicator.container });
+        manager.addMenu(this._inputSourceIndicator.menu);
+        this._inputSourceManager.passwordModeEnabled = true;
 
         let mainContentBox = new St.BoxLayout({ style_class: 'prompt-dialog-main-layout',
                                                 vertical: false });
@@ -123,11 +131,18 @@ const NetworkSecretDialog = new Lang.Class({
                 secret.valid = true;
 
             if (rtl) {
-                layout.attach(secret.entry, 0, pos, 1, 1);
-                layout.attach(label, 1, pos, 1, 1);
+                let j = 0;
+                if (i === 0) {
+                    layout.attach(this._inputSourceIndicator.container, j, pos, 1, 1);
+                    j++;
+                }
+                layout.attach(secret.entry, j+1, pos, 1, 1);
+                layout.attach(label, j+2, pos, 1, 1);
             } else {
                 layout.attach(label, 0, pos, 1, 1);
                 layout.attach(secret.entry, 1, pos, 1, 1);
+                if (i === 0)
+                    layout.attach(this._inputSourceIndicator.container, 2, pos, 1, 1);
             }
             pos++;
 
@@ -171,6 +186,8 @@ const NetworkSecretDialog = new Lang.Class({
                 this._agent.set_password(this._requestId, secret.key, secret.value);
         }
 
+        this._inputSourceManager.passwordModeEnabled = false;
+
         if (valid) {
             this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
             this.close(global.get_current_time());
@@ -179,6 +196,8 @@ const NetworkSecretDialog = new Lang.Class({
     },
 
     cancel: function() {
+        this._inputSourceManager.passwordModeEnabled = false;
+
         this._agent.respond(this._requestId, Shell.NetworkAgentResponse.USER_CANCELED);
         this.close(global.get_current_time());
     },
