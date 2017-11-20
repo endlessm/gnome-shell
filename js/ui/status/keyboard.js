@@ -317,6 +317,7 @@ const InputSourceManager = new Lang.Class({
         this._ibusSources = {};
 
         this._currentSource = null;
+        this._needsFallbackSource = false;
         this._passwordModeEnabled = false;
 
         // All valid input sources currently in the gsettings
@@ -495,14 +496,19 @@ const InputSourceManager = new Lang.Class({
 
     _syncPasswordMode: function() {
         if (!this._passwordModeEnabled) {
-            this._updateInputSources(false);
+            if (this._needsFallbackSource) {
+                this._needsFallbackSource = false;
+                this._currentSource = null;
+            }
+            this._updateInputSources();
             return;
         }
 
         if (!this._mruSources.some(Lang.bind(this, function(src) {
             return this._keyboardManager.isLatinLayout(src.id);
         }))) {
-            this._updateInputSources(true);
+            this._needsFallbackSource = true;
+            this._updateInputSources();
         }
     },
 
@@ -552,10 +558,10 @@ const InputSourceManager = new Lang.Class({
     },
 
     _inputSourcesChanged: function() {
-        this._updateInputSources(false);
+        this._updateInputSources();
     },
 
-    _updateInputSources: function(needsFallbackSource = false) {
+    _updateInputSources: function() {
         let sources = this._settings.inputSources;
         let nSources = sources.length;
 
@@ -593,7 +599,7 @@ const InputSourceManager = new Lang.Class({
                 infosList.push({ type: type, id: id, displayName: displayName, shortName: shortName });
         }
 
-        if (infosList.length == 0 || needsFallbackSource) {
+        if (infosList.length == 0 || this._needsFallbackSource) {
             let type = INPUT_SOURCE_TYPE_XKB;
             let id = KeyboardManager.DEFAULT_LAYOUT;
             let [ , displayName, shortName, , ] = this._xkbInfo.get_layout_info(id);
