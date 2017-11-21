@@ -131,15 +131,18 @@ const NetworkSecretDialog = new Lang.Class({
 
             if (rtl) {
                 let j = 0;
+                // Some network dialogs have several password entries and
+                // we only want to attach the kbd layout switcher left of the first entry
                 if (i === 0) {
                     layout.attach(this._inputSourceIndicator.container, j, pos, 1, 1);
                     j++;
                 }
-                layout.attach(secret.entry, j+1, pos, 1, 1);
-                layout.attach(label, j+2, pos, 1, 1);
+                layout.attach(secret.entry, j, pos, 1, 1);
+                layout.attach(label, j+1, pos, 1, 1);
             } else {
                 layout.attach(label, 0, pos, 1, 1);
                 layout.attach(secret.entry, 1, pos, 1, 1);
+                // We only want to attach the kbd layout switcher right to the first entry
                 if (i === 0)
                     layout.attach(this._inputSourceIndicator.container, 2, pos, 1, 1);
             }
