@@ -15,7 +15,7 @@ const Animation = imports.ui.animation;
 const Batch = imports.gdm.batch;
 const Config = imports.misc.config;
 const GdmUtil = imports.gdm.util;
-const InputSourceManager = imports.ui.status.keyboard;
+const Keyboard = imports.ui.status.keyboard;
 const Params = imports.misc.params;
 const ShellEntry = imports.ui.shellEntry;
 const Tweener = imports.ui.tweener;
@@ -116,8 +116,8 @@ const AuthPrompt = new Lang.Class({
                          y_fill: false,
                          x_align: St.Align.START });
 
-        // for setting passwords we switch to a latin keyboard layout
-        this._inputSourceManager = InputSourceManager.getInputSourceManager();
+        // for setting passwords we enable a password mode for kbd layouts
+        this._inputSourceManager = Keyboard.getInputSourceManager();
         this._inputSourceManager.passwordModeEnabled = true;
 
         this._entry.grab_key_focus();

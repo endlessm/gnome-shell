@@ -15,8 +15,7 @@ const PolkitAgent = imports.gi.PolkitAgent;
 
 const Animation = imports.ui.animation;
 const Components = imports.ui.components;
-const InputSourceManager = imports.ui.status.keyboard;
-const InputSourceIndicator = imports.ui.status.keyboard.InputSourceIndicator;
+const Keyboard = imports.ui.status.keyboard;
 const ModalDialog = imports.ui.modalDialog;
 const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
@@ -153,8 +152,8 @@ const AuthenticationDialog = new Lang.Class({
         this._passwordBox.add(this._passwordEntry,
                               { expand: true });
 
-        this._inputSourceManager = InputSourceManager.getInputSourceManager();
-        this._inputSourceIndicator = new InputSourceIndicator(this, false);
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
         this._passwordBox.add(this._inputSourceIndicator.container);
         let manager = new PopupMenu.PopupMenuManager({ actor: this._inputSourceIndicator.container });
         manager.addMenu(this._inputSourceIndicator.menu);

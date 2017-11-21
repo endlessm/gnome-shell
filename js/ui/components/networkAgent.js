@@ -12,8 +12,7 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Config = imports.misc.config;
-const InputSourceIndicator = imports.ui.status.keyboard.InputSourceIndicator;
-const InputSourceManager = imports.ui.status.keyboard;
+const Keyboard = imports.ui.status.keyboard;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
@@ -40,8 +39,8 @@ const NetworkSecretDialog = new Lang.Class({
         else
             this._content = this._getContent();
 
-        this._inputSourceManager = InputSourceManager.getInputSourceManager();
-        this._inputSourceIndicator = new InputSourceIndicator(this, false);
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
         let manager = new PopupMenu.PopupMenuManager({ actor: this._inputSourceIndicator.container });
         manager.addMenu(this._inputSourceIndicator.menu);
         this._inputSourceManager.passwordModeEnabled = true;
