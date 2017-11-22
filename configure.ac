@@ -113,7 +113,8 @@ SHARED_PCS="gio-unix-2.0 >= $GIO_MIN_VERSION
             libcanberra libcanberra-gtk3
             polkit-agent-1 >= $POLKIT_MIN_VERSION
             gcr-base-3 >= $GCR_MIN_VERSION
-            eosmetrics-0"
+            eosmetrics-0
+            xkbcommon"
 if test x$have_systemd = xyes; then
   SHARED_PCS="${SHARED_PCS} libsystemd"
 fi
