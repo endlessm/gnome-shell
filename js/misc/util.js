@@ -69,18 +69,57 @@ const _searchUrlRegexp = new RegExp(
     '^([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)+.*)\\.+[A-Za-z0-9\.\/%&=\?\-_]+$',
     'gi');
 
+const supportedSearchSchemes = [ 'http', 'https', 'ftp' ];
+
 // findSearchUrls:
 // @terms: list of searchbar terms to find URLs in
+// @maxLength: maximum number of characters in each non-URI term to match against, defaults
+//             to 32 characters to prevent hogging the CPU with too long generic strings.
 //
-// Similar to "findUrls", but for use only with terms from the searchbar.
-// The regex for these URLs matches strings such as "google.com" (note the
-// lack of preceding scheme).
+// Similar to "findUrls", but adapted for use only with terms from the searchbar.
+//
+// In order not to be too CPU-expensive, this function is implemented in the following way:
+//   1. If the term is a valid URI in that it's possible to parse at least
+//      its scheme and host fields, it's considered a valid URL "as-is".
+//   2. Else, if the term is a generic string exceeding the maximum length
+//      specified then we simply ignore it and move onto the next term.
+//   3. In any other case (non-URI term, valid length) we match the term
+//      passed against the regular expression to determine if it's a URL.
+//
+// Note that the regex for these URLs matches strings such as "google.com" (no need to the
+// specify a preceding scheme), which is why we have to limit its execution to a certain
+// maximum length, as the term can be pretty free-form. By default, this maximum length
+// is 32 characters, which should be a good compromise considering that "many of the world's
+// most visited web sites have domain names of between 6 - 10 characters" (see [1][2]).
+//
+// [1] https://www.domainregistration.com.au/news/2013/1301-domain-length.php
+// [2] https://www.domainregistration.com.au/infocentre/info-domain-length.php
 //
 // Return value: the list of URLs found in the string
-function findSearchUrls(terms) {
+function findSearchUrls(terms, maxLength=32) {
     let res = [], match;
-    for (let i in terms) {
-        while ((match = _searchUrlRegexp.exec(terms[i])))
+    for (let term of terms) {
+        if (GLib.uri_parse_scheme(term)) {
+            let supportedScheme = false;
+            for (let scheme of supportedSearchSchemes) {
+                if (term.startsWith(scheme + '://')) {
+                    supportedScheme = true;
+                    break;
+                }
+            }
+
+            // Check that there's a valid host after the scheme part.
+            if (supportedScheme && term.split('://')[1]) {
+                res.push(term);
+                continue
+            }
+        }
+
+        // Try to save CPU cycles from regexp-matching too long strings.
+        if ((term.length > maxLength))
+            continue;
+
+        while ((match = _searchUrlRegexp.exec(term)))
             res.push(match[0]);
     }
     return res;
