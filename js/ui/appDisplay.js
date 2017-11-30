@@ -1772,9 +1772,10 @@ const FolderView = new Lang.Class({
             if (!this.iconsNeedRedraw())
                 return;
 
-            this._redisplay();
-
-            this._folderIcon.icon.reloadIcon();
+            if (!this._recreateIconWorkId)
+                this._recreateIconWorkId = Main.initializeDeferredWork(this._folderIcon.actor, Lang.bind(this, this._redisplay));
+            else
+                Main.queueDeferredWork(this._recreateIconWorkId);
         }));
     },
 
@@ -1782,6 +1783,7 @@ const FolderView = new Lang.Class({
         this.removeAll();
         this.addIcons();
         this.updateNoAppsLabelVisibility();
+        this._folderIcon.icon.reloadIcon();
     },
 
     _createItemIcon: function(item) {
