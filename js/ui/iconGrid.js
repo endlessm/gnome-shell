@@ -745,6 +745,8 @@ const IconGrid = new Lang.Class({
      * to know how much spacing can the grid has
      */
     adaptToSize: function(availWidth, availHeight) {
+        this._adaptedWidth = availWidth;
+        this._adaptedHeight = availHeight;
         this._fixedHItemSize = this._hItemSize;
         this._fixedVItemSize = this._vItemSize;
     },
@@ -1185,8 +1187,16 @@ const PaginatedIconGrid = new Lang.Class({
     },
 
     adaptToSize: function(availWidth, availHeight) {
+        let size_changed = availWidth != this._adaptedWidth || availHeight != this._adaptedHeight;
+
         this.parent(availWidth, availHeight);
         this._computePages(availWidth, availHeight);
+
+        // If the adapted size changed, we must queue a relayout in the sizing
+        // machinery to make sure we always get the correct size. This cannot
+        // be done inside adaptToSize(), so we can't just call allocate() here.
+        if (size_changed)
+            this._grid.queue_relayout();
     },
 
     _availableHeightPerPageForItems: function() {
