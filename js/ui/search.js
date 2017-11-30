@@ -505,6 +505,9 @@ var SearchResults = new Lang.Class({
         this._searchSettings.connect('changed::disable-external', Lang.bind(this, this._reloadRemoteProviders));
         this._searchSettings.connect('changed::sort-order', Lang.bind(this, this._reloadRemoteProviders));
 
+        let appSystem = Shell.AppSystem.get_default();
+        appSystem.connect ('installed-changed', this._reloadRemoteProviders.bind(this));
+
         this._searchTimeoutId = 0;
         this._cancellable = new Gio.Cancellable();
 
