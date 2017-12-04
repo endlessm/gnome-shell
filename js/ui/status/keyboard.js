@@ -22,6 +22,12 @@ const Util = imports.misc.util;
 const INPUT_SOURCE_TYPE_XKB = 'xkb';
 const INPUT_SOURCE_TYPE_IBUS = 'ibus';
 
+const InputSourceManagerIface = '<node> \
+<interface name="org.gnome.Shell.InputSourceManager"> \
+<property name="PasswordModeEnabled" type="b" access="readwrite" /> \
+</interface> \
+</node>';
+
 const LayoutMenuItem = new Lang.Class({
     Name: 'LayoutMenuItem',
     Extends: PopupMenu.PopupBaseMenuItem,
@@ -319,6 +325,9 @@ const InputSourceManager = new Lang.Class({
         this._currentSource = null;
         this._needsFallbackSource = false;
         this._passwordModeEnabled = false;
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(InputSourceManagerIface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell/InputSourceManager');
+        Gio.DBus.session.own_name('org.gnome.Shell.InputSourceManager', Gio.BusNameOwnerFlags.REPLACE, null, null);
 
         // All valid input sources currently in the gsettings
         // KEY_INPUT_SOURCES list ordered by most recently used
@@ -480,6 +489,14 @@ const InputSourceManager = new Lang.Class({
 
         if (interactive)
             this._updateMruSettings();
+    },
+
+    get PasswordModeEnabled() {
+        return this.passwordModeEnabled;
+    },
+
+    set PasswordModeEnabled(enable) {
+        this.passwordModeEnabled = enable;
     },
 
     get passwordModeEnabled() {
