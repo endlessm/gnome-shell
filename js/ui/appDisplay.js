@@ -1830,7 +1830,15 @@ const ViewIcon = new Lang.Class({
         }
     },
 
+    getId: function() {
+        throw new Error('Not implemented');
+    },
+
     getName: function() {
+        throw new Error('Not implemented');
+    },
+
+    getIcon: function() {
         throw new Error('Not implemented');
     },
 
@@ -2093,12 +2101,16 @@ const FolderIcon = new Lang.Class({
             }));
     },
 
+    getId: function() {
+        return this._dirInfo.get_id();
+    },
+
     getName: function() {
         return this._name;
     },
 
-    getId: function() {
-        return this._dirInfo.get_id();
+    getIcon: function() {
+        return this._dirInfo.get_icon();
     },
 
     getAppIds: function() {
@@ -2469,8 +2481,16 @@ const AppIcon = new Lang.Class({
                                                            Lang.bind(this, this._sourceAdded));
     },
 
+    getId: function() {
+        return this.app.get_id();
+    },
+
     getName: function() {
         return this.name;
+    },
+
+    getIcon: function() {
+        return this.app.get_icon();
     },
 
     _onDestroy: function() {
@@ -2519,10 +2539,6 @@ const AppIcon = new Lang.Class({
             this._dot.show();
         else
             this._dot.hide();
-    },
-
-    getId: function() {
-        return this.app.get_id();
     },
 
     animateLaunch: function() {
