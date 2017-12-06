@@ -37,6 +37,8 @@ const CUSTOMER_SUPPORT_LOCATIONS = [
 
 const CUSTOMER_SUPPORT_GROUP_NAME = 'Customer Support';
 const CUSTOMER_SUPPORT_KEY_EMAIL = 'Email';
+const PASSWORD_RESET_GROUP_NAME = 'Password Reset';
+const PASSWORD_RESET_KEY_SALT = 'Salt';
 
 const AuthPromptMode = {
     UNLOCK_ONLY: 0,
@@ -631,14 +633,25 @@ const AuthPrompt = new Lang.Class({
         // Note: These are not secure random numbers. Doesn't matter. The
         // mechanism to convert a reset code to unlock code is well-known, so
         // who cares how random the reset code is?
-        let resetCode = '';
+        // The fist digit is fixed to "1" as version of the hash code (the zeroth
+        // version had one less digit in the code).
+
+        let resetCode = this._getResetCodeSalt() ? '1' : '';
+
         for (let n = 0; n < _RESET_CODE_LENGTH; n++)
             resetCode = '%s%d'.format(resetCode, GLib.random_int_range(0, 10));
         return resetCode;
     },
 
     _computeUnlockCode: function(resetCode) {
+        let salt = this._getResetCodeSalt();
         let checksum = new GLib.Checksum(GLib.ChecksumType.MD5);
+
+        if (salt) {
+            checksum.update(ByteArray.fromString(salt));
+            checksum.update([0]);
+        }
+
         checksum.update(ByteArray.fromString(resetCode));
 
         let unlockCode = checksum.get_string();
@@ -657,10 +670,23 @@ const AuthPrompt = new Lang.Class({
 
         try {
             return keyFile.get_locale_string(CUSTOMER_SUPPORT_GROUP_NAME,
-                                                             CUSTOMER_SUPPORT_KEY_EMAIL,
-                                                             null);
+                                             CUSTOMER_SUPPORT_KEY_EMAIL,
+                                             null);
         } catch (e) {
             logError(e, 'Failed to read customer support email');
+            return null;
+        }
+    },
+
+    _getResetCodeSalt: function() {
+        let keyFile = this._ensureCustomerSupportFile();
+
+        try {
+            return keyFile.get_locale_string(PASSWORD_RESET_GROUP_NAME,
+                                             PASSWORD_RESET_KEY_SALT,
+                                             null);
+        } catch (e) {
+            logError(e, 'Failed to read password reset salt value');
             return null;
         }
     },
