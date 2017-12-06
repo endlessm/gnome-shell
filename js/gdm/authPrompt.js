@@ -29,6 +29,15 @@ const MESSAGE_FADE_OUT_ANIMATION_TIME = 0.5;
 
 const _RESET_CODE_LENGTH = 7;
 
+const CUSTOMER_SUPPORT_FILENAME = 'vendor-customer-support.ini';
+const CUSTOMER_SUPPORT_LOCATIONS = [
+    Config.LOCALSTATEDIR + '/lib/eos-image-defaults/' + CUSTOMER_SUPPORT_FILENAME,
+    Config.PKGDATADIR + '/' + CUSTOMER_SUPPORT_FILENAME
+];
+
+const CUSTOMER_SUPPORT_GROUP_NAME = 'Customer Support';
+const CUSTOMER_SUPPORT_KEY_EMAIL = 'Email';
+
 const AuthPromptMode = {
     UNLOCK_ONLY: 0,
     UNLOCK_OR_LOG_IN: 1
@@ -179,10 +188,10 @@ const AuthPrompt = new Lang.Class({
         this._spinner.actor.show();
         this._defaultButtonWell.add_child(this._spinner.actor);
 
-        this._customerSupportEmail = null;
-
         this._displayingPasswordHint = false;
         this._passwordResetCode = null;
+
+        this._customerSupportKeyFile = null;
     },
 
     _onDestroy: function() {
@@ -600,27 +609,22 @@ const AuthPrompt = new Lang.Class({
         this.emit('cancelled');
     },
 
-    _ensureCustomerSupportData: function() {
-        if (this._customerSupportEmail)
-            return true;
+    _ensureCustomerSupportFile: function() {
+        if (this._customerSupportKeyFile)
+            return this._customerSupportKeyFile;
 
-        const CUSTOMER_SUPPORT_FILENAME = 'vendor-customer-support.ini';
-        const CUSTOMER_SUPPORT_GROUP_NAME = 'Customer Support';
-        const CUSTOMER_SUPPORT_KEY_EMAIL = 'Email';
+        this._customerSupportKeyFile = new GLib.KeyFile();
 
-        try {
-            let keyFile = new GLib.KeyFile();
-            keyFile.load_from_file(Config.PKGDATADIR + '/' + CUSTOMER_SUPPORT_FILENAME,
-                                   GLib.KeyFileFlags.NONE);
-            this._customerSupportEmail = keyFile.get_locale_string(CUSTOMER_SUPPORT_GROUP_NAME,
-                                                                   CUSTOMER_SUPPORT_KEY_EMAIL,
-                                                                   null);
-        } catch (e) {
-            logError(e, 'Failed to read customer support data');
-            return false;
+        for (let path of CUSTOMER_SUPPORT_LOCATIONS) {
+            try {
+                this._customerSupportKeyFile.load_from_file(path, GLib.KeyFileFlags.NONE);
+                break;
+            } catch (e) {
+                logError(e, 'Failed to read customer support data from ' + path);
+            }
         }
 
-        return this._customerSupportEmail ? true : false;
+        return this._customerSupportKeyFile;
     },
 
     _generateResetCode: function() {
@@ -648,8 +652,22 @@ const AuthPrompt = new Lang.Class({
         return unlockCode;
     },
 
+    _getCustomerSupportEmail: function() {
+        let keyFile = this._ensureCustomerSupportFile();
+
+        try {
+            return keyFile.get_locale_string(CUSTOMER_SUPPORT_GROUP_NAME,
+                                                             CUSTOMER_SUPPORT_KEY_EMAIL,
+                                                             null);
+        } catch (e) {
+            logError(e, 'Failed to read customer support email');
+            return null;
+        }
+    },
+
     _showPasswordResetPrompt: function() {
-        if (!this._ensureCustomerSupportData())
+        let customerSupportEmail = this._getCustomerSupportEmail();
+        if (!customerSupportEmail)
             return;
 
         // Stop the normal gdm conversation so it doesn't interfere.
@@ -669,7 +687,7 @@ const AuthPrompt = new Lang.Class({
             // Translators: Password reset. The first %s is a verification code and the second is an email.
             _("Please inform customer support of your verification code %s by emailing %s. The code will remain valid until you click Cancel or turn off your computer.").format(
                 this._passwordResetCode,
-                this._customerSupportEmail));
+                customerSupportEmail));
 
         // Translators: Button on login dialog, after clicking Forgot Password?
         this.nextButton.set_label(_("Reset Password"));
@@ -712,7 +730,7 @@ const AuthPrompt = new Lang.Class({
                               Lang.bind(this, function (obj, result) {
                                   try {
                                       let permission = Polkit.Permission.new_finish(result);
-                                      if (permission.get_allowed())
+                                      if (permission.get_allowed() && this._getCustomerSupportEmail())
                                           this._passwordResetButton.show();
                                   } catch(e) {
                                       logError(e, 'Failed to determine if password reset is allowed');
