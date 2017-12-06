@@ -33,6 +33,10 @@ const LAUNCH_MAXIMIZED_DESKTOP_KEY = 'X-Endless-LaunchMaximized';
 function _shouldShowSplash(app) {
     let info = app.get_app_info();
 
+    // Don't show the splash screen if the app is already running.
+    if (app.state == Shell.AppState.RUNNING)
+        return false;
+
     if (!(info && info.has_key(LAUNCH_MAXIMIZED_DESKTOP_KEY) &&
           info.get_boolean(LAUNCH_MAXIMIZED_DESKTOP_KEY)))
         return false;
@@ -123,9 +127,7 @@ const AppActivationContext = new Lang.Class({
                 });
             });
 
-            if (this._app.state != Shell.AppState.RUNNING)
-                this.showSplash();
-
+            this.showSplash();
             invoke();
         }));
     },
