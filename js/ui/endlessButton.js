@@ -17,6 +17,8 @@ const EndlessButton = new Lang.Class({
         this.parent(_("Endless Button"));
         this.actor.add_style_class_name('endless-button');
         this.actor.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
+        this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
+        this.actor.connect('button-release-event', Lang.bind(this, this._onButtonReleaseEvent));
 
         let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/endless-button-symbolic.svg');
         this.setIcon(new Gio.FileIcon({ file: iconFile }));
@@ -109,5 +111,16 @@ const EndlessButton = new Lang.Class({
             if (this._label.get_parent() != null)
                 Main.uiGroup.remove_actor(this._label);
         }
+    },
+
+    _onButtonPressEvent: function (actor, event) {
+        // This is the CSS active state
+        this.actor.add_style_pseudo_class('clicked');
+        return Clutter.EVENT_PROPAGATE;
+    },
+
+    _onButtonReleaseEvent: function (actor, event) {
+        this.actor.remove_style_pseudo_class('clicked');
+        return Clutter.EVENT_PROPAGATE;
     }
 });
