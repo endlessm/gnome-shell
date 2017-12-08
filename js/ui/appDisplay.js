@@ -167,21 +167,158 @@ const BaseAppView = new Lang.Class({
 
         this._items = {};
         this._allItems = [];
+
+        this._repositionedView = null;
+        this.repositionedIconData = [ null, null ];
     },
 
     _keyFocusIn: function(actor) {
         // Nothing by default
     },
 
+    _createItemIcon: function(item) {
+        throw new Error('Not implemented');
+    },
+
+    _createItemForId: function(itemId) {
+        let appSystem = Shell.AppSystem.get_default();
+        let item = null;
+
+        if (IconGridLayout.layout.iconIsFolder(itemId))
+            item = Shell.DesktopDirInfo.new(itemId);
+        else
+            item = appSystem.lookup_app(itemId);
+
+        return item;
+    },
+
+    getLayoutIds: function() {
+        let viewId = this.getViewId();
+        return IconGridLayout.layout.getIcons(viewId).slice();
+    },
+
+    _trimInvisible: function(items) {
+        let appSystem = Shell.AppSystem.get_default();
+        return items.filter(Lang.bind(this,
+            function(itemId) {
+                return IconGridLayout.layout.iconIsFolder(itemId) || appSystem.lookup_app(itemId) || (itemId == EOS_APP_CENTER_ID);
+            }));
+    },
+
+    _findIconChanges: function() {
+        let oldItemLayout = this._allItems.map(function(icon) { return icon.getId(); });
+        let newItemLayout = this.getLayoutIds();
+        newItemLayout = this._trimInvisible(newItemLayout);
+
+        let movedList = {};
+        let removedList = [];
+        for (let oldItemIdx in oldItemLayout) {
+            let oldItem = oldItemLayout[oldItemIdx];
+            let newItemIdx = newItemLayout.indexOf(oldItem);
+
+            if (oldItemIdx != newItemIdx) {
+                if (newItemIdx < 0)
+                    removedList.push(oldItemIdx);
+                else
+                    movedList[oldItemIdx] = newItemIdx;
+            }
+        }
+
+        return [movedList, removedList];
+    },
+
+    animateMovement: function() {
+        let [movedList, removedList] = this._findIconChanges();
+        this._grid.animateShuffling(movedList,
+                                    removedList,
+                                    this.repositionedIconData,
+                                    Lang.bind(this, this.addIcons));
+        this.repositionedIconData = [ null, null ];
+    },
+
+    iconsNeedRedraw: function() {
+        // Check if the icons moved around
+        let [movedList, removedList] = this._findIconChanges();
+        let movedLength = Object.keys(movedList).length;
+        if (movedLength > 0 || removedList.length > 0)
+            return true;
+
+        // Create a map from app ids to icon objects
+        let iconTable = {};
+        for (let idx in this._allItems)
+            iconTable[this._allItems[idx].getId()] = this._allItems[idx];
+
+        let layoutIds = this.getLayoutIds();
+
+        // Iterate through all visible icons
+        for (let itemId of layoutIds) {
+            let item = this._createItemForId(itemId);
+            if (!item)
+                continue;
+
+            // The App Center icon cannot be changed or renamed
+            if (item == this._appCenterItem)
+                continue;
+
+            let currentIcon = iconTable[itemId];
+            if (!currentIcon)
+                return true; // This icon is new
+
+            let isFolder = IconGridLayout.layout.iconIsFolder(itemId);
+            let oldIconInfo = null;
+            let newIconInfo = null;
+
+            if (isFolder) {
+                oldIconInfo = currentIcon.folder.get_icon();
+                newIconInfo = item.get_icon();
+            } else if (currentIcon.app) {
+                let appInfo = currentIcon.app.get_app_info();
+                oldIconInfo = appInfo.get_icon();
+                newIconInfo = item.get_app_info().get_icon();
+            }
+
+            // The icon image changed
+            if (newIconInfo && !newIconInfo.equal(oldIconInfo))
+                return true;
+        }
+
+        return false;
+    },
+
+    addIcons: function(isHidden) {
+        // Don't do anything if we don't have more up-to-date information, since
+        // re-adding icons unnecessarily can cause UX problems
+        if (!this.iconsNeedRedraw())
+            return;
+
+        this.removeAll();
+
+        let ids = this.getLayoutIds();
+
+        for (let itemId of ids) {
+            let item = this._createItemForId(itemId);
+            if (!item)
+                continue;
+
+            let icon = this._createItemIcon(item);
+            if (!icon)
+                continue;
+
+            let iconActor = icon.actor;
+
+            if (isHidden)
+                iconActor.hide();
+
+            this.addItem(icon);
+        }
+
+        this.loadGrid();
+    },
+
     removeAll: function() {
         this._grid.destroyAll();
         this._items = {};
         this._allItems = [];
-    },
-
-    _redisplay: function() {
-        this.removeAll();
-        this._loadApps();
     },
 
     getAllItems: function() {
@@ -609,14 +746,42 @@ const AllView = new Lang.Class({
                                           // and set it to edit mode
                                           this._addedFolderId = id;
                                       }));
+    },
 
-        this._loadApps();
+    loadGrid: function() {
+        this._maybeAddAppCenterIcon();
+        this.parent();
+    },
+
+    getLayoutIds: function() {
+        let layoutIds = this.parent();
+
+        // AllView also has the App Center icon appended at the end of the list.
+        // For Drag n' Drop work correctly, we must take this icon into account
+        // when calculating the diff between before and after the DnD.
+        layoutIds.push(EOS_APP_CENTER_ID);
+
+        return layoutIds;
     },
 
     removeAll: function() {
         this.folderIcons = [];
         this._appCenterIcon = null;
         this.parent();
+    },
+
+    _redisplay: function() {
+        if (this.getAllItems().length == 0) {
+            this.addIcons();
+        } else {
+            let animateView = this._repositionedView;
+            if (!animateView)
+                animateView = this;
+
+            this._repositionedView = null;
+
+            animateView.animateMovement();
+        }
     },
 
     _itemNameChanged: function(item) {
@@ -630,46 +795,49 @@ const AllView = new Lang.Class({
         this._grid.addItem(item, newIdx);
     },
 
-    _loadApps: function() {
-        let desktopIds = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+    _ensureAppCenterIcon: function() {
+        if (this._appCenterIcon)
+            return;
 
-        let items = [];
-        for (let idx in desktopIds) {
-            let itemId = desktopIds[idx];
-            items.push(itemId);
+        this._appCenterIcon = new AppCenterIcon(this);
+        this._appCenterItem = {
+            get_name: Lang.bind(this, function() {
+                return this._appCenterIcon.getName();
+            })
+        };
+    },
+
+    _createItemForId: function(itemId) {
+        if (itemId == EOS_APP_CENTER_ID) {
+            this._ensureAppCenterIcon();
+            return this._appCenterItem;
         }
 
-        let appSys = Shell.AppSystem.get_default();
+        return this.parent(itemId);
+    },
 
-        items.forEach(Lang.bind(this, function(itemId) {
-            let icon = null;
+    _createItemIcon: function(item) {
+        if (item == this._appCenterItem)
+            return this._appCenterIcon;
 
-            if (IconGridLayout.layout.iconIsFolder(itemId)) {
-                icon = new FolderIcon(itemId, this);
-                icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
-                this.folderIcons.push(icon);
-                if (this._addedFolderId == itemId) {
-                    this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
-                    this._addedFolderId = null;
-                }
-            } else {
-                let app = appSys.lookup_app(itemId);
-                if (app)
-                    icon = new AppIcon(app,
-                                       { isDraggable: true,
-                                         parentView: this },
-                                       null);
+        let itemId = item.get_id();
+
+        if (IconGridLayout.layout.iconIsFolder(itemId)) {
+            let icon = new FolderIcon(item, this);
+            icon.connect('name-changed', Lang.bind(this, this._itemNameChanged));
+            this.folderIcons.push(icon);
+            if (this._addedFolderId == itemId) {
+                this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
+                this._addedFolderId = null;
             }
 
-            // Some apps defined by the icon grid layout might not be installed
-            if (icon)
-                this.addItem(icon);
-        }));
+            return icon;
+        }
 
-        // Add the App Center icon if it is enabled (and installed)
-        this._maybeAddAppCenterIcon();
-
-        this.loadGrid();
+        return new AppIcon(item,
+                           { isDraggable: true,
+                             parentView: this },
+                           null);
     },
 
     _maybeAddAppCenterIcon: function() {
@@ -685,7 +853,7 @@ const AllView = new Lang.Class({
             return;
         }
 
-        this._appCenterIcon = new AppCenterIcon(this);
+        this._ensureAppCenterIcon();
         this.addItem(this._appCenterIcon);
     },
 
@@ -1110,6 +1278,9 @@ const AllView = new Lang.Class({
             if (!accepted)
                 return false;
 
+            this._repositionedView = this._dragView;
+            this._repositionedView.repositionedIconData = [ this._originalIdx, position ];
+
             if (this._currentPopup) {
                 this._eventBlocker.reactive = false;
                 this._currentPopup.popdown();
@@ -1130,21 +1301,15 @@ const AllView = new Lang.Class({
         let insertId = icon ? icon.getId() : null;
         let folderId = this._dragView.getViewId();
 
+        this._repositionedView = this._dragView;
+        this._repositionedView.repositionedIconData = [ this._originalIdx, position ];
+
         // If we dropped the icon outside of the folder, close the popup and
         // add the icon to the main view
         if (droppedOutsideOfFolder) {
             source.blockHandler = true;
             this._eventBlocker.reactive = false;
             this._currentPopup.popdown();
-
-            // Append the inserted app to the end of the grid
-            let appSystem = Shell.AppSystem.get_default();
-            let app  = appSystem.lookup_app(source.getId());
-            let icon = new AppIcon(app,
-                                   { isDraggable: true,
-                                     parentView: this },
-                                   null);
-            this.addItem(icon);
         }
 
         IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
@@ -1533,6 +1698,45 @@ const FolderView = new Lang.Class({
         let action = new Clutter.PanAction({ interpolate: true });
         action.connect('pan', Lang.bind(this, this._onPan));
         this.actor.add_action(action);
+
+        this.addIcons();
+        this.updateNoAppsLabelVisibility();
+
+        this.actor.connect('notify::mapped', Lang.bind(this, function(actor) {
+            // HACK!!! The only way to make the folder popover get the correct
+            // sizing is by removing and readding all the icons. To not hit the
+            // performance too badly, only do that when absolutely necessary.
+            if (!this.actor.mapped)
+                return;
+
+            this._redisplay();
+        }));
+
+        IconGridLayout.layout.connect('changed', Lang.bind(this, function() {
+            // AllView only checks for the toplevel icons. When dragging an icon
+            // from inside a folder to another folder, AllView won't be modified
+            // and this.iconsNeedRedraw() returns false. Thus, we have to manually
+            // update the folders too.
+            if (!this.iconsNeedRedraw())
+                return;
+
+            this._redisplay();
+
+            this._folderIcon.icon.reloadIcon();
+        }));
+    },
+
+    _redisplay: function() {
+        this.removeAll();
+        this.addIcons();
+        this.updateNoAppsLabelVisibility();
+    },
+
+    _createItemIcon: function(item) {
+        return new AppIcon(item,
+                           { isDraggable: true,
+                             parentView: this },
+                           null);
     },
 
     updateNoAppsLabelVisibility: function() {
@@ -1626,12 +1830,6 @@ const FolderView = new Lang.Class({
 
     getViewId: function() {
         return this._folderIcon.getId();
-    },
-
-    canDropAt: function(x, y, canDropPastEnd) {
-        // FIXME: Temporarily disable dragging elements around inside a
-        // folder, as it's causing the GrabHelper to crash for some reason.
-        return [-1, IconGrid.CursorLocation.DEFAULT];
     }
 });
 
@@ -2003,7 +2201,7 @@ const FolderIcon = new Lang.Class({
     Name: 'FolderIcon',
     Extends: ViewIcon,
 
-    _init: function(id, parentView) {
+    _init: function(dirInfo, parentView) {
         let viewIconParams = { isDraggable: true,
                                parentView: parentView };
         let buttonParams = { button_mask: St.ButtonMask.ONE,
@@ -2011,11 +2209,12 @@ const FolderIcon = new Lang.Class({
         let iconParams = { createIcon: Lang.bind(this, this._createIcon),
                            setSizeManually: false,
                            editable: true };
-        this.id = id;
+
         this.name = '';
         this._parentView = parentView;
 
-        this._dirInfo = Shell.DesktopDirInfo.new(id);
+        this.id = dirInfo.get_id();
+        this._dirInfo = dirInfo;
         this._name = this._dirInfo.get_name();
 
         this.parent(viewIconParams, buttonParams, iconParams);
@@ -2030,13 +2229,13 @@ const FolderIcon = new Lang.Class({
 
         this.view = new FolderView(this, this._dirInfo);
 
+        this._updateName();
+
         this.actor.connect('notify::mapped', Lang.bind(this,
             function() {
                 if (!this.actor.mapped && this._popup)
                     this._popup.popdown();
             }));
-
-        this._redisplay();
     },
 
     getName: function() {
@@ -2090,35 +2289,6 @@ const FolderIcon = new Lang.Class({
         this.name = name;
         this.icon.label.text = this.name;
         this.emit('name-changed');
-    },
-
-    _redisplay: function() {
-        this._updateName();
-
-        this.view.removeAll();
-
-        let appSys = Shell.AppSystem.get_default();
-        let addAppId = (function addAppId(appId) {
-            let app = appSys.lookup_app(appId);
-            if (!app)
-                return;
-
-            if (!app.get_app_info().should_show())
-                return;
-
-            let icon = new AppIcon(app,
-                                   { isDraggable: true,
-                                     parentView: this.view },
-                                   null);
-            this.view.addItem(icon);
-        }).bind(this);
-
-        let folderApps = IconGridLayout.layout.getIcons(this.id);
-        folderApps.forEach(addAppId);
-
-        this.view.loadGrid();
-        this.view.updateNoAppsLabelVisibility();
-        this.emit('apps-changed');
     },
 
     _createIcon: function(iconSize) {
