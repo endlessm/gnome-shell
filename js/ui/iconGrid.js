@@ -1,7 +1,9 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Clutter = imports.gi.Clutter;
+const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
@@ -1208,14 +1210,26 @@ const PaginatedIconGrid = new Lang.Class({
             Tweener.addTween(this._translatedChildren[i],
                              { translation_y: 0,
                                time: EXTRA_SPACE_ANIMATION_TIME,
-                               transition: 'easeInOutQuad',
-                               onComplete: Lang.bind(this,
-                                   function() {
-                                       this._extraSpaceData = null;
-                                       this.emit('space-closed');
-                                   })
+                               transition: 'easeInOutQuad'
                              });
         }
+
+        // This is not entirely correct since we should ideally do
+        // this on onComplete, but in our current implementation of
+        // folders and DnD it can happen that the actor of the icons
+        // we are moving back into their position get destroyed before
+        // the tween completes (e.g. dragging icons out of folders),
+        // meaning that the onComplete callback is never called, and
+        // leaving this in an inconsistent state.
+        //
+        // As a temporary solution for now, let's assume that the folder
+        // will be closed after EXTRA_SPACE_ANIMATION_TIME and reset the
+        // status + emit the space-closed signal only once at that point.
+        Mainloop.timeout_add_seconds(EXTRA_SPACE_ANIMATION_TIME, () => {
+            this._extraSpaceData = null;
+            this.emit('space-closed');
+            return GLib.SOURCE_REMOVE;
+        });
     }
 });
 Signals.addSignalMethods(PaginatedIconGrid.prototype);
