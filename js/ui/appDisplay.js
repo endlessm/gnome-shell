@@ -213,6 +213,9 @@ const BaseAppView = new Lang.Class({
     },
 
     getIconForIndex: function(index) {
+        if (index < 0 || index >= this._allItems.length)
+            return null;
+
         return this._allItems[index];
     },
 
