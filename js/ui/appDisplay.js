@@ -941,13 +941,9 @@ const AllView = new Lang.Class({
     _onDragBegin: function(overview, source) {
         // Save the currently dragged item info
         this._setupDragState(source);
-
-        // Hide the event blocker in all cases to allow for dash DnD
-        this._eventBlocker.hide();
     },
 
     _onDragEnd: function(overview, source) {
-        this._eventBlocker.show();
         this._clearDragState(source);
     },
 
