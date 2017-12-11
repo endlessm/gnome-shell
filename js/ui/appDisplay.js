@@ -272,8 +272,8 @@ class BaseAppView {
         this._allItems = [];
     }
 
-    _redisplay() {
-        if (!this.iconsNeedRedraw())
+    _redisplay(forceRedisplay) {
+        if (!forceRedisplay && !this.iconsNeedRedraw())
             return;
 
         this.removeAll();
@@ -1472,12 +1472,35 @@ var FolderView = class FolderView extends BaseAppView {
         action.connect('pan', this._onPan.bind(this));
         this.actor.add_action(action);
 
-        this._redisplay();
+        this.actor.connect('notify::mapped', (actor) => {
+            // The only way to make the folder popover get the correct sizing
+            // is by removing and re-adding all the icons. To not hit the
+            // performance too badly, only do that when absolutely necessary.
+            if (this.actor.mapped)
+                this._redisplay(true);
+        });
+
+        this._redisplayFolderWorkId = Main.initializeDeferredWork(this._folderIcon.actor, this._redisplay.bind(this));
+        let layoutChangedId = IconGridLayout.layout.connect('changed', () => {
+            // AllView only checks for the toplevel icons, not those inside folders.
+            Main.queueDeferredWork(this._redisplayFolderWorkId);
+        });
+
+        this._folderIcon.actor.connect('destroy', () => {
+            // The deferred work will not be valid after the folderIcon is destroyed.
+            IconGridLayout.layout.disconnect(layoutChangedId);
+        });
+
+        // Don't call _redisplay() here, since that will call reloadIcon() which, besides
+        // not been needed at this point, will fail due to the view not being created yet.
+        this._loadApps();
+        this.updateNoAppsLabelVisibility();
     }
 
-    _redisplay() {
-        super._redisplay();
+    _redisplay(forceRedisplay) {
+        super._redisplay(forceRedisplay);
         this.updateNoAppsLabelVisibility();
+        this._folderIcon.icon.reloadIcon();
     }
 
     _createItemIcon(item) {
