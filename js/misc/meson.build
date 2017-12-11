@@ -9,7 +9,7 @@ jsconf.set('datadir', datadir)
 jsconf.set('libexecdir', libexecdir)
 jsconf.set('localstatedir', localstatedir)
 jsconf.set('pkgdatadir', pkgdatadir)
-jsconf.set('sysconfdir', sysconfdir)
+jsconf.set('nmprefixdir', nm_prefix)
 
 config_js = configure_file(
   input: 'config.js.in',
