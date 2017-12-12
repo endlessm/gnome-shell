@@ -88,6 +88,9 @@ const EOS_DRAG_OVER_FOLDER_OPACITY = 128;
 
 const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
 
+const EOS_NEW_ICON_ANIMATION_TIME = 0.5;
+const EOS_NEW_ICON_ANIMATION_DELAY = 0.7;
+
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
     if (!categoriesStr)
@@ -201,6 +204,25 @@ class BaseAppView {
         return [movedList, removedList];
     }
 
+    _findAddedIcons() {
+        let oldItemLayout = this._allItems.map(function(icon) { return icon.getId(); });
+        if (oldItemLayout.length === 0)
+            return [];
+
+        let newItemLayout = this.getLayoutIds();
+        newItemLayout = this._trimInvisible(newItemLayout);
+
+        let addedIds = [];
+        for (let newItem of newItemLayout) {
+            let oldItemIdx = oldItemLayout.indexOf(newItem);
+
+            if (oldItemIdx < 0)
+                addedIds.push(newItem);
+        }
+
+        return addedIds;
+    }
+
     iconsNeedRedraw() {
         // Check if the icons moved around
         let [movedList, removedList] = this._findIconChanges();
@@ -249,6 +271,10 @@ class BaseAppView {
     }
 
     _loadApps() {
+        let addedIds = this._findAddedIcons();
+
+        this.removeAll();
+
         let ids = this.getLayoutIds();
 
         for (let itemId of ids) {
@@ -259,6 +285,9 @@ class BaseAppView {
             let icon = this._createItemIcon(item);
             if (!icon)
                 continue;
+
+            if (addedIds.indexOf(itemId) != -1)
+                icon.scheduleScaleIn();
 
             this.addItem(icon);
         }
@@ -276,7 +305,6 @@ class BaseAppView {
         if (!forceRedisplay && !this.iconsNeedRedraw())
             return;
 
-        this.removeAll();
         this._loadApps();
     }
 
@@ -1643,6 +1671,8 @@ class ViewIcon extends GObject.Object {
         this.canDrop = false;
         this.blockHandler = false;
 
+        this._scaleInId = 0;
+
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
         this._iconState = ViewIconState.NORMAL;
@@ -1701,6 +1731,8 @@ class ViewIcon extends GObject.Object {
     }
 
     _onDestroy() {
+        this._unscheduleScaleIn();
+
         this.actor._delegate = null;
     }
 
@@ -1713,6 +1745,47 @@ class ViewIcon extends GObject.Object {
             return new St.Icon({ icon_size: this._iconSize });
 
         return this._createIconFunc(this._iconSize);
+    }
+
+    _scaleIn() {
+        this.actor.scale_x = 0;
+        this.actor.scale_y = 0;
+        this.actor.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
+
+        Tweener.addTween(this.actor, {
+            scale_x: 1,
+            scale_y: 1,
+            time: EOS_NEW_ICON_ANIMATION_TIME,
+            delay: EOS_NEW_ICON_ANIMATION_DELAY,
+            transition: (t, b, c, d) => {
+                // Similar to easeOutElastic, but less aggressive.
+                t /= d;
+                let p = 0.5;
+                return b + c * (Math.pow(2, -11 * t) * Math.sin(2 * Math.PI * (t - p / 4) / p) + 1);
+            }
+        });
+    }
+
+    _unscheduleScaleIn() {
+        if (this._scaleInId != 0) {
+            Main.overview.disconnect(this._scaleInId);
+            this._scaleInId = 0;
+        }
+    }
+
+    scheduleScaleIn() {
+        if (this._scaleInId != 0)
+            return;
+
+        if (Main.overview.visible) {
+            this._scaleIn();
+            return;
+        }
+
+        this._scaleInId = Main.overview.connect('shown', () => {
+            this._unscheduleScaleIn();
+            this._scaleIn();
+        });
     }
 
     remove() {
