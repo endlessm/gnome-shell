@@ -2168,25 +2168,32 @@ stage {
 
 #panel .endless-button,
 #panel.solid .endless-button {
-    color: #d1d1d1;
+    background-gradient-start: rgba(255, 255, 255, 0.1);
+    background-gradient-end: transparent;
+    background-gradient-direction: radial;
+    background-gradient-position: 0 20px;
+    background-gradient-radius: 65px;
+    background-gradient-stop: 63px;
+
+    color: rgba(255, 255, 255, 0.8);
     min-height: 40px;
-    min-width: 60px;
+    min-width: 65px;
     padding: 0px;
-}
-
-#panel .endless-button {
-    background-color: rgba(27, 27, 27, 0.66);
-    transition-duration: 300ms;
-}
-
-#panel.solid .endless-button {
-    background-color: #1b1b1b;
-    transition-duration: 500ms;
 }
 
 #panel .endless-button:hover,
 #panel.solid .endless-button:hover {
+    background-gradient-start: rgba(255, 255, 255, 0.15);
     color: #f15a22;
+    transition: 300ms;
+}
+
+#panel .endless-button:clicked,
+#panel.solid .endless-button:clicked {
+    background-gradient-start: rgba(255, 255, 255, 0.15);
+    color: white;
+    transition: 300ms;
+    box-shadow: none;
 }
 
 #panel .endless-button .single-icon-button {
