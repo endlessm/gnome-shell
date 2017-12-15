@@ -2054,6 +2054,11 @@ stage {
     -minimum-hpadding: 6px;
 }
 
+#panelRight .panel-button {
+    -natural-hpadding: 10px;
+    -minimum-hpadding: 10px;
+}
+
 .popup-menu.panel-menu {
     -boxpointer-gap: 0px;
     margin-bottom: 0px;
@@ -2114,13 +2119,15 @@ stage {
 }
 
 #panel .user-menu-button-icon {
-    border-radius: 12px;
-    background-size: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 17px;
+    background-size: 34px;
     padding: 0px;
 }
 
 #panel .user-menu-button-icon:hover {
-    border: 1px solid #555;
+    border-radius: 18px;
+    background-size: 36px;
 }
 
 .user-menu-avatar {
@@ -2164,6 +2171,12 @@ stage {
 .system-menu-action-desc {
     color: #ccc;
     font-size: 9pt;
+}
+
+.aggregate-menu-indicators-box {
+    padding: 6px 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
 }
 
 #panel .endless-button,

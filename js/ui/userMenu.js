@@ -17,7 +17,7 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const UserWidget = imports.ui.userWidget;
 
-const USER_ICON_SIZE = 24;
+const USER_ICON_SIZE = 34;
 
 const ONLINE_ACCOUNTS_TEXT = _("Online Accounts");
 const ONLINE_ACCOUNTS_PANEL_LAUNCHER = 'gnome-online-accounts-panel.desktop';
