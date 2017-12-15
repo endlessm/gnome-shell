@@ -44,6 +44,11 @@ const BackgroundMenu = new Lang.Class({
 });
 
 function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
+    // We don't want the background menu enabled on the desktop
+    // during the FBE, or in any mode without an overview, fwiw.
+    if (!Main.sessionMode.hasOverview)
+        return;
+
     // Either the actor or the action has to be defined
     if (!actor && !clickAction)
         return;
