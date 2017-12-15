@@ -106,8 +106,8 @@ const _modes = {
         panel: {
             left: ['endlessButton', 'appIcons'],
             center: [],
-            right: ['a11y', 'keyboard', 'aggregateMenu', 'userMenu',
-                    'dateMenu', 'hotCorner']
+            right: ['a11y', 'keyboard', 'aggregateMenu', 'dateMenu',
+                    'userMenu', 'hotCorner']
         }
     },
 
