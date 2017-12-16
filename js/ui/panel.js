@@ -704,7 +704,11 @@ const AggregateMenu = new Lang.Class({
         let menuLayout = new AggregateLayout();
         this.menu.box.set_layout_manager(menuLayout);
 
-        this._indicators = new St.BoxLayout({ style_class: 'panel-status-indicators-box' });
+        let userMode = Main.sessionMode.hasOverview;
+        let indicatorStyleClass = userMode ? 'aggregate-menu-indicators-box' : 'panel-status-indicators-box';
+
+        this._indicators = new St.BoxLayout({ style_class: indicatorStyleClass,
+                                              y_align: Clutter.ActorAlign.CENTER });
         this.actor.add_child(this._indicators);
 
         if (Config.HAVE_NETWORKMANAGER) {
@@ -739,7 +743,9 @@ const AggregateMenu = new Lang.Class({
         this._indicators.add_child(this._rfkill.indicators);
         this._indicators.add_child(this._volume.indicators);
         this._indicators.add_child(this._power.indicators);
-        this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
+
+        if (!userMode)
+            this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
         let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
         this._settingsItem = this.menu.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
