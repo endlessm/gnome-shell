@@ -188,6 +188,82 @@ var BaseAppView = new Lang.Class({
         return IconGridLayout.layout.getIcons(viewId).slice();
     },
 
+    _trimInvisible: function(ids) {
+        let appSystem = Shell.AppSystem.get_default();
+        return ids.filter((id) => {
+            return IconGridLayout.layout.iconIsFolder(id) || appSystem.lookup_app(id) || (id == EOS_APP_CENTER_ID);
+        });
+    },
+
+    _findIconChanges: function() {
+        let oldItemLayout = this._allItems.map(function(icon) { return icon.getId(); });
+        let newItemLayout = this.getLayoutIds();
+        newItemLayout = this._trimInvisible(newItemLayout);
+
+        let movedList = new Map();
+        let removedList = [];
+        for (let oldItemIdx in oldItemLayout) {
+            let oldItem = oldItemLayout[oldItemIdx];
+            let newItemIdx = newItemLayout.indexOf(oldItem);
+
+            if (oldItemIdx != newItemIdx) {
+                if (newItemIdx < 0)
+                    removedList.push(oldItemIdx);
+                else
+                    movedList.set(oldItemIdx, newItemIdx);
+            }
+        }
+
+        return [movedList, removedList];
+    },
+
+    iconsNeedRedraw: function() {
+        // Check if the icons moved around
+        let [movedList, removedList] = this._findIconChanges();
+        if (movedList.size > 0 || removedList.length > 0)
+            return true;
+
+        // Create a map from app ids to icon objects
+        let iconTable = {};
+        for (let item of this._allItems)
+            iconTable[item.getId()] = item;
+
+        let layoutIds = this.getLayoutIds();
+
+        // Iterate through all visible icons
+        for (let itemId of layoutIds) {
+            let item = this._createItemForId(itemId);
+            if (!item)
+                continue;
+
+            // The App Center icon cannot be changed or renamed
+            if (item == this._appCenterItem)
+                continue;
+
+            let currentIcon = iconTable[itemId];
+
+            // This icon is new
+            if (!currentIcon)
+                return true;
+
+            // This icon was renamed out of band
+            if (currentIcon.getName() != item.get_name())
+                return true;
+
+            // currentIcon is a ViewIcon (AppIcon or FolderIcon).
+            let oldIconInfo = currentIcon.getIcon();
+
+            // item is either a ShellApp or a  ShellDesktopDirInfo.
+            let newIconInfo = item.get_icon();
+
+            // The icon image changed
+            if (newIconInfo && !newIconInfo.equal(oldIconInfo))
+                return true;
+        }
+
+        return false;
+    },
+
     _loadApps: function() {
         let ids = this.getLayoutIds();
 
@@ -213,6 +289,9 @@ var BaseAppView = new Lang.Class({
     },
 
     _redisplay: function() {
+        if (!this.iconsNeedRedraw())
+            return;
+
         this.removeAll();
         this._loadApps();
     },
