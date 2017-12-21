@@ -1917,29 +1917,28 @@ stage {
   background: #12282e url(noise-texture.png);
 }
 
-.discovery-feed-button {
-    width: 44px;
-    height: 22px;
-    border-radius: 0px 0px 22px 22px;
-
-    background-gradient-start: rgba(255, 95, 42, 0.9);
-    background-gradient-end: rgba(248, 63, 0, 0.9);
-    background-gradient-direction: vertical;
-
-    box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.25);
-
-    color: #eeeeec;
+.discovery-feed-bar-icon:highlighted {
+    background-image: url("resource:///org/gnome/shell/theme/discovery-feed-bar-hover.png");
+    height: 12px;
+    width: 1004px;
 }
 
-.discovery-feed-button:hover {
-    background-gradient-start: rgba(255, 95, 42, 1.0);
-    background-gradient-end: rgba(248, 63, 0, 1.0);
-
-    color: white;
+.discovery-feed-bar-icon {
+    background-image: url("resource:///org/gnome/shell/theme/discovery-feed-bar-normal.png");
+    height: 12px;
+    width: 1004px;
 }
 
-.discovery-feed-icon {
-    padding-bottom: 6px;
+.discovery-feed-tile-icon {
+    background-image: url("resource:///org/gnome/shell/theme/discovery-feed-tile-normal.png");
+    height: 30px;
+    width: 56px;
+}
+
+.discovery-feed-tile-icon:highlighted {
+    background-image: url("resource:///org/gnome/shell/theme/discovery-feed-tile-hover.png");
+    height: 30px;
+    width: 56px;
 }
 
 .force-app-exit-dialog {

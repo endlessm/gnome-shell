@@ -38,10 +38,6 @@ function _checkIfDiscoveryFeedEnabled() {
 function maybeCreateButton() {
     if (_checkIfDiscoveryFeedEnabled()) {
         let discoveryFeedButton = new DiscoveryFeedButton();
-        discoveryFeedButton.connect('clicked', Lang.bind(this, function() {
-            Main.discoveryFeed.show(global.get_current_time());
-        }));
-
         return discoveryFeedButton;
     }
 
@@ -54,20 +50,52 @@ function maybeCreateButton() {
  */
 const DiscoveryFeedButton = new Lang.Class({
     Name: 'DiscoveryFeedButton',
-    Extends: St.Button,
+    Extends: St.BoxLayout,
 
     _init: function() {
-        this.parent({ name: 'discovery-feed',
-                      child: new St.Icon({ icon_name: 'go-down-symbolic',
-                                           icon_size: 16,
-                                           style_class: 'discovery-feed-icon ' }),
-                      style_class: 'discovery-feed-button',
+        this.parent({ vertical: true,
                       visible: _primaryMonitorWidthPassesThreshold() });
+
+        this._bar = new St.Button({ name: 'discovery-feed-bar',
+                                    child: new St.Icon({ style_class: 'discovery-feed-bar-icon' }),
+                                    style_class: 'discovery-feed-bar' });
+        this.add(this._bar);
+
+        this._tile = new St.Button({ name: 'discovery-feed-tile',
+                                     child: new St.Icon({ style_class: 'discovery-feed-tile-icon' }),
+                                     style_class: 'discovery-feed-tile' });
+        this.add(this._tile, { x_fill: false,
+                               x_align: St.Align.MIDDLE,
+                               expand: true });
+
+        this._bar.connect('event', Lang.bind(this, this._onEvent));
+        this._tile.connect('event', Lang.bind(this, this._onEvent));
+
+        this._bar.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
+        this._tile.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
 
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, function() {
             this.visible = _primaryMonitorWidthPassesThreshold();
         }));
     },
+
+    _onEvent: function(actor, event) {
+        if (event.type() == Clutter.EventType.TOUCH_BEGIN ||
+            event.type() == Clutter.EventType.BUTTON_PRESS)
+            Main.discoveryFeed.show(global.get_current_time());
+
+        return Clutter.EVENT_PROPAGATE;
+    },
+
+    _onHoverChanged: function(actor) {
+        if (actor.get_hover()) {
+            this._bar.child.add_style_pseudo_class('highlighted');
+            this._tile.child.add_style_pseudo_class('highlighted');
+        } else {
+            this._bar.child.remove_style_pseudo_class('highlighted');
+            this._tile.child.remove_style_pseudo_class('highlighted');
+        }
+     },
 
     changeVisbilityState: function(value) {
         // Helper function to ensure that visibility is set correctly,
