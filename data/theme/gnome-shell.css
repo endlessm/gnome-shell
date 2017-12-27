@@ -2172,15 +2172,40 @@ stage {
     font-size: 9pt;
 }
 
-.aggregate-menu-indicators-box {
+#panel .panel-button .aggregate-menu-indicators-box {
     padding: 6px 4px;
-    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
     border-radius: 3px;
+}
+
+#panel .panel-button .aggregate-menu-indicators-box {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+#panel .panel-button:hover .aggregate-menu-indicators-box {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+#panel .panel-button:clicked .aggregate-menu-indicators-box {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#panel .panel-button:active .aggregate-menu-indicators-box {
+    color: white;
+}
+
+
+#panel .endless-button {
+    background-gradient-start: rgba(255, 255, 255, 0.08);
+}
+
+#panel.solid .endless-button {
+    background-gradient-start: rgba(255, 255, 255, 0.08);
 }
 
 #panel .endless-button,
 #panel.solid .endless-button {
-    background-gradient-start: rgba(255, 255, 255, 0.1);
     background-gradient-end: transparent;
     background-gradient-direction: radial;
     background-gradient-position: 0 20px;
@@ -2193,16 +2218,21 @@ stage {
     padding: 0px;
 }
 
+
 #panel .endless-button:hover,
 #panel.solid .endless-button:hover {
-    background-gradient-start: rgba(255, 255, 255, 0.15);
+    background-gradient-start: rgba(255, 255, 255, 0.12);
+}
+
+#panel .endless-button:hover,
+#panel.solid .endless-button:hover {
     color: #f15a22;
     transition: 300ms;
 }
 
 #panel .endless-button:clicked,
 #panel.solid .endless-button:clicked {
-    background-gradient-start: rgba(255, 255, 255, 0.15);
+    background-gradient-start: rgba(255, 255, 255, 0.05);
     color: white;
     transition: 300ms;
     box-shadow: none;
