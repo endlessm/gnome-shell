@@ -238,7 +238,7 @@ const Indicator = new Lang.Class({
         actors.forEach(function(actor) { actor.set_size(width, -1); });
     },
 
-    _createActionButton: function(accessibleName) {
+    _createActionButton: function(accessibleName, customClass) {
         let box = new St.BoxLayout({ vertical: true,
                                      style_class: 'system-menu-action-container' });
         let button = new St.Button({ reactive: true,
@@ -258,11 +258,14 @@ const Indicator = new Lang.Class({
         box._button = button;
         box._label = label;
 
+        if (customClass)
+            button.style_class = ['system-menu-action', customClass].join(' ');
+
         return box;
     },
 
-    _createActionButtonForIconName: function(iconName, accessibleName, callback) {
-        let box = this._createActionButton(accessibleName);
+    _createActionButtonForIconName: function(iconName, accessibleName, callback, customClass) {
+        let box = this._createActionButton(accessibleName, customClass);
         let button = box._button
         button.child = new St.Icon({ icon_name: iconName, x_expand: false });
 
@@ -272,11 +275,11 @@ const Indicator = new Lang.Class({
         return box;
     },
 
-    _createActionButtonForIconPath: function(iconPath, accessibleName, callback) {
+    _createActionButtonForIconPath: function(iconPath, accessibleName, callback, customClass) {
         let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell' + iconPath);
         let gicon = new Gio.FileIcon({ file: iconFile });
 
-        let box = this._createActionButton(accessibleName);
+        let box = this._createActionButton(accessibleName, customClass);
         let button = box._button;
         button.child = new St.Icon({ gicon: gicon, x_expand: false });
 
@@ -335,12 +338,14 @@ const Indicator = new Lang.Class({
 
         this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png',
                                                                  _("Log Out"),
-                                                                 this._onQuitSessionActivate);
+                                                                 this._onQuitSessionActivate,
+                                                                 null);
         item.actor.add(this._logoutAction, { expand: true, x_fill: false });
 
         this._lockScreenAction = this._createActionButtonForIconName('changes-prevent-symbolic',
                                                                      _("Lock"),
-                                                                     this._onLockScreenClicked);
+                                                                     this._onLockScreenClicked,
+                                                                     null);
         item.actor.add(this._lockScreenAction, { expand: true, x_fill: false });
         this._systemActions.bind_property('can-lock-screen',
                                           this._lockScreenAction,
@@ -349,7 +354,8 @@ const Indicator = new Lang.Class({
 
         this._suspendAction = this._createActionButtonForIconName('media-playback-pause-symbolic',
                                                                   _("Suspend"),
-                                                                  this._onSuspendClicked);
+                                                                  this._onSuspendClicked,
+                                                                  null);
         this._systemActions.bind_property('can-suspend',
                                           this._suspendAction,
                                           'visible',
@@ -357,7 +363,8 @@ const Indicator = new Lang.Class({
 
         this._powerOffAction = this._createActionButtonForIconName('system-shutdown-symbolic',
                                                                    _("Power Off"),
-                                                                   this._onPowerOffClicked);
+                                                                   this._onPowerOffClicked,
+                                                                   'poweroff-button');
         this._systemActions.bind_property('can-power-off',
                                           this._powerOffAction,
                                           'visible',
