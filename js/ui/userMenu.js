@@ -22,6 +22,9 @@ const USER_ICON_SIZE = 34;
 const ONLINE_ACCOUNTS_TEXT = _("Online Accounts");
 const ONLINE_ACCOUNTS_PANEL_LAUNCHER = 'gnome-online-accounts-panel.desktop';
 
+const SETTINGS_TEXT = _("All Settings…");
+const SETTINGS_LAUNCHER = "gnome-control-center.desktop";
+
 const USER_ACCOUNTS_PANEL_LAUNCHER = 'gnome-user-accounts-panel.desktop';
 
 const HELP_CENTER_TEXT = _("Help Center");
@@ -116,15 +119,37 @@ const UserMenu = new Lang.Class({
         }));
 
         this.menu.addMenuItem(this._accountSection);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         let menuItemsSection = new PopupMenu.PopupMenuSection();
         menuItemsSection.box.style_class = 'user-menu-items';
 
-        menuItemsSection.addSettingsAction(ONLINE_ACCOUNTS_TEXT, ONLINE_ACCOUNTS_PANEL_LAUNCHER);
+        // Control Center
+        let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
+        this._settingsItem = menuItemsSection.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
+            this.menu.close(BoxPointer.PopupAnimation.NONE);
+            Main.overview.hide();
+
+            let app = Shell.AppSystem.get_default().lookup_app(SETTINGS_LAUNCHER);
+            let context = new AppActivation.AppActivationContext(app);
+            context.activate();
+        }), gicon);
+
+        // Social
+        gicon = new Gio.ThemedIcon({ name: 'user-available-symbolic' });
+        menuItemsSection.addSettingsAction(ONLINE_ACCOUNTS_TEXT, ONLINE_ACCOUNTS_PANEL_LAUNCHER, gicon);
+
+        // Help center
+        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/endless-help-symbolic.svg')
+        gicon = new Gio.FileIcon({ file: iconFile });
         menuItemsSection.addAction(HELP_CENTER_TEXT, Lang.bind(this, function() {
             this._launchApplication(HELP_CENTER_LAUNCHER);
-        }));
+        }), gicon);
         this.menu.addMenuItem(menuItemsSection);
+
+        // We need to monitor the session to know when to show/hide the settings item
+        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
+        this._sessionUpdated();
     },
 
     _launchApplication: function(launcherName) {
@@ -139,5 +164,9 @@ const UserMenu = new Lang.Class({
     _updateUser: function() {
         this._panelAvatar.update();
         this._accountSection.update();
+    },
+
+    _sessionUpdated: function() {
+        this._settingsItem.actor.visible = Main.sessionMode.allowSettings;
     }
 });

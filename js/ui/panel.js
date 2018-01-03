@@ -35,9 +35,6 @@ const BUTTON_DND_ACTIVATION_TIMEOUT = 250;
 
 const SPINNER_ANIMATION_TIME = 1.0;
 
-const SETTINGS_TEXT = _("All Settings…");
-const CONTROL_CENTER_LAUNCHER = "gnome-control-center.desktop";
-
 // To make sure the panel corners blend nicely with the panel,
 // we draw background and borders the same way, e.g. drawing
 // them as filled shapes from the outside inwards instead of
@@ -747,22 +744,6 @@ const AggregateMenu = new Lang.Class({
         if (!userMode)
             this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
-        let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
-        this._settingsItem = this.menu.addAction(SETTINGS_TEXT, Lang.bind(this, function() {
-            this.menu.close(BoxPointer.PopupAnimation.NONE);
-            Main.overview.hide();
-
-            let app = Shell.AppSystem.get_default().lookup_app(CONTROL_CENTER_LAUNCHER);
-            let context = new AppActivation.AppActivationContext(app);
-            context.activate();
-        }), gicon);
-
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-        // We need to monitor the session to know when to show/hide the settings item
-        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
-        this._sessionUpdated();
-
         if (this._network) {
             this.menu.addMenuItem(this._network.menu);
         }
@@ -784,10 +765,6 @@ const AggregateMenu = new Lang.Class({
         menuLayout.addSizeChild(this._orientation.menu.actor);
         menuLayout.addSizeChild(this._rfkill.menu.actor);
         menuLayout.addSizeChild(this._power.menu.actor);
-    },
-
-    _sessionUpdated: function() {
-        this._settingsItem.actor.visible = Main.sessionMode.allowSettings;
     }
 });
 
@@ -807,6 +784,7 @@ const UserMenu = new Lang.Class({
         this._userMenu = new imports.ui.userMenu.UserMenu();
         this.actor.add_child(this._userMenu.panelBox);
         this.menu.addMenuItem(this._userMenu.menu);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         let systemIndicator = new imports.ui.status.system.Indicator();
         this.menu.addMenuItem(systemIndicator.menu);
