@@ -68,8 +68,12 @@ const DiscoveryFeedButton = new Lang.Class({
                                x_align: St.Align.MIDDLE,
                                expand: true });
 
-        this._bar.connect('event', Lang.bind(this, this._onEvent));
-        this._tile.connect('event', Lang.bind(this, this._onEvent));
+        this._bar.connect('clicked', Lang.bind(this, function() {
+            Main.discoveryFeed.show(global.get_current_time());
+        }));
+        this._tile.connect('clicked', Lang.bind(this, function() {
+            Main.discoveryFeed.show(global.get_current_time());
+        }));
 
         this._bar.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
         this._tile.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
@@ -77,14 +81,6 @@ const DiscoveryFeedButton = new Lang.Class({
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, function() {
             this.visible = _primaryMonitorWidthPassesThreshold();
         }));
-    },
-
-    _onEvent: function(actor, event) {
-        if (event.type() == Clutter.EventType.TOUCH_BEGIN ||
-            event.type() == Clutter.EventType.BUTTON_PRESS)
-            Main.discoveryFeed.show(global.get_current_time());
-
-        return Clutter.EVENT_PROPAGATE;
     },
 
     _onHoverChanged: function(actor) {
