@@ -1917,6 +1917,11 @@ stage {
   background: #12282e url(noise-texture.png);
 }
 
+.popup-separator-menu-item {
+  margin: 12px 0;
+  padding: 0;
+}
+
 .discovery-feed-bar-icon:highlighted {
     background-image: url("resource:///org/gnome/shell/theme/discovery-feed-bar-hover.png");
     height: 18px;
@@ -2149,17 +2154,47 @@ stage {
 }
 
 .user-menu-items {
-    margin: 14px 0px;
+    margin: 6px 0px;
 }
 
 .system-menu-action {
-    border: 1px solid #666;
+    color: #888;
+    border: 1px solid #888;
+}
+
+.system-menu-action.poweroff-button {
+    color: black;
+    background-color: #888;
+    border: 1px solid #888;
 }
 
 .system-menu-action:hover,
 .system-menu-action:focus {
-    background-color: rgba(238, 238, 236, 0.2);
-    border: 1px solid #666;
+    color: white;
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 13px;
+}
+
+.system-menu-action.poweroff-button:hover,
+.system-menu-action.poweroff-button:focus {
+    color: black;
+    background-color: #dddddd;
+    border: 1px solid #dddddd;
+    padding: 13px;
+}
+
+.system-menu-action:clicked {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    padding: 13px;
+}
+
+.system-menu-action.poweroff-button:clicked {
+    color: black;
+    background-color: #444;
+    border: 1px solid #444;
     padding: 13px;
 }
 
