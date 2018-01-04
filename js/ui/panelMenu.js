@@ -137,6 +137,11 @@ const Button = new Lang.Class({
              event.type() == Clutter.EventType.BUTTON_PRESS))
             this.menu.toggle();
 
+        if (event.get_state() & Clutter.ModifierType.BUTTON1_MASK)
+            this.actor.add_style_pseudo_class('clicked');
+        else
+            this.actor.remove_style_pseudo_class('clicked');
+
         return Clutter.EVENT_PROPAGATE;
     },
 
