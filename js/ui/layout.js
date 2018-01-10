@@ -333,13 +333,7 @@ const LayoutManager = new Lang.Class({
                          { opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
                            saturation: AppDisplay.EOS_ACTIVE_GRID_SATURATION,
                            time: 0.25,
-                           transition: AppDisplay.EOS_ACTIVE_GRID_TRANSITION,
-                           onComplete: function() {
-                               this._viewsClone.opacity = AppDisplay.EOS_INACTIVE_GRID_OPACITY;
-                               this._viewsClone.saturation = AppDisplay.EOS_INACTIVE_GRID_SATURATION;
-                           },
-                           onCompleteScope: this
-                         });
+                           transition: AppDisplay.EOS_ACTIVE_GRID_TRANSITION });
     },
 
     _addBackgroundMenu: function(bgManager) {
