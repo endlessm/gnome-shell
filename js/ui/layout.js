@@ -327,7 +327,7 @@ const LayoutManager = new Lang.Class({
         this._backgroundGroup.add_child(this._viewsClone);
     },
 
-    prepareForOverview: function() {
+    prepareToEnterOverview: function() {
         Main.overview.opacityPrepared = true;
         Tweener.addTween(this._viewsClone,
                          { opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
