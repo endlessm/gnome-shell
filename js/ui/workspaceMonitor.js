@@ -51,7 +51,7 @@ const WorkspaceMonitor = new Lang.Class({
 
         let visibleApps = this._getVisibleApps();
         if (_isLastWindow(visibleApps, actor.meta_window))
-            Main.layoutManager.prepareForOverview();
+            Main.layoutManager.prepareToEnterOverview();
     },
 
     _updateOverview: function() {
