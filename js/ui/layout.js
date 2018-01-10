@@ -327,13 +327,27 @@ const LayoutManager = new Lang.Class({
         this._backgroundGroup.add_child(this._viewsClone);
     },
 
-    prepareToEnterOverview: function() {
+    _animateViewsClone: function(targetOpacity, targetSaturation) {
+        // Don't unnecessarily tween the clone's saturation & opacity.
+        if (this._viewsClone.opacity == targetOpacity && this._viewsClone.saturation == targetSaturation)
+            return;
+
         Main.overview.opacityPrepared = true;
         Tweener.addTween(this._viewsClone,
-                         { opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
-                           saturation: AppDisplay.EOS_ACTIVE_GRID_SATURATION,
+                         { opacity: targetOpacity,
+                           saturation: targetSaturation,
                            time: 0.25,
                            transition: AppDisplay.EOS_ACTIVE_GRID_TRANSITION });
+    },
+
+    prepareToEnterOverview: function() {
+        this._animateViewsClone(AppDisplay.EOS_ACTIVE_GRID_OPACITY,
+                                AppDisplay.EOS_ACTIVE_GRID_SATURATION);
+    },
+
+    prepareToLeaveOverview: function() {
+        this._animateViewsClone(AppDisplay.EOS_INACTIVE_GRID_OPACITY,
+                                AppDisplay.EOS_INACTIVE_GRID_SATURATION);
     },
 
     _addBackgroundMenu: function(bgManager) {

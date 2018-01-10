@@ -1628,6 +1628,7 @@ const WindowManager = new Lang.Class({
         }
 
         this._unminimizing.push(actor);
+        Main.layoutManager.prepareToLeaveOverview();
 
         if (actor.meta_window.is_monitor_sized()) {
             actor.opacity = 0;

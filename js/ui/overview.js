@@ -826,11 +826,13 @@ const Overview = new Lang.Class({
         if (hidingFromApps)
             this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
 
-        if (hidingFromApps) {
+        if (hidingFromApps || this.opacityPrepared) {
             // When we're hiding from the apps page, we want to instantaneously
             // switch to the application, so don't fade anything. We'll tween
             // the grid clone in the background separately - see comment in
             // viewSelector.js::ViewsClone.
+            this._overview.opacity = EOS_INACTIVE_GRID_OPACITY;
+            this.opacityPrepared = false;
             this._hideDone();
             return;
         }
@@ -839,7 +841,7 @@ const Overview = new Lang.Class({
 
         // Make other elements fade out.
         Tweener.addTween(this._overview,
-                         { opacity: 0,
+                         { opacity: EOS_INACTIVE_GRID_OPACITY,
                            transition: 'easeOutQuad',
                            time: ANIMATION_TIME,
                            onComplete: this._hideDone,
