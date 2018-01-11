@@ -333,7 +333,7 @@ const SpeedwagonSplash = new Lang.Class({
         this._proxy = new SpeedwagonProxy(Gio.DBus.session,
                                           'com.endlessm.Speedwagon',
                                           '/com/endlessm/Speedwagon');
-        this._proxy.connectSignal('SplashClosed', Lang.bind(this, function() {
+        this._splashClosedId = this._proxy.connectSignal('SplashClosed', Lang.bind(this, function() {
             this.emit('close-clicked');
         }));
     },
@@ -344,6 +344,7 @@ const SpeedwagonSplash = new Lang.Class({
 
     rampOut: function() {
         this._proxy.HideSplashRemote(this._app.get_id());
+        this._proxy.disconnectSignal(this._splashClosedId);
     },
 });
 Signals.addSignalMethods(SpeedwagonSplash.prototype);
