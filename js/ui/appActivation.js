@@ -184,7 +184,9 @@ const AppActivationContext = new Lang.Class({
         }
 
         if (this._splash) {
-            this._splash.rampOut();
+            // The splash screen is already gone if manually aborted.
+            if (!this._abort)
+                this._splash.rampOut();
             this._splash = null;
         }
     },
