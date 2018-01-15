@@ -61,7 +61,6 @@ const AppActivationContext = new Lang.Class({
     _init: function(app) {
         this._app = app;
         this._abort = false;
-        this._cancelled = false;
 
         this._splash = null;
 
@@ -147,16 +146,6 @@ const AppActivationContext = new Lang.Class({
         Main.overview.hide();
     },
 
-    cancelSplash: function() {
-        this._cancelled = true;
-        this._clearSplash();
-        // If application doesn't quit very likely is because it
-        // didn't reach running state yet; so wait for it to
-        // finish
-        if (!this._app.request_quit())
-            this._abort = true;
-    },
-
     showSplash: function() {
         if (!_shouldShowSplash(this._app))
             return;
@@ -166,9 +155,7 @@ const AppActivationContext = new Lang.Class({
         if (Main.overview.visible)
             this._hideWindows();
 
-        this._cancelled = false;
         this._splash = new SpeedwagonSplash(this._app);
-        this._splash.connect('close-clicked', Lang.bind(this, this.cancelSplash));
         this._splash.show();
 
         // Scale the timeout by the slow down factor, because otherwise
@@ -191,6 +178,11 @@ const AppActivationContext = new Lang.Class({
     _clearSplash: function() {
         this._resetWindowsVisibility();
 
+        if (this._appStateId) {
+            this._appSystem.disconnect(this._appStateId);
+            this._appStateId = 0;
+        }
+
         if (this._splash) {
             this._splash.rampOut();
             this._splash = null;
@@ -200,7 +192,7 @@ const AppActivationContext = new Lang.Class({
     _maybeClearSplash: function() {
         // Clear the splash only when we've waited at least 700ms,
         // and when the app has transitioned to the running state...
-        if (this._appStateId == 0 && this._timeoutId == 0)
+        if (this._app.state == Shell.AppState.RUNNING && this._timeoutId == 0)
             this._clearSplash();
     },
 
@@ -275,17 +267,15 @@ const AppActivationContext = new Lang.Class({
         if (this._isBogusWindow(app))
             return;
 
-        appSystem.disconnect(this._appStateId);
-        this._appStateId = 0;
 
-        let aborted = this._abort;
-        this._abort = false;
-
-        if (aborted) {
+        if (this._abort) {
             this._app.request_quit();
             this._clearSplash();
+            this._abort = false;
         } else if (app.state == Shell.AppState.STOPPED) {
-            this._clearSplash();
+            // User cancelled the splash screen, but we need to wait
+            // for the running state before requesting to quit the app.
+            this._abort = true;
         } else {
             this._recordLaunchTime();
             this._maybeClearSplash();
@@ -303,8 +293,6 @@ const AppActivationContext = new Lang.Class({
         // The focused application changed and it is not the one that we are showing
         // the splash for, so clear the splash after it times out (because we don't
         // want to risk hiding too early)
-        this._appSystem.disconnect(this._appStateId);
-        this._appStateId = 0;
         this._maybeClearSplash();
     }
 });
@@ -317,9 +305,6 @@ const SpeedwagonIface = '<node> \
 <method name="HideSplash"> \
     <arg type="s" direction="in" name="desktopFile" /> \
 </method> \
-<signal name="SplashClosed"> \
-    <arg type="s" name="desktopFile" /> \
-</signal> \
 </interface> \
 </node>';
 const SpeedwagonProxy = Gio.DBusProxy.makeProxyWrapper(SpeedwagonIface);
@@ -333,9 +318,6 @@ const SpeedwagonSplash = new Lang.Class({
         this._proxy = new SpeedwagonProxy(Gio.DBus.session,
                                           'com.endlessm.Speedwagon',
                                           '/com/endlessm/Speedwagon');
-        this._splashClosedId = this._proxy.connectSignal('SplashClosed', Lang.bind(this, function() {
-            this.emit('close-clicked');
-        }));
     },
 
     show: function() {
@@ -344,7 +326,6 @@ const SpeedwagonSplash = new Lang.Class({
 
     rampOut: function() {
         this._proxy.HideSplashRemote(this._app.get_id());
-        this._proxy.disconnectSignal(this._splashClosedId);
     },
 });
 Signals.addSignalMethods(SpeedwagonSplash.prototype);
