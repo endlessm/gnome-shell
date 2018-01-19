@@ -19,15 +19,15 @@ const UserWidget = imports.ui.userWidget;
 
 const USER_ICON_SIZE = 34;
 
-const ONLINE_ACCOUNTS_TEXT = _("Online Accounts");
+const ONLINE_ACCOUNTS_TEXT = _("Social Accounts");
 const ONLINE_ACCOUNTS_PANEL_LAUNCHER = 'gnome-online-accounts-panel.desktop';
 
-const SETTINGS_TEXT = _("All Settings…");
+const SETTINGS_TEXT = _("Settings");
 const SETTINGS_LAUNCHER = "gnome-control-center.desktop";
 
 const USER_ACCOUNTS_PANEL_LAUNCHER = 'gnome-user-accounts-panel.desktop';
 
-const HELP_CENTER_TEXT = _("Help Center");
+const HELP_CENTER_TEXT = _("Help");
 const HELP_CENTER_LAUNCHER = 'org.gnome.Yelp.desktop';
 
 const UserAccountSection = new Lang.Class({
