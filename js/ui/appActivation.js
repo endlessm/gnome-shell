@@ -60,9 +60,6 @@ const AppActivationContext = new Lang.Class({
 
     _init: function(app) {
         this._app = app;
-        this._abort = false;
-        this._cancelled = false;
-
         this._splash = null;
 
         this._appStateId = 0;
@@ -147,16 +144,6 @@ const AppActivationContext = new Lang.Class({
         Main.overview.hide();
     },
 
-    cancelSplash: function() {
-        this._cancelled = true;
-        this._clearSplash();
-        // If application doesn't quit very likely is because it
-        // didn't reach running state yet; so wait for it to
-        // finish
-        if (!this._app.request_quit())
-            this._abort = true;
-    },
-
     showSplash: function() {
         if (!_shouldShowSplash(this._app))
             return;
@@ -166,9 +153,7 @@ const AppActivationContext = new Lang.Class({
         if (Main.overview.visible)
             this._hideWindows();
 
-        this._cancelled = false;
         this._splash = new SpeedwagonSplash(this._app);
-        this._splash.connect('close-clicked', Lang.bind(this, this.cancelSplash));
         this._splash.show();
 
         // Scale the timeout by the slow down factor, because otherwise
@@ -278,13 +263,7 @@ const AppActivationContext = new Lang.Class({
         appSystem.disconnect(this._appStateId);
         this._appStateId = 0;
 
-        let aborted = this._abort;
-        this._abort = false;
-
-        if (aborted) {
-            this._app.request_quit();
-            this._clearSplash();
-        } else if (app.state == Shell.AppState.STOPPED) {
+        if (app.state == Shell.AppState.STOPPED) {
             this._clearSplash();
         } else {
             this._recordLaunchTime();
@@ -317,9 +296,6 @@ const SpeedwagonIface = '<node> \
 <method name="HideSplash"> \
     <arg type="s" direction="in" name="desktopFile" /> \
 </method> \
-<signal name="SplashClosed"> \
-    <arg type="s" name="desktopFile" /> \
-</signal> \
 </interface> \
 </node>';
 const SpeedwagonProxy = Gio.DBusProxy.makeProxyWrapper(SpeedwagonIface);
@@ -333,9 +309,6 @@ const SpeedwagonSplash = new Lang.Class({
         this._proxy = new SpeedwagonProxy(Gio.DBus.session,
                                           'com.endlessm.Speedwagon',
                                           '/com/endlessm/Speedwagon');
-        this._splashClosedId = this._proxy.connectSignal('SplashClosed', Lang.bind(this, function() {
-            this.emit('close-clicked');
-        }));
     },
 
     show: function() {
@@ -344,7 +317,6 @@ const SpeedwagonSplash = new Lang.Class({
 
     rampOut: function() {
         this._proxy.HideSplashRemote(this._app.get_id());
-        this._proxy.disconnectSignal(this._splashClosedId);
     },
 });
 Signals.addSignalMethods(SpeedwagonSplash.prototype);
