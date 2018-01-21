@@ -124,6 +124,8 @@ if enable_networkmanager != 'no'
     version: secret_req, required: want_networkmanager
   )
 
+  vpndir = nm_deps[0].get_pkgconfig_variable('vpnservicedir')
+
   have_networkmanager = true
   foreach dep : nm_deps
     have_networkmanager = have_networkmanager and dep.found()
@@ -133,14 +135,9 @@ if enable_networkmanager != 'no'
     nm_deps = []
   endif
 else
-  have_networkmanager = false
-endif
+  vpndir = prefix
 
-networkmanager_dep = dependency('NetworkManager', required: false)
-if (networkmanager_dep.found())
-  nm_prefix = networkmanager_dep.get_pkgconfig_variable('prefix')
-else
-  nm_prefix = prefix
+  have_networkmanager = false
 endif
 
 enable_systemd = get_option('enable-systemd')
