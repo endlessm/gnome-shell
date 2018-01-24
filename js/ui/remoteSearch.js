@@ -174,11 +174,11 @@ function loadRemoteSearchProviders(searchSettings, callback) {
                         appIdB == CONTROL_CENTER_DESKTOP_ID);
 
             // if providerA is on the desktop, it's sorted before providerB
-            if (hasA)
+            if (hasA && !hasB)
                 return -1;
 
             // if providerB is on the desktop, it's sorted before providerA
-            if (hasB)
+            if (hasB && !hasA)
                 return 1;
 
             // fall back to alphabetical order
