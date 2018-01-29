@@ -6,6 +6,7 @@ const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 
+const AppActivation = imports.ui.appActivation;
 const Config = imports.misc.config;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
@@ -88,6 +89,8 @@ var GnomeShell = new Lang.Class({
 
         this._extensionsService = new GnomeShellExtensions();
         this._screenshotService = new Screenshot.ScreenshotService();
+
+        this._appLauncherService = new AppLauncher();
 
         this._grabbedAccelerators = new Map();
         this._grabbers = new Map();
@@ -480,4 +483,49 @@ var ScreenSaverDBus = new Lang.Class({
         else
             return 0;
     },
+});
+
+const AppLauncherIface = '<node> \
+<interface name="org.gnome.Shell.AppLauncher"> \
+<method name="Launch"> \
+    <arg type="s" direction="in" name="name" /> \
+    <arg type="u" direction="in" name="timestamp" /> \
+</method> \
+</interface> \
+</node>';
+
+function activationContextForAppName(appName, appSys) {
+    if (!appName.endsWith('.desktop'))
+        appName += '.desktop';
+
+    let app = appSys.lookup_app(appName);
+    if (!app)
+        return null;
+
+    return new AppActivation.AppActivationContext(app);
+}
+
+var AppLauncher = new Lang.Class({
+    Name: 'AppLauncherDBus',
+
+    _init: function() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppLauncherIface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
+
+        this._appSys = Shell.AppSystem.get_default();
+    },
+
+    LaunchAsync: function(params, invocation) {
+        let [appName, timestamp] = params;
+
+        let activationContext = activationContextForAppName(appName, this._appSys);
+        if (!activationContext) {
+            invocation.return_error_literal(Gio.IOErrorEnum,
+                                            Gio.IOErrorEnum.NOT_FOUND,
+                                            'Unable to launch app ' + appName + ': Not installed');
+            return;
+        }
+
+        activationContext.activate(null, timestamp);
+    }
 });
