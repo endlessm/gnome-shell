@@ -1065,11 +1065,11 @@ var Panel = new Lang.Class({
 
         /* Check if at least one window is near enough to the panel */
         let [, panelTop] = this.actor.get_transformed_position();
-        let panelBottom = panelTop + this.actor.get_height();
         let scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         let isNearEnough = windows.some(Lang.bind(this, function(metaWindow) {
             let verticalPosition = metaWindow.get_frame_rect().y;
-            return verticalPosition < panelBottom + 5 * scale;
+            let height = metaWindow.get_frame_rect().height;
+            return panelTop - (verticalPosition + height) < 5 * scale;
         }));
 
         if (isNearEnough)
