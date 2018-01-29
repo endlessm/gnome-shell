@@ -47,7 +47,7 @@ const _modes = {
         panel: {
             left: [],
             center: [],
-            right: ['a11y', 'keyboard', 'aggregateMenu']
+            right: ['a11y', 'keyboard', 'aggregateMenu', 'powerMenu']
         },
         panelStyle: 'login-screen'
     },
