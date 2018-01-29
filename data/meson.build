@@ -1,6 +1,7 @@
 desktop_files = [
   'org.gnome.Shell.desktop',
   'gnome-shell-extension-prefs.desktop',
+  'eos-launch.desktop',
   'eos-link-feedback.desktop'
 ]
 service_files = []
@@ -14,6 +15,7 @@ desktopconf = configuration_data()
 # We substitute in bindir so it works as an autostart
 # file when built in a non-system prefix
 desktopconf.set('bindir', bindir)
+desktopconf.set('pkgdatadir', pkgdatadir)
 desktopconf.set('VERSION', meson.project_version())
 foreach desktop_file : desktop_files
   i18n.merge_file('desktop',
