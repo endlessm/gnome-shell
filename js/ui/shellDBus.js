@@ -1,7 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported GnomeShell, ScreenSaverDBus */
 
-const { Gio, GLib, Meta } = imports.gi;
+const { Gio, GLib, Meta, Shell } = imports.gi;
 
 const Config = imports.misc.config;
 const ExtensionDownloader = imports.ui.extensionDownloader;
@@ -28,6 +28,8 @@ var GnomeShell = class {
 
         this._extensionsService = new GnomeShellExtensions();
         this._screenshotService = new Screenshot.ScreenshotService();
+
+        this._appLauncherService = new AppLauncher();
 
         this._grabbedAccelerators = new Map();
         this._grabbers = new Map();
@@ -515,5 +517,94 @@ var ScreenSaverDBus = class {
             return Math.floor((GLib.get_monotonic_time() - started) / 1000000);
         else
             return 0;
+    }
+};
+
+const AppLauncherIface = loadInterfaceXML('org.gnome.Shell.AppLauncher');
+
+var AppLauncher = class {
+    constructor() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppLauncherIface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
+
+        this._appSys = Shell.AppSystem.get_default();
+    }
+
+    LaunchAsync(params, invocation) {
+        const [appName, timestamp] = params;
+
+        const app = this._appForAppName(appName);
+        if (!app) {
+            invocation.return_error_literal(
+                Gio.IOErrorEnum,
+                Gio.IOErrorEnum.NOT_FOUND,
+                `Unable to launch app ${appName}: Not installed`);
+            return;
+        }
+
+        app.activate_full(-1, timestamp);
+        invocation.return_value(null);
+    }
+
+    LaunchViaDBusCallAsync(params, invocation) {
+        const [appName, busName, path, interfaceName, method, args] = params;
+
+        const app = this._appForAppName(appName);
+        if (!app) {
+            invocation.return_error_literal(
+                Gio.IOErrorEnum,
+                Gio.IOErrorEnum.NOT_FOUND,
+                `Unable to launch app ${appName}: Not installed`);
+            return;
+        }
+
+        this._activateViaDBusCall(busName, path, interfaceName, method, args, (error, result) => {
+            if (error) {
+                logError(error);
+                invocation.return_error_literal(
+                    Gio.IOErrorEnum,
+                    Gio.IOErrorEnum.FAILED,
+                    `Unable to launch app ${appName} through DBus call on ${busName} ${path} ${interfaceName} ${method}: ${String(error)}`);
+            } else {
+                invocation.return_value(result);
+            }
+        });
+    }
+
+    _appForAppName(appName) {
+        if (!appName.endsWith('.desktop'))
+            appName += '.desktop';
+
+        return this._appSys.lookup_app(appName);
+    }
+
+    _activateViaDBusCall(busName, path, interfaceName, method, args, done) {
+        Gio.bus_get(Gio.BusType.SESSION, null, (source, result) => {
+            let bus = null;
+            try {
+                bus = Gio.bus_get_finish(result);
+            } catch (error) {
+                done(error, null);
+                return;
+            }
+
+            const proxy = new Gio.DBusProxy({
+                g_bus_type: Gio.BusType.SESSION,
+                g_connection: bus,
+                g_default_timeout: GLib.MAXINT32,
+                g_flags: Gio.DBusProxyFlags.NONE,
+                g_interface_name: interfaceName,
+                g_name: busName,
+                g_object_path: path,
+            });
+
+            proxy.call(method, args, Gio.DBusCallFlags.NONE, -1, null, (source2, result2) => {
+                try {
+                    done(null, proxy.call_finish(result2));
+                } catch (error) {
+                    done(error, null);
+                }
+            });
+        });
     }
 };
