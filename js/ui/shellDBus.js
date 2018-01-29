@@ -3,6 +3,7 @@
 const { EosMetrics, Gio, GLib, Meta, Shell } = imports.gi;
 const Lang = imports.lang;
 
+const AppActivation = imports.ui.appActivation;
 const Config = imports.misc.config;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
@@ -28,6 +29,7 @@ var GnomeShell = class {
         this._screenshotService = new Screenshot.ScreenshotService();
 
         this._appstoreService = null;
+        this._appLauncherService = new AppLauncher();
 
         Main.sessionMode.connect('updated', this._sessionModeChanged.bind(this));
         this._sessionModeChanged();
@@ -514,5 +516,41 @@ var AppStoreService = class {
     _emitApplicationsChanged() {
         let allApps = this._iconGridLayout.listApplications();
         this._dbusImpl.emit_signal('ApplicationsChanged', GLib.Variant.new('(as)', [allApps]));
+    }
+};
+
+const AppLauncherIface = loadInterfaceXML('org.gnome.Shell.AppLauncher');
+
+var AppLauncher = class {
+    constructor() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppLauncherIface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
+
+        this._appSys = Shell.AppSystem.get_default();
+    }
+
+    LaunchAsync(params, invocation) {
+        let [appName, timestamp] = params;
+
+        let activationContext = this._activationContextForAppName(appName);
+        if (!activationContext) {
+            invocation.return_error_literal(Gio.IOErrorEnum,
+                                            Gio.IOErrorEnum.NOT_FOUND,
+                                            'Unable to launch app ' + appName + ': Not installed');
+            return;
+        }
+
+        activationContext.activate(null, timestamp);
+    }
+
+    _activationContextForAppName(appName) {
+        if (!appName.endsWith('.desktop'))
+            appName += '.desktop';
+
+        let app = this._appSys.lookup_app(appName);
+        if (!app)
+            return null;
+
+        return new AppActivation.AppActivationContext(app);
     }
 };
