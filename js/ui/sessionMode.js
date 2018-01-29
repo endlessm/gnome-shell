@@ -48,7 +48,7 @@ const _modes = {
         components: ['polkitAgent'],
         panel: {
             left: [],
-            center: ['dateMenu'],
+            center: [],
             right: ['a11yGreeter', 'keyboard', 'aggregateMenu'],
         },
         panelStyle: 'login-screen'
@@ -99,9 +99,9 @@ const _modes = {
                      'keyring', 'autorunManager', 'automountManager'],
 
         panel: {
-            left: ['activities', 'appMenu'],
-            center: ['dateMenu'],
-            right: ['a11y', 'keyboard', 'aggregateMenu']
+            left: [],
+            center: [],
+            right: ['a11y', 'keyboard', 'aggregateMenu', 'dateMenu']
         }
     }
 };
