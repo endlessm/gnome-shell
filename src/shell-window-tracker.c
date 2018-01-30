@@ -4,6 +4,10 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -13,6 +17,8 @@
 #include <meta/group.h>
 #include <meta/util.h>
 #include <meta/window.h>
+
+#include <glib.h>
 
 #define SN_API_NOT_YET_FROZEN 1
 #include <libsn/sn.h>
@@ -34,6 +40,9 @@
 
 #define BUILDER_WINDOW "org.gnome.Builder"
 
+#define APP_FREEZING_MEM_TOTAL_MAX (1*1024*1024*1024)
+#define APP_FREEZING_CONCURRENT_PROCS_MAX 1
+
 /**
  * SECTION:shell-window-tracker
  * @short_description: Associate windows with applications
@@ -54,6 +63,8 @@ struct _ShellWindowTracker
   GHashTable *window_to_app;
 
   MetaWindow *coding_app;
+
+  GHashTable *client_pids;
 };
 
 G_DEFINE_TYPE (ShellWindowTracker, shell_window_tracker, G_TYPE_OBJECT);
@@ -488,6 +499,157 @@ _shell_window_tracker_get_app_context (ShellWindowTracker *tracker, ShellApp *ap
   return "";
 }
 
+static int
+intcmp_reverse (gconstpointer a,
+                gconstpointer b)
+{
+  gint64 timestamp_a = (a != NULL) ? *((gint64*) a) : 0;
+  gint64 timestamp_b = (b != NULL) ? *((gint64*) b) : 0;
+
+  return timestamp_b - timestamp_a;
+}
+
+static void
+hash_table_insert_into_tree_swapped (gpointer pid_ptr, gpointer timestamp_ptr,
+                                     gpointer user_data)
+{
+  g_tree_insert ((GTree *) user_data, timestamp_ptr, pid_ptr);
+}
+
+static gboolean
+signal_stop_cont (gpointer key,
+                  gpointer value,
+                  gpointer user_data)
+{
+  pid_t pid = GPOINTER_TO_INT (value);
+  int *proc_cont_count = user_data;
+
+  int signum = SIGSTOP;
+  if (*proc_cont_count < APP_FREEZING_CONCURRENT_PROCS_MAX)
+    {
+      signum = SIGCONT;
+      (*proc_cont_count)++;
+    }
+
+  int kill_result = kill(pid, signum);
+  if (kill_result)
+    {
+      g_warning("failed to send %s to PID %d when its window changed focus: %s",
+                (signum == SIGSTOP) ? "SIGSTOP" : "SIGCONT", pid,
+                g_strerror(errno));
+    }
+
+  // continue traversal
+  return FALSE;
+}
+
+static void
+update_app_freeze_states (ShellWindowTracker *self, MetaWindow *new_focus_win)
+{
+  // selectively stop and continue windows' processes
+  //
+  // This is designed make low-memory and low-CPU-power computers more
+  // responsive by reducing background CPU usage and memory (de)allocations
+  // which can lead to thrashing. By cutting off resources to the
+  // least-recently-used processes, we direct resources to the applications the
+  // user is most-actively using which makes the system more responsive to their
+  // needs.
+  //
+  // Note that, though this setup prevents rapid background memoy churn that can
+  // cause thrashing, it doesn't prevent recently-focused apps from behaving
+  // badly and could potentially force the system to hold onto more memory if it
+  // stops processes that would pro-actively free up their memory under pressure
+  // (such as Chromium with tab-discarding enabled).
+  //
+  // However, as of this writing, most apps are not so well behaved so limiting
+  // their memory churn and CPU hogging is more important.
+  GList *workspaces, *iter;
+  MetaScreen *screen = shell_global_get_screen(shell_global_get());
+  workspaces = meta_screen_get_workspaces(screen);
+  GHashTable *client_pids_new = g_hash_table_new_full(g_direct_hash,
+                                                      g_direct_equal, NULL,
+                                                      g_free);
+  for (iter = workspaces; iter; iter = iter->next)
+    {
+      MetaWorkspace *workspace = iter->data;
+      GList *windows = meta_workspace_list_windows(workspace);
+      GList *window_iter;
+
+      for (window_iter = windows; window_iter; window_iter = window_iter->next)
+        {
+          MetaWindow *window = window_iter->data;
+          gboolean focused = (window == new_focus_win);
+          // FIXME: this technically isn't public API. I'm discussing with the
+          // Mutter maintainers to get this made public
+          pid_t pid = meta_window_get_client_pid(window);
+
+          // skip over "uninteresting" windows (eg, dialogs, splash screens) so
+          // we never stop any processes which have only "uninteresting" windows
+          // to avoid the risk of:
+          //   * launch an app which shows only a splash screen during load
+          //   * navigate away such that the process gets stopped
+          //   * the only windows in the process can't be navigated to so it
+          //     can't be focused and thus never gets continued
+          if (!shell_window_tracker_is_window_interesting(window))
+            continue;
+
+          // record the window's most recent focus as a timestamp associated
+          // with its client PID. We will use this to consider recency in our
+          // stopping/continuing heuristics.
+          //
+          // This intentionally ignores entries from the old tree that do not
+          // correspond to any open windows to effectively clear out entries for
+          // processes as they quit. This avoids the structure approaching
+          // PID_MAX (usually 32k) mostly-obsolete entries over time.
+
+          gpointer pid_pointer = GINT_TO_POINTER(pid);
+          gpointer value_existing = g_hash_table_lookup(self->client_pids,
+                                                        pid_pointer);
+          gpointer value_new = g_hash_table_lookup(client_pids_new,
+                                                   pid_pointer);
+          // determine the latest focus-time timestamp among all windows for a
+          // process, including the current time if it's currently focused
+          gint64 timestamp_newest = 0;
+          if (value_existing != NULL)
+            {
+              timestamp_newest = MAX(timestamp_newest,
+                                     *((gint64*)value_existing));
+            }
+          if (value_new != NULL)
+            timestamp_newest = MAX(timestamp_newest, *((gint64*)value_new));
+
+          if (focused)
+            timestamp_newest = g_get_monotonic_time();
+
+          // allocate memory for the timestamp instead of stuffing it into a
+          // pointer so this still works on 32-bit systems
+          gint64 *timestamp_alloc = g_new0(gint64, 1);
+          *timestamp_alloc = timestamp_newest;
+          g_hash_table_insert(client_pids_new, GINT_TO_POINTER(pid),
+                              timestamp_alloc);
+        }
+
+      g_list_free(windows);
+    }
+
+  g_hash_table_destroy(self->client_pids);
+  self->client_pids = client_pids_new;
+
+  // note: this tree never owns any of the allocated memory so doesn't free
+  // it
+  GTree *timestamp_client_pids_tree = g_tree_new(intcmp_reverse);
+  g_hash_table_foreach(self->client_pids, hash_table_insert_into_tree_swapped,
+                       timestamp_client_pids_tree);
+
+  // send SIGCONT to the first APP_FREEZING_CONCURRENT_PROCS_MAX
+  // most-recently-focused processes, only counting one SIGCONT per process
+  // (which may have multiple windows)
+  int procs_cont_count = 0;
+  g_tree_foreach(timestamp_client_pids_tree, signal_stop_cont,
+                 &procs_cont_count);
+  g_tree_destroy(timestamp_client_pids_tree);
+}
+
 static void
 update_focus_app (ShellWindowTracker *self)
 {
@@ -509,6 +671,13 @@ update_focus_app (ShellWindowTracker *self)
 
   if (new_focus_app)
     {
+      long mem_total = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
+
+      // only enable this feature on systems with low total RAM as it only
+      // improves responsiveness in those cases
+      if (mem_total <= APP_FREEZING_MEM_TOTAL_MAX)
+        update_app_freeze_states (self, new_focus_win);
+
       shell_app_update_window_actions (new_focus_app, new_focus_win);
       shell_app_update_app_menu (new_focus_app, new_focus_win);
     }
@@ -699,6 +868,9 @@ shell_window_tracker_init (ShellWindowTracker *self)
 {
   MetaScreen *screen;
 
+  self->client_pids = g_hash_table_new_full (g_direct_hash, g_direct_equal,
+                                             NULL, g_free);
+
   self->window_to_app = g_hash_table_new_full (g_direct_hash, g_direct_equal,
                                                NULL, (GDestroyNotify) g_object_unref);
 
@@ -716,6 +888,7 @@ shell_window_tracker_finalize (GObject *object)
 {
   ShellWindowTracker *self = SHELL_WINDOW_TRACKER (object);
 
+  g_hash_table_destroy (self->client_pids);
   g_hash_table_destroy (self->window_to_app);
 
   G_OBJECT_CLASS (shell_window_tracker_parent_class)->finalize(object);
