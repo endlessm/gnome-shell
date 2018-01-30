@@ -19,11 +19,11 @@ const MagnifierDBus = imports.ui.magnifierDBus;
 const Params = imports.misc.params;
 const PointerWatcher = imports.ui.pointerWatcher;
 
-const MOUSE_POLL_FREQUENCY = 50;
-const CROSSHAIRS_CLIP_SIZE = [100, 100];
-const NO_CHANGE = 0.0;
+var MOUSE_POLL_FREQUENCY = 50;
+var CROSSHAIRS_CLIP_SIZE = [100, 100];
+var NO_CHANGE = 0.0;
 
-const POINTER_REST_TIME = 1000; // milliseconds
+var POINTER_REST_TIME = 1000; // milliseconds
 
 // Settings
 const APPLICATIONS_SCHEMA       = 'org.gnome.desktop.a11y.applications';
@@ -54,7 +54,7 @@ const CROSS_HAIRS_CLIP_KEY      = 'cross-hairs-clip';
 
 let magDBusService = null;
 
-const Magnifier = new Lang.Class({
+var Magnifier = new Lang.Class({
     Name: 'Magnifier',
 
     _init: function() {
@@ -672,7 +672,7 @@ const Magnifier = new Lang.Class({
 });
 Signals.addSignalMethods(Magnifier.prototype);
 
-const ZoomRegion = new Lang.Class({
+var ZoomRegion = new Lang.Class({
     Name: 'ZoomRegion',
 
     _init: function(magnifier, mouseSourceActor) {
@@ -1536,7 +1536,7 @@ const ZoomRegion = new Lang.Class({
     }
 });
 
-const Crosshairs = new Lang.Class({
+var Crosshairs = new Lang.Class({
     Name: 'Crosshairs',
 
     _init: function() {
@@ -1781,7 +1781,7 @@ const Crosshairs = new Lang.Class({
     }
 });
 
-const MagShaderEffects = new Lang.Class({
+var MagShaderEffects = new Lang.Class({
     Name: 'MagShaderEffects',
 
     _init: function(uiGroupClone) {

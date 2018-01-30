@@ -28,7 +28,7 @@ const EdgeDragAction = imports.ui.edgeDragAction;
 const IconGrid = imports.ui.iconGrid;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
-const PINCH_GESTURE_THRESHOLD = 0.7;
+var PINCH_GESTURE_THRESHOLD = 0.7;
 
 const SEARCH_ACTIVATION_TIMEOUT = 50;
 const SEARCH_METRIC_INACTIVITY_TIMEOUT_SECONDS = 3;
@@ -45,7 +45,7 @@ const DesktopSearchProvider = {
     MY_COMPUTER: 0,
 };
 
-const ViewPage = {
+var ViewPage = {
     WINDOWS: 1,
     APPS: 2
 };
@@ -55,7 +55,7 @@ const ViewsDisplayPage = {
     SEARCH: 2
 };
 
-const FocusTrap = new Lang.Class({
+var FocusTrap = new Lang.Class({
     Name: 'FocusTrap',
     Extends: St.Widget,
 
@@ -76,7 +76,7 @@ function getTermsForSearchString(searchString) {
     return terms;
 }
 
-const TouchpadShowOverviewAction = new Lang.Class({
+var TouchpadShowOverviewAction = new Lang.Class({
     Name: 'TouchpadShowOverviewAction',
 
     _init: function(actor) {
@@ -98,7 +98,7 @@ const TouchpadShowOverviewAction = new Lang.Class({
 });
 Signals.addSignalMethods(TouchpadShowOverviewAction.prototype);
 
-const ShowOverviewAction = new Lang.Class({
+var ShowOverviewAction = new Lang.Class({
     Name: 'ShowOverviewAction',
     Extends: Clutter.GestureAction,
     Signals: { 'activated': { param_types: [GObject.TYPE_DOUBLE] } },
@@ -161,7 +161,7 @@ const ShowOverviewAction = new Lang.Class({
     }
 });
 
-const ViewsDisplayLayout = new Lang.Class({
+var ViewsDisplayLayout = new Lang.Class({
     Name: 'ViewsDisplayLayout',
     Extends: Clutter.BinLayout,
     Signals: { 'grid-available-size-changed': { param_types: [GObject.TYPE_INT,

@@ -22,18 +22,18 @@ const ShellEntry = imports.ui.shellEntry;
 const UserWidget = imports.ui.userWidget;
 const Tweener = imports.ui.tweener;
 
-const DIALOG_ICON_SIZE = 48;
+var DIALOG_ICON_SIZE = 48;
 
-const WORK_SPINNER_ICON_SIZE = 16;
-const WORK_SPINNER_ANIMATION_DELAY = 1.0;
-const WORK_SPINNER_ANIMATION_TIME = 0.3;
+var WORK_SPINNER_ICON_SIZE = 16;
+var WORK_SPINNER_ANIMATION_DELAY = 1.0;
+var WORK_SPINNER_ANIMATION_TIME = 0.3;
 
 const DialogMode = {
     AUTH: 0,
     CONFIRM: 1
 };
 
-const AuthenticationDialog = new Lang.Class({
+var AuthenticationDialog = new Lang.Class({
     Name: 'AuthenticationDialog',
     Extends: ModalDialog.ModalDialog,
 
@@ -402,7 +402,7 @@ const AuthenticationDialog = new Lang.Class({
 });
 Signals.addSignalMethods(AuthenticationDialog.prototype);
 
-const AuthenticationAgent = new Lang.Class({
+var AuthenticationAgent = new Lang.Class({
     Name: 'AuthenticationAgent',
 
     _init: function() {
@@ -463,4 +463,4 @@ const AuthenticationAgent = new Lang.Class({
     },
 });
 
-const Component = AuthenticationAgent;
+var Component = AuthenticationAgent;

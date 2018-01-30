@@ -21,7 +21,7 @@ const KEY_MOUSE_KEYS_ENABLED        = 'mousekeys-enable';
 
 const APPLICATIONS_SCHEMA           = 'org.gnome.desktop.a11y.applications';
 
-const DPI_FACTOR_LARGE              = 1.25;
+var DPI_FACTOR_LARGE              = 1.25;
 
 const WM_SCHEMA                     = 'org.gnome.desktop.wm.preferences';
 const KEY_VISUAL_BELL               = 'visual-bell';
@@ -34,7 +34,7 @@ const KEY_TEXT_SCALING_FACTOR       = 'text-scaling-factor';
 
 const HIGH_CONTRAST_THEME           = 'HighContrast';
 
-const ATIndicator = new Lang.Class({
+var ATIndicator = new Lang.Class({
     Name: 'ATIndicator',
     Extends: PanelMenu.Button,
 
@@ -213,7 +213,7 @@ const ATIndicator = new Lang.Class({
     }
 });
 
-const ATGreeterIndicator = new Lang.Class({
+var ATGreeterIndicator = new Lang.Class({
     Name: 'ATGreeterIndicator',
     Extends: ATIndicator,
 

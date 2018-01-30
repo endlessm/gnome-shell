@@ -9,7 +9,7 @@ const St = imports.gi.St;
 const Main = imports.ui.main;
 const ModalDialog = imports.ui.modalDialog;
 
-const AudioDevice = {
+var AudioDevice = {
     HEADPHONES: 1 << 0,
     HEADSET:    1 << 1,
     MICROPHONE: 1 << 2
@@ -28,7 +28,7 @@ const AudioDeviceSelectionIface = '<node> \
 </interface> \
 </node>';
 
-const AudioDeviceSelectionDialog = new Lang.Class({
+var AudioDeviceSelectionDialog = new Lang.Class({
     Name: 'AudioDeviceSelectionDialog',
     Extends: ModalDialog.ModalDialog,
 
@@ -146,7 +146,7 @@ const AudioDeviceSelectionDialog = new Lang.Class({
     }
 });
 
-const AudioDeviceSelectionDBus = new Lang.Class({
+var AudioDeviceSelectionDBus = new Lang.Class({
     Name: 'AudioDeviceSelectionDBus',
 
     _init: function() {

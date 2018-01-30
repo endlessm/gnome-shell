@@ -23,7 +23,7 @@ const SPINNER_MIN_DURATION = 1000;
 const OVERVIEW_ENTRY_BLINK_DURATION = 0.4;
 const OVERVIEW_ENTRY_BLINK_BRIGHTNESS = 1.4;
 
-const EntryMenu = new Lang.Class({
+var EntryMenu = new Lang.Class({
     Name: 'ShellEntryMenu',
     Extends: PopupMenu.PopupMenu,
 

@@ -5,9 +5,9 @@ const Signals = imports.signals;
 const Clutter = imports.gi.Clutter;
 const Params = imports.misc.params;
 
-const DEFAULT_LIMIT = 512;
+var DEFAULT_LIMIT = 512;
 
-const HistoryManager = new Lang.Class({
+var HistoryManager = new Lang.Class({
     Name: 'HistoryManager',
 
     _init: function(params) {

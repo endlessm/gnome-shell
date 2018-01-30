@@ -12,14 +12,14 @@ const St = imports.gi.St;
 
 const Params = imports.misc.params;
 
-const AVATAR_ICON_SIZE = 64;
+var AVATAR_ICON_SIZE = 64;
 
 // Adapted from gdm/gui/user-switch-applet/applet.c
 //
 // Copyright (C) 2004-2005 James M. Cape <jcape@ignore-your.tv>.
 // Copyright (C) 2008,2009 Red Hat, Inc.
 
-const Avatar = new Lang.Class({
+var Avatar = new Lang.Class({
     Name: 'Avatar',
 
     _init: function(user, params) {
@@ -66,7 +66,7 @@ const Avatar = new Lang.Class({
     }
 });
 
-const UserWidgetLabel = new Lang.Class({
+var UserWidgetLabel = new Lang.Class({
     Name: 'UserWidgetLabel',
     Extends: St.Widget,
 
@@ -151,7 +151,7 @@ const UserWidgetLabel = new Lang.Class({
     },
 });
 
-const UserWidget = new Lang.Class({
+var UserWidget = new Lang.Class({
     Name: 'UserWidget',
 
     _init: function(user) {

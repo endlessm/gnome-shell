@@ -12,10 +12,10 @@ const St = imports.gi.St;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 
-const ANIMATION_TIME = 0.1;
-const DISPLAY_TIMEOUT = 600;
+var ANIMATION_TIME = 0.1;
+var DISPLAY_TIMEOUT = 600;
 
-const WorkspaceSwitcherPopup = new Lang.Class({
+var WorkspaceSwitcherPopup = new Lang.Class({
     Name: 'WorkspaceSwitcherPopup',
 
     _init : function() {

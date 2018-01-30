@@ -39,15 +39,15 @@ const DISABLE_LOCK_KEY = 'disable-lock-screen';
 const LOCKED_STATE_STR = 'screenShield.locked';
 // fraction of screen height the arrow must reach before completing
 // the slide up automatically
-const ARROW_DRAG_THRESHOLD = 0.1;
+var ARROW_DRAG_THRESHOLD = 0.1;
 
 // Parameters for the arrow animation
-const N_ARROWS = 3;
-const ARROW_ANIMATION_TIME = 0.6;
-const ARROW_ANIMATION_PEAK_OPACITY = 0.4;
-const ARROW_IDLE_TIME = 30000; // ms
+var N_ARROWS = 3;
+var ARROW_ANIMATION_TIME = 0.6;
+var ARROW_ANIMATION_PEAK_OPACITY = 0.4;
+var ARROW_IDLE_TIME = 30000; // ms
 
-const SUMMARY_ICON_SIZE = 48;
+var SUMMARY_ICON_SIZE = 48;
 
 // ScreenShield animation time
 // - STANDARD_FADE_TIME is used when the session goes idle
@@ -55,12 +55,12 @@ const SUMMARY_ICON_SIZE = 48;
 //   or when cancelling the dialog
 // - BACKGROUND_FADE_TIME is used when the background changes to crossfade to new background
 // - CURTAIN_SLIDE_TIME is used when raising the shield before unlocking
-const STANDARD_FADE_TIME = 10;
-const MANUAL_FADE_TIME = 0.3;
-const BACKGROUND_FADE_TIME = 1.0;
-const CURTAIN_SLIDE_TIME = 0.3;
+var STANDARD_FADE_TIME = 10;
+var MANUAL_FADE_TIME = 0.3;
+var BACKGROUND_FADE_TIME = 1.0;
+var CURTAIN_SLIDE_TIME = 0.3;
 
-const Clock = new Lang.Class({
+var Clock = new Lang.Class({
     Name: 'ScreenShieldClock',
 
     _init: function() {
@@ -95,7 +95,7 @@ const Clock = new Lang.Class({
     }
 });
 
-const NotificationsBox = new Lang.Class({
+var NotificationsBox = new Lang.Class({
     Name: 'NotificationsBox',
 
     _init: function() {
@@ -345,7 +345,7 @@ const NotificationsBox = new Lang.Class({
 });
 Signals.addSignalMethods(NotificationsBox.prototype);
 
-const Arrow = new Lang.Class({
+var Arrow = new Lang.Class({
     Name: 'Arrow',
     Extends: St.Bin,
 
@@ -456,7 +456,7 @@ const ArrowContainerConstraint = new Lang.Class({
  * This will ensure that the screen blanks at the right time when it fades out.
  * https://bugzilla.gnome.org/show_bug.cgi?id=668703 explains the dependency.
  */
-const ScreenShield = new Lang.Class({
+var ScreenShield = new Lang.Class({
     Name: 'ScreenShield',
 
     _init: function() {

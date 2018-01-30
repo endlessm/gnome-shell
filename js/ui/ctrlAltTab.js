@@ -12,16 +12,16 @@ const SwitcherPopup = imports.ui.switcherPopup;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 
-const POPUP_APPICON_SIZE = 96;
-const POPUP_FADE_TIME = 0.1; // seconds
+var POPUP_APPICON_SIZE = 96;
+var POPUP_FADE_TIME = 0.1; // seconds
 
-const SortGroup = {
+var SortGroup = {
     TOP:    0,
     MIDDLE: 1,
     BOTTOM: 2
 };
 
-const CtrlAltTabManager = new Lang.Class({
+var CtrlAltTabManager = new Lang.Class({
     Name: 'CtrlAltTabManager',
 
     _init: function() {
@@ -137,7 +137,7 @@ const CtrlAltTabManager = new Lang.Class({
     }
 });
 
-const CtrlAltTabPopup = new Lang.Class({
+var CtrlAltTabPopup = new Lang.Class({
     Name: 'CtrlAltTabPopup',
     Extends: SwitcherPopup.SwitcherPopup,
 
@@ -168,7 +168,7 @@ const CtrlAltTabPopup = new Lang.Class({
     },
 });
 
-const CtrlAltTabSwitcher = new Lang.Class({
+var CtrlAltTabSwitcher = new Lang.Class({
     Name: 'CtrlAltTabSwitcher',
     Extends: SwitcherPopup.SwitcherList,
 

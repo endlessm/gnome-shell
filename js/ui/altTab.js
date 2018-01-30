@@ -14,19 +14,19 @@ const Main = imports.ui.main;
 const SwitcherPopup = imports.ui.switcherPopup;
 const Tweener = imports.ui.tweener;
 
-const APP_ICON_HOVER_TIMEOUT = 200; // milliseconds
+var APP_ICON_HOVER_TIMEOUT = 200; // milliseconds
 
-const THUMBNAIL_DEFAULT_SIZE = 256;
-const THUMBNAIL_POPUP_TIME = 500; // milliseconds
-const THUMBNAIL_FADE_TIME = 0.1; // seconds
+var THUMBNAIL_DEFAULT_SIZE = 256;
+var THUMBNAIL_POPUP_TIME = 500; // milliseconds
+var THUMBNAIL_FADE_TIME = 0.1; // seconds
 
-const WINDOW_PREVIEW_SIZE = 128;
-const APP_ICON_SIZE = 96;
-const APP_ICON_SIZE_SMALL = 48;
+var WINDOW_PREVIEW_SIZE = 128;
+var APP_ICON_SIZE = 96;
+var APP_ICON_SIZE_SMALL = 48;
 
 const baseIconSizes = [96, 64, 48, 32, 22];
 
-const AppIconMode = {
+var AppIconMode = {
     THUMBNAIL_ONLY: 1,
     APP_ICON_ONLY: 2,
     BOTH: 3,
@@ -58,7 +58,7 @@ function getWindows(workspace) {
     }).filter((w, i, a) => !w.skip_taskbar && a.indexOf(w) == i);
 }
 
-const AppSwitcherPopup = new Lang.Class({
+var AppSwitcherPopup = new Lang.Class({
     Name: 'AppSwitcherPopup',
     Extends: SwitcherPopup.SwitcherPopup,
 
@@ -368,7 +368,7 @@ const AppSwitcherPopup = new Lang.Class({
     }
 });
 
-const CyclerHighlight = new Lang.Class({
+var CyclerHighlight = new Lang.Class({
     Name: 'CyclerHighlight',
 
     _init: function() {
@@ -429,7 +429,7 @@ const CyclerHighlight = new Lang.Class({
     }
 });
 
-const CyclerPopup = new Lang.Class({
+var CyclerPopup = new Lang.Class({
     Name: 'CyclerPopup',
     Extends: SwitcherPopup.SwitcherPopup,
     Abstract: true,
@@ -490,7 +490,7 @@ const CyclerPopup = new Lang.Class({
 });
 
 
-const GroupCyclerPopup = new Lang.Class({
+var GroupCyclerPopup = new Lang.Class({
     Name: 'GroupCyclerPopup',
     Extends: CyclerPopup,
 
@@ -511,7 +511,7 @@ const GroupCyclerPopup = new Lang.Class({
     }
 });
 
-const WindowSwitcherPopup = new Lang.Class({
+var WindowSwitcherPopup = new Lang.Class({
     Name: 'WindowSwitcherPopup',
     Extends: SwitcherPopup.SwitcherPopup,
 
@@ -558,7 +558,7 @@ const WindowSwitcherPopup = new Lang.Class({
     }
 });
 
-const WindowCyclerPopup = new Lang.Class({
+var WindowCyclerPopup = new Lang.Class({
     Name: 'WindowCyclerPopup',
     Extends: CyclerPopup,
 
@@ -584,7 +584,7 @@ const WindowCyclerPopup = new Lang.Class({
     }
 });
 
-const AppIcon = new Lang.Class({
+var AppIcon = new Lang.Class({
     Name: 'AppIcon',
 
     _init: function(app) {
@@ -605,7 +605,7 @@ const AppIcon = new Lang.Class({
     }
 });
 
-const AppSwitcher = new Lang.Class({
+var AppSwitcher = new Lang.Class({
     Name: 'AppSwitcher',
     Extends: SwitcherPopup.SwitcherList,
 
@@ -779,7 +779,7 @@ const AppSwitcher = new Lang.Class({
     }
 });
 
-const ThumbnailList = new Lang.Class({
+var ThumbnailList = new Lang.Class({
     Name: 'ThumbnailList',
     Extends: SwitcherPopup.SwitcherList,
 
@@ -847,7 +847,7 @@ const ThumbnailList = new Lang.Class({
     }
 });
 
-const WindowIcon = new Lang.Class({
+var WindowIcon = new Lang.Class({
     Name: 'WindowIcon',
 
     _init: function(window, mode) {
@@ -904,7 +904,7 @@ const WindowIcon = new Lang.Class({
     }
 });
 
-const WindowList = new Lang.Class({
+var WindowList = new Lang.Class({
     Name: 'WindowList',
     Extends: SwitcherPopup.SwitcherList,
 

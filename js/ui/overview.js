@@ -27,16 +27,16 @@ const ViewSelector = imports.ui.viewSelector;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
 
 // Time for initial animation going into Overview mode
-const ANIMATION_TIME = 0.25;
+var ANIMATION_TIME = 0.25;
 
 // Must be less than ANIMATION_TIME, since we switch to
 // or from the overview completely after ANIMATION_TIME,
 // and don't want the shading animation to get cut off
-const SHADE_ANIMATION_TIME = .20;
+var SHADE_ANIMATION_TIME = .20;
 
-const DND_WINDOW_SWITCH_TIMEOUT = 750;
+var DND_WINDOW_SWITCH_TIMEOUT = 750;
 
-const OVERVIEW_ACTIVATION_TIMEOUT = 0.5;
+var OVERVIEW_ACTIVATION_TIMEOUT = 0.5;
 
 const NO_WINDOWS_OPEN_DIALOG_TIMEOUT = 2000; // ms
 
@@ -52,7 +52,7 @@ const EOS_ACTIVE_GRID_OPACITY = imports.ui.appDisplay.EOS_ACTIVE_GRID_OPACITY;
 const EOS_INACTIVE_GRID_SATURATION = imports.ui.appDisplay.EOS_INACTIVE_GRID_SATURATION;
 const EOS_ACTIVE_GRID_SATURATION = imports.ui.appDisplay.EOS_ACTIVE_GRID_SATURATION;
 
-const ShellInfo = new Lang.Class({
+var ShellInfo = new Lang.Class({
     Name: 'ShellInfo',
 
     _init: function() {
@@ -121,7 +121,7 @@ const ShellInfo = new Lang.Class({
     }
 });
 
-const NoWindowsDialog = new Lang.Class({
+var NoWindowsDialog = new Lang.Class({
     Name: 'NoWindowsDialog',
     Extends: ModalDialog.ModalDialog,
 
@@ -170,7 +170,7 @@ const NoWindowsDialog = new Lang.Class({
     },
 });
 
-const Overview = new Lang.Class({
+var Overview = new Lang.Class({
     Name: 'Overview',
 
     _init: function() {

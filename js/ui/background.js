@@ -107,7 +107,7 @@ const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 
-const DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x12282eff);
+var DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x12282eff);
 
 const BACKGROUND_SCHEMA = 'org.gnome.desktop.background';
 const PRIMARY_COLOR_KEY = 'primary-color';
@@ -117,14 +117,14 @@ const BACKGROUND_STYLE_KEY = 'picture-options';
 const PICTURE_OPACITY_KEY = 'picture-opacity';
 const PICTURE_URI_KEY = 'picture-uri';
 
-const FADE_ANIMATION_TIME = 1.0;
+var FADE_ANIMATION_TIME = 1.0;
 
 // These parameters affect how often we redraw.
 // The first is how different (percent crossfaded) the slide show
 // has to look before redrawing and the second is the minimum
 // frequency (in seconds) we're willing to wake up
-const ANIMATION_OPACITY_STEP_INCREMENT = 4.0;
-const ANIMATION_MIN_WAKEUP_INTERVAL = 1.0;
+var ANIMATION_OPACITY_STEP_INCREMENT = 4.0;
+var ANIMATION_MIN_WAKEUP_INTERVAL = 1.0;
 
 let _backgroundCache = null;
 
@@ -138,7 +138,7 @@ function _fileEqual0(file1, file2) {
     return file1.equal(file2);
 }
 
-const BackgroundCache = new Lang.Class({
+var BackgroundCache = new Lang.Class({
     Name: 'BackgroundCache',
 
     _init: function() {
@@ -230,7 +230,7 @@ function getBackgroundCache() {
     return _backgroundCache;
 }
 
-const Background = new Lang.Class({
+var Background = new Lang.Class({
     Name: 'Background',
 
     _init: function(params) {
@@ -492,7 +492,7 @@ Signals.addSignalMethods(Background.prototype);
 
 let _systemBackground;
 
-const SystemBackground = new Lang.Class({
+var SystemBackground = new Lang.Class({
     Name: 'SystemBackground',
 
     _init: function() {
@@ -529,7 +529,7 @@ const SystemBackground = new Lang.Class({
 });
 Signals.addSignalMethods(SystemBackground.prototype);
 
-const BackgroundSource = new Lang.Class({
+var BackgroundSource = new Lang.Class({
     Name: 'BackgroundSource',
 
     _init: function(layoutManager, settingsSchema) {
@@ -617,7 +617,7 @@ const BackgroundSource = new Lang.Class({
     }
 });
 
-const Animation = new Lang.Class({
+var Animation = new Lang.Class({
     Name: 'Animation',
 
     _init: function(params) {
@@ -665,7 +665,7 @@ const Animation = new Lang.Class({
 });
 Signals.addSignalMethods(Animation.prototype);
 
-const BackgroundManager = new Lang.Class({
+var BackgroundManager = new Lang.Class({
     Name: 'BackgroundManager',
 
     _init: function(params) {

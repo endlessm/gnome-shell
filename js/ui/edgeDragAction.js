@@ -8,10 +8,10 @@ const St = imports.gi.St;
 
 const Main = imports.ui.main;
 
-const EDGE_THRESHOLD = 20;
-const DRAG_DISTANCE = 80;
+var EDGE_THRESHOLD = 20;
+var DRAG_DISTANCE = 80;
 
-const EdgeDragAction = new Lang.Class({
+var EdgeDragAction = new Lang.Class({
     Name: 'EdgeDragAction',
     Extends: Clutter.GestureAction,
     Signals: { 'activated': {} },

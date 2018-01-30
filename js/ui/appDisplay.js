@@ -38,38 +38,38 @@ const Params = imports.misc.params;
 const Util = imports.misc.util;
 const SystemActions = imports.misc.systemActions;
 
-const MAX_APPLICATION_WORK_MILLIS = 75;
-const MENU_POPUP_TIMEOUT = 600;
-const MAX_COLUMNS = 7;
-const MIN_COLUMNS = 4;
-const MIN_ROWS = 1;
+var MAX_APPLICATION_WORK_MILLIS = 75;
+var MENU_POPUP_TIMEOUT = 600;
+var MAX_COLUMNS = 7;
+var MIN_COLUMNS = 4;
+var MIN_ROWS = 1;
 
-const INACTIVE_GRID_OPACITY = 77;
+var INACTIVE_GRID_OPACITY = 77;
 // This time needs to be less than IconGrid.EXTRA_SPACE_ANIMATION_TIME
 // to not clash with other animations
-const INACTIVE_GRID_OPACITY_ANIMATION_TIME = 0.24;
-const FOLDER_SUBICON_FRACTION = .4;
+var INACTIVE_GRID_OPACITY_ANIMATION_TIME = 0.24;
+var FOLDER_SUBICON_FRACTION = .4;
 
-const MIN_FREQUENT_APPS_COUNT = 3;
+var MIN_FREQUENT_APPS_COUNT = 3;
 
-const INDICATORS_BASE_TIME = 0.25;
-const INDICATORS_ANIMATION_DELAY = 0.125;
-const INDICATORS_ANIMATION_MAX_TIME = 0.75;
+var INDICATORS_BASE_TIME = 0.25;
+var INDICATORS_ANIMATION_DELAY = 0.125;
+var INDICATORS_ANIMATION_MAX_TIME = 0.75;
+
+var VIEWS_SWITCH_TIME = 0.4;
+var VIEWS_SWITCH_ANIMATION_DELAY = 0.1;
 
 // Follow iconGrid animations approach and divide by 2 to animate out to
 // not annoy the user when the user wants to quit appDisplay.
 // Also, make sure we don't exceed iconGrid animation total time or
 // views switch time.
-const INDICATORS_BASE_TIME_OUT = 0.125;
-const INDICATORS_ANIMATION_DELAY_OUT = 0.0625;
-const INDICATORS_ANIMATION_MAX_TIME_OUT =
+var INDICATORS_BASE_TIME_OUT = 0.125;
+var INDICATORS_ANIMATION_DELAY_OUT = 0.0625;
+var INDICATORS_ANIMATION_MAX_TIME_OUT =
     Math.min (VIEWS_SWITCH_TIME,
               IconGrid.ANIMATION_TIME_OUT + IconGrid.ANIMATION_MAX_DELAY_OUT_FOR_ITEM);
 
-const PAGE_SWITCH_TIME = 0.3;
-
-const VIEWS_SWITCH_TIME = 0.4;
-const VIEWS_SWITCH_ANIMATION_DELAY = 0.1;
+var PAGE_SWITCH_TIME = 0.3;
 
 const SWITCHEROO_BUS_NAME = 'net.hadess.SwitcherooControl';
 const SWITCHEROO_OBJECT_PATH = '/net/hadess/SwitcherooControl';
@@ -144,7 +144,7 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-const BaseAppView = new Lang.Class({
+var BaseAppView = new Lang.Class({
     Name: 'BaseAppView',
     Abstract: true,
 
@@ -467,7 +467,7 @@ const BaseAppView = new Lang.Class({
 });
 Signals.addSignalMethods(BaseAppView.prototype);
 
-const PageIndicatorsActor = new Lang.Class({
+var PageIndicatorsActor = new Lang.Class({
     Name:'PageIndicatorsActor',
     Extends: St.BoxLayout,
 
@@ -491,7 +491,7 @@ const PageIndicatorsActor = new Lang.Class({
     }
 });
 
-const PageIndicators = new Lang.Class({
+var PageIndicators = new Lang.Class({
     Name:'PageIndicators',
 
     _init: function() {
@@ -584,7 +584,7 @@ const PageIndicators = new Lang.Class({
 });
 Signals.addSignalMethods(PageIndicators.prototype);
 
-const AllViewContainer = new Lang.Class({
+var AllViewContainer = new Lang.Class({
     Name: 'AllViewContainer',
     Extends: St.Widget,
 
@@ -624,7 +624,7 @@ const AllViewContainer = new Lang.Class({
     }
 });
 
-const AllView = new Lang.Class({
+var AllView = new Lang.Class({
     Name: 'AllView',
     Extends: BaseAppView,
 
@@ -1382,7 +1382,7 @@ const AllView = new Lang.Class({
 });
 Signals.addSignalMethods(AllView.prototype);
 
-const FrequentView = new Lang.Class({
+var FrequentView = new Lang.Class({
     Name: 'FrequentView',
     Extends: BaseAppView,
 
@@ -1449,11 +1449,11 @@ const FrequentView = new Lang.Class({
     }
 });
 
-const Views = {
+var Views = {
     ALL: 0
 };
 
-const ControlsBoxLayout = Lang.Class({
+var ControlsBoxLayout = Lang.Class({
     Name: 'ControlsBoxLayout',
     Extends: Clutter.BoxLayout,
 
@@ -1478,7 +1478,7 @@ const ControlsBoxLayout = Lang.Class({
     }
 });
 
-const AppDisplay = new Lang.Class({
+var AppDisplay = new Lang.Class({
     Name: 'AppDisplay',
 
     _init: function() {
@@ -1520,7 +1520,7 @@ const AppDisplay = new Lang.Class({
     }
 })
 
-const AppSearchProvider = new Lang.Class({
+var AppSearchProvider = new Lang.Class({
     Name: 'AppSearchProvider',
 
     _init: function() {
@@ -1659,7 +1659,7 @@ const AppSearchProvider = new Lang.Class({
     }
 });
 
-const FolderView = new Lang.Class({
+var FolderView = new Lang.Class({
     Name: 'FolderView',
     Extends: BaseAppView,
 
@@ -2235,7 +2235,7 @@ const ViewIcon = new Lang.Class({
     }
 });
 
-const FolderIcon = new Lang.Class({
+var FolderIcon = new Lang.Class({
     Name: 'FolderIcon',
     Extends: ViewIcon,
 
@@ -2435,7 +2435,7 @@ const FolderIcon = new Lang.Class({
 });
 Signals.addSignalMethods(FolderIcon.prototype);
 
-const AppFolderPopup = new Lang.Class({
+var AppFolderPopup = new Lang.Class({
     Name: 'AppFolderPopup',
 
     _init: function(source, side) {
@@ -2596,7 +2596,7 @@ const AppFolderPopup = new Lang.Class({
 });
 Signals.addSignalMethods(AppFolderPopup.prototype);
 
-const AppIconSourceActor = new Lang.Class({
+var AppIconSourceActor = new Lang.Class({
     Name: 'AppIconSourceActor',
     Extends: MessageTray.SourceActor,
 
@@ -2611,7 +2611,7 @@ const AppIconSourceActor = new Lang.Class({
     }
 });
 
-const AppIcon = new Lang.Class({
+var AppIcon = new Lang.Class({
     Name: 'AppIcon',
     Extends: ViewIcon,
 
@@ -2844,7 +2844,7 @@ const AppCenterIconState = {
     FULL_TRASH: ViewIconState.NUM_STATES + 1
 };
 
-const AppCenterIcon = new Lang.Class({
+var AppCenterIcon = new Lang.Class({
     Name: 'AppCenterIcon',
     Extends: AppIcon,
 

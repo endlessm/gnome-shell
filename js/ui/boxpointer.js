@@ -10,14 +10,14 @@ const St = imports.gi.St;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 
-const PopupAnimation = {
+var PopupAnimation = {
     NONE:  0,
     SLIDE: 1 << 0,
     FADE:  1 << 1,
     FULL:  ~0,
 };
 
-const POPUP_ANIMATION_TIME = 0.15;
+var POPUP_ANIMATION_TIME = 0.15;
 
 /**
  * BoxPointer:
@@ -32,7 +32,7 @@ const POPUP_ANIMATION_TIME = 0.15;
  * totally inside the monitor if possible.
  *
  */
-const BoxPointer = new Lang.Class({
+var BoxPointer = new Lang.Class({
     Name: 'BoxPointer',
 
     _init: function(arrowSide, binProperties) {

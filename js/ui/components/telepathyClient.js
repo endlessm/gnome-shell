@@ -29,25 +29,25 @@ const Util = imports.misc.util;
 const HAVE_TP = (Tp != null && Tpl != null);
 
 // See Notification.appendMessage
-const SCROLLBACK_IMMEDIATE_TIME = 3 * 60; // 3 minutes
-const SCROLLBACK_RECENT_TIME = 15 * 60; // 15 minutes
-const SCROLLBACK_RECENT_LENGTH = 20;
-const SCROLLBACK_IDLE_LENGTH = 5;
+var SCROLLBACK_IMMEDIATE_TIME = 3 * 60; // 3 minutes
+var SCROLLBACK_RECENT_TIME = 15 * 60; // 15 minutes
+var SCROLLBACK_RECENT_LENGTH = 20;
+var SCROLLBACK_IDLE_LENGTH = 5;
 
 // See Source._displayPendingMessages
-const SCROLLBACK_HISTORY_LINES = 10;
+var SCROLLBACK_HISTORY_LINES = 10;
 
 // See Notification._onEntryChanged
-const COMPOSING_STOP_TIMEOUT = 5;
+var COMPOSING_STOP_TIMEOUT = 5;
 
-const CHAT_EXPAND_LINES = 12;
+var CHAT_EXPAND_LINES = 12;
 
-const NotificationDirection = {
+var NotificationDirection = {
     SENT: 'chat-sent',
     RECEIVED: 'chat-received'
 };
 
-const N_ = function(s) { return s; };
+var N_ = function(s) { return s; };
 
 function makeMessageFromTpMessage(tpMessage, direction) {
     let [text, flags] = tpMessage.to_text();
@@ -79,7 +79,7 @@ function makeMessageFromTplEvent(event) {
     };
 }
 
-const TelepathyComponent = new Lang.Class({
+var TelepathyComponent = new Lang.Class({
     Name: 'TelepathyComponent',
 
     _init: function() {
@@ -113,7 +113,7 @@ const TelepathyComponent = new Lang.Class({
     }
 });
 
-const TelepathyClient = HAVE_TP ? new Lang.Class({
+var TelepathyClient = HAVE_TP ? new Lang.Class({
     Name: 'TelepathyClient',
     Extends: Tp.BaseClient,
 
@@ -280,7 +280,7 @@ const TelepathyClient = HAVE_TP ? new Lang.Class({
     },
 }) : null;
 
-const ChatSource = new Lang.Class({
+var ChatSource = new Lang.Class({
     Name: 'ChatSource',
     Extends: MessageTray.Source,
 
@@ -647,7 +647,7 @@ const ChatSource = new Lang.Class({
     }
 });
 
-const ChatNotification = new Lang.Class({
+var ChatNotification = new Lang.Class({
     Name: 'ChatNotification',
     Extends: MessageTray.Notification,
 
@@ -806,7 +806,7 @@ const ChatNotification = new Lang.Class({
     }
 });
 
-const ChatLineBox = new Lang.Class({
+var ChatLineBox = new Lang.Class({
     Name: 'ChatLineBox',
     Extends: St.BoxLayout,
 
@@ -816,7 +816,7 @@ const ChatLineBox = new Lang.Class({
     }
 });
 
-const ChatNotificationBanner = new Lang.Class({
+var ChatNotificationBanner = new Lang.Class({
     Name: 'ChatNotificationBanner',
     Extends: MessageTray.NotificationBanner,
 
@@ -996,4 +996,4 @@ const ChatNotificationBanner = new Lang.Class({
     }
 });
 
-const Component = TelepathyComponent;
+var Component = TelepathyComponent;

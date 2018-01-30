@@ -31,13 +31,13 @@ const AccessIface = '<node> \
 </interface> \
 </node>';
 
-const DialogResponse = {
+var DialogResponse = {
     OK: 0,
     CANCEL: 1,
     CLOSED: 2
 };
 
-const AccessDialog = new Lang.Class({
+var AccessDialog = new Lang.Class({
     Name: 'AccessDialog',
     Extends: ModalDialog.ModalDialog,
 
@@ -159,7 +159,7 @@ const AccessDialog = new Lang.Class({
     }
 });
 
-const AccessDialogDBus = new Lang.Class({
+var AccessDialogDBus = new Lang.Class({
     Name: 'AccessDialogDBus',
 
     _init: function() {

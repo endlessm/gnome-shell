@@ -11,9 +11,9 @@ const PermissionStore = imports.misc.permissionStore;
 const Util = imports.misc.util;
 
 // Minimum time between updates to show loading indication
-const UPDATE_THRESHOLD = 10 * GLib.TIME_SPAN_MINUTE;
+var UPDATE_THRESHOLD = 10 * GLib.TIME_SPAN_MINUTE;
 
-const WeatherClient = new Lang.Class({
+var WeatherClient = new Lang.Class({
     Name: 'WeatherClient',
 
     _init: function() {

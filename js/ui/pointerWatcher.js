@@ -8,7 +8,7 @@ const GnomeDesktop = imports.gi.GnomeDesktop;
 const Shell = imports.gi.Shell;
 
 // We stop polling if the user is idle for more than this amount of time
-const IDLE_TIME = 1000;
+var IDLE_TIME = 1000;
 
 // This file implements a reasonably efficient system for tracking the position
 // of the mouse pointer. We simply query the pointer from the X server in a loop,
@@ -22,7 +22,7 @@ function getPointerWatcher() {
     return _pointerWatcher;
 }
 
-const PointerWatch = new Lang.Class({
+var PointerWatch = new Lang.Class({
     Name: 'PointerWatch',
 
     _init: function(watcher, interval, callback) {
@@ -39,7 +39,7 @@ const PointerWatch = new Lang.Class({
     }
 });
 
-const PointerWatcher = new Lang.Class({
+var PointerWatcher = new Lang.Class({
     Name: 'PointerWatcher',
 
     _init: function() {

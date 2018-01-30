@@ -23,11 +23,11 @@ const Util = imports.misc.util;
 
 const SEARCH_PROVIDERS_SCHEMA = 'org.gnome.desktop.search-providers';
 
-const MAX_LIST_SEARCH_RESULTS_ROWS = 3;
-const MAX_GRID_SEARCH_RESULTS_ROWS = 1;
-const MAX_GRID_SEARCH_RESULTS_COLS = 8;
+var MAX_LIST_SEARCH_RESULTS_ROWS = 3;
+var MAX_GRID_SEARCH_RESULTS_ROWS = 1;
+var MAX_GRID_SEARCH_RESULTS_COLS = 8;
 
-const MaxWidthBin = new Lang.Class({
+var MaxWidthBin = new Lang.Class({
     Name: 'MaxWidthBin',
     Extends: St.Bin,
 
@@ -47,7 +47,7 @@ const MaxWidthBin = new Lang.Class({
     }
 });
 
-const SearchResult = new Lang.Class({
+var SearchResult = new Lang.Class({
     Name: 'SearchResult',
 
     _init: function(provider, metaInfo) {
@@ -70,7 +70,7 @@ const SearchResult = new Lang.Class({
 });
 Signals.addSignalMethods(SearchResult.prototype);
 
-const ListDescriptionBox = new Lang.Class({
+var ListDescriptionBox = new Lang.Class({
     Name: 'ListDescriptionBox',
     Extends: St.BoxLayout,
 
@@ -91,7 +91,7 @@ const ListDescriptionBox = new Lang.Class({
     }
 });
 
-const ListSearchResult = new Lang.Class({
+var ListSearchResult = new Lang.Class({
     Name: 'ListSearchResult',
     Extends: SearchResult,
 
@@ -144,7 +144,7 @@ const ListSearchResult = new Lang.Class({
     }
 });
 
-const GridSearchResult = new Lang.Class({
+var GridSearchResult = new Lang.Class({
     Name: 'GridSearchResult',
     Extends: SearchResult,
 
@@ -161,7 +161,7 @@ const GridSearchResult = new Lang.Class({
     }
 });
 
-const SearchResultsBase = new Lang.Class({
+var SearchResultsBase = new Lang.Class({
     Name: 'SearchResultsBase',
 
     _init: function(provider) {
@@ -289,7 +289,7 @@ const SearchResultsBase = new Lang.Class({
     }
 });
 
-const ListSearchResults = new Lang.Class({
+var ListSearchResults = new Lang.Class({
     Name: 'ListSearchResults',
     Extends: SearchResultsBase,
 
@@ -349,7 +349,7 @@ const ListSearchResults = new Lang.Class({
 });
 Signals.addSignalMethods(ListSearchResults.prototype);
 
-const GridSearchResults = new Lang.Class({
+var GridSearchResults = new Lang.Class({
     Name: 'GridSearchResults',
     Extends: SearchResultsBase,
 
@@ -389,7 +389,7 @@ const GridSearchResults = new Lang.Class({
 });
 Signals.addSignalMethods(GridSearchResults.prototype);
 
-const SearchResultsBin = new Lang.Class({
+var SearchResultsBin = new Lang.Class({
     Name: 'SearchResultsBin',
     Extends: St.BoxLayout,
 
@@ -409,7 +409,7 @@ const SearchResultsBin = new Lang.Class({
     }
 });
 
-const SearchResults = new Lang.Class({
+var SearchResults = new Lang.Class({
     Name: 'SearchResults',
 
     _init: function() {
@@ -790,7 +790,7 @@ const SearchResults = new Lang.Class({
 });
 Signals.addSignalMethods(SearchResults.prototype);
 
-const ProviderIcon = new Lang.Class({
+var ProviderIcon = new Lang.Class({
     Name: 'ProviderIcon',
     Extends: St.Button,
 

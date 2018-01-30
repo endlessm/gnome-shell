@@ -13,7 +13,7 @@ const Tweener = imports.ui.tweener;
 const ViewSelector = imports.ui.viewSelector;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
 
-const SIDE_CONTROLS_ANIMATION_TIME = 0.16;
+var SIDE_CONTROLS_ANIMATION_TIME = 0.16;
 
 function getRtlSlideDirection(direction, actor) {
     let rtl = (actor.text_direction == Clutter.TextDirection.RTL);
@@ -24,12 +24,12 @@ function getRtlSlideDirection(direction, actor) {
     return direction;
 };
 
-const SlideDirection = {
+var SlideDirection = {
     LEFT: 0,
     RIGHT: 1
 };
 
-const SlideLayout = new Lang.Class({
+var SlideLayout = new Lang.Class({
     Name: 'SlideLayout',
     Extends: Clutter.FixedLayout,
 
@@ -103,7 +103,7 @@ const SlideLayout = new Lang.Class({
     },
 });
 
-const SlidingControl = new Lang.Class({
+var SlidingControl = new Lang.Class({
     Name: 'SlidingControl',
 
     _init: function(params) {
@@ -237,7 +237,7 @@ const SlidingControl = new Lang.Class({
     }
 });
 
-const ThumbnailsSlider = new Lang.Class({
+var ThumbnailsSlider = new Lang.Class({
     Name: 'ThumbnailsSlider',
     Extends: SlidingControl,
 
@@ -313,7 +313,7 @@ const ThumbnailsSlider = new Lang.Class({
     }
 });
 
-const DashSlider = new Lang.Class({
+var DashSlider = new Lang.Class({
     Name: 'DashSlider',
     Extends: SlidingControl,
 
@@ -352,7 +352,7 @@ const DashSlider = new Lang.Class({
     }
 });
 
-const DashSpacer = new Lang.Class({
+var DashSpacer = new Lang.Class({
     Name: 'DashSpacer',
     Extends: St.Widget,
 
@@ -390,7 +390,7 @@ const DashSpacer = new Lang.Class({
     }
 });
 
-const ControlsLayout = new Lang.Class({
+var ControlsLayout = new Lang.Class({
     Name: 'ControlsLayout',
     Extends: Clutter.BinLayout,
     Signals: { 'allocation-changed': { flags: GObject.SignalFlags.RUN_LAST } },
@@ -401,7 +401,7 @@ const ControlsLayout = new Lang.Class({
     }
 });
 
-const ControlsManager = new Lang.Class({
+var ControlsManager = new Lang.Class({
     Name: 'ControlsManager',
 
     _init: function() {
