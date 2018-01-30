@@ -61,6 +61,14 @@ var AltSwitcher = new Lang.Class({
         }
 
         let childShown = this.actor.get_child();
+
+        // We can hit a point where neither the standard nor the
+        // alternate child is visible, so exit cleanly in that case.
+        if (!childToShow) {
+            this.actor.visible = false;
+            return;
+        }
+
         if (childShown != childToShow) {
             if (childShown) {
                 if (childShown.fake_release)
