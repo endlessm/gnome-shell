@@ -4,6 +4,10 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -13,6 +17,8 @@
 #include <meta/group.h>
 #include <meta/util.h>
 #include <meta/window.h>
+
+#include <glib.h>
 
 #define SN_API_NOT_YET_FROZEN 1
 #include <libsn/sn.h>
@@ -33,6 +39,8 @@
 #define SPEEDWAGON_ROLE "eos-speedwagon"
 
 #define BUILDER_WINDOW "org.gnome.Builder"
+
+#define APP_FREEZING_MEM_TOTAL_MAX (1*1024*1024*1024)
 
 /**
  * SECTION:shell-window-tracker
@@ -489,6 +497,80 @@ _shell_window_tracker_get_app_context (ShellWindowTracker *tracker, ShellApp *ap
 }
 
 static void
+update_app_freeze_states (ShellWindowTracker *self)
+{
+  // selectively stop and continue apps' processes
+  //
+  // This is designed make low-memory and low-CPU-power computers more
+  // responsive by reducing background CPU usage and memory (de)allocations
+  // which can lead to thrashing. By cutting off resources to the
+  // least-recently-used processes, we direct resources to the applications the
+  // user is most-actively using which makes the system more responsive to their
+  // needs.
+  //
+  // Note that, though this setup prevents rapid background memory churn that
+  // can cause thrashing, it doesn't prevent recently-focused apps from behaving
+  // badly and could potentially force the system to hold onto more memory if it
+  // stops processes that would pro-actively free up their memory under pressure
+  // (such as Chromium with tab-discarding enabled).
+  //
+  // However, as of this writing, most apps are not so well behaved so limiting
+  // their memory churn and CPU hogging is more important.
+
+  ShellAppSystem *appsys = shell_app_system_get_default ();
+  GSList *apps_running = shell_app_system_get_running (appsys);
+  GSList *pids_running = NULL;
+  for (GSList *app_node = apps_running; app_node != NULL;
+       app_node = app_node->next)
+    {
+      // skip non-"running" apps so we never stop an app before it has a window
+      // the user can focus (and thus return it to normal running condition)
+      if (shell_app_get_state (app_node->data) != SHELL_APP_STATE_RUNNING)
+        continue;
+
+      GSList *pids = shell_app_get_client_pids (app_node->data);
+
+      // once we pick the "active" app, consistently always send SIGCONT to its
+      // PIDs whenever we encounter them for the remainder of this function
+      // call. This is critical when multiple ShellApps have the same PID among
+      // their PIDs as is the case for different LibreOffice applications. If we
+      // simply continued the first app's PIDs and stopped the remaining apps'
+      // PIDs, and the most-recently-used app was LibreOffice Calc and another
+      // running app was LibreOffice Writer, we would stop both apps' processes
+      // (and thus stop all UI processes).
+      if (!pids_running)
+        pids_running = g_slist_copy (pids);
+
+      for (GSList *pid_node = pids; pid_node != NULL; pid_node = pid_node->next)
+        {
+          pid_t pid = (pid_t) GPOINTER_TO_INT (pid_node->data);
+
+          if (pid <= 0)
+            continue;
+
+          GSList *pid_node_match = g_slist_find (pids_running, GINT_TO_POINTER (pid));
+
+          int signum = SIGSTOP;
+          if (pid_node_match)
+            signum = SIGCONT;
+
+          int kill_result = kill(pid, signum);
+          if (kill_result)
+            {
+              g_warning("failed to send %s to PID %d when its window changed focus: %s",
+                        (signum == SIGSTOP) ? "SIGSTOP" : "SIGCONT", pid,
+                        g_strerror(errno));
+            }
+        }
+
+      g_slist_free (pids);
+    }
+
+  g_slist_free (pids_running);
+  g_slist_free (apps_running);
+}
+
+static void
 update_focus_app (ShellWindowTracker *self)
 {
   MetaWindow *new_focus_win;
@@ -509,6 +591,13 @@ update_focus_app (ShellWindowTracker *self)
 
   if (new_focus_app)
     {
+      long mem_total = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
+
+      // only enable this feature on systems with low total RAM as it only
+      // improves responsiveness in those cases
+      if (mem_total <= APP_FREEZING_MEM_TOTAL_MAX)
+        update_app_freeze_states (self);
+
       shell_app_update_window_actions (new_focus_app, new_focus_win);
       shell_app_update_app_menu (new_focus_app, new_focus_win);
     }
