@@ -1,4 +1,4 @@
-project('gnome-shell', 'c',
+project('gnome-shell', ['c', 'cpp'],
   version: '3.26.2',
   meson_version: '>= 0.42.0',
   license: 'GPLv2+'
@@ -104,6 +104,10 @@ endif
 
 # Endless-specific: Metrics
 eosmetrics_dep = dependency('eosmetrics-0')
+
+# Endless-specific: Wobbly windows
+libwobbly_dep = dependency('libwindowfx_wobbly')
+libeos_shell_fx_deps = [mutter_dep, gdk_pixbuf_dep, libwobbly_dep]
 
 nm_deps = []
 enable_networkmanager = get_option('enable-networkmanager')
