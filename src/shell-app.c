@@ -85,7 +85,6 @@ struct _ShellApp
                           */
 
   ShellAppRunningState *running_state;
-  gboolean showing_splash;
 
   char *window_id_string;
   char *name_collation_key;
@@ -929,45 +928,12 @@ shell_app_on_user_time_changed (MetaWindow *window,
 }
 
 static void
-shell_app_do_quit (ShellApp *app)
-{
-  GSList *iter;
-
-  if (app->running_state == NULL)
-    return;
-
-  for (iter = app->running_state->windows; iter; iter = iter->next)
-    {
-      MetaWindow *win = iter->data;
-
-      if (!shell_window_tracker_is_window_interesting (win))
-        continue;
-
-      meta_window_delete (win, shell_global_get_current_time (shell_global_get ()));
-    }
-}
-
-static void
 shell_app_sync_running_state (ShellApp *app)
 {
   g_return_if_fail (app->running_state != NULL);
 
   if (app->running_state->interesting_windows > 0)
     {
-      if (app->showing_splash && app->state == SHELL_APP_STATE_STOPPED)
-        {
-          /* The only way we can reach a point there there is at least
-           * one interesting window available and the app's state is set
-           * to STOPPED is when we have closed the speedwagon window and
-           * the SplashClosed D-Bus signal hasn't managed to reach the
-           * shell before the app's main window is created. In this case,
-           * we honor the explicitly closed splash screen and quit the app.
-           */
-          shell_app_do_quit (app);
-          return;
-        }
-
-      app->showing_splash = FALSE;
       shell_app_state_transition (app, SHELL_APP_STATE_RUNNING);
     }
   else if (app->state != SHELL_APP_STATE_STARTING)
@@ -1048,7 +1014,7 @@ get_application_proxy (GObject      *source,
   g_assert (SHELL_IS_APP (app));
 
   proxy = shell_org_gtk_application_proxy_new_finish (result, NULL);
-  if (proxy != NULL && app->running_state != NULL)
+  if (proxy != NULL)
     {
       app->running_state->application_proxy = proxy;
       g_signal_connect (proxy,
@@ -1129,12 +1095,8 @@ _shell_app_add_window (ShellApp        *app,
 
   if (shell_app_is_interesting_window (window))
     app->running_state->interesting_windows++;
-
-  if (shell_window_tracker_is_speedwagon_window (window))
-    {
-      app->running_state->speedwagon_windows++;
-      app->showing_splash = TRUE;
-    }
+  else if (shell_window_tracker_is_speedwagon_window (window))
+    app->running_state->speedwagon_windows++;
 
   shell_app_sync_running_state (app);
 
@@ -1249,13 +1211,22 @@ _shell_app_handle_startup_sequence (ShellApp          *app,
 gboolean
 shell_app_request_quit (ShellApp   *app)
 {
+  GSList *iter;
+
   if (shell_app_get_state (app) != SHELL_APP_STATE_RUNNING)
     return FALSE;
 
   /* TODO - check for an XSMP connection; we could probably use that */
 
-  shell_app_do_quit (app);
+  for (iter = app->running_state->windows; iter; iter = iter->next)
+    {
+      MetaWindow *win = iter->data;
 
+      if (!shell_window_tracker_is_window_interesting (win))
+        continue;
+
+      meta_window_delete (win, shell_global_get_current_time (shell_global_get ()));
+    }
   return TRUE;
 }
 
