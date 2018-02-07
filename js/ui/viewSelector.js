@@ -1,12 +1,14 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { EosMetrics, Clutter, Gio, GObject, Meta, Shell, St } = imports.gi;
+const { EosMetrics, Clutter, Gio, GLib,
+        GObject, Meta, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
 const AppDisplay = imports.ui.appDisplay;
 const DiscoveryFeedButton = imports.ui.discoveryFeedButton;
 const LayoutManager = imports.ui.layout;
 const Main = imports.ui.main;
+const Mainloop = imports.mainloop;
 const Monitor = imports.ui.monitor;
 const OverviewControls = imports.ui.overviewControls;
 const Params = imports.misc.params;
@@ -357,6 +359,7 @@ var ViewsDisplay = class {
 
         this._searchResults = new Search.SearchResults();
         this._searchResults.connect('search-progress-updated', this._updateSpinner.bind(this));
+        this._searchResults.connect('search-close-clicked', this._resetSearch.bind(this));
 
         // Since the entry isn't inside the results container we install this
         // dummy widget as the last results container child so that we can
@@ -401,7 +404,11 @@ var ViewsDisplay = class {
     }
 
     _updateSpinner() {
-        this.entry.setSpinning(this._searchResults.searchInProgress);
+        // Make sure we never set the spinner on when there's nothing to search,
+        // regardless of the reported current state, as it can be out of date.
+        let searchTerms = this.entry.text.trim();
+        let spinning = (searchTerms.length > 0) && this._searchResults.searchInProgress;
+        this.entry.setSpinning(spinning);
     }
 
     _enterSearch() {
