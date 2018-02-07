@@ -407,7 +407,14 @@ popup-separator-menu-item {
 
 .app-folder,
 .app-well-app.app-folder {
-    .overview-icon { @extend %app-well-icon; }
+    & > .overview-icon {
+        @extend %app-well-icon;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
+.app-folder-popup {
+    -arrow-background-color: rgba(0, 0, 0, 0.3);
 }
 
 .icon-grid {
