@@ -8,6 +8,7 @@ const Signals = imports.signals;
 
 const AltTab = imports.ui.altTab;
 const AppFavorites = imports.ui.appFavorites;
+const CodeView = imports.ui.codeView;
 const Dialog = imports.ui.dialog;
 const ForceAppExitDialog = imports.ui.forceAppExitDialog;
 const WorkspaceSwitcherPopup = imports.ui.workspaceSwitcherPopup;
@@ -989,6 +990,8 @@ var WindowManager = class {
                                         () => Main.layoutManager.emit('background-clicked'));
         });
 
+        this._codeViewManager = new CodeView.CodeViewManager();
+
         this._isWorkspacePrepended = false;
 
         this._switchData = null;
@@ -1006,6 +1009,7 @@ var WindowManager = class {
             this._mapWindowDone(shellwm, actor);
             this._destroyWindowDone(shellwm, actor);
             this._sizeChangeWindowDone(shellwm, actor);
+            this._codeViewManager.killEffectsOnActor(actor);
         });
 
         this._shellwm.connect('switch-workspace', this._switchWorkspace.bind(this));
@@ -2058,7 +2062,8 @@ var WindowManager = class {
                 return Shell.WindowTracker.is_speedwagon_window(w);
             }));
             if (hasSplashWindow) {
-                shellwm.completed_map(actor);
+                if (!this._codeViewManager.handleMapWindow(actor))
+                    shellwm.completed_map(actor);
                 return;
             }
         }
@@ -2120,6 +2125,9 @@ var WindowManager = class {
                     }
                 });
             } else {
+                if (this._codeViewManager.handleMapWindow(actor))
+                    return;
+
                 actor.set_pivot_point(0.5, 1.0);
                 actor.scale_x = 0.01;
                 actor.scale_y = 0.05;
@@ -2201,6 +2209,9 @@ var WindowManager = class {
 
         if (window.is_attached_dialog())
             this._checkDimming(window.get_transient_for(), window);
+
+        if (this._codeViewManager.handleDestroyWindow(actor))
+            return;
 
         let types = [Meta.WindowType.NORMAL,
                      Meta.WindowType.DIALOG,

@@ -1,0 +1,12 @@
+<node>
+  <interface name="com.hack_computer.HackableApp">
+    <!-- AppId: The well-known-name of the application. -->
+    <property name="AppId" type="s" access="read"/>
+    <!-- PulseFlipToHackButton: Whether the FtH button should pulse or not. -->
+    <property name="PulseFlipToHackButton" type="b" access="readwrite"/>
+    <!-- State: The current state of the application. 0: APP, 1: TOOLBOX.-->
+    <property name="State" type="u" access="read"/>
+    <!-- ToolboxVisible: Whether the toolbox of the app is visible or not.-->
+    <property name="ToolboxVisible" type="b" access="readwrite"/>
+  </interface>
+</node>
