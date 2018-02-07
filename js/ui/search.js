@@ -18,12 +18,14 @@ const InternetSearch = imports.ui.internetSearch;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
 const RemoteSearch = imports.ui.remoteSearch;
+const Separator = imports.ui.separator;
 const Util = imports.misc.util;
 
 const SEARCH_PROVIDERS_SCHEMA = 'org.gnome.desktop.search-providers';
 
 var MAX_LIST_SEARCH_RESULTS_ROWS = 5;
 var MAX_GRID_SEARCH_RESULTS_ROWS = 1;
+var MAX_GRID_SEARCH_RESULTS_COLS = 8;
 
 var MaxWidthBin = new Lang.Class({
     Name: 'MaxWidthBin',
@@ -69,11 +71,32 @@ var SearchResult = new Lang.Class({
 });
 Signals.addSignalMethods(SearchResult.prototype);
 
+var ListDescriptionBox = new Lang.Class({
+    Name: 'ListDescriptionBox',
+    Extends: St.BoxLayout,
+
+    vfunc_get_preferred_height: function(forWidth) {
+        // This container requests space for the title and description
+        // regardless of visibility, but allocates normally to visible actors.
+        // This allows us have a constant sized box, but still center the title
+        // label when the description is not present.
+        let min = 0, nat = 0;
+        let children = this.get_children();
+        for (let i = 0; i < children.length; i++) {
+            let child = children[i];
+            let [childMin, childNat] = child.get_preferred_height(forWidth);
+            min += childMin;
+            nat += childNat;
+        }
+        return [min, nat];
+    }
+});
+
 var ListSearchResult = new Lang.Class({
     Name: 'ListSearchResult',
     Extends: SearchResult,
 
-    ICON_SIZE: 24,
+    ICON_SIZE: 32,
 
     _init: function(provider, metaInfo, resultsView) {
         this.parent(provider, metaInfo, resultsView);
@@ -87,33 +110,32 @@ var ListSearchResult = new Lang.Class({
 
         this._termsChangedId = 0;
 
-        let titleBox = new St.BoxLayout({ style_class: 'list-search-result-title' });
-
-        content.add(titleBox, { x_fill: true,
-                                y_fill: false,
-                                x_align: St.Align.START,
-                                y_align: St.Align.MIDDLE });
-
         // An icon for, or thumbnail of, content
         let icon = this.metaInfo['createIcon'](this.ICON_SIZE);
         if (icon) {
-            titleBox.add(icon);
+            content.add(icon);
         }
 
-        let title = new St.Label({ text: this.metaInfo['name'] });
-        titleBox.add(title, { x_fill: false,
-                              y_fill: false,
-                              x_align: St.Align.START,
-                              y_align: St.Align.MIDDLE });
+        let details = new ListDescriptionBox({ vertical: true });
+        content.add(details, { x_fill: true,
+                               y_fill: false,
+                               x_align: St.Align.START,
+                               y_align: St.Align.MIDDLE });
 
+        let title = new St.Label({ style_class: 'list-search-result-title',
+                                   text: this.metaInfo['name'] })
+        details.add(title, { x_fill: false,
+                             y_fill: false,
+                             x_align: St.Align.START,
+                             y_align: St.Align.START });
         this.actor.label_actor = title;
 
         if (this.metaInfo['description']) {
             this._descriptionLabel = new St.Label({ style_class: 'list-search-result-description' });
-            content.add(this._descriptionLabel, { x_fill: false,
+            details.add(this._descriptionLabel, { x_fill: false,
                                                   y_fill: false,
                                                   x_align: St.Align.START,
-                                                  y_align: St.Align.MIDDLE });
+                                                  y_align: St.Align.END });
 
             this._termsChangedId =
                 this._resultsView.connect('terms-changed',
@@ -121,6 +143,12 @@ var ListSearchResult = new Lang.Class({
 
             this._highlightTerms();
         }
+
+        let hoverIcon = new St.Icon({ style_class: 'list-search-result-arrow-icon',
+                                      icon_name: 'go-next-symbolic' });
+        content.add(hoverIcon, { x_fill: false,
+                                 x_align: St.Align.END,
+                                 expand: true });
 
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
     },
@@ -170,8 +198,8 @@ var SearchResultsBase = new Lang.Class({
                                               y_fill: true });
         this.actor.add(this._resultDisplayBin, { expand: true });
 
-        let separator = new St.Widget({ style_class: 'search-section-separator' });
-        this.actor.add(separator);
+        let separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
+        this.actor.add(separator.actor);
 
         this._resultDisplays = {};
 
@@ -208,7 +236,7 @@ var SearchResultsBase = new Lang.Class({
         this.provider.activateResult(id, this._terms);
         if (result.metaInfo.clipboardText)
             this._clipboard.set_text(St.ClipboardType.CLIPBOARD, result.metaInfo.clipboardText);
-        Main.overview.toggle();
+        Main.overview.hide();
     },
 
     _setMoreCount: function(count) {
@@ -310,7 +338,9 @@ var ListSearchResults = new Lang.Class({
 
         this._content = new St.BoxLayout({ style_class: 'list-search-results',
                                            vertical: true });
-        this._container.add(this._content, { expand: true });
+        this._container.add(this._content, { expand: true,
+                                             y_fill: false,
+                                             y_align: St.Align.MIDDLE });
 
         this._resultDisplayBin.set_child(this._container);
     },
@@ -333,6 +363,10 @@ var ListSearchResults = new Lang.Class({
     },
 
     _addItem: function(display) {
+        if (this._content.get_n_children() > 0) {
+            display.separator = new Separator.HorizontalSeparator({ style_class: 'search-section-separator' });
+            this._content.add(display.separator.actor);
+        }
         this._content.add_actor(display.actor);
     },
 
@@ -351,15 +385,8 @@ var GridSearchResults = new Lang.Class({
 
     _init: function(provider, resultsView) {
         this.parent(provider, resultsView);
-        // We need to use the parent container to know how much results we can show.
-        // None of the actors in this class can be used for that, since the main actor
-        // goes hidden when no results are displayed, and then it lost its allocation.
-        // Then on the next use of _getMaxDisplayedResults allocation is 0, en therefore
-        // it doesn't show any result although we have some.
-        this._parentContainer = resultsView.actor;
-
         this._grid = new IconGrid.IconGrid({ rowLimit: MAX_GRID_SEARCH_RESULTS_ROWS,
-                                             xAlign: St.Align.START });
+                                             xAlign: St.Align.MIDDLE });
         this._bin = new St.Bin({ x_align: St.Align.MIDDLE });
         this._bin.set_child(this._grid.actor);
 
@@ -367,9 +394,7 @@ var GridSearchResults = new Lang.Class({
     },
 
     _getMaxDisplayedResults: function() {
-        let parentThemeNode = this._parentContainer.get_theme_node();
-        let availableWidth = parentThemeNode.adjust_for_width(this._parentContainer.width);
-        return this._grid.columnsForWidth(availableWidth) * this._grid.getRowLimit();
+        return MAX_GRID_SEARCH_RESULTS_ROWS * MAX_GRID_SEARCH_RESULTS_COLS;
     },
 
     _clearResultDisplay: function () {
@@ -394,12 +419,50 @@ var GridSearchResults = new Lang.Class({
 });
 Signals.addSignalMethods(GridSearchResults.prototype);
 
+var SearchResultsBin = new Lang.Class({
+    Name: 'SearchResultsBin',
+    Extends: St.BoxLayout,
+
+    vfunc_allocate: function(box, flags) {
+        let themeNode = this.get_theme_node();
+        let maxWidth = themeNode.get_max_width();
+        let availWidth = box.x2 - box.x1;
+        let adjustedBox = box;
+
+        if (availWidth > maxWidth) {
+            let excessWidth = availWidth - maxWidth;
+            adjustedBox.x1 += Math.floor(excessWidth / 2);
+            adjustedBox.x2 -= Math.floor(excessWidth / 2);
+        }
+
+        this.parent(adjustedBox, flags);
+    }
+});
+
 var SearchResults = new Lang.Class({
     Name: 'SearchResults',
 
     _init: function() {
-        this.actor = new St.BoxLayout({ name: 'searchResults',
-                                        vertical: true });
+        this.actor = new SearchResultsBin({ name: 'searchResults',
+                                            vertical: true });
+        Util.blockClickEventsOnActor(this.actor);
+
+        let closeIcon = new St.Icon({ icon_name: 'window-close-symbolic' });
+        let closeButton = new St.Button({ name: 'searchResultsCloseButton',
+                                          child: closeIcon,
+                                          x_expand: true,
+                                          y_expand: false });
+        // We need to set the ClutterActor align, not St.Bin
+        closeButton.set_x_align(Clutter.ActorAlign.END);
+        closeButton.set_y_align(Clutter.ActorAlign.START);
+        closeButton.connect('clicked', Lang.bind(this, function () {
+            this.emit('search-close-clicked');
+        }));
+
+        let topBin = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        topBin.add_actor(closeButton);
+
+        this.actor.add_child(topBin);
 
         this._content = new St.BoxLayout({ name: 'searchResultsContent',
                                            vertical: true });
@@ -663,6 +726,24 @@ var SearchResults = new Lang.Class({
         }
     },
 
+    _syncSeparatorVisibility: function () {
+        let lastVisibleDisplay;
+        for (let i = 0; i < this._providers.length; i++) {
+            let provider = this._providers[i];
+            let display = provider.display;
+
+            if (!display.separator)
+                continue;
+
+            display.separator.actor.show();
+            if (display.actor.visible)
+                lastVisibleDisplay = display;
+        }
+
+        if (lastVisibleDisplay)
+            lastVisibleDisplay.separator.actor.hide();
+    },
+
     _updateSearchProgress: function () {
         let haveResults = this._providers.some(function(provider) {
             let display = provider.display;
@@ -670,6 +751,7 @@ var SearchResults = new Lang.Class({
         });
         let showStatus = !haveResults && !this.isAnimating;
 
+        this._syncSeparatorVisibility();
         this._scrollView.visible = haveResults;
         this._statusBin.visible = showStatus;
 
@@ -768,7 +850,7 @@ var ProviderInfo = new Lang.Class({
     Name: 'ProviderInfo',
     Extends: St.Button,
 
-    PROVIDER_ICON_SIZE: 32,
+    PROVIDER_ICON_SIZE: 64,
 
     _init: function(provider) {
         this.provider = provider;
@@ -777,10 +859,6 @@ var ProviderInfo = new Lang.Class({
                       can_focus: true,
                       accessible_name: provider.appInfo.get_name(),
                       track_hover: true });
-
-        this._content = new St.BoxLayout({ vertical: false,
-                                           style_class: 'list-search-provider-content' });
-        this.set_child(this._content);
 
         let icon = new St.Icon({ icon_size: this.PROVIDER_ICON_SIZE,
                                  gicon: provider.appInfo.get_icon() });
@@ -798,8 +876,18 @@ var ProviderInfo = new Lang.Class({
         detailsBox.add_actor(this._moreLabel);
 
 
+        this._content = new St.Widget({ layout_manager: new Clutter.BinLayout() });
         this._content.add_actor(icon);
         this._content.add_actor(detailsBox);
+
+        let box = new St.BoxLayout({ vertical: true, x_expand: false });
+        this.set_child(box);
+
+        box.add_actor(this._content);
+
+        let label = new St.Label({ text: provider.appInfo.get_name(),
+                                   style_class: 'search-provider-icon-label' });
+        box.add_actor(label);
     },
 
     animateLaunch: function() {
