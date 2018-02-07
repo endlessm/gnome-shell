@@ -733,6 +733,38 @@ popup-separator-menu-item {
     &:active { @extend %search-result-active; }
 }
 
+// Endless Hack
+
+.view-source {
+    background-image: url("resource:///org/gnome/shell/theme/flip-front-normal.png");
+    width: 66px;
+    height: 124px;
+    background-position: -30px 0px;
+    transition-duration: 100ms;
+
+    &.back {
+        background-image: url("resource:///org/gnome/shell/theme/flip-back-normal.png");
+    }
+
+    &:hover {
+        background-image: url("resource:///org/gnome/shell/theme/flip-front-hover.png");
+    }
+
+    &.back:hover {
+        background-image: url("resource:///org/gnome/shell/theme/flip-back-hover.png");
+    }
+
+    &.dimmed,
+    &.dimmed:hover {
+        background-image: url("resource:///org/gnome/shell/theme/flip-front-dimmed.png");
+    }
+
+    &.back.dimmed,
+    &.back.dimmed:hover {
+        background-image: url("resource:///org/gnome/shell/theme/flip-back-dimmed.png");
+    }
+}
+
 // Discovery Feed
 
 .discovery-feed-bar-icon {
