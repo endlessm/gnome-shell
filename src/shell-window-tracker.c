@@ -27,6 +27,9 @@
 #define SIDE_COMPONENT_ROLE "eos-side-component"
 #define SPEEDWAGON_ROLE "eos-speedwagon"
 
+#define OLD_HACK_TOOLBOX_ID "com.endlessm.HackToolbox.Toolbox"
+#define HACK_TOOLBOX_ID "com.hack_computer.HackToolbox.Toolbox"
+
 /**
  * SECTION:shell-window-tracker
  * @short_description: Associate windows with applications
