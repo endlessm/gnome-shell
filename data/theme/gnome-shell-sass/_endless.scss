@@ -394,6 +394,22 @@ popup-separator-menu-item {
     & > StBoxLayout { padding: 0px 70px; }
 }
 
+%app-well-icon {
+    width: 118px;
+    height: 118px;
+    padding: 6px 1px 6px 1px;
+    spacing: 4px;
+}
+
+.app-well-app {
+    .overview-icon { @extend %app-well-icon; }
+}
+
+.app-folder,
+.app-well-app.app-folder {
+    .overview-icon { @extend %app-well-icon; }
+}
+
 .icon-grid {
     spacing: 10px;
     -shell-grid-horizontal-item-size: 118px;
@@ -670,6 +686,7 @@ popup-separator-menu-item {
 // Editable Labels
 
 .overview-icon-label {
+    padding: 4px 0 4px 0;
     width: 118px;
     text-shadow: black 0px 2px 2px;
 
