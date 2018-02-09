@@ -420,7 +420,6 @@ const SystemActions = new Lang.Class({
         if (!this._actions.get(LOGOUT_ACTION_ID).available)
             throw new Error('The logout action is not available!');
 
-        Main.overview.hide();
         this._session.LogoutRemote(0);
     },
 
