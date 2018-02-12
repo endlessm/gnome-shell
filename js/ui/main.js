@@ -79,6 +79,7 @@ var magnifier = null;
 var xdndHandler = null;
 var keyboard = null;
 var layoutManager = null;
+var trayArea = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
