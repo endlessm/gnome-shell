@@ -14,6 +14,7 @@ const AccessDialog = imports.ui.accessDialog;
 const AudioDeviceSelection = imports.ui.audioDeviceSelection;
 const Components = imports.ui.components;
 const CtrlAltTab = imports.ui.ctrlAltTab;
+const CustomerSupport = imports.misc.customerSupport;
 const EndSessionDialog = imports.ui.endSessionDialog;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
@@ -91,6 +92,7 @@ var kbdA11yDialog = null;
 var inputMethod = null;
 var introspectService = null;
 var locatePointer = null;
+var customerSupport = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
@@ -210,6 +212,9 @@ function _initializeUI() {
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();
     locatePointer = new LocatePointer.LocatePointer();
+
+    // Centralized handling of things specific to customer support.
+    customerSupport = new CustomerSupport.CustomerSupport();
 
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();
