@@ -12,6 +12,7 @@ import * as BreakManager from '../misc/breakManager.js';
 import * as Config from '../misc/config.js';
 import * as Components from './components.js';
 import * as CtrlAltTab from './ctrlAltTab.js';
+import * as CustomerSupport from '../misc/customerSupport.js';
 import * as EndSessionDialog from './endSessionDialog.js';
 import * as ExtensionSystem from './extensionSystem.js';
 import * as ExtensionDownloader from './extensionDownloader.js';
@@ -96,6 +97,7 @@ export let screenTimeDBus = null;
 export let breakManagerDispatcher = null;
 export let timeLimitsManager = null;
 export let timeLimitsDispatcher = null;
+export let customerSupport = null;
 
 let _startDate;
 let _defaultCssStylesheet = null;
@@ -231,6 +233,9 @@ async function _initializeUI() {
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();
     locatePointer = new LocatePointer.LocatePointer();
+
+    // Centralized handling of things specific to customer support.
+    customerSupport = new CustomerSupport.CustomerSupport();
 
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();

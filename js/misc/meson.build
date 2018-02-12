@@ -15,6 +15,7 @@ jsconf.set('SYSTEM_FOLDER_APPS', run_command(
 ).stdout())
 jsconf.set('datadir', datadir)
 jsconf.set('libexecdir', libexecdir)
+jsconf.set('localstatedir', localstatedir)
 
 config_js = configure_file(
   input: 'config.js.in',

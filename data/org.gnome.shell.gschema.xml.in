@@ -1,4 +1,11 @@
 <schemalist>
+
+  <enum id="org.gnome.shell.PasswordResetPolicy">
+    <value nick="default" value="-1"/>
+    <value nick="disable" value="0"/>
+    <value nick="enable" value="1"/>
+  </enum>
+
   <schema id="org.gnome.shell" path="/org/gnome/shell/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="development-tools" type="b">
@@ -136,6 +143,19 @@
     <child name="window-switcher" schema="org.gnome.shell.window-switcher"/>
     <child name="world-clocks" schema="org.gnome.shell.world-clocks"/>
     <child name="weather" schema="org.gnome.shell.weather"/>
+
+    <key name="password-reset-allowed" enum="org.gnome.shell.PasswordResetPolicy">
+      <default>'default'</default>
+      <summary>Whether password reset is allowed</summary>
+      <description>
+        This key controls whether to show the "Forgot Password?" button
+        on the login screen. 'default' tells GNOME Shell to use the vendor
+        default setting. 'enable' and 'disable' can be used to explicitly
+        enable or disable the reset button, respectively. Note that it
+        only makes sense to set this key for the Debian-gdm user; changing
+        it for your own user account will have no effect.
+      </description>
+    </key>
   </schema>
 
   <schema id="org.gnome.shell.keybindings" path="/org/gnome/shell/keybindings/"
