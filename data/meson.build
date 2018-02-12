@@ -132,4 +132,7 @@ compiled_schemas = custom_target('compile-schemas',
   input: schema,
   output: 'gschemas.compiled',
   command: [find_program('glib-compile-schemas'), '--strict', data_builddir],
-)
+  build_by_default: true)
+
+install_data('40-gdm.rules', install_dir: polkitrulesdir)
+install_data('vendor-customer-support.ini', install_dir: pkgdatadir)
