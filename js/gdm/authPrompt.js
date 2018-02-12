@@ -1,11 +1,14 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported AuthPrompt */
 
-const { Clutter, GLib, GObject, Pango, Shell, St } = imports.gi;
+const { AccountsService, Clutter, GLib, Gio,
+    GObject, Pango, Polkit, Shell, St } = imports.gi;
+const ByteArray = imports.byteArray;
 
 const Animation = imports.ui.animation;
 const Batch = imports.gdm.batch;
 const GdmUtil = imports.gdm.util;
+const Main = imports.ui.main;
 const OVirt = imports.gdm.oVirt;
 const Vmware = imports.gdm.vmware;
 const Params = imports.misc.params;
@@ -18,6 +21,9 @@ var DEFAULT_BUTTON_WELL_ANIMATION_DELAY = 1000;
 var DEFAULT_BUTTON_WELL_ANIMATION_TIME = 300;
 
 var MESSAGE_FADE_OUT_ANIMATION_TIME = 500;
+
+const _RESET_CODE_LENGTH = 7;
+const _PASSWORD_RESET_SERVER = 'pwreset.endlessos.org';
 
 var AuthPromptMode = {
     UNLOCK_ONLY: 0,
@@ -38,6 +44,17 @@ var BeginRequestType = {
     DONT_PROVIDE_USERNAME: 1,
     REUSE_USERNAME: 2,
 };
+
+function _getMachineId() {
+    let machineId;
+    try {
+        machineId = Shell.get_file_contents_utf8_sync('/etc/machine-id');
+    } catch (e) {
+        logError(e, "Failed to get contents for file '/etc/machine-id'");
+        machineId = '00000000000000000000000000000000';
+    }
+    return machineId;
+}
 
 var AuthPrompt = GObject.registerClass({
     Signals: {
@@ -116,6 +133,27 @@ var AuthPrompt = GObject.registerClass({
         this._message.clutter_text.line_wrap = true;
         this._message.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.add_child(this._message);
+
+        const passwordResetLabel = new St.Label({
+            text: _('Forgot password?'),
+            style_class: 'login-dialog-password-recovery-label',
+        });
+        this._passwordResetButton = new St.Button({
+            style_class: 'login-dialog-password-recovery-button',
+            button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+            can_focus: true,
+            child: passwordResetLabel,
+            reactive: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
+            visible: false,
+        });
+        this.add_child(this._passwordResetButton);
+        this._passwordResetButton.connect('clicked', this._showPasswordResetPrompt.bind(this));
+
+        this._displayingPasswordHint = false;
+        this._customerSupportKeyFile = null;
+        this._passwordResetCode = null;
     }
 
     _onDestroy() {
@@ -179,8 +217,19 @@ var AuthPrompt = GObject.registerClass({
 
         [this._textEntry, this._passwordEntry].forEach(entry => {
             entry.clutter_text.connect('text-changed', () => {
-                if (!this._userVerifier.hasPendingMessages)
-                    this._fadeOutMessage();
+                if (!this._passwordResetCode) {
+                    if (!this._userVerifier.hasPendingMessages)
+                        this._fadeOutMessage();
+
+                    this._canActivateNext =
+                        this._entry.text.length > 0 ||
+                        this.verificationStatus === AuthPromptStatus.VERIFYING;
+                } else {
+                    // Password unlock code must contain the right number of digits, and only digits.
+                    this._canActivateNext =
+                        this._entry.text.length === _RESET_CODE_LENGTH &&
+                        this._entry.text.search(/\D/) === -1;
+                }
             });
 
             entry.clutter_text.connect('activate', () => {
@@ -240,16 +289,17 @@ var AuthPrompt = GObject.registerClass({
     }
 
     _activateNext(shouldSpin) {
+        if (!this._canActivateNext)
+            return;
+
         this.verificationStatus = AuthPromptStatus.VERIFICATION_IN_PROGRESS;
-        this.updateSensitivity(false);
 
-        if (shouldSpin)
-            this.startSpinning();
-
-        if (this._queryingService)
-            this._userVerifier.answerQuery(this._queryingService, this._entry.text);
+        if (this._passwordResetCode === null)
+            this._respondToSessionWorker(shouldSpin);
+        else if (this._entry.get_text() === this._computeUnlockCode(this._passwordResetCode))
+            this._performPasswordReset();
         else
-            this._preemptiveAnswer = this._entry.text;
+            this._handleIncorrectPasswordResetCode();
 
         this.emit('next');
     }
@@ -348,6 +398,8 @@ var AuthPrompt = GObject.registerClass({
 
         if (wasQueryingService)
             Util.wiggle(this._entry);
+
+        this._maybeShowPasswordResetButton();
     }
 
     _onVerificationComplete() {
@@ -545,9 +597,13 @@ var AuthPrompt = GObject.registerClass({
         this._queryingService = null;
         this.clear();
         this._message.opacity = 0;
+        this._message.text = '';
         this.setUser(null);
         this._updateEntry(true);
         this.stopSpinning();
+
+        this._passwordResetButton.visible = false;
+        this._passwordResetCode = null;
 
         if (oldStatus == AuthPromptStatus.VERIFICATION_FAILED)
             this.emit('failed');
@@ -591,6 +647,7 @@ var AuthPrompt = GObject.registerClass({
         params = Params.parse(params, { userName: null,
                                         hold: null });
 
+        this._username = params.userName;
         this.updateSensitivity(false);
 
         let hold = params.hold;
@@ -604,6 +661,7 @@ var AuthPrompt = GObject.registerClass({
     finish(onComplete) {
         if (!this._userVerifier.hasPendingMessages) {
             this._userVerifier.clear();
+            this._username = null;
             onComplete();
             return;
         }
@@ -611,6 +669,7 @@ var AuthPrompt = GObject.registerClass({
         let signalId = this._userVerifier.connect('no-more-messages', () => {
             this._userVerifier.disconnect(signalId);
             this._userVerifier.clear();
+            this._username = null;
             onComplete();
         });
     }
@@ -628,5 +687,152 @@ var AuthPrompt = GObject.registerClass({
         }
 
         this.reset();
+    }
+
+    _getUserLastLoginTime() {
+        const userManager = AccountsService.UserManager.get_default();
+        const user = userManager.get_user(this._username);
+        return user.get_login_time();
+    }
+
+    _generateResetCode() {
+        // Note: These are not secure random numbers. Doesn't matter. The
+        // mechanism to convert a reset code to unlock code is well-known, so
+        // who cares how random the reset code is?
+
+        // The fist digit is fixed to "1" as version of the hash code (the zeroth
+        // version had one less digit in the code).
+        let resetCode = Main.customerSupport.passwordResetSalt ? '1' : '';
+
+        const machineId = _getMachineId();
+        const lastLoginTime = this._getUserLastLoginTime();
+        const input = machineId + this._username + lastLoginTime;
+        let checksum = GLib.compute_checksum_for_data(GLib.ChecksumType.SHA256, input);
+        checksum = checksum.replace(/\D/g, '');
+
+        const hashCode = `${parseInt(checksum) % (10 ** _RESET_CODE_LENGTH)}`;
+        resetCode = `${resetCode}${hashCode.padStart(_RESET_CODE_LENGTH, '0')}`;
+
+        return resetCode;
+    }
+
+    _computeUnlockCode(resetCode) {
+        const checksum = new GLib.Checksum(GLib.ChecksumType.MD5);
+        checksum.update(ByteArray.fromString(resetCode));
+
+        if (Main.customerSupport.passwordResetSalt) {
+            checksum.update(ByteArray.fromString(Main.customerSupport.passwordResetSalt));
+            checksum.update([0]);
+        }
+
+        let unlockCode = checksum.get_string();
+        // Remove everything except digits.
+        unlockCode = unlockCode.replace(/\D/g, '');
+        unlockCode = unlockCode.slice(0, _RESET_CODE_LENGTH);
+
+        while (unlockCode.length < _RESET_CODE_LENGTH)
+            unlockCode += '0';
+
+        return unlockCode;
+    }
+
+    _showPasswordResetPrompt() {
+        if (!Main.customerSupport.customerSupportEmail)
+            return;
+
+        // Stop the normal gdm conversation so it doesn't interfere.
+        this._userVerifier.cancel();
+
+        this._passwordResetButton.hide();
+        this._entry.text = null;
+        this._entry.clutter_text.set_password_char('');
+        this._passwordResetCode = this._generateResetCode();
+
+        // Translators: During a password reset, prompt for the "secret code" provided by customer support.
+        this.setQuestion(_('Enter unlock code'));
+        this.setMessage(
+            GdmUtil.PASSWORD_SERVICE_NAME,
+            // Translators: The first %s is the password reset website URL and the second is a verification code.
+            _('Please open %s in a web browser, and enter the verification code %s. The service will provide you with an unlock code, which you can enter here.').format(
+                _PASSWORD_RESET_SERVER,
+                this._passwordResetCode),
+            GdmUtil.MessageType.INFO);
+    }
+
+    _maybeShowPasswordResetButton() {
+        // Do not allow password reset if we are not performing password auth.
+        if (!this._userVerifier.serviceIsDefault(GdmUtil.PASSWORD_SERVICE_NAME))
+            return;
+
+        // Do not allow password reset on the unlock screen.
+        if (this._userVerifier.reauthenticating)
+            return;
+
+        // Do not allow password reset if we are already in the middle of
+        // performing a password reset. Or if there is no password.
+        const userManager = AccountsService.UserManager.get_default();
+        const user = userManager.get_user(this._username);
+        if (user.get_password_mode() !== AccountsService.UserPasswordMode.REGULAR)
+            return;
+
+        // Do not allow password reset if it's disabled in GSettings.
+        const policy = global.settings.get_enum('password-reset-allowed');
+        if (policy === 0)
+            return;
+
+        // There's got to be a better way to get our pid in gjs?
+        const credentials = new Gio.Credentials();
+        const pid = credentials.get_unix_pid();
+
+        // accountsservice provides no async API, and unconditionally informs
+        // polkit that interactive authorization is permissible. If interactive
+        // authorization is attempted on the login screen during the call to
+        // set_password_mode, it will hang forever. Ensure the password reset
+        // button is hidden in this case. Besides, it's stupid to prompt for a
+        // password in order to perform password reset.
+        Polkit.Permission.new(
+            'org.freedesktop.accounts.user-administration',
+            Polkit.UnixProcess.new_for_owner(pid, 0, -1),
+            null,
+            (obj, result) => {
+                try {
+                    const permission = Polkit.Permission.new_finish(result);
+                    if (permission.get_allowed() && Main.customerSupport.customerSupportEmail)
+                        this._passwordResetButton.show();
+                } catch (e) {
+                    logError(e, 'Failed to determine if password reset is allowed');
+                }
+            });
+    }
+
+    _respondToSessionWorker(shouldSpin) {
+        this.updateSensitivity(false);
+
+        if (shouldSpin)
+            this.startSpinning();
+
+        if (this._queryingService)
+            this._userVerifier.answerQuery(this._queryingService, this._entry.text);
+        else
+            this._preemptiveAnswer = this._entry.text;
+    }
+
+    _performPasswordReset() {
+        this._entry.text = null;
+        this._passwordResetCode = null;
+        this.updateSensitivity(false);
+
+        const userManager = AccountsService.UserManager.get_default();
+        const user = userManager.get_user(this._username);
+        user.set_password_mode(AccountsService.UserPasswordMode.SET_AT_LOGIN);
+
+        this._userVerifier.begin(this._username, new Batch.Hold());
+        this.verificationStatus = AuthPromptStatus.VERIFYING;
+    }
+
+    _handleIncorrectPasswordResetCode() {
+        this._entry.text = null;
+        this.updateSensitivity(true);
+        this._message.text = _('Your unlock code was incorrect. Please try again.');
     }
 });
