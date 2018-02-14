@@ -1018,6 +1018,29 @@ var FolderView = class FolderView extends BaseAppView {
         let action = new Clutter.PanAction({ interpolate: true });
         action.connect('pan', this._onPan.bind(this));
         this.actor.add_action(action);
+
+        this._redisplay();
+    }
+
+    _loadApps() {
+        let appSys = Shell.AppSystem.get_default();
+        let addAppId = (function addAppId(appId) {
+            let app = appSys.lookup_app(appId);
+            if (!app)
+                return;
+
+            if (!app.get_app_info().should_show())
+                return;
+
+            let icon = new AppIcon(app);
+            this.addItem(icon);
+        }).bind(this);
+
+        let folderApps = IconGridLayout.layout.getIcons(this._dirInfo.get_id());
+        folderApps.forEach(addAppId);
+
+        this.actor.visible = this.view.getAllItems().length > 0;
+        this.loadGrid();
     }
 
     _childFocused(actor) {
@@ -1135,12 +1158,13 @@ var FolderIcon = class FolderIcon {
             this.view.actor.vscroll.adjustment.value = 0;
             this._openSpaceForPopup();
         });
+
+        this._updateName();
+
         this.actor.connect('notify::mapped', () => {
             if (!this.actor.mapped && this._popup)
                 this._popup.popdown();
         });
-
-        this._redisplay();
     }
 
     getAppIds() {
@@ -1155,31 +1179,6 @@ var FolderIcon = class FolderIcon {
         this.name = name;
         this.icon.label.text = this.name;
         this.emit('name-changed');
-    }
-
-    _redisplay() {
-        this._updateName();
-
-        this.view.removeAll();
-
-        let appSys = Shell.AppSystem.get_default();
-        let addAppId = appId => {
-            let app = appSys.lookup_app(appId);
-            if (!app)
-                return;
-
-            if (!app.get_app_info().should_show())
-                return;
-
-            let icon = new AppIcon(app);
-            this.view.addItem(icon);
-        };
-
-        let folderApps = IconGridLayout.layout.getIcons(this.id);
-        folderApps.forEach(addAppId);
-
-        this.actor.visible = this.view.getAllItems().length > 0;
-        this.view.loadGrid();
     }
 
     _createIcon(iconSize) {
