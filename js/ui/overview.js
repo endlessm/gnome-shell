@@ -507,6 +507,7 @@ var Overview = new Lang.Class({
 
     focusSearch: function() {
         this.show();
+        this.viewSelector.focusSearch();
     },
 
     _showOrSwitchPage: function(page) {
