@@ -457,18 +457,18 @@ var Overview = class {
     }
 
     beginItemDrag(source) {
-        this.emit('item-drag-begin');
+        this.emit('item-drag-begin', source);
         this._inItemDrag = true;
     }
 
     cancelledItemDrag(source) {
-        this.emit('item-drag-cancelled');
+        this.emit('item-drag-cancelled', source);
     }
 
     endItemDrag(source) {
         if (!this._inItemDrag)
             return;
-        this.emit('item-drag-end');
+        this.emit('item-drag-end', source);
         this._inItemDrag = false;
     }
 
