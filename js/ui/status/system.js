@@ -149,21 +149,13 @@ var Indicator = new Lang.Class({
                 this._systemActions.forceUpdate();
             }));
         this._updateMultiUser();
-
-        Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
-        this._sessionUpdated();
     },
 
     _updateActionsVisibility: function() {
-        let visible = (this._settingsAction.visible ||
-                       this._lockScreenAction.visible ||
+        let visible = (this._lockScreenAction.visible ||
                        this._altSwitcher.actor.visible);
 
         this._actionsItem.actor.visible = visible;
-    },
-
-    _sessionUpdated: function() {
-        this._settingsAction.visible = Main.sessionMode.allowSettings;
     },
 
     _updateMultiUser: function() {
@@ -206,14 +198,28 @@ var Indicator = new Lang.Class({
         }
     },
 
+    _createActionButtonBase: function(accessibleName) {
+        let button = new St.Button({ reactive: true,
+                                     can_focus: true,
+                                     track_hover: true,
+                                     accessible_name: accessibleName,
+                                     style_class: 'system-menu-action' });
+        return button;
+    },
+
     _createActionButton: function(iconName, accessibleName) {
-        let icon = new St.Button({ reactive: true,
-                                   can_focus: true,
-                                   track_hover: true,
-                                   accessible_name: accessibleName,
-                                   style_class: 'system-menu-action' });
-        icon.child = new St.Icon({ icon_name: iconName });
-        return icon;
+        let button = this._createActionButtonBase(accessibleName);
+        button.child = new St.Icon({ icon_name: iconName });
+        return button;
+    },
+
+    _createActionButtonForIconPath: function(iconPath, accessibleName) {
+        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell' + iconPath);
+        let gicon = new Gio.FileIcon({ file: iconFile });
+
+        let button = this._createActionButtonBase(accessibleName);
+        button.child = new St.Icon({ gicon: gicon });
+        return button;
     },
 
     _createSubMenu: function() {
@@ -262,16 +268,17 @@ var Indicator = new Lang.Class({
         this._user.connect('notify::is-loaded', Lang.bind(this, this._updateSwitchUserSubMenu));
         this._user.connect('changed', Lang.bind(this, this._updateSwitchUserSubMenu));
 
-        this.menu.addMenuItem(this._switchUserSubMenu);
-
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         item = new PopupMenu.PopupBaseMenuItem({ reactive: false,
                                                  can_focus: false });
 
-        this._settingsAction = this._createActionButton('preferences-system-symbolic', _("Settings"));
-        this._settingsAction.connect('clicked', () => { this._onSettingsClicked(); });
-        item.actor.add(this._settingsAction, { expand: true, x_fill: false });
+        this._logoutAction = this._createActionButtonForIconPath('/theme/system-logout.png', _("Log Out"));
+        this._logoutAction.connect('clicked',  () => {
+            this.menu.itemActivated(BoxPointer.PopupAnimation.NONE);
+            this._systemActions.activateLogout();
+        });
+        item.actor.add(this._logoutAction, { expand: true, x_fill: false });
 
         this._lockScreenAction = this._createActionButton('changes-prevent-symbolic', _("Lock"));
         this._lockScreenAction.connect('clicked', () => {
@@ -310,19 +317,9 @@ var Indicator = new Lang.Class({
         this._actionsItem = item;
         this.menu.addMenuItem(item);
 
-
-        this._settingsAction.connect('notify::visible',
-                                     () => { this._updateActionsVisibility(); });
         this._lockScreenAction.connect('notify::visible',
                                        () => { this._updateActionsVisibility(); });
         this._altSwitcher.actor.connect('notify::visible',
                                         () => { this._updateActionsVisibility(); });
-    },
-
-    _onSettingsClicked: function() {
-        this.menu.itemActivated();
-        let app = Shell.AppSystem.get_default().lookup_app('gnome-control-center.desktop');
-        Main.overview.hide();
-        app.activate();
     }
 });
