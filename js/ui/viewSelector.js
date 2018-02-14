@@ -14,6 +14,7 @@ const St = imports.gi.St;
 const GObject = imports.gi.GObject;
 
 const AppDisplay = imports.ui.appDisplay;
+const DiscoveryFeedButton = imports.ui.discoveryFeedButton;
 const LayoutManager = imports.ui.layout;
 const Main = imports.ui.main;
 const Monitor = imports.ui.monitor;
@@ -167,10 +168,11 @@ var ViewsDisplayLayout = new Lang.Class({
     Signals: { 'grid-available-size-changed': { param_types: [GObject.TYPE_INT,
                                                               GObject.TYPE_INT] } },
 
-    _init: function(entry, gridContainerActor, searchResultsActor) {
+    _init: function(entry, discoveryFeedButton, gridContainerActor, searchResultsActor) {
         this.parent();
 
         this._entry = entry;
+        this._discoveryFeedButton = discoveryFeedButton;
         this._gridContainerActor = gridContainerActor;
         this._searchResultsActor = searchResultsActor;
 
@@ -225,6 +227,12 @@ var ViewsDisplayLayout = new Lang.Class({
         entryBox.y1 = this._heightAboveEntry + entryTopMargin;
         entryBox.y2 = entryBox.y1 + entryHeight;
 
+        let discoveryFeedButtonBox = allocation.copy();
+        if (this._discoveryFeedButton)
+            discoveryFeedButtonBox = DiscoveryFeedButton.determineAllocationWithinBox(this._discoveryFeedButton,
+                                                                                      allocation,
+                                                                                      availWidth);
+
         let gridContainerBox = allocation.copy();
         // The grid container box should have the dimensions of this container but start
         // after the search entry and according to the calculated xplacement policies
@@ -241,18 +249,21 @@ var ViewsDisplayLayout = new Lang.Class({
             searchResultsBox.y2 = searchResultsBox.y1 + searchResultsHeight;
         }
 
-        return [entryBox, gridContainerBox, searchResultsBox];
+        return [entryBox, discoveryFeedButtonBox, gridContainerBox, searchResultsBox];
     },
 
     vfunc_allocate: function(container, allocation, flags) {
-        let [entryBox, gridContainerBox, searchResultsBox] = this._computeChildrenAllocation(allocation);
+        let [entryBox, discoveryFeedButtonBox, gridContainerBox, searchResultsBox] = this._computeChildrenAllocation(allocation);
 
         // We want to emit the signal BEFORE any allocation has happened since the
         // icon grid will need to precompute certain values before being able to
         // report a sensible preferred height for the specified width.
-        this.emit('grid-available-size-changed', allocation.x2 - allocation.x1, allocation.y2 - allocation.y1);
+        this.emit('grid-available-size-changed', gridContainerBox.x2 - gridContainerBox.x1,
+                  gridContainerBox.y2 - gridContainerBox.y1);
 
         this._entry.allocate(entryBox, flags);
+        if (this._discoveryFeedButton)
+            this._discoveryFeedButton.allocate(discoveryFeedButtonBox, flags);
         this._gridContainerActor.allocate(gridContainerBox, flags);
         if (this._searchResultsActor)
             this._searchResultsActor.allocate(searchResultsBox, flags);
@@ -267,6 +278,11 @@ var ViewsDisplayLayout = new Lang.Class({
 
         this._gridContainerActor.opacity = (1 - v) * 255;
         this._searchResultsActor.opacity = v * 255;
+
+        if (this._discoveryFeedButton) {
+            this._discoveryFeedButton.changeVisbilityState(v != 1);
+            this._discoveryFeedButton.opacity = (1 - v) * 255;
+        }
 
         let entryTranslation = - this._heightAboveEntry * v;
         this._entry.translation_y = entryTranslation;
@@ -285,14 +301,15 @@ var ViewsDisplayContainer = new Lang.Class({
     Name: 'ViewsDisplayContainer',
     Extends: St.Widget,
 
-    _init: function(entry, gridContainer, searchResults) {
+    _init: function(entry, discoveryFeedButton, gridContainer, searchResults) {
         this._entry = entry;
+        this._discoveryFeedButton = discoveryFeedButton;
         this._gridContainer = gridContainer;
         this._searchResults = searchResults;
 
         this._activePage = ViewsDisplayPage.APP_GRID;
 
-        let layoutManager = new ViewsDisplayLayout(entry, gridContainer.actor, searchResults.actor);
+        let layoutManager = new ViewsDisplayLayout(entry, discoveryFeedButton, gridContainer.actor, searchResults.actor);
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true });
@@ -300,6 +317,8 @@ var ViewsDisplayContainer = new Lang.Class({
         layoutManager.connect('grid-available-size-changed', this._onGridAvailableSizeChanged.bind(this));
 
         this.add_child(this._entry);
+        if (this._discoveryFeedButton)
+            this.add_child(this._discoveryFeedButton);
         this.add_child(this._gridContainer.actor);
         this.add_child(this._searchResults.actor);
     },
@@ -388,7 +407,10 @@ var ViewsDisplay = new Lang.Class({
         Main.overview.addAction(clickAction, false);
         this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
 
-        this.actor = new ViewsDisplayContainer(this.entry, this._appDisplay, this._searchResults);
+        this.actor = new ViewsDisplayContainer(this.entry,
+                                               DiscoveryFeedButton.maybeCreateButton(),
+                                               this._appDisplay,
+                                               this._searchResults);
     },
 
     _recordDesktopSearchMetric: function(query, searchProvider) {
@@ -500,7 +522,9 @@ var ViewsClone = new Lang.Class({
                                                                { allowScrolling: false });
         appGridContainer.reactive = false;
 
-        let layoutManager = new ViewsDisplayLayout(entry, appGridContainer, null);
+        let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
+
+        let layoutManager = new ViewsDisplayLayout(entry, discoveryFeedButton, appGridContainer, null);
         this.parent({ layout_manager: layoutManager,
                       x_expand: true,
                       y_expand: true,
@@ -513,6 +537,8 @@ var ViewsClone = new Lang.Class({
         let cloneAdjustment = appGridContainer.scrollView.vscroll.adjustment;
         originalAdjustment.bind_property('value', cloneAdjustment, 'value', GObject.BindingFlags.SYNC_CREATE);
 
+        if (discoveryFeedButton)
+            this.add_child(discoveryFeedButton);
         this.add_child(entry);
         this.add_child(appGridContainer);
 
