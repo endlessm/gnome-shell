@@ -855,6 +855,7 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'dateMenu': imports.ui.dateMenu.DateMenuButton,
     'a11y': imports.ui.status.accessibility.ATIndicator,
     'keyboard': imports.ui.status.keyboard.InputSourceIndicator,
+    'hotCorner': imports.ui.hotCorner.HotCorner,
     'powerMenu': PowerMenu,
 };
 
