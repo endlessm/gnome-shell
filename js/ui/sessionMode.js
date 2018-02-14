@@ -102,7 +102,7 @@ const _modes = {
             left: ['endlessButton', 'appIcons'],
             center: [],
             right: ['a11y', 'keyboard', 'aggregateMenu', 'dateMenu',
-                    'hotCorner']
+                    'userMenu', 'hotCorner']
         }
     }
 };

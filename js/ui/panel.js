@@ -24,9 +24,6 @@ var BUTTON_DND_ACTIVATION_TIMEOUT = 250;
 
 var SPINNER_ANIMATION_TIME = 1.0;
 
-const SETTINGS_TEXT = _("All Settings…");
-const CONTROL_CENTER_LAUNCHER = "gnome-control-center.desktop";
-
 // To make sure the panel corners blend nicely with the panel,
 // we draw background and borders the same way, e.g. drawing
 // them as filled shapes from the outside inwards instead of
@@ -802,17 +799,6 @@ class AggregateMenu extends PanelMenu.Button {
         if (!userMode)
             this._indicators.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
-        let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
-        this.menu.addAction(SETTINGS_TEXT, () => {
-            this.menu.close(BoxPointer.PopupAnimation.NONE);
-            Main.overview.hide();
-
-            let app = Shell.AppSystem.get_default().lookup_app(CONTROL_CENTER_LAUNCHER);
-            let context = new AppActivation.AppActivationContext(app);
-            context.activate();
-        }, gicon);
-
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         if (this._network) {
             this.menu.addMenuItem(this._network.menu);
         }
@@ -835,6 +821,38 @@ class AggregateMenu extends PanelMenu.Button {
         menuLayout.addSizeChild(this._orientation.menu.actor);
         menuLayout.addSizeChild(this._rfkill.menu.actor);
         menuLayout.addSizeChild(this._power.menu.actor);
+    }
+});
+
+var UserMenu = GObject.registerClass(
+class UserMenu extends PanelMenu.Button {
+    _init() {
+        super._init(0.0, C_("User menu", "User Menu"), false);
+
+        this.actor.accessible_role = Atk.Role.MENU;
+
+        let menuLayout = new AggregateLayout();
+        this.menu.box.set_layout_manager(menuLayout);
+        this.menu.actor.add_style_class_name('aggregate-menu');
+
+        this._userMenu = new imports.ui.userMenu.UserMenu();
+        this.actor.add_child(this._userMenu.panelBox);
+        this.menu.addMenuItem(this._userMenu.menu);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        let systemIndicator = new imports.ui.status.system.Indicator();
+        this.menu.addMenuItem(systemIndicator.menu);
+
+        menuLayout.addSizeChild(systemIndicator.menu.actor);
+
+        // We need to monitor the session to know when to show the button
+        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionUpdated();
+    }
+
+    _sessionUpdated() {
+        this.actor.visible = !Main.sessionMode.isGreeter;
+        this.setSensitive(!Main.sessionMode.isLocked);
     }
 });
 
@@ -875,6 +893,7 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
     'keyboard': imports.ui.status.keyboard.InputSourceIndicator,
     'hotCorner': imports.ui.hotCorner.HotCorner,
     'powerMenu': PowerMenu,
+    'userMenu': UserMenu,
 };
 
 var Panel = GObject.registerClass(
