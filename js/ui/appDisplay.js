@@ -172,6 +172,40 @@ var BaseAppView = new Lang.Class({
         // Nothing by default
     },
 
+    _createItemForId: function(itemId) {
+        if (IconGridLayout.layout.iconIsFolder(itemId))
+            return Shell.DesktopDirInfo.new(itemId);
+
+        return Shell.AppSystem.get_default().lookup_app(itemId);
+    },
+
+    _createItemIcon: function(item) {
+        throw new Error('Not implemented');
+    },
+
+    getLayoutIds: function() {
+        let viewId = this.getViewId();
+        return IconGridLayout.layout.getIcons(viewId).slice();
+    },
+
+    _loadApps: function() {
+        let ids = this.getLayoutIds();
+
+        for (let itemId of ids) {
+            let item = this._createItemForId(itemId);
+            if (!item)
+                continue;
+
+            let icon = this._createItemIcon(item);
+            if (!icon)
+                continue;
+
+            this.addItem(icon);
+        }
+
+        this.loadGrid();
+    },
+
     removeAll: function() {
         this._grid.destroyAll();
         this._items = {};
@@ -601,8 +635,28 @@ var AllView = new Lang.Class({
             // and set it to edit mode
             this._addedFolderId = id;
         });
+    },
 
-        this._loadApps();
+    loadGrid: function() {
+        this._maybeAddAppCenterIcon();
+        this.parent();
+    },
+
+    getLayoutIds: function() {
+        let layoutIds = this.parent();
+
+        if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
+            return layoutIds;
+
+        let appSys = Shell.AppSystem.get_default();
+        if (appSys.lookup_app(EOS_APP_CENTER_ID)) {
+            // AllView also has the App Center icon appended at the end of the list.
+            // For Drag n' Drop work correctly, we must take this icon into account
+            // when calculating the diff between before and after the DnD.
+            layoutIds.push(EOS_APP_CENTER_ID);
+        }
+
+        return layoutIds;
     },
 
     removeAll: function() {
@@ -622,47 +676,47 @@ var AllView = new Lang.Class({
         this._grid.addItem(item, newIdx);
     },
 
-    _loadApps: function() {
-        let desktopIds = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+    _ensureAppCenterIcon: function() {
+        if (this._appCenterIcon)
+            return;
 
-        let items = [];
-        for (let idx in desktopIds) {
-            let itemId = desktopIds[idx];
-            items.push(itemId);
+        this._appCenterIcon = new AppCenterIcon(this);
+        this._appCenterItem = {
+            get_name: () => { return this._appCenterIcon.getName(); }
+        };
+    },
+
+    _createItemForId: function(itemId) {
+        if (itemId == EOS_APP_CENTER_ID) {
+            this._ensureAppCenterIcon();
+            return this._appCenterItem;
         }
 
-        let appSys = Shell.AppSystem.get_default();
+        return this.parent(itemId);
+    },
 
-        items.forEach((itemId) => {
-            let icon = null;
+    _createItemIcon: function(item) {
+        if (item == this._appCenterItem)
+            return this._appCenterIcon;
 
-            if (IconGridLayout.layout.iconIsFolder(itemId)) {
-                let item = Shell.DesktopDirInfo.new(itemId);
-                icon = new FolderIcon(item, this);
-                icon.connect('name-changed', this._itemNameChanged.bind(this));
-                this.folderIcons.push(icon);
-                if (this._addedFolderId == itemId) {
-                    this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
-                    this._addedFolderId = null;
-                }
-            } else {
-                let app = appSys.lookup_app(itemId);
-                if (app)
-                    icon = new AppIcon(app,
-                                       { isDraggable: true,
-                                         parentView: this },
-                                       null);
-            }
+        let itemId = item.get_id();
 
-            // Some apps defined by the icon grid layout might not be installed
-            if (icon)
-                this.addItem(icon);
-        });
+        if (!IconGridLayout.layout.iconIsFolder(itemId)) {
+            return new AppIcon(item,
+                               { isDraggable: true,
+                                 parentView: this },
+                               null);
+        }
 
-        // Add the App Center icon if it is enabled (and installed)
-        this._maybeAddAppCenterIcon();
+        let icon = new FolderIcon(item, this);
+        icon.connect('name-changed', this._itemNameChanged.bind(this));
+        this.folderIcons.push(icon);
+        if (this._addedFolderId == itemId) {
+            this.selectAppWithLabelMode(this._addedFolderId, EditableLabelMode.EDIT);
+            this._addedFolderId = null;
+        }
 
-        this.loadGrid();
+        return icon;
     },
 
     _maybeAddAppCenterIcon: function() {
@@ -678,7 +732,7 @@ var AllView = new Lang.Class({
             return;
         }
 
-        this._appCenterIcon = new AppCenterIcon(this);
+        this._ensureAppCenterIcon();
         this.addItem(this._appCenterIcon);
     },
 
@@ -1125,15 +1179,6 @@ var AllView = new Lang.Class({
             source.blockHandler = true;
             this._eventBlocker.reactive = false;
             this._currentPopup.popdown();
-
-            // Append the inserted app to the end of the grid
-            let appSystem = Shell.AppSystem.get_default();
-            let app  = appSystem.lookup_app(source.getId());
-            let icon = new AppIcon(app,
-                                   { isDraggable: true,
-                                     parentView: this },
-                                   null);
-            this.addItem(icon);
         }
 
         IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
@@ -1521,28 +1566,16 @@ var FolderView = new Lang.Class({
         this._redisplay();
     },
 
-    _loadApps: function() {
-        let appSys = Shell.AppSystem.get_default();
-        let addAppId = (function addAppId(appId) {
-            let app = appSys.lookup_app(appId);
-            if (!app)
-                return;
-
-            if (!app.get_app_info().should_show())
-                return;
-
-            let icon = new AppIcon(app,
-                                   { isDraggable: true,
-                                     parentView: this.view },
-                                   null);
-            this.addItem(icon);
-        }).bind(this);
-
-        let folderApps = IconGridLayout.layout.getIcons(this._dirInfo.get_id());
-        folderApps.forEach(addAppId);
-
-        this.loadGrid();
+    _redisplay: function() {
+        this.parent();
         this.updateNoAppsLabelVisibility();
+    },
+
+    _createItemIcon: function(item) {
+        return new AppIcon(item,
+                           { isDraggable: true,
+                             parentView: this },
+                           null);
     },
 
     updateNoAppsLabelVisibility: function() {
