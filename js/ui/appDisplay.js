@@ -1105,7 +1105,7 @@ var FolderView = new Lang.Class({
             if (!app.get_app_info().should_show())
                 return;
 
-            let icon = new AppIcon(app);
+            let icon = new AppIcon(app, null);
             this.addItem(icon);
         }).bind(this);
 
@@ -1221,9 +1221,14 @@ var FolderIcon = new Lang.Class({
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
 
-        this.icon = new IconGrid.BaseIcon('', { createIcon: Lang.bind(this, this._createIcon), setSizeManually: true });
+        this.icon = new IconGrid.BaseIcon('', { createIcon: Lang.bind(this, this._createIcon),
+                                                setSizeManually: true,
+                                                editable: true });
         this.actor.set_child(this.icon.actor);
         this.actor.label_actor = this.icon.label;
+
+        this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
+        this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
 
         this.view = new FolderView(this._dirInfo);
 
@@ -1247,6 +1252,22 @@ var FolderIcon = new Lang.Class({
         return this.view.getAllItems().map(function(item) {
             return item.id;
         });
+    },
+
+    _onLabelUpdate: function(label, newText) {
+        try {
+            this._dirInfo.create_custom_with_name(newText);
+            this.name = newText;
+        } catch(e) {
+            logError(e, 'error while creating a custom dirInfo for: '
+                      + this.name
+                      + ' using new name: '
+                      + newText);
+        }
+    },
+
+    _onLabelCancel: function() {
+        this.icon.actor.sync_hover();
     },
 
     _updateName: function() {
@@ -1564,6 +1585,11 @@ var AppIcon = new Lang.Class({
         this.actor.connect('clicked', Lang.bind(this, this._onClicked));
         this.actor.connect('popup-menu', Lang.bind(this, this._onKeyboardPopupMenu));
 
+        if (iconParams['showLabel'] && iconParams['editable']) {
+            this.icon.label.connect('label-edit-update', Lang.bind(this, this._onLabelUpdate));
+            this.icon.label.connect('label-edit-cancel', Lang.bind(this, this._onLabelCancel));
+        }
+
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
 
@@ -1592,6 +1618,14 @@ var AppIcon = new Lang.Class({
                 this._updateRunningStyle();
             }));
         this._updateRunningStyle();
+    },
+
+    _onLabelUpdate: function() {
+        // Do nothing by default
+    },
+
+    _onLabelCancel: function() {
+        this.icon.actor.sync_hover();
     },
 
     _onDestroy: function() {
