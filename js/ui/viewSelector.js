@@ -243,7 +243,7 @@ var ViewSelector = new Lang.Class({
                               Meta.KeyBindingFlags.NONE,
                               Shell.ActionMode.NORMAL |
                               Shell.ActionMode.OVERVIEW,
-                              Lang.bind(Main.overview, Main.overview.toggle));
+                              Main.overview.toggleWindows.bind(Main.overview));
 
         let side;
         if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
@@ -278,11 +278,11 @@ var ViewSelector = new Lang.Class({
         Main.overview.show();
     },
 
-    show: function() {
+    show: function(viewPage) {
         this.reset();
         this._workspacesDisplay.show(true);
 
-        this._showPage(this._appsPage);
+        this._showPage(this._pageFromViewPage(viewPage));
     },
 
     animateFromOverview: function() {
