@@ -473,6 +473,7 @@ var ViewSelector = new Lang.Class({
                                                                    work_area: true }));
 
         this.appDisplay = this._viewsDisplay.appDisplay;
+        this._entry = this._viewsDisplay.entry;
 
         this._stageKeyPressId = 0;
         Main.overview.connect('showing', Lang.bind(this,
@@ -555,7 +556,14 @@ var ViewSelector = new Lang.Class({
         Main.overview.show();
     },
 
+    _clearSearch: function() {
+        this._entry.resetSearch();
+        this._viewsDisplay.actor.showPage(ViewsDisplayPage.APP_GRID, false);
+    },
+
     show: function(viewPage) {
+        this._clearSearch();
+
         // We're always starting up to the APPS page, so avoid making the workspacesDisplay
         // (used for the Windows picker) visible to prevent situations where that actor
         // would intercept clicks meant for the desktop's icons grid.
@@ -579,6 +587,11 @@ var ViewSelector = new Lang.Class({
 
     hide: function() {
         this._workspacesDisplay.hide();
+    },
+
+    focusSearch: function() {
+        if (this._activePage == this._appsPage)
+            this._entry.grab_key_focus();
     },
 
     _addPage: function(actor, name, a11yIcon, params) {
@@ -655,6 +668,13 @@ var ViewSelector = new Lang.Class({
         }
     },
 
+    _pageChanged: function() {
+        if (this._activePage != this._appsPage)
+            this._clearSearch();
+
+        this._pageChanged();
+    },
+
     _showPage: function(page) {
         if (!Main.overview.visible)
             return;
@@ -688,6 +708,12 @@ var ViewSelector = new Lang.Class({
             Main.overview.toggleWindows();
             return Clutter.EVENT_STOP;
         }
+
+        if (this._entry.handleStageEvent(event))
+            return Clutter.EVENT_STOP;
+
+        if (this._entry.active)
+            return Clutter.EVENT_PROPAGATE;
 
         if (!global.stage.key_focus) {
             if (symbol == Clutter.Tab || symbol == Clutter.Down) {
