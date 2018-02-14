@@ -12,6 +12,8 @@ const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 const Main = imports.ui.main;
 
+const EditableLabel = imports.ui.editableLabel;
+
 var ICON_SIZE = 64;
 var MIN_ICON_SIZE = 16;
 
@@ -41,6 +43,7 @@ var BaseIcon = new Lang.Class({
         params = Params.parse(params, { createIcon: null,
                                         createExtraIcons: null,
                                         setSizeManually: false,
+                                        editable: false,
                                         showLabel: true });
 
         let styleClass = 'overview-icon';
@@ -88,7 +91,12 @@ var BaseIcon = new Lang.Class({
         this._layeredIcon.add_actor(shadow);
 
         if (params.showLabel) {
-            this.label = new St.Label({ text: label });
+            if (params.editable)
+                this.label = new EditableLabel.EditableLabel({ text: label,
+                                                               style_class: 'overview-icon-label' });
+            else
+                this.label = new St.Label({ text: label,
+                                            style_class: 'overview-icon-label' });
             box.add_actor(this.label);
         } else {
             this.label = null;
