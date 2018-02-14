@@ -609,7 +609,9 @@ var AllView = new Lang.Class({
             } else {
                 let app = appSys.lookup_app(itemId);
                 if (app)
-                    icon = new AppIcon(app, { isDraggable: favoritesWritable });
+                    icon = new AppIcon(app,
+                                       { isDraggable: favoritesWritable },
+                                       null);
             }
 
             // Some apps defined by the icon grid layout might not be installed
@@ -924,7 +926,8 @@ var FrequentView = new Lang.Class({
             if (!mostUsed[i].get_app_info().should_show())
                 continue;
             let appIcon = new AppIcon(mostUsed[i],
-                                      { isDraggable: favoritesWritable });
+                                      { isDraggable: favoritesWritable },
+                                      null);
             this._grid.addItem(appIcon, -1);
         }
     },
@@ -1288,7 +1291,11 @@ const ViewIconState = {
 var ViewIcon = new Lang.Class({
     Name: 'ViewIcon',
 
-    _init: function(buttonParams, iconParams) {
+    _init: function(params, buttonParams, iconParams) {
+        params = Params.parse(params,
+                              { isDraggable: true,
+                                showMenu: true },
+                              true);
         buttonParams = Params.parse(buttonParams,
                                     { style_class: 'app-well-app',
                                       button_mask: St.ButtonMask.ONE |
@@ -1305,6 +1312,7 @@ var ViewIcon = new Lang.Class({
                                     showLabel: true },
                                   true);
 
+        this.showMenu = params.showMenu;
 
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
@@ -1314,12 +1322,6 @@ var ViewIcon = new Lang.Class({
         this.actor._delegate = this;
         this.actor.connect('destroy', this._onDestroy.bind(this));
 
-        // Get the isDraggable property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { isDraggable: true },
-                                         true);
-        let isDraggable = appIconParams['isDraggable'];
-        delete iconParams['isDraggable'];
-
         this.icon = new IconGrid.BaseIcon(this.getName(), iconParams);
         if (iconParams['showLabel'] && iconParams['editable']) {
             this.icon.label.connect('label-edit-update', this._onLabelUpdate.bind(this));
@@ -1328,7 +1330,7 @@ var ViewIcon = new Lang.Class({
 
         this.actor.label_actor = this.icon.label;
 
-        if (isDraggable) {
+        if (params.isDraggable) {
             this._draggable = DND.makeDraggable(this.actor);
             this._draggable.connect('drag-begin', () => {
                 this.prepareForDrag();
@@ -1411,10 +1413,10 @@ var FolderIcon = new Lang.Class({
     Extends: ViewIcon,
 
     _init: function(dirInfo, parentView) {
+        let viewIconParams = { isDraggable: false };
         let buttonParams = { button_mask: St.ButtonMask.ONE,
                              toggle_mode: true };
-        let iconParams = { isDraggable: false,
-                           createIcon: this._createIcon.bind(this),
+        let iconParams = { createIcon: this._createIcon.bind(this),
                            setSizeManually: false,
                            editable: true };
         this.name = dirInfo.get_name();
@@ -1423,7 +1425,7 @@ var FolderIcon = new Lang.Class({
         this.id = dirInfo.get_id();
         this._dirInfo = dirInfo;
 
-        this.parent(buttonParams, iconParams);
+        this.parent(viewIconParams, buttonParams, iconParams);
         this.actor.add_style_class_name('app-folder');
         this.actor.set_child(this.icon.actor);
 
@@ -1750,7 +1752,7 @@ var AppIcon = new Lang.Class({
     Name: 'AppIcon',
     Extends: ViewIcon,
 
-    _init : function(app, iconParams) {
+    _init : function(app, viewIconParams, iconParams) {
         this.app = app;
         this.id = app.get_id();
         this.name = app.get_name();
@@ -1762,14 +1764,7 @@ var AppIcon = new Lang.Class({
         if (!iconParams)
             iconParams = {};
 
-        // Get the showMenu property without passing it on to the BaseIcon:
-        let appIconParams = Params.parse(iconParams, { showMenu: true },
-                                         true);
-
-        this._showMenu = appIconParams['showMenu'];
-        delete iconParams['showMenu'];
-
-        this.parent(buttonParams, iconParams);
+        this.parent(viewIconParams, buttonParams, iconParams);
 
         this._dot = new St.Widget({ style_class: 'app-well-app-running-dot',
                                     layout_manager: new Clutter.BinLayout(),
@@ -1895,7 +1890,7 @@ var AppIcon = new Lang.Class({
     popupMenu: function() {
         this._removeMenuTimeout();
 
-        if (!this._showMenu)
+        if (!this.showMenu)
             return true;
 
         this.actor.fake_release();
