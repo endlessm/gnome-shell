@@ -121,10 +121,8 @@ function run() {
 
     for (let i = 0; i < 2; i++) {
         Scripting.scriptEvent('applicationsShowStart');
-        Main.overview._dash.showAppsButton.checked = true;
         yield Scripting.waitLeisure();
         Scripting.scriptEvent('applicationsShowDone');
-        Main.overview._dash.showAppsButton.checked = false;
         yield Scripting.waitLeisure();
     }
 }

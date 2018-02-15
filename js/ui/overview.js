@@ -235,7 +235,6 @@ var Overview = new Lang.Class({
 
         // Create controls
         this._controls = new OverviewControls.ControlsManager(this._searchEntry);
-        this._dash = this._controls.dash;
         this.viewSelector = this._controls.viewSelector;
 
         // Add our same-line elements after the search entry
@@ -248,13 +247,6 @@ var Overview = new Lang.Class({
                                         opacity: 0 });
 
         this._overview.add_actor(this._panelGhost);
-
-        // TODO - recalculate everything when desktop size changes
-        this.dashIconSize = this._dash.iconSize;
-        this._dash.connect('icon-size-changed',
-                           Lang.bind(this, function() {
-                               this.dashIconSize = this._dash.iconSize;
-                           }));
 
         this.viewSelector.connect('page-changed', this._onPageChanged.bind(this));
         Main.layoutManager.connect('startup-prepared', this._onStartupPrepared.bind(this));
@@ -767,10 +759,6 @@ var Overview = new Lang.Class({
 
     getActivePage: function() {
         return this.viewSelector.getActivePage();
-    },
-
-    getShowAppsButton: function() {
-        return this._dash.showAppsButton;
     }
 });
 Signals.addSignalMethods(Overview.prototype);
