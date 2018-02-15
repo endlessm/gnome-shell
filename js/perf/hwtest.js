@@ -124,7 +124,6 @@ function run() {
     yield Scripting.sleep(1000);
 
     Scripting.scriptEvent('applicationsShowStart');
-    Main.overview._dash.showAppsButton.checked = true;
 
     yield Scripting.waitLeisure();
     Scripting.scriptEvent('applicationsShowDone');
