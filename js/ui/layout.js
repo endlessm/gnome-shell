@@ -991,6 +991,10 @@ var LayoutManager = new Lang.Class({
         // so queue an update now.
         this._queueUpdateRegions();
     },
+
+    get startingUp() {
+        return this._startingUp;
+    }
 });
 Signals.addSignalMethods(LayoutManager.prototype);
 
