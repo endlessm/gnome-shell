@@ -2,7 +2,6 @@
 
 const { Clutter, GObject, Meta, St } = imports.gi;
 
-const Dash = imports.ui.dash;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
@@ -392,16 +391,10 @@ var ControlsLayout = GObject.registerClass({
 
 var ControlsManager = class {
     constructor(searchEntry) {
-        this.dash = new Dash.Dash();
-        this._dashSlider = new DashSlider(this.dash);
-        this._dashSpacer = new DashSpacer();
-        this._dashSpacer.setDashActor(this._dashSlider.actor);
-
         this._thumbnailsBox = new WorkspaceThumbnail.ThumbnailsBox();
         this._thumbnailsSlider = new ThumbnailsSlider(this._thumbnailsBox);
 
-        this.viewSelector = new ViewSelector.ViewSelector(searchEntry,
-                                                          this.dash.showAppsButton);
+        this.viewSelector = new ViewSelector.ViewSelector(searchEntry);
         this.viewSelector.connect('page-changed', this._setVisibility.bind(this));
         this.viewSelector.connect('page-empty', this._onPageEmpty.bind(this));
 
@@ -413,16 +406,12 @@ var ControlsManager = class {
                                         x_expand: true, y_expand: true });
         this.actor.add_actor(this._group);
 
-        this.actor.add_actor(this._dashSlider.actor);
-
-        this._group.add_actor(this._dashSpacer);
         this._group.add(this.viewSelector.actor, { x_fill: true,
                                                    expand: true });
         this._group.add_actor(this._thumbnailsSlider.actor);
 
         layout.connect('allocation-changed', this._updateWorkspacesGeometry.bind(this));
 
-        Main.overview.connect('showing', this._updateSpacerVisibility.bind(this));
         Main.overview.connect('item-drag-begin', () => {
             let activePage = this.viewSelector.getActivePage();
             if (activePage != ViewSelector.ViewPage.WINDOWS)
@@ -442,15 +431,11 @@ var ControlsManager = class {
         let geometry = { x: x, y: y, width: width, height: height };
 
         let spacing = this.actor.get_theme_node().get_length('spacing');
-        let dashWidth = this._dashSlider.getVisibleWidth() + spacing;
         let thumbnailsWidth = this._thumbnailsSlider.getNonExpandedWidth() + spacing;
 
-        geometry.width -= dashWidth;
         geometry.width -= thumbnailsWidth;
 
-        if (this.actor.get_text_direction() == Clutter.TextDirection.LTR)
-            geometry.x += dashWidth;
-        else
+        if (this.actor.get_text_direction() == Clutter.TextDirection.RTL)
             geometry.x += thumbnailsWidth;
 
         this.viewSelector.setWorkspacesFullGeometry(geometry);
@@ -466,14 +451,7 @@ var ControlsManager = class {
             return;
 
         let activePage = this.viewSelector.getActivePage();
-        let dashVisible = (activePage == ViewSelector.ViewPage.WINDOWS ||
-                           activePage == ViewSelector.ViewPage.APPS);
         let thumbnailsVisible = (activePage == ViewSelector.ViewPage.WINDOWS);
-
-        if (dashVisible)
-            this._dashSlider.slideIn();
-        else
-            this._dashSlider.slideOut();
 
         if (thumbnailsVisible)
             this._thumbnailsSlider.slideIn();
@@ -481,18 +459,7 @@ var ControlsManager = class {
             this._thumbnailsSlider.slideOut();
     }
 
-    _updateSpacerVisibility() {
-        if (Main.overview.animationInProgress && !Main.overview.visibleTarget)
-            return;
-
-        let activePage = this.viewSelector.getActivePage();
-        this._dashSpacer.visible = (activePage == ViewSelector.ViewPage.WINDOWS);
-    }
-
     _onPageEmpty() {
-        this._dashSlider.pageEmpty();
         this._thumbnailsSlider.pageEmpty();
-
-        this._updateSpacerVisibility();
     }
 };
