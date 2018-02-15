@@ -1002,6 +1002,10 @@ var LayoutManager = GObject.registerClass({
         // so queue an update now.
         this._queueUpdateRegions();
     }
+
+    get startingUp() {
+        return this._startingUp;
+    }
 });
 
 
