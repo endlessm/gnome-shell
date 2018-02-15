@@ -334,6 +334,7 @@ var LayoutManager = new Lang.Class({
         if (this._viewsClone.opacity == targetOpacity && this._viewsClone.saturation == targetSaturation)
             return;
 
+        Main.overview.opacityPrepared = true;
         Tweener.addTween(this._viewsClone,
                          { opacity: targetOpacity,
                            saturation: targetSaturation,
