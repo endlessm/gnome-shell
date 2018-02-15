@@ -7,7 +7,6 @@ const Meta = imports.gi.Meta;
 const St = imports.gi.St;
 const Shell = imports.gi.Shell;
 
-const Dash = imports.ui.dash;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
@@ -400,16 +399,10 @@ var ControlsManager = new Lang.Class({
     Name: 'ControlsManager',
 
     _init: function(searchEntry) {
-        this.dash = new Dash.Dash();
-        this._dashSlider = new DashSlider(this.dash);
-        this._dashSpacer = new DashSpacer();
-        this._dashSpacer.setDashActor(this._dashSlider.actor);
-
         this._thumbnailsBox = new WorkspaceThumbnail.ThumbnailsBox();
         this._thumbnailsSlider = new ThumbnailsSlider(this._thumbnailsBox);
 
-        this.viewSelector = new ViewSelector.ViewSelector(searchEntry,
-                                                          this.dash.showAppsButton);
+        this.viewSelector = new ViewSelector.ViewSelector(searchEntry);
         this.viewSelector.connect('page-changed', Lang.bind(this, this._setVisibility));
         this.viewSelector.connect('page-empty', Lang.bind(this, this._onPageEmpty));
 
@@ -421,16 +414,12 @@ var ControlsManager = new Lang.Class({
                                         x_expand: true, y_expand: true });
         this.actor.add_actor(this._group);
 
-        this.actor.add_actor(this._dashSlider.actor);
-
-        this._group.add_actor(this._dashSpacer);
         this._group.add(this.viewSelector.actor, { x_fill: true,
                                                    expand: true });
         this._group.add_actor(this._thumbnailsSlider.actor);
 
         layout.connect('allocation-changed', Lang.bind(this, this._updateWorkspacesGeometry));
 
-        Main.overview.connect('showing', Lang.bind(this, this._updateSpacerVisibility));
         Main.overview.connect('item-drag-begin', Lang.bind(this,
             function() {
                 let activePage = this.viewSelector.getActivePage();
@@ -453,15 +442,11 @@ var ControlsManager = new Lang.Class({
         let geometry = { x: x, y: y, width: width, height: height };
 
         let spacing = this.actor.get_theme_node().get_length('spacing');
-        let dashWidth = this._dashSlider.getVisibleWidth() + spacing;
         let thumbnailsWidth = this._thumbnailsSlider.getNonExpandedWidth() + spacing;
 
-        geometry.width -= dashWidth;
         geometry.width -= thumbnailsWidth;
 
-        if (this.actor.get_text_direction() == Clutter.TextDirection.LTR)
-            geometry.x += dashWidth;
-        else
+        if (this.actor.get_text_direction() == Clutter.TextDirection.RTL)
             geometry.x += thumbnailsWidth;
 
         this.viewSelector.setWorkspacesFullGeometry(geometry);
@@ -477,14 +462,7 @@ var ControlsManager = new Lang.Class({
             return;
 
         let activePage = this.viewSelector.getActivePage();
-        let dashVisible = (activePage == ViewSelector.ViewPage.WINDOWS ||
-                           activePage == ViewSelector.ViewPage.APPS);
         let thumbnailsVisible = (activePage == ViewSelector.ViewPage.WINDOWS);
-
-        if (dashVisible)
-            this._dashSlider.slideIn();
-        else
-            this._dashSlider.slideOut();
 
         if (thumbnailsVisible)
             this._thumbnailsSlider.slideIn();
@@ -492,18 +470,7 @@ var ControlsManager = new Lang.Class({
             this._thumbnailsSlider.slideOut();
     },
 
-    _updateSpacerVisibility: function() {
-        if (Main.overview.animationInProgress && !Main.overview.visibleTarget)
-            return;
-
-        let activePage = this.viewSelector.getActivePage();
-        this._dashSpacer.visible = (activePage == ViewSelector.ViewPage.WINDOWS);
-    },
-
     _onPageEmpty: function() {
-        this._dashSlider.pageEmpty();
         this._thumbnailsSlider.pageEmpty();
-
-        this._updateSpacerVisibility();
     }
 });
