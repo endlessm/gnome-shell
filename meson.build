@@ -214,7 +214,11 @@ subdir('js')
 subdir('src')
 subdir('po')
 subdir('data')
-subdir('tests')
+
+# Temporarily disable tests while we don't support
+# running meson test under Xvfb in jenkins-obs-build.
+# See https://github.com/endlessm/eos-build/pull/726
+# subdir('tests')
 
 if get_option('enable-documentation')
   subdir('docs/reference')
