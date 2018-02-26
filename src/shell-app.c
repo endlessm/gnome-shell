@@ -1142,6 +1142,11 @@ _shell_app_remove_window (ShellApp   *app,
  * shell_app_get_pids:
  * @app: a #ShellApp
  *
+ * Get a list of this application's client PIDs.
+ * Note that for applications with private PID namespaces or which fail to
+ * correctly set the _NET_WM_PID property, these values may not be global. In
+ * that case, you will want to instead use shell_app_get_client_pids().
+ *
  * Returns: (transfer container) (element-type int): An unordered list of process identifers associated with this application.
  */
 GSList *
@@ -1155,6 +1160,38 @@ shell_app_get_pids (ShellApp *app)
     {
       MetaWindow *window = iter->data;
       int pid = meta_window_get_pid (window);
+      /* Note in the (by far) common case, app will only have one pid, so
+       * we'll hit the first element, so don't worry about O(N^2) here.
+       */
+      if (!g_slist_find (result, GINT_TO_POINTER (pid)))
+        result = g_slist_prepend (result, GINT_TO_POINTER (pid));
+    }
+  return result;
+}
+
+/**
+ * shell_app_get_client_pids:
+ * @app: a #ShellApp
+ *
+ * Get a list of this application's client PIDs. This is similar to
+ * shell_app_get_pids() but gets the PIDs as returned by
+ * meta_window_get_client_pid() which even returns the correct global PID even
+ * for applications which have a distinct internal PID namespace (such as
+ * Flatpak apps).
+ *
+ * Returns: (transfer container) (element-type int): An unordered list of process identifers associated with this application.
+ */
+GSList *
+shell_app_get_client_pids (ShellApp *app)
+{
+  GSList *result;
+  GSList *iter;
+
+  result = NULL;
+  for (iter = shell_app_get_windows (app); iter; iter = iter->next)
+    {
+      MetaWindow *window = iter->data;
+      uint32_t pid = meta_window_get_client_pid (window);
       /* Note in the (by far) common case, app will only have one pid, so
        * we'll hit the first element, so don't worry about O(N^2) here.
        */

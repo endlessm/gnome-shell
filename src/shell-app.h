@@ -54,6 +54,8 @@ GSList *shell_app_get_windows (ShellApp *app);
 
 GSList *shell_app_get_pids (ShellApp *app);
 
+GSList *shell_app_get_client_pids (ShellApp *app);
+
 gboolean shell_app_is_on_workspace (ShellApp *app, MetaWorkspace *workspace);
 
 gboolean shell_app_launch (ShellApp     *app,
