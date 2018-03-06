@@ -153,7 +153,7 @@ var TrayArea = new Lang.Class({
         let iconWmClass = icon.wm_class ? icon.wm_class.toLowerCase() : '';
         for (let [wmClass, uuid] of EXTENSIONS_BLACKLIST) {
             if (ExtensionUtils.extensions[uuid] !== undefined &&
-                ExtensionUtilsg.extensions[uuid].state === 1 &&
+                ExtensionUtils.extensions[uuid].state === 1 &&
                 iconWmClass === wmClass)
                 return;
         }
