@@ -47,10 +47,10 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 // The original TopIcons Plus extension allowed configuring these values via a
 // GSettings schema, but we don't need that for now, let's hardcode those values.
-const ICON_BRIGHTNESS = 0.0;
-const ICON_CONTRAST = 0.0;
-const ICON_OPACITY = 240;
-const ICON_SATURATION = 0.4;
+const ICON_BRIGHTNESS = 0.0;   // range: [-1.0, 1.0]
+const ICON_CONTRAST = 0.0;     // range: [-1.0, 1.0]
+const ICON_OPACITY = 153;      // range: [0, 255]
+const ICON_DESATURATION = 1.0; // range: [0.0, 1.0]
 const ICON_SIZE = 24;
 
 // We don't want to show icons in the tray bar for apps that are already
@@ -118,15 +118,14 @@ var TrayArea = new Lang.Class({
 
         // Saturation
         if (arguments.length == 1) {
-            let sat_effect = new Clutter.DesaturateEffect({ factor : ICON_SATURATION });
-            sat_effect.set_factor(ICON_SATURATION);
-            sat_effect.set_factor(ICON_SATURATION);
-            icon.add_effect_with_name('desaturate', sat_effect);
+            let desat_effect = new Clutter.DesaturateEffect({ factor : ICON_DESATURATION });
+            desat_effect.set_factor(ICON_DESATURATION);
+            icon.add_effect_with_name('desaturate', desat_effect);
         } else {
             for (let icon of this._icons) {
                 let effect = icon.get_effect('desaturate');
                 if (effect)
-                    effect.set_factor(ICON_SATURATION);
+                    effect.set_factor(ICON_DESATURATION);
             }
         }
 
