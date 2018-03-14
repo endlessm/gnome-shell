@@ -51,7 +51,7 @@ const ICON_BRIGHTNESS = 0.0;   // range: [-1.0, 1.0]
 const ICON_CONTRAST = 0.0;     // range: [-1.0, 1.0]
 const ICON_OPACITY = 153;      // range: [0, 255]
 const ICON_DESATURATION = 1.0; // range: [0.0, 1.0]
-const ICON_SIZE = 24;
+const ICON_SIZE = 16;
 
 // We don't want to show icons in the tray bar for apps that are already
 // handled by other extensions, such as in the case of Skype.
