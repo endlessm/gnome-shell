@@ -44,7 +44,6 @@ libdir = join_paths(prefix, get_option('libdir'))
 libexecdir = join_paths(prefix, get_option('libexecdir'))
 localstatedir = join_paths(prefix, get_option('localstatedir'))
 mandir = join_paths(prefix, get_option('mandir'))
-sysconfdir = join_paths(prefix, get_option('sysconfdir'))
 
 pkgdatadir = join_paths(datadir, meson.project_name())
 pkglibdir = join_paths(libdir, meson.project_name())
@@ -118,18 +117,14 @@ enable_networkmanager = get_option('enable-networkmanager')
 if enable_networkmanager != 'no'
   want_networkmanager = enable_networkmanager == 'yes'
 
-  nm_deps += dependency('libnm-glib',
-    version: nm_req, required: want_networkmanager
-  )
-  nm_deps += dependency('libnm-util',
-    version: nm_req, required: want_networkmanager
-  )
-  nm_deps += dependency('libnm-gtk',
+  nm_deps += dependency('libnm',
     version: nm_req, required: want_networkmanager
   )
   nm_deps += dependency('libsecret-1',
     version: secret_req, required: want_networkmanager
   )
+
+  vpndir = nm_deps[0].get_pkgconfig_variable('vpnservicedir')
 
   have_networkmanager = true
   foreach dep : nm_deps
@@ -140,6 +135,8 @@ if enable_networkmanager != 'no'
     nm_deps = []
   endif
 else
+  vpndir = prefix
+
   have_networkmanager = false
 endif
 

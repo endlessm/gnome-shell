@@ -5,10 +5,10 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Lang = imports.lang;
-const NetworkManager = imports.gi.NetworkManager;
-const NMClient = imports.gi.NMClient;
+const NM = imports.gi.NM;
 const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
+const Signals = imports.signals;
 const St = imports.gi.St;
 
 const Config = imports.misc.config;
@@ -194,7 +194,7 @@ var NetworkSecretDialog = new Lang.Class({
 
     _validateStaticWep: function(secret) {
         let value = secret.value;
-        if (secret.wep_key_type == NetworkManager.WepKeyType.KEY) {
+        if (secret.wep_key_type == NM.WepKeyType.KEY) {
             if (value.length == 10 || value.length == 26) {
 		for (let i = 0; i < value.length; i++) {
                     if (!((value[i] >= 'a' && value[i] <= 'f')
@@ -210,7 +210,7 @@ var NetworkSecretDialog = new Lang.Class({
                 }
             } else
                 return false;
-	} else if (secret.wep_key_type == NetworkManager.WepKeyType.PASSPHRASE) {
+	} else if (secret.wep_key_type == NM.WepKeyType.PASSPHRASE) {
 	    if (value.length < 0 || value.length > 64)
 	        return false;
 	}
@@ -309,7 +309,7 @@ var NetworkSecretDialog = new Lang.Class({
         switch (connectionType) {
         case '802-11-wireless':
             wirelessSetting = this._connection.get_setting_wireless();
-            ssid = NetworkManager.utils_ssid_to_utf8(wirelessSetting.get_ssid());
+            ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
             content.title = _("Authentication required by wireless network");
             content.message = _("Passwords or encryption keys are required to access the wireless network “%s”.").format(ssid);
             this._getWirelessSecrets(content.secrets, wirelessSetting);
@@ -372,9 +372,9 @@ var VPNRequestHandler = new Lang.Class({
                    ];
         if (authHelper.externalUIMode)
             argv.push('--external-ui-mode');
-        if (flags & NMClient.SecretAgentGetSecretsFlags.ALLOW_INTERACTION)
+        if (flags & NM.SecretAgentGetSecretsFlags.ALLOW_INTERACTION)
             argv.push('-i');
-        if (flags & NMClient.SecretAgentGetSecretsFlags.REQUEST_NEW)
+        if (flags & NM.SecretAgentGetSecretsFlags.REQUEST_NEW)
             argv.push('-r');
         if (authHelper.supportsHints) {
             for (let i = 0; i < hints.length; i++) {
@@ -435,7 +435,9 @@ var VPNRequestHandler = new Lang.Class({
         if (this._destroyed)
             return;
 
-        GLib.source_remove(this._childWatch);
+        this.emit('destroy');
+        if (this._childWatch)
+            GLib.source_remove(this._childWatch);
 
         this._stdin.close(null);
         // Stdout is closed when we finish reading from it
@@ -562,6 +564,7 @@ var VPNRequestHandler = new Lang.Class({
                 logError(e, 'error while reading VPN plugin output keyfile');
 
                 this._agent.respond(this._requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
+                this.destroy();
                 return;
             }
         }
@@ -572,6 +575,7 @@ var VPNRequestHandler = new Lang.Class({
             this._shellDialog.open(global.get_current_time());
         } else {
             this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
+            this.destroy();
         }
     },
 
@@ -592,23 +596,26 @@ var VPNRequestHandler = new Lang.Class({
             logError(e, 'internal error while writing connection to helper');
 
             this._agent.respond(this._requestId, Shell.NetworkAgentResponse.INTERNAL_ERROR);
+            this.destroy();
         }
     },
 });
+Signals.addSignalMethods(VPNRequestHandler.prototype);
 
 var NetworkAgent = new Lang.Class({
     Name: 'NetworkAgent',
 
     _init: function() {
         this._native = new Shell.NetworkAgent({ identifier: 'org.gnome.Shell.NetworkAgent',
-                                                capabilities: NMClient.SecretAgentCapabilities.VPN_HINTS
+                                                capabilities: NM.SecretAgentCapabilities.VPN_HINTS,
+                                                auto_register: false
                                               });
 
         this._dialogs = { };
         this._vpnRequests = { };
         this._notifications = { };
 
-        this._pluginDir = Gio.file_new_for_path(GLib.build_filenamev([Config.SYSCONFDIR, 'NetworkManager/VPN']));
+        this._pluginDir = Gio.file_new_for_path(Config.VPNDIR);
         try {
             let monitor = this._pluginDir.monitor(Gio.FileMonitorFlags.NONE, null);
             monitor.connect('changed', () => { this._vpnCacheBuilt = false; });
@@ -618,12 +625,21 @@ var NetworkAgent = new Lang.Class({
 
         this._native.connect('new-request', Lang.bind(this, this._newRequest));
         this._native.connect('cancel-request', Lang.bind(this, this._cancelRequest));
-
-        this._enabled = false;
+        try {
+            this._native.init(null);
+        } catch(e) {
+            this._native = null;
+            logError(e, 'error initializing the NetworkManager Agent');
+        }
     },
 
     enable: function() {
-        this._enabled = true;
+        if (!this._native)
+            return;
+
+        this._native.auto_register = true;
+        if (!this._native.registered)
+            this._native.register_async(null, null);
     },
 
     disable: function() {
@@ -641,7 +657,12 @@ var NetworkAgent = new Lang.Class({
             this._notifications[requestId].destroy();
         this._notifications = { };
 
-        this._enabled = false;
+        if (!this._native)
+            return;
+
+        this._native.auto_register = false;
+        if (this._native.registered)
+            this._native.unregister_async(null, null);
     },
 
     _showNotification: function(requestId, connection, settingName, hints, flags) {
@@ -655,7 +676,7 @@ var NetworkAgent = new Lang.Class({
         switch (connectionType) {
         case '802-11-wireless':
             let wirelessSetting = connection.get_setting_wireless();
-            let ssid = NetworkManager.utils_ssid_to_utf8(wirelessSetting.get_ssid());
+            let ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid());
             title = _("Authentication required by wireless network");
             body = _("Passwords or encryption keys are required to access the wireless network “%s”.").format(ssid);
             break;
@@ -705,12 +726,7 @@ var NetworkAgent = new Lang.Class({
     },
 
     _newRequest:  function(agent, requestId, connection, settingName, hints, flags) {
-        if (!this._enabled) {
-            agent.respond(requestId, Shell.NetworkAgentResponse.USER_CANCELED);
-            return;
-        }
-
-        if (!(flags & NMClient.SecretAgentGetSecretsFlags.USER_REQUESTED))
+        if (!(flags & NM.SecretAgentGetSecretsFlags.USER_REQUESTED))
             this._showNotification(requestId, connection, settingName, hints, flags);
         else
             this._handleRequest(requestId, connection, settingName, hints, flags);
@@ -756,7 +772,11 @@ var NetworkAgent = new Lang.Class({
             return;
         }
 
-        this._vpnRequests[requestId] = new VPNRequestHandler(this._native, requestId, binary, serviceType, connection, hints, flags);
+        let vpnRequest = new VPNRequestHandler(this._native, requestId, binary, serviceType, connection, hints, flags);
+        vpnRequest.connect('destroy', Lang.bind(this, function() {
+            delete this._vpnRequests[requestId];
+        }));
+        this._vpnRequests[requestId] = vpnRequest;
     },
 
     _buildVPNServiceCache: function() {
