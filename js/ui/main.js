@@ -88,6 +88,7 @@ let desktopAppClient = null;
 let workspaceMonitor = null;
 let codingManager = null;
 let discoveryFeed = null;
+let paygManager = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
