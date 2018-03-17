@@ -80,6 +80,7 @@ var kbdA11yDialog = null;
 var inputMethod = null;
 var introspectService = null;
 var discoveryFeed = null;
+var paygManager = null;
 var trayArea = null;
 var workspaceMonitor = null;
 let _startDate;
