@@ -83,6 +83,7 @@ var xdndHandler = null;
 var keyboard = null;
 var layoutManager = null;
 var discoveryFeed = null;
+var paygManager = null;
 var trayArea = null;
 var workspaceMonitor = null;
 let _startDate;
