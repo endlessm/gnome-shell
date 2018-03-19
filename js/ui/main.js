@@ -45,6 +45,7 @@ const WindowManager = imports.ui.windowManager;
 const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
+const PaygManager = imports.misc.paygManager;
 const Watermark = imports.ui.watermark;
 const WorkspaceMonitor = imports.ui.workspaceMonitor;
 
@@ -175,6 +176,11 @@ function _initializeUI() {
     overview = new Overview.Overview();
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();
+
+    // The ScreenShield depends on the PaygManager, so this
+    // module needs to be initialized first.
+    paygManager = new PaygManager.PaygManager();
+
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();
 
