@@ -175,6 +175,18 @@ var MessageDialogContent = GObject.registerClass({
             this[`_${prop}`].add_style_class_name(`message-dialog-${prop}`);
         });
 
+        if (params.center_title) {
+            let titleParams = { x_expand: true,
+                                x_align: Clutter.ActorAlign.CENTER };
+
+            Object.assign(this._title, titleParams);
+            Object.assign(this._title.clutter_text, titleParams);
+
+            this._title.clutter_text.line_alignment = Pango.Alignment.CENTER;
+
+            delete params['center_title'];
+        }
+
         let textProps = { ellipsize_mode: Pango.EllipsizeMode.NONE,
                           line_wrap: true };
         Object.assign(this._subtitle.clutter_text, textProps);
