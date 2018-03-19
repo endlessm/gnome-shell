@@ -55,6 +55,30 @@ var PaygManager = new Lang.Class({
 
         this._codeExpiredId = 0;
         this._propertiesChangedId = 0;
+
+        this._proxy = new Gio.DBusProxy({ g_connection: Gio.DBus.system,
+                                          g_interface_name: this._proxyInfo.name,
+                                          g_interface_info: this._proxyInfo,
+                                          g_name: EOS_PAYG_NAME,
+                                          g_object_path: EOS_PAYG_PATH,
+                                          g_flags: Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION })
+
+        this._proxy.init_async(GLib.PRIORITY_DEFAULT, null, this._onProxyConstructed.bind(this));
+    },
+
+    _onProxyConstructed: function(object, res) {
+        try {
+            object.init_finish (res);
+        } catch (e) {
+            logError(e, "Error while constructing D-Bus proxy for " + EOS_PAYG_NAME);
+            return;
+        }
+
+        this._setEnabled(this._proxy.Enabled);
+        this._setExpiryTime(this._proxy.ExpiryTime);
+
+        this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
+        this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
     },
 
     _onPropertiesChanged: function(proxy, changedProps, invalidatedProps) {
@@ -86,53 +110,6 @@ var PaygManager = new Lang.Class({
         this.emit('code-expired');
     },
 
-    _onProxyConstructed: function(object, res) {
-        try {
-            object.init_finish (res);
-        } catch (e) {
-            logError(e, "Error while constructing D-Bus proxy for " + EOS_PAYG_NAME);
-            return;
-        }
-
-        this._setEnabled(this._proxy.Enabled);
-        this._setExpiryTime(this._proxy.ExpiryTime);
-    },
-
-    enable: function() {
-        if (!this._proxy) {
-            this._proxy = new Gio.DBusProxy({ g_connection: Gio.DBus.system,
-                                              g_interface_name: this._proxyInfo.name,
-                                              g_interface_info: this._proxyInfo,
-                                              g_name: EOS_PAYG_NAME,
-                                              g_object_path: EOS_PAYG_PATH,
-                                              g_flags: Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION })
-
-            this._proxy.init_async(GLib.PRIORITY_DEFAULT, null, this._onProxyConstructed.bind(this));
-        }
-
-        this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
-        this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
-
-        Main.paygManager = this;
-    },
-
-    disable: function() {
-        Main.paygManager = null;
-
-        if (this._propertiesChangedId > 0) {
-            this._proxy.disconnect(this._propertiesChangedId);
-            this._propertiesChangedId = 0;
-        }
-
-        if (this._codeExpiredId > 0) {
-            this._proxy.disconnectSignal(this._codeExpiredId);
-            this._codeExpiredId = 0;
-        }
-
-        this._setEnabled(false);
-        this._setExpiryTime(0);
-    },
-
     addCode: function(code) {
         this._proxy.AddCodeRemote(code);
     },
@@ -150,5 +127,3 @@ var PaygManager = new Lang.Class({
     },
 });
 Signals.addSignalMethods(PaygManager.prototype);
-
-var Component = PaygManager;
