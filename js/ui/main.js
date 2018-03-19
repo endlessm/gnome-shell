@@ -84,6 +84,7 @@ var keyboard = null;
 var layoutManager = null;
 var codingManager = null;
 var discoveryFeed = null;
+var paygManager = null;
 var trayArea = null;
 var workspaceMonitor = null;
 let _startDate;
