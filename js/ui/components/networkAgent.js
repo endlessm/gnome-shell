@@ -46,9 +46,7 @@ var NetworkSecretDialog = new Lang.Class({
         manager.addMenu(this._inputSourceIndicator.menu);
         this._inputSourceManager.passwordModeEnabled = true;
 
-        let icon = new Gio.ThemedIcon({ name: 'dialog-password-symbolic' });
-        let contentParams = { icon,
-                              title: this._content.title,
+        let contentParams = { title: this._content.title,
                               body: this._content.message };
         let contentBox = new Dialog.MessageDialogContent(contentParams);
         this.contentLayout.add_actor(contentBox);
