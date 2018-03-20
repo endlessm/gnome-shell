@@ -55,12 +55,14 @@ var PaygManager = GObject.registerClass({
         'code-format-changed': {},
         'enabled-changed': { param_types: [GObject.TYPE_BOOLEAN] },
         'expiry-time-changed': { param_types: [GObject.TYPE_INT64] },
+        'initialized': {},
     },
 }, class PaygManager extends GObject.Object {
 
     _init() {
         super._init();
 
+        this._initialized = false;
         this._proxy = null;
         this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
 
@@ -89,20 +91,28 @@ var PaygManager = GObject.registerClass({
     }
 
     _onProxyConstructed(object, res) {
+        let success = false;
         try {
-            object.init_finish (res);
+            success = object.init_finish (res);
         } catch (e) {
             logError(e, 'Error while constructing D-Bus proxy for %s'.format(EOS_PAYG_NAME));
-            return;
         }
 
-        this._setEnabled(this._proxy.Enabled);
-        this._setExpiryTime(this._proxy.ExpiryTime);
-        this._setRateLimitEndTime(this._proxy.RateLimitEndTime);
-        this._setCodeFormat(this._proxy.CodeFormat || "^[0-9]{8}$");
+        if (success) {
+            // Don't use the setters here to prevent emitting a -changed signal
+            // on startup, which is useless and confuses the screenshield when
+            // selecting the session mode to construct the right unlock dialog.
+            this._enabled = this._proxy.Enabled;
+            this._expiryTime = this._proxy.ExpiryTime;
+            this._rateLimitEndTime = this._proxy.RateLimitEndTime;
+            this._setCodeFormat(this._proxy.CodeFormat || "^[0-9]{8}$");
 
-        this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
-        this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
+            this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
+            this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
+        }
+
+        this._initialized = true;
+        this.emit('initialized');
     }
 
     _onPropertiesChanged(proxy, changedProps, invalidatedProps) {
@@ -184,6 +194,10 @@ var PaygManager = GObject.registerClass({
 
         let [is_match, match_info] = this._codeFormatRegex.match(code, 0);
         return is_match || (partial && match_info.is_partial_match());
+    }
+
+    get initialized() {
+        return this._initialized;
     }
 
     get enabled() {
