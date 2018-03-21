@@ -112,27 +112,13 @@ var UserListItem = class {
         let hold = new Batch.Hold();
 
         this.hideTimedLoginIndicator();
-
-        this._timedLoginIndicator.visible = true;
-
-        let startTime = GLib.get_monotonic_time();
-
-        this._timedLoginTimeoutId = GLib.timeout_add (GLib.PRIORITY_DEFAULT, 33,
-            () => {
-                let currentTime = GLib.get_monotonic_time();
-                let elapsedTime = (currentTime - startTime) / GLib.USEC_PER_SEC;
-                this._timedLoginIndicator.scale_x = elapsedTime / time;
-                if (elapsedTime >= time) {
-                    this._timedLoginTimeoutId = 0;
-                    hold.release();
-                    return GLib.SOURCE_REMOVE;
-                }
-
-                return GLib.SOURCE_CONTINUE;
-            });
-
-        GLib.Source.set_name_by_id(this._timedLoginTimeoutId, '[gnome-shell] this._timedLoginTimeoutId');
-
+        this._timedLoginIndicator.add_style_pseudo_class('showing')
+        Tweener.addTween(this._timedLoginIndicator,
+                         { scale_x: 1.0,
+                           time: time,
+                           transition: 'linear',
+                           onComplete: hold.release.bind(this)
+                         });
         return hold;
     }
 
@@ -144,6 +130,7 @@ var UserListItem = class {
 
         this._timedLoginIndicator.visible = false;
         this._timedLoginIndicator.scale_x = 0.;
+        this._timedLoginIndicator.remove_style_pseudo_class('showing');
     }
 };
 Signals.addSignalMethods(UserListItem.prototype);
