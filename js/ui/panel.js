@@ -730,10 +730,12 @@ var AggregateMenu = new Lang.Class({
         this._location = new imports.ui.status.location.Indicator();
         this._nightLight = new imports.ui.status.nightLight.Indicator();
         this._orientation = new imports.ui.status.orientation.Indicator();
+        this._automaticUpdates = new imports.ui.status.automaticUpdates.Indicator();
 
         this._indicators.add_child(this._screencast.indicators);
         this._indicators.add_child(this._location.indicators);
         this._indicators.add_child(this._nightLight.indicators);
+        this._indicators.add_child(this._automaticUpdates.indicators);
         if (this._network) {
             this._indicators.add_child(this._network.indicators);
         }
@@ -752,6 +754,7 @@ var AggregateMenu = new Lang.Class({
         if (this._network) {
             this.menu.addMenuItem(this._network.menu);
         }
+        this.menu.addMenuItem(this._automaticUpdates.menu);
         if (this._bluetooth) {
             this.menu.addMenuItem(this._bluetooth.menu);
         }
