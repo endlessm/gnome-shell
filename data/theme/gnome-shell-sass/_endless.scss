@@ -11,6 +11,21 @@
 // is probably the best way forward (e.g. modifying _common.css for $font-family)).
 
 
+// Login dialog
+
+.login-dialog-user-list-item {
+    .login-dialog-timed-login-indicator {
+        // Don't allocate this space in CSS, do it in code instead
+        height: 0px;
+        margin: 0;
+
+        &:showing {
+            height: 2px;
+            margin: 2px 0 0 0;
+        }
+    }
+}
+
 // Lock screen
 
 #lockDialogGroup {
