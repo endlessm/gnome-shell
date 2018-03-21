@@ -126,6 +126,7 @@ var UserListItem = new Lang.Class({
         let hold = new Batch.Hold();
 
         this.hideTimedLoginIndicator();
+        this._timedLoginIndicator.add_style_pseudo_class('showing')
         Tweener.addTween(this._timedLoginIndicator,
                          { scale_x: 1.,
                            time: time,
@@ -141,6 +142,7 @@ var UserListItem = new Lang.Class({
     hideTimedLoginIndicator: function() {
         Tweener.removeTweens(this._timedLoginIndicator);
         this._timedLoginIndicator.scale_x = 0.;
+        this._timedLoginIndicator.remove_style_pseudo_class('showing')
     }
 });
 Signals.addSignalMethods(UserListItem.prototype);
