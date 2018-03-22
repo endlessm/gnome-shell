@@ -502,6 +502,10 @@ const LoginDialog = new Lang.Class({
         // focus later
         this._startupCompleteId = Main.layoutManager.connect('startup-complete',
                                                              Lang.bind(this, this._updateDisableUserList));
+
+        // With PAYG machines this class can be created AFTER the startup process.
+        if (!Main.layoutManager.startingUp)
+            this._updateDisableUserList();
     },
 
     _getBannerAllocation: function (dialogBox) {
