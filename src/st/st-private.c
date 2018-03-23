@@ -117,7 +117,6 @@ _st_set_text_from_style (ClutterText *text,
   const PangoFontDescription *font;
   StTextAlign align;
   gdouble spacing;
-  gchar *font_features;
 
   st_theme_node_get_foreground_color (theme_node, &color);
   clutter_text_set_color (text, &color);
@@ -145,19 +144,10 @@ _st_set_text_from_style (ClutterText *text,
        */
     }
 
-  spacing = st_theme_node_get_letter_spacing (theme_node);
-  if (spacing)
-    {
-      PangoAttribute *letter_spacing = pango_attr_letter_spacing_new ((int)(.5 + spacing) * PANGO_SCALE);
-      pango_attr_list_insert (attribs, letter_spacing);
-    }
-
-  font_features = st_theme_node_get_font_features (theme_node);
-  if (font_features)
-    {
-      pango_attr_list_insert (attribs, pango_attr_font_features_new (font_features));
-      g_free (font_features);
-    }
+  if (st_theme_node_lookup_length (theme_node, "letter-spacing", TRUE, &spacing)) {
+    PangoAttribute *letter_spacing = pango_attr_letter_spacing_new ((int)(.5 + spacing) * PANGO_SCALE);
+    pango_attr_list_insert (attribs, letter_spacing);
+  }
 
   clutter_text_set_attributes (text, attribs);
 
