@@ -128,4 +128,11 @@ var PaygManager = GObject.registerClass({
     get expiryTime() {
         return this._expiryTime;
     }
+
+    get isLocked() {
+        if (!this.enabled)
+            return false;
+
+        return this._expiryTime <= (GLib.get_real_time() / GLib.USEC_PER_SEC);
+    }
 });
