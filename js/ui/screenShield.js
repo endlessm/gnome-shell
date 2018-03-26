@@ -593,15 +593,16 @@ var ScreenShield = class {
                 return;
             }
 
-            if (Main.sessionMode.currentMode == 'unlock-dialog-payg') {
+            let paygExpectedMode = this._isGreeter ? 'gdm-unlock-dialog-payg' : 'unlock-dialog-payg';
+            if (Main.sessionMode.currentMode == paygExpectedMode) {
                 // This is the most common case.
-                Main.sessionMode.popMode('unlock-dialog-payg');
+                Main.sessionMode.popMode(paygExpectedMode);
             } else if (Main.sessionMode.currentMode == 'lock-screen') {
                 // There's a chance we could be in the screen shield, instead of the
                 // unlock dialog, if the user wend back manually to it (e.g. pressed ESC)
                 // between introducing the code and the actual verification happening.
                 Main.sessionMode.popMode('lock-screen');
-                Main.sessionMode.popMode('unlock-dialog-payg');
+                Main.sessionMode.popMode(paygExpectedMode);
                 Main.sessionMode.pushMode('lock-screen');
             }
 
@@ -957,6 +958,9 @@ var ScreenShield = class {
         this._isGreeter = Main.sessionMode.isGreeter;
         this._isLocked = true;
 
+        if (this._isGreeter && Main.paygManager.isLocked)
+            Main.sessionMode.pushMode('gdm-unlock-dialog-payg');
+
         if (this._ensureUnlockDialog(true, true))
             this._hideLockScreen(false, 0);
     }
@@ -1267,6 +1271,8 @@ var ScreenShield = class {
 
         if (Main.sessionMode.currentMode == 'lock-screen')
             Main.sessionMode.popMode('lock-screen');
+        if (Main.sessionMode.currentMode == 'gdm-unlock-dialog-payg')
+            Main.sessionMode.popMode('gdm-unlock-dialog-payg');
         if (Main.sessionMode.currentMode == 'unlock-dialog-payg')
             Main.sessionMode.popMode('unlock-dialog-payg');
         if (Main.sessionMode.currentMode == 'unlock-dialog')
