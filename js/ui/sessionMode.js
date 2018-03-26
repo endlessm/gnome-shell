@@ -55,6 +55,11 @@ const _modes = {
         panelStyle: 'login-screen'
     },
 
+    'gdm-unlock-dialog-payg': {
+        parentMode: 'gdm',
+        unlockDialog: imports.ui.paygUnlockDialog.PaygUnlockDialog,
+    },
+
     'lock-screen': {
         isLocked: true,
         isGreeter: undefined,
