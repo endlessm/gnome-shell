@@ -43,6 +43,22 @@ const EOS_PAYG_IFACE = '<node> \
 </interface> \
 </node>';
 
+var PaygErrorDomain = GLib.quark_from_string('payg-error');
+
+var PaygError = {
+    INVALID_CODE      : 0,
+    CODE_ALREADY_USED : 1,
+    TOO_MANY_ATTEMPTS : 2,
+    DISABLED          : 3,
+};
+
+const DBusErrorsMapping = {
+    INVALID_CODE      : 'com.endlessm.Payg1.Error.InvalidCode',
+    CODE_ALREADY_USED : 'com.endlessm.Payg1.Error.CodeAlreadyUsed',
+    TOO_MANY_ATTEMPTS : 'com.endlessm.Payg1.Error.TooManyAttempts',
+    DISABLED          : 'com.endlessm.Payg1.Error.Disabled',
+};
+
 var PaygManager = new Lang.Class({
     Name: 'PaygManager',
 
@@ -64,6 +80,9 @@ var PaygManager = new Lang.Class({
                                           g_flags: Gio.DBusProxyFlags.NONE })
 
         this._proxy.init_async(GLib.PRIORITY_DEFAULT, null, this._onProxyConstructed.bind(this));
+
+        for (let errorCode in DBusErrorsMapping)
+            Gio.DBusError.register_error(PaygErrorDomain, PaygError[errorCode], DBusErrorsMapping[errorCode]);
     },
 
     _onProxyConstructed: function(object, res) {
@@ -110,8 +129,11 @@ var PaygManager = new Lang.Class({
         this.emit('code-expired');
     },
 
-    addCode: function(code) {
-        this._proxy.AddCodeRemote(code);
+    addCode: function(code, callback) {
+        this._proxy.AddCodeRemote(code, (result, error) => {
+            if (callback)
+                callback(error);
+        });
     },
 
     clearCode: function() {
