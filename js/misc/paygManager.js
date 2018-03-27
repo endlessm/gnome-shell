@@ -34,7 +34,7 @@ const EOS_PAYG_PATH = '/com/endlessm/Payg1';
 const EOS_PAYG_IFACE = '<node> \
 <interface name="com.endlessm.Payg1"> \
 <method name="AddCode"> \
-  <arg type="ay" direction="in" name="code"/> \
+  <arg type="s" direction="in" name="code"/> \
 </method> \
 <method name="ClearCode" /> \
 <signal name="Expired" /> \
