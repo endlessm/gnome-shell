@@ -63,6 +63,8 @@ var PaygManager = new Lang.Class({
     Name: 'PaygManager',
 
     _init: function() {
+        this._initialized = false;
+
         this._proxy = null;
         this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
 
@@ -86,18 +88,26 @@ var PaygManager = new Lang.Class({
     },
 
     _onProxyConstructed: function(object, res) {
+        let success = false;
         try {
-            object.init_finish (res);
+            success = object.init_finish (res);
         } catch (e) {
             logError(e, "Error while constructing D-Bus proxy for " + EOS_PAYG_NAME);
-            return;
         }
 
-        this._setEnabled(this._proxy.Enabled);
-        this._setExpiryTime(this._proxy.ExpiryTime);
+        if (success) {
+            // Don't use the setters here to prevent emitting a -changed signal
+            // on startup, which is useless and confuses the screenshield when
+            // selecting the session mode to construct the right unlock dialog.
+            this._enabled = this._proxy.Enabled;
+            this._expiryTime = this._proxy.ExpiryTime;
 
-        this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
-        this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
+            this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
+            this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
+        }
+
+        this._initialized = true;
+        this.emit('initialized');
     },
 
     _onPropertiesChanged: function(proxy, changedProps, invalidatedProps) {
@@ -138,6 +148,10 @@ var PaygManager = new Lang.Class({
 
     clearCode: function() {
         this._proxy.ClearCodeRemote();
+    },
+
+    get initialized() {
+        return this._initialized;
     },
 
     get enabled() {
