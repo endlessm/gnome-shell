@@ -61,7 +61,7 @@ var PaygManager = new Lang.Class({
                                           g_interface_info: this._proxyInfo,
                                           g_name: EOS_PAYG_NAME,
                                           g_object_path: EOS_PAYG_PATH,
-                                          g_flags: Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION })
+                                          g_flags: Gio.DBusProxyFlags.NONE })
 
         this._proxy.init_async(GLib.PRIORITY_DEFAULT, null, this._onProxyConstructed.bind(this));
     },
