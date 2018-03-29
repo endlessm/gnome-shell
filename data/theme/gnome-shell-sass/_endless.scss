@@ -836,13 +836,19 @@ popup-separator-menu-item {
       padding-top: 24px;
       padding-bottom: 12px;
       spacing: 8px;
-      width: 23em;
 
       .unlock-dialog-payg-title {
           color: $osd_fg_color;
           font-size: 24px;
           font-weight: bold;
           text-align: left;
+          margin: 24px;
+      }
+
+      .unlock-dialog-payg-promptbox {
+          spacing: 6px;
+          min-width: 370px;
+          max-width: 370px;
       }
 
       .unlock-dialog-payg-label {
@@ -870,6 +876,19 @@ popup-separator-menu-item {
 
       .unlock-dialog-payg-button-box {
           spacing: 5px;
+      }
+
+      .unlock-dialog-payg-help-main {
+          color: $osd_fg_color;
+          font-weight: bold;
+          text-align: left;
+          margin-top: 36px;
+      }
+
+      .unlock-dialog-payg-help-sub {
+          color: $osd_fg_color;
+          font-size: 100%;
+          text-align: left;
       }
   }
 }
