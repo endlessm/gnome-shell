@@ -1421,11 +1421,17 @@ var ScreenShield = class {
 
     // If the previous shell crashed, and gnome-session restarted us, then re-lock
     lockIfWasLocked() {
-        if (!this._settings.get_boolean(LOCK_ENABLED_KEY) && !Main.paygManager.isLocked)
+        // We need to add some extra checks for PAYG becasue we don't want to
+        // end up loging the screen for not regular sessions (e.g. initial-setup).
+        let shouldLockForPayg = Main.paygManager.isLocked &&
+            (Main.sessionMode.currentMode == 'user' ||
+             Main.sessionMode.currentMode == 'user-coding');
+
+        if (!this._settings.get_boolean(LOCK_ENABLED_KEY) && !shouldLockForPayg)
             return;
 
         let wasLocked = global.get_runtime_state('b',LOCKED_STATE_STR);
-        if (wasLocked === null && !Main.paygManager.isLocked)
+        if (wasLocked === null && !shouldLockForPayg)
             return;
         Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
             this.lock(false);
