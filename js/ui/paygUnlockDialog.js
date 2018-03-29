@@ -225,12 +225,12 @@ class PaygUnlockDialog extends GObject.Object {
         this.actor.add_child(promptBox);
 
         let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
-                                        text: _("Your subscription has expired"),
+                                        text: _("Your Endless pay-as-you-go usage credit has expired."),
                                         x_align: Clutter.ActorAlign.CENTER });
         promptBox.add_child(titleLabel);
 
         let promptLabel = new St.Label({ style_class: 'unlock-dialog-payg-label',
-                                         text: _("Enter a new code to unlock the computer:"),
+                                         text: _("Enter a new code to unlock your computer:"),
                                          x_align: Clutter.ActorAlign.START });
         promptBox.add_child(promptLabel);
 
@@ -419,9 +419,9 @@ class PaygUnlockDialog extends GObject.Object {
 
         // Common errors after this point.
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
-            this._setErrorMessage(_("Invalid code"));
+            this._setErrorMessage(_("Invalid code. Please try again."));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
-            this._setErrorMessage(_("Code already used"));
+            this._setErrorMessage(_("Code already used. Please enter a new code."));
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
             this._setErrorMessage(_("Time exceeded while verifying the code"));
         } else {
