@@ -325,6 +325,8 @@ var PaygUnlockDialog = new Lang.Class({
             this._setErrorMessage(_("Code already used"));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
             this._setErrorMessage(_("Too many attempts"));
+        } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
+            this._setErrorMessage(_("Time exceeded while verifying the code"));
         } else {
             // We don't consider any other error here (and we don't consider DISABLED explicitly,
             // since that should not happen), but still we need to show something to the user.
