@@ -51,14 +51,14 @@ var PaygError = {
     CODE_ALREADY_USED : 1,
     TOO_MANY_ATTEMPTS : 2,
     DISABLED          : 3,
-}
+};
 
 const DBusErrorsMapping = {
     INVALID_CODE      : 'com.endlessm.Payg1.Error.InvalidCode',
     CODE_ALREADY_USED : 'com.endlessm.Payg1.Error.CodeAlreadyUsed',
     TOO_MANY_ATTEMPTS : 'com.endlessm.Payg1.Error.TooManyAttempts',
     DISABLED          : 'com.endlessm.Payg1.Error.Disabled',
-}
+};
 
 // This function checks the configuration file of PAYG directly
 // from the expected locations on disk, on an attempt to figure
