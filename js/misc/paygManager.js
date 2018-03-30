@@ -65,13 +65,15 @@ var PaygManager = new Lang.Class({
 
     _init: function() {
         this._initialized = false;
-
         this._proxy = null;
-        this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
 
         this._enabled = false;
         this._expiryTime = 0;
         this._rateLimitEndTime = 0;
+
+        // D-Bus related initialization code only below this point.
+
+        this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
 
         this._codeExpiredId = 0;
         this._propertiesChangedId = 0;
@@ -154,6 +156,11 @@ var PaygManager = new Lang.Class({
     },
 
     addCode: function(code, callback) {
+        if (!this._proxy) {
+            log("Unable to add PAYG code: No D-Bus proxy for " + EOS_PAYG_NAME)
+            return;
+        }
+
         this._proxy.AddCodeRemote(code, (result, error) => {
             if (callback)
                 callback(error);
@@ -161,6 +168,11 @@ var PaygManager = new Lang.Class({
     },
 
     clearCode: function() {
+        if (!this._proxy) {
+            log("Unable to clear PAYG code: No D-Bus proxy for " + EOS_PAYG_NAME)
+            return;
+        }
+
         this._proxy.ClearCodeRemote();
     },
 
