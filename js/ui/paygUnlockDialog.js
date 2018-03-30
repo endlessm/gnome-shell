@@ -74,10 +74,28 @@ var PaygUnlockCodeEntry = new Lang.Class({
         this.clutter_text.x_align = Clutter.ActorAlign.CENTER;
 
         this._enabled = false;
-        this.connect('button-press-event', this._onButtonPressEvent.bind(this));
+        this._buttonPressEventId = this.connect('button-press-event', this._onButtonPressEvent.bind(this));
+        this._capturedEventId = this.clutter_text.connect('captured-event', this._onCapturedEvent.bind(this));
+        this._textChangedId = this.clutter_text.connect('text-changed', this._onTextChanged.bind(this));
 
-        this.clutter_text.connect('captured-event', this._onCapturedEvent.bind(this));
-        this.clutter_text.connect('text-changed', this._onTextChanged.bind(this));
+        this.connect('destroy', this._onDestroy.bind(this));
+    },
+
+    _onDestroy: function() {
+        if (this._buttonPressEventId > 0) {
+            this.disconnect(this._buttonPressEventId);
+            this._buttonPressEventId = 0;
+        }
+
+        if (this._capturedEventId > 0) {
+            this.clutter_text.disconnect(this._capturedEventId);
+            this._capturedEventId = 0;
+        }
+
+        if (this._textChangedId > 0) {
+            this.clutter_text.disconnect(this._textChangedId);
+            this._textChangedId = 0;
+        }
     },
 
     _onCapturedEvent: function(textActor, event) {
