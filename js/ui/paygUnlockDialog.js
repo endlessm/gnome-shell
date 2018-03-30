@@ -20,6 +20,7 @@
 
 const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
+const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
@@ -342,7 +343,16 @@ var PaygUnlockDialog = new Lang.Class({
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
             this._setErrorMessage(_("Code already used. Please enter a new code."));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
-            this._setErrorMessage(_("Too many attempts. Please wait and try again."));
+            let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
+            let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
+            let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60))
+            if (minutesLeft >= 1 || secondsLeft > 30) {
+                this._setErrorMessage(Gettext.ngettext("Too many attempts. Try again in %s minute.",
+                                                       "Too many attempts. Try again in %s minutes.", minutesLeft)
+                                      .format(minutesLeft));
+            } else {
+                this._setErrorMessage(_("Too many attempts. Try again in a few seconds."));
+            }
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
             this._setErrorMessage(_("Time exceeded while verifying the code"));
         } else {
