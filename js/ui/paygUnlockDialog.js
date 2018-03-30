@@ -130,6 +130,9 @@ var PaygUnlockCodeEntry = new Lang.Class({
     },
 
     addCharacter: function(character) {
+        if (!GLib.unichar_isdigit(character))
+            return;
+
         this.clutter_text.insert_unichar(character);
     },
 
