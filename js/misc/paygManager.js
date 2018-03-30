@@ -60,18 +60,55 @@ const DBusErrorsMapping = {
     DISABLED          : 'com.endlessm.Payg1.Error.Disabled',
 };
 
+// This function checks the configuration file of PAYG directly
+// from the expected locations on disk, on an attempt to figure
+// out whether the feature is enabled, so that we don't wake up
+// the D-Bus service and keep it running when it's disabled.
+function _isPaygEnabled() {
+    // See man page eos-payg.conf(5)
+    let searchDirs = [
+        '/etc/eos-payg',
+        '/usr/local/share/eos-payg',
+        '/usr/share/eos-payg',
+    ];
+
+    let configFileName = 'eos-payg.conf'
+    let keyfile = new GLib.KeyFile();
+    try {
+        keyfile.load_from_dirs(configFileName,
+                               searchDirs,
+                               GLib.KeyFileFlags.NONE);
+        return keyfile.get_boolean('PAYG', 'Enabled');
+    } catch (e) {
+        // A non-existent file is a perfectly normal use case.
+        if (!e.matches(GLib.KeyFileError, GLib.KeyFileError.NOT_FOUND))
+            logError(e, "Error reading PAYG configuration file from " + configFileName);
+    }
+
+    return false;
+}
+
 var PaygManager = new Lang.Class({
     Name: 'PaygManager',
 
     _init: function() {
         this._initialized = false;
-
         this._proxy = null;
-        this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
 
         this._enabled = false;
         this._expiryTime = 0;
         this._rateLimitEndTime = 0;
+
+        if (!_isPaygEnabled()) {
+            // Consider this manager initialized if PAYG is not
+            // enabled, and skip all the D-Bus related bits.
+            this._initialized = true;
+            return;
+        }
+
+        // D-Bus related initialization code only below this point.
+
+        this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
 
         this._codeExpiredId = 0;
         this._propertiesChangedId = 0;
@@ -154,6 +191,11 @@ var PaygManager = new Lang.Class({
     },
 
     addCode: function(code, callback) {
+        if (!this._proxy) {
+            log("Unable to add PAYG code: No D-Bus proxy for " + EOS_PAYG_NAME)
+            return;
+        }
+
         this._proxy.AddCodeRemote(code, (result, error) => {
             if (callback)
                 callback(error);
@@ -161,6 +203,11 @@ var PaygManager = new Lang.Class({
     },
 
     clearCode: function() {
+        if (!this._proxy) {
+            log("Unable to clear PAYG code: No D-Bus proxy for " + EOS_PAYG_NAME)
+            return;
+        }
+
         this._proxy.ClearCodeRemote();
     },
 
