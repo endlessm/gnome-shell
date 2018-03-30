@@ -25,6 +25,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Lang = imports.lang;
+const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Signals = imports.signals;
@@ -286,11 +287,21 @@ var PaygUnlockDialog = new Lang.Class({
             this._startVerifyingCode();
         });
 
+        this._clearTooManyAttemptsId = 0;
+        this.connect('destroy', this._onDestroy.bind(this));
+
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, Lang.bind(this, this._onCancelled));
 
         this._updateSensitivity();
         this._entry.grab_key_focus();
+    },
+
+    _onDestroy: function() {
+        if (this._clearTooManyAttemptsId > 0) {
+            Mainloop.source_remove(this._clearTooManyAttemptsId);
+            this._clearTooManyAttemptsId = 0;
+        }
     },
 
     _createButtonsArea: function() {
@@ -400,12 +411,11 @@ var PaygUnlockDialog = new Lang.Class({
         this._updateSensitivity();
     },
 
-    _showError: function(error) {
-        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
-            this._setErrorMessage(_("Invalid code. Please try again."));
-        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
-            this._setErrorMessage(_("Code already used. Please enter a new code."));
-        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
+    _processError: function(error) {
+        logError(error, 'Error adding PAYG code');
+
+        // The 'too many errors' case is a bit special, and sets a different state.
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
             let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
             let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
             let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60))
@@ -416,6 +426,26 @@ var PaygUnlockDialog = new Lang.Class({
             } else {
                 this._setErrorMessage(_("Too many attempts. Try again in a few seconds."));
             }
+
+            // Make sure to clean the status once the time is up (if this dialog is still alive)
+            // and make sure that we install this callback at some point in the future (+1 sec).
+            this._clearTooManyAttemptsId = Mainloop.timeout_add_seconds(secondsLeft + 1, () => {
+                this._verificationStatus = UnlockStatus.NOT_VERIFYING;
+                this._clearError();
+                this._updateSensitivity();
+                this._entry.grab_key_focus()
+                return GLib.SOURCE_REMOVE;
+            });
+
+            this._verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
+            return;
+        }
+
+        // Common errors after this point.
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
+            this._setErrorMessage(_("Invalid code. Please try again."));
+        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
+            this._setErrorMessage(_("Code already used. Please enter a new code."));
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
             this._setErrorMessage(_("Time exceeded while verifying the code"));
         } else {
@@ -424,8 +454,7 @@ var PaygUnlockDialog = new Lang.Class({
             this._setErrorMessage(_("Unknown error"));
         }
 
-        // The actual error will show up in the journal, no matter what.
-        logError(error, 'Error adding PAYG code');
+        this._verificationStatus = UnlockStatus.FAILED;
     },
 
     _clearError: function() {
@@ -440,8 +469,7 @@ var PaygUnlockDialog = new Lang.Class({
         }
 
         if (error) {
-            this._verificationStatus = UnlockStatus.FAILED;
-            this._showError(error);
+            this._processError(error);
         } else {
             this._verificationStatus = UnlockStatus.SUCCEEDED;
             this._clearError();
