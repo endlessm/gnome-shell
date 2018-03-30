@@ -418,8 +418,8 @@ var PaygUnlockDialog = new Lang.Class({
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
             let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
             let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
-            let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60))
-            if (minutesLeft >= 1 || secondsLeft > 30) {
+            if (secondsLeft > 30) {
+                let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60))
                 this._setErrorMessage(Gettext.ngettext("Too many attempts. Try again in %s minute.",
                                                        "Too many attempts. Try again in %s minutes.", minutesLeft)
                                       .format(minutesLeft));
