@@ -371,8 +371,10 @@ var PaygUnlockDialog = new Lang.Class({
 
     _addCodeCallback: function(error) {
         // We don't care about the result if we're closing the dialog.
-        if (this._cancelled)
+        if (this._cancelled) {
+            this._verificationStatus = UnlockStatus.NOT_VERIFYING;
             return;
+        }
 
         if (error) {
             this._verificationStatus = UnlockStatus.FAILED;
@@ -392,6 +394,7 @@ var PaygUnlockDialog = new Lang.Class({
         this._verificationStatus = UnlockStatus.VERIFYING;
         this._startSpinning();
         this._updateSensitivity();
+        this._cancelled = false;
 
         Main.paygManager.addCode(this._entry.code, this._addCodeCallback.bind(this));
     },
