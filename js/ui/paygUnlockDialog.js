@@ -157,27 +157,35 @@ var PaygUnlockDialog = new Lang.Class({
 
         this._parentActor.add_child(this.actor);
 
+        let mainBox = new St.BoxLayout({ vertical: true,
+                                         x_align: Clutter.ActorAlign.FILL,
+                                         y_align: Clutter.ActorAlign.CENTER,
+                                         x_expand: true,
+                                         y_expand: true,
+                                         style_class: 'unlock-dialog-payg-layout'});
+        this.actor.add_child(mainBox)
+
+        let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
+                                        text: _("Your Endless pay-as-you-go usage credit has expired."),
+                                        x_align: Clutter.ActorAlign.CENTER });
+        mainBox.add_child(titleLabel);
+
         let promptBox = new St.BoxLayout({ vertical: true,
                                            x_align: Clutter.ActorAlign.CENTER,
                                            y_align: Clutter.ActorAlign.CENTER,
                                            x_expand: true,
                                            y_expand: true,
-                                           style_class: 'unlock-dialog-payg-layout'});
+                                           style_class: 'unlock-dialog-payg-promptbox'});
         promptBox.connect('key-press-event', (actor, event) => {
             if (event.get_key_symbol() == Clutter.KEY_Escape)
                 this._onCancelled();
 
             return Clutter.EVENT_PROPAGATE;
         });
-        this.actor.add_child(promptBox);
-
-        let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
-                                        text: _("Your subscription has expired"),
-                                        x_align: Clutter.ActorAlign.CENTER });
-        promptBox.add_child(titleLabel);
+        mainBox.add_child(promptBox);
 
         let promptLabel = new St.Label({ style_class: 'unlock-dialog-payg-label',
-                                         text: _("Enter a new code to unlock the computer:"),
+                                         text: _("Enter a new code to unlock your computer:"),
                                          x_align: Clutter.ActorAlign.START });
         promptBox.add_child(promptLabel);
 
@@ -192,6 +200,16 @@ var PaygUnlockDialog = new Lang.Class({
 
         this._buttonBox = this._createButtonsArea();
         promptBox.add_child(this._buttonBox);
+
+        let helpLineMain = new St.Label({ style_class: 'unlock-dialog-payg-help-main',
+                                          text: _("Don’t have an unlock code? That’s OK!"),
+                                          x_align: Clutter.ActorAlign.START });
+        promptBox.add_child(helpLineMain);
+
+        let helpLineSub = new St.Label({ style_class: 'unlock-dialog-payg-help-sub',
+                                         text: _("Talk to your sales representative to purchase a new code."),
+                                         x_align: Clutter.ActorAlign.START });
+        promptBox.add_child(helpLineSub);
 
         Main.ctrlAltTabManager.addGroup(promptBox, _("Unlock Machine"), 'dialog-password-symbolic');
 
@@ -320,11 +338,11 @@ var PaygUnlockDialog = new Lang.Class({
 
     _showError: function(error) {
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
-            this._setErrorMessage(_("Invalid code"));
+            this._setErrorMessage(_("Invalid code. Please try again."));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
-            this._setErrorMessage(_("Code already used"));
+            this._setErrorMessage(_("Code already used. Please enter a new code."));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
-            this._setErrorMessage(_("Too many attempts"));
+            this._setErrorMessage(_("Too many attempts. Please wait and try again."));
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
             this._setErrorMessage(_("Time exceeded while verifying the code"));
         } else {
