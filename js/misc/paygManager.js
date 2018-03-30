@@ -38,6 +38,7 @@ const EOS_PAYG_IFACE = '<node> \
 <signal name="Expired" /> \
 <property name="ExpiryTime" type="t" access="read"/> \
 <property name="Enabled" type="b" access="read"/> \
+<property name="RateLimitEndTime" type="t" access="read"/> \
 </interface> \
 </node>';
 
@@ -73,6 +74,7 @@ var PaygManager = GObject.registerClass({
 
         this._enabled = false;
         this._expiryTime = 0;
+        this._rateLimitEndTime = 0;
 
         this._codeExpiredId = 0;
         this._propertiesChangedId = 0;
@@ -104,6 +106,7 @@ var PaygManager = GObject.registerClass({
             // selecting the session mode to construct the right unlock dialog.
             this._enabled = this._proxy.Enabled;
             this._expiryTime = this._proxy.ExpiryTime;
+            this._rateLimitEndTime = this._proxy.RateLimitEndTime;
 
             this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
             this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
@@ -120,6 +123,9 @@ var PaygManager = GObject.registerClass({
 
         if (propsDict.hasOwnProperty('ExpiryTime'))
             this._setExpiryTime(this._proxy.ExpiryTime);
+
+        if (propsDict.hasOwnProperty('RateLimitEndTime'))
+            this._setRateLimitEndTime(this._proxy.RateLimitEndTime);
     }
 
     _setEnabled(value) {
@@ -136,6 +142,14 @@ var PaygManager = GObject.registerClass({
 
         this._expiryTime = value;
         this.emit('expiry-time-changed', this._expiryTime);
+    }
+
+    _setRateLimitEndTime(value) {
+        if (this._rateLimitEndTime === value)
+            return;
+
+        this._rateLimitEndTime = value;
+        this.emit('rate-limit-end-time-changed', this._rateLimitEndTime);
     }
 
     _onCodeExpired(proxy) {
@@ -163,6 +177,10 @@ var PaygManager = GObject.registerClass({
 
     get expiryTime() {
         return this._expiryTime;
+    }
+
+    get rateLimitEndTime() {
+        return this._rateLimitEndTime;
     }
 
     get isLocked() {
