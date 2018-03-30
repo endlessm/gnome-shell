@@ -54,7 +54,8 @@ var UnlockStatus = {
     NOT_VERIFYING: 0,
     VERIFYING: 1,
     FAILED: 2,
-    SUCCEEDED: 3,
+    TOO_MANY_ATTEMPTS: 3,
+    SUCCEEDED: 4,
 };
 
 var PaygUnlockCodeEntry = new Lang.Class({
@@ -72,6 +73,7 @@ var PaygUnlockCodeEntry = new Lang.Class({
         this.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.clutter_text.x_align = Clutter.ActorAlign.CENTER;
 
+        this._enabled = false;
         this.connect('button-press-event', this._onButtonPressEvent.bind(this));
 
         this.clutter_text.connect('captured-event', this._onCapturedEvent.bind(this));
@@ -107,6 +109,10 @@ var PaygUnlockCodeEntry = new Lang.Class({
         if (isExitKey || isEnterKey || isDeleteKey || isMovementKey)
             return Clutter.EVENT_PROPAGATE
 
+        // Do nothing if the entry is disabled.
+        if (!this._enabled)
+            return Clutter.EVENT_STOP;
+
         // Don't allow inserting more digits than required.
         if (this._code.length >= CODE_REQUIRED_LENGTH_CHARS)
             return Clutter.EVENT_STOP;
@@ -125,20 +131,30 @@ var PaygUnlockCodeEntry = new Lang.Class({
     },
 
     _onButtonPressEvent: function() {
+        if (!this._enabled)
+            return;
+
         this.grab_key_focus();
         return false;
     },
 
     addCharacter: function(character) {
-        if (!GLib.unichar_isdigit(character))
+        if (!this._enabled || !GLib.unichar_isdigit(character))
             return;
 
         this.clutter_text.insert_unichar(character);
     },
 
     setEnabled: function(value) {
+        if (this._enabled == value)
+            return;
+
+        this._enabled = value;
         this.reactive = value;
+        this.can_focus = value;
+        this.clutter_text.reactive = value;
         this.clutter_text.editable = value;
+        this.clutter_text.cursor_visible = value;
     },
 
     reset: function() {
@@ -318,14 +334,20 @@ var PaygUnlockDialog = new Lang.Class({
     },
 
     _updateNextButtonSensitivity: function() {
-        let sensitive = this._validateCurrentCode() && this._verificationStatus != UnlockStatus.VERIFYING;
+        let sensitive = this._validateCurrentCode() &&
+            this._verificationStatus != UnlockStatus.VERIFYING &&
+            this._verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
+
         this._nextButton.reactive = sensitive;
         this._nextButton.can_focus = sensitive;
     },
 
     _updateSensitivity: function() {
+        let shouldEnableEntry = this._verificationStatus != UnlockStatus.VERIFYING &&
+            this._verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
+
         this._updateNextButtonSensitivity();
-        this._entry.setEnabled(this._verificationStatus != UnlockStatus.VERIFYING);
+        this._entry.setEnabled(shouldEnableEntry);
     },
 
     _setErrorMessage: function(message) {
