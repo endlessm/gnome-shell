@@ -193,6 +193,7 @@ var PaygManager = GObject.registerClass({
             this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
             this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
 
+            this._maybeNotifyUser();
             this._updateExpirationReminders();
         }
 
@@ -295,6 +296,16 @@ var PaygManager = GObject.registerClass({
         source.notify(this._notification);
 
         this._notification.connect('destroy', () => this._notification = null);
+    }
+
+    _maybeNotifyUser() {
+        // Sanity check.
+        if (notificationAlertTimesSecs.length == 0)
+            return;
+
+        let secondsLeft = this._timeRemainingSecs();
+        if (secondsLeft > 0 && secondsLeft <= notificationAlertTimesSecs[0])
+            this._notifyPaygReminder(secondsLeft);
     }
 
     _updateExpirationReminders() {
