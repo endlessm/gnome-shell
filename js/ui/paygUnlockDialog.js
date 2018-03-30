@@ -82,17 +82,37 @@ var PaygUnlockCodeEntry = new Lang.Class({
         if (event.type() != Clutter.EventType.KEY_PRESS)
             return Clutter.EVENT_PROPAGATE;
 
-        let character = event.get_key_unicode();
+        let keysym = event.get_key_symbol();
+        let isDeleteKey =
+            keysym == Clutter.KEY_Delete ||
+            keysym == Clutter.KEY_KP_Delete ||
+            keysym == Clutter.KEY_BackSpace;
+        let isEnterKey =
+            keysym == Clutter.KEY_Return ||
+            keysym == Clutter.KEY_KP_Enter ||
+            keysym == Clutter.KEY_ISO_Enter;
+        let isExitKey =
+            keysym == Clutter.KEY_Escape ||
+            keysym == Clutter.KEY_Tab;
+        let isMovementKey =
+            keysym == Clutter.KEY_Left ||
+            keysym == Clutter.KEY_Right ||
+            keysym == Clutter.KEY_Home ||
+            keysym == Clutter.KEY_KP_Home ||
+            keysym == Clutter.KEY_End ||
+            keysym == Clutter.KEY_KP_End;
 
-        // We only support printable characters.
-        if (!GLib.unichar_isprint(character))
-            return Clutter.EVENT_PROPAGATE;
+        // Make sure we can leave the entry and delete and
+        // navigate numbers with the keyboard.
+        if (isExitKey || isEnterKey || isDeleteKey || isMovementKey)
+            return Clutter.EVENT_PROPAGATE
 
         // Don't allow inserting more digits than required.
         if (this._code.length >= CODE_REQUIRED_LENGTH_CHARS)
             return Clutter.EVENT_STOP;
 
         // Allow digits only
+        let character = event.get_key_unicode();
         if (GLib.unichar_isdigit(character))
             this.clutter_text.insert_unichar(character);
 
