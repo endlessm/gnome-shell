@@ -20,10 +20,12 @@
 
 const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
+const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 const Lang = imports.lang;
+const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Signals = imports.signals;
@@ -53,7 +55,8 @@ var UnlockStatus = {
     NOT_VERIFYING: 0,
     VERIFYING: 1,
     FAILED: 2,
-    SUCCEEDED: 3,
+    TOO_MANY_ATTEMPTS: 3,
+    SUCCEEDED: 4,
 };
 
 var PaygUnlockCodeEntry = new Lang.Class({
@@ -71,27 +74,70 @@ var PaygUnlockCodeEntry = new Lang.Class({
         this.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.clutter_text.x_align = Clutter.ActorAlign.CENTER;
 
-        this.connect('button-press-event', this._onButtonPressEvent.bind(this));
+        this._enabled = false;
+        this._buttonPressEventId = this.connect('button-press-event', this._onButtonPressEvent.bind(this));
+        this._capturedEventId = this.clutter_text.connect('captured-event', this._onCapturedEvent.bind(this));
+        this._textChangedId = this.clutter_text.connect('text-changed', this._onTextChanged.bind(this));
 
-        this.clutter_text.connect('captured-event', this._onCapturedEvent.bind(this));
-        this.clutter_text.connect('text-changed', this._onTextChanged.bind(this));
+        this.connect('destroy', this._onDestroy.bind(this));
+    },
+
+    _onDestroy: function() {
+        if (this._buttonPressEventId > 0) {
+            this.disconnect(this._buttonPressEventId);
+            this._buttonPressEventId = 0;
+        }
+
+        if (this._capturedEventId > 0) {
+            this.clutter_text.disconnect(this._capturedEventId);
+            this._capturedEventId = 0;
+        }
+
+        if (this._textChangedId > 0) {
+            this.clutter_text.disconnect(this._textChangedId);
+            this._textChangedId = 0;
+        }
     },
 
     _onCapturedEvent: function(textActor, event) {
         if (event.type() != Clutter.EventType.KEY_PRESS)
             return Clutter.EVENT_PROPAGATE;
 
-        let character = event.get_key_unicode();
+        let keysym = event.get_key_symbol();
+        let isDeleteKey =
+            keysym == Clutter.KEY_Delete ||
+            keysym == Clutter.KEY_KP_Delete ||
+            keysym == Clutter.KEY_BackSpace;
+        let isEnterKey =
+            keysym == Clutter.KEY_Return ||
+            keysym == Clutter.KEY_KP_Enter ||
+            keysym == Clutter.KEY_ISO_Enter;
+        let isExitKey =
+            keysym == Clutter.KEY_Escape ||
+            keysym == Clutter.KEY_Tab;
+        let isMovementKey =
+            keysym == Clutter.KEY_Left ||
+            keysym == Clutter.KEY_Right ||
+            keysym == Clutter.KEY_Home ||
+            keysym == Clutter.KEY_KP_Home ||
+            keysym == Clutter.KEY_End ||
+            keysym == Clutter.KEY_KP_End;
 
-        // We only support printable characters.
-        if (!GLib.unichar_isprint(character))
-            return Clutter.EVENT_PROPAGATE;
+        // Make sure we can leave the entry and delete and
+        // navigate numbers with the keyboard.
+        if (isExitKey || isEnterKey || isDeleteKey || isMovementKey)
+            return Clutter.EVENT_PROPAGATE
+
+        // Do nothing if the entry is disabled.
+        if (!this._enabled)
+            return Clutter.EVENT_STOP;
 
         // Don't allow inserting more digits than required.
         if (this._code.length >= CODE_REQUIRED_LENGTH_CHARS)
             return Clutter.EVENT_STOP;
 
         // Allow digits only
+        let character = event.get_key_unicode();
         if (GLib.unichar_isdigit(character))
             this.clutter_text.insert_unichar(character);
 
@@ -104,17 +150,30 @@ var PaygUnlockCodeEntry = new Lang.Class({
     },
 
     _onButtonPressEvent: function() {
+        if (!this._enabled)
+            return;
+
         this.grab_key_focus();
         return false;
     },
 
     addCharacter: function(character) {
+        if (!this._enabled || !GLib.unichar_isdigit(character))
+            return;
+
         this.clutter_text.insert_unichar(character);
     },
 
     setEnabled: function(value) {
+        if (this._enabled == value)
+            return;
+
+        this._enabled = value;
         this.reactive = value;
+        this.can_focus = value;
+        this.clutter_text.reactive = value;
         this.clutter_text.editable = value;
+        this.clutter_text.cursor_visible = value;
     },
 
     reset: function() {
@@ -228,11 +287,21 @@ var PaygUnlockDialog = new Lang.Class({
             this._startVerifyingCode();
         });
 
+        this._clearTooManyAttemptsId = 0;
+        this.connect('destroy', this._onDestroy.bind(this));
+
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, Lang.bind(this, this._onCancelled));
 
-        this._entry.grab_key_focus()
         this._updateSensitivity();
+        this._entry.grab_key_focus();
+    },
+
+    _onDestroy: function() {
+        if (this._clearTooManyAttemptsId > 0) {
+            Mainloop.source_remove(this._clearTooManyAttemptsId);
+            this._clearTooManyAttemptsId = 0;
+        }
     },
 
     _createButtonsArea: function() {
@@ -294,14 +363,20 @@ var PaygUnlockDialog = new Lang.Class({
     },
 
     _updateNextButtonSensitivity: function() {
-        let sensitive = this._validateCurrentCode() && this._verificationStatus != UnlockStatus.VERIFYING;
+        let sensitive = this._validateCurrentCode() &&
+            this._verificationStatus != UnlockStatus.VERIFYING &&
+            this._verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
+
         this._nextButton.reactive = sensitive;
         this._nextButton.can_focus = sensitive;
     },
 
     _updateSensitivity: function() {
+        let shouldEnableEntry = this._verificationStatus != UnlockStatus.VERIFYING &&
+            this._verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
+
         this._updateNextButtonSensitivity();
-        this._entry.setEnabled(this._verificationStatus != UnlockStatus.VERIFYING);
+        this._entry.setEnabled(shouldEnableEntry);
     },
 
     _setErrorMessage: function(message) {
@@ -336,13 +411,41 @@ var PaygUnlockDialog = new Lang.Class({
         this._updateSensitivity();
     },
 
-    _showError: function(error) {
+    _processError: function(error) {
+        logError(error, 'Error adding PAYG code');
+
+        // The 'too many errors' case is a bit special, and sets a different state.
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
+            let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
+            let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
+            let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60))
+            if (minutesLeft >= 1 || secondsLeft > 30) {
+                this._setErrorMessage(Gettext.ngettext("Too many attempts. Try again in %s minute.",
+                                                       "Too many attempts. Try again in %s minutes.", minutesLeft)
+                                      .format(minutesLeft));
+            } else {
+                this._setErrorMessage(_("Too many attempts. Try again in a few seconds."));
+            }
+
+            // Make sure to clean the status once the time is up (if this dialog is still alive)
+            // and make sure that we install this callback at some point in the future (+1 sec).
+            this._clearTooManyAttemptsId = Mainloop.timeout_add_seconds(secondsLeft + 1, () => {
+                this._verificationStatus = UnlockStatus.NOT_VERIFYING;
+                this._clearError();
+                this._updateSensitivity();
+                this._entry.grab_key_focus()
+                return GLib.SOURCE_REMOVE;
+            });
+
+            this._verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
+            return;
+        }
+
+        // Common errors after this point.
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
             this._setErrorMessage(_("Invalid code. Please try again."));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
             this._setErrorMessage(_("Code already used. Please enter a new code."));
-        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
-            this._setErrorMessage(_("Too many attempts. Please wait and try again."));
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
             this._setErrorMessage(_("Time exceeded while verifying the code"));
         } else {
@@ -351,8 +454,7 @@ var PaygUnlockDialog = new Lang.Class({
             this._setErrorMessage(_("Unknown error"));
         }
 
-        // The actual error will show up in the journal, no matter what.
-        logError(error, 'Error adding PAYG code');
+        this._verificationStatus = UnlockStatus.FAILED;
     },
 
     _clearError: function() {
@@ -361,12 +463,13 @@ var PaygUnlockDialog = new Lang.Class({
 
     _addCodeCallback: function(error) {
         // We don't care about the result if we're closing the dialog.
-        if (this._cancelled)
+        if (this._cancelled) {
+            this._verificationStatus = UnlockStatus.NOT_VERIFYING;
             return;
+        }
 
         if (error) {
-            this._verificationStatus = UnlockStatus.FAILED;
-            this._showError(error);
+            this._processError(error);
         } else {
             this._verificationStatus = UnlockStatus.SUCCEEDED;
             this._clearError();
@@ -382,6 +485,7 @@ var PaygUnlockDialog = new Lang.Class({
         this._verificationStatus = UnlockStatus.VERIFYING;
         this._startSpinning();
         this._updateSensitivity();
+        this._cancelled = false;
 
         Main.paygManager.addCode(this._entry.code, this._addCodeCallback.bind(this));
     },
