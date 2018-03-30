@@ -289,8 +289,8 @@ var PaygUnlockDialog = new Lang.Class({
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, Lang.bind(this, this._onCancelled));
 
-        this._entry.grab_key_focus()
         this._updateSensitivity();
+        this._entry.grab_key_focus();
     },
 
     _createButtonsArea: function() {
