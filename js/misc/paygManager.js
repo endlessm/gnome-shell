@@ -21,9 +21,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-const { Gio, GLib, GObject } = imports.gi;
+const { Gio, GLib, GnomeDesktop, GObject } = imports.gi;
 
+const Gettext = imports.gettext;
 const Main = imports.ui.main;
+const Mainloop = imports.mainloop;
+const MessageTray = imports.ui.messageTray;
 const Signals = imports.signals;
 
 const EOS_PAYG_NAME = 'com.endlessm.Payg1';
@@ -58,6 +61,78 @@ const DBusErrorsMapping = {
     DISABLED          : 'com.endlessm.Payg1.Error.Disabled',
 };
 
+// Title and description text to be shown in the periodic reminders.
+const NOTIFICATION_TITLE_TEXT = _("Pay as You Go");
+const NOTIFICATION_DETAILED_FORMAT_STRING = _("Subscription runs out in %s.");
+
+// This list defines the different instants in time where we would
+// want to show notifications to the user reminding that the payg
+// subscription will be expiring soon, up to a max GLib.MAXUINT32.
+//
+// It contains a list of integers representing the number of seconds
+// earlier to the expiration time when we want to show a notification,
+// which needs to be sorted in DESCENDING order.
+const notificationAlertTimesSecs = [
+    60 * 60 * 48, // 2 days
+    60 * 60 * 24, // 1 day
+    60 * 60 * 2,  // 2 hours
+    60 * 60,      // 1 hour
+    60 * 30,      // 30 minutes
+    60 * 2,       // 2 minutes
+    30,           // 30 seconds
+];
+
+// Takes an UNIX timestamp (in seconds) and returns a string
+// with a precision level appropriate to show to the user.
+//
+// The returned string will be formatted just in seconds for times
+// under 1 minute, in minutes for times under 2 hours, in hours and
+// minutes (if applicable) for times under 1 day, and then in days
+// and hours (if applicable) for anything longer than that in days.
+//
+// Some examples:
+//   - 45 seconds => "45 seconds"
+//   - 60 seconds => "1 minute"
+//   - 95 seconds => "1 minute"
+//   - 120 seconds => "2 minutes"
+//   - 3600 seconds => "60 minutes"
+//   - 4500 seconds => "75 minutes"
+//   - 7200 seconds => "2 hours"
+//   - 8640 seconds => "2 hours 24 minutes"
+//   - 86400 seconds => "1 day"
+//   - 115200 seconds => "1 day 8 hours"
+//   - 172800 seconds => "2 days"
+function timeToString(seconds) {
+    if (seconds < 60)
+        return Gettext.ngettext("%s second", "%s seconds", seconds).format(Math.floor(seconds));
+
+    let minutes = Math.floor(seconds / 60);
+    if (minutes < 120)
+        return Gettext.ngettext("%s minute", "%s minutes", minutes).format(minutes);
+
+    let hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        let hoursStr = Gettext.ngettext("%s hour", "%s hours", hours).format(hours);
+
+        let minutesPast = minutes % 60;
+        if (minutesPast == 0)
+            return hoursStr;
+
+        let minutesStr = Gettext.ngettext("%s minute", "%s minutes", minutesPast).format(minutesPast);
+        return ("%s %s").format(hoursStr, minutesStr);
+    }
+
+    let days = Math.floor(hours / 24);
+    let daysStr = Gettext.ngettext("%s day", "%s days", days).format(days);
+
+    let hoursPast = hours % 24;
+    if (hoursPast == 0)
+        return daysStr;
+
+    let hoursStr = Gettext.ngettext("%s hour", "%s hours", hoursPast).format(hoursPast);
+    return ("%s %s").format(daysStr, hoursStr);
+}
+
 var PaygManager = GObject.registerClass({
     Signals: { 'code-expired': { },
                'enabled-changed': { param_types: [GObject.TYPE_BOOLEAN] },
@@ -74,6 +149,12 @@ var PaygManager = GObject.registerClass({
         this._enabled = false;
         this._expiryTime = 0;
         this._rateLimitEndTime = 0;
+        this._notification = null;
+
+        // Keep track of clock changes to update notifications.
+
+        this._wallClock = new GnomeDesktop.WallClock({ time_only: true });
+        this._wallClock.connect('notify::clock', this._clockUpdated.bind(this));
 
         // D-Bus related initialization code only below this point.
 
@@ -81,6 +162,7 @@ var PaygManager = GObject.registerClass({
 
         this._codeExpiredId = 0;
         this._propertiesChangedId = 0;
+        this._expirationReminderId = 0;
 
         this._proxy = new Gio.DBusProxy({ g_connection: Gio.DBus.system,
                                           g_interface_name: this._proxyInfo.name,
@@ -113,6 +195,8 @@ var PaygManager = GObject.registerClass({
 
             this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
             this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
+
+            this._updateExpirationReminders();
         }
 
         this._initialized = true;
@@ -144,6 +228,8 @@ var PaygManager = GObject.registerClass({
             return;
 
         this._expiryTime = value;
+        this._updateExpirationReminders();
+
         this.emit('expiry-time-changed', this._expiryTime);
     }
 
@@ -157,6 +243,83 @@ var PaygManager = GObject.registerClass({
 
     _onCodeExpired(proxy) {
         this.emit('code-expired');
+    }
+
+    _timeRemainingSecs() {
+        if (!this._enabled)
+            return GLib.MAXUINT64;
+
+        return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
+    }
+
+    _clockUpdated() {
+        this._updateExpirationReminders();
+    }
+
+    _notifyPaygReminder(secondsLeft) {
+        // Only notify when in an regular session, not in GDM or initial-setup.
+        if (Main.sessionMode.currentMode != 'user' &&
+            Main.sessionMode.currentMode != 'user-coding') {
+            return;
+        }
+
+        if (this._notification)
+            this._notification.destroy();
+
+        let source = new MessageTray.SystemNotificationSource();
+        Main.messageTray.add(source);
+
+        let timeLeft = timeToString(secondsLeft);
+        this._notification = new MessageTray.Notification(source,
+                                                          NOTIFICATION_TITLE_TEXT,
+                                                          NOTIFICATION_DETAILED_FORMAT_STRING.format(timeLeft));
+        this._notification.setUrgency(MessageTray.Urgency.HIGH);
+        this._notification.setTransient(false);
+        source.notify(this._notification);
+
+        this._notification.connect('destroy', function() {
+            this._notification = null;
+        });
+    }
+
+    _updateExpirationReminders() {
+        if (this._expirationReminderId > 0) {
+            Mainloop.source_remove(this._expirationReminderId);
+            this._expirationReminderId = 0;
+        }
+
+        let secondsLeft = this._timeRemainingSecs();
+
+        // The interval passed to timeout_add_seconds needs to be a 32-bit
+        // unsigned integer, so don't bother with notifications otherwise.
+        if (secondsLeft <= 0 || secondsLeft >= GLib.MAXUINT32)
+            return;
+
+        // Look for the right time to set the alarm for.
+        let targetAlertTime = 0;
+        for (let alertTime of notificationAlertTimesSecs) {
+            if (secondsLeft > alertTime) {
+                targetAlertTime = alertTime;
+                break;
+            }
+        }
+
+        // Too late to set up an alarm now.
+        if (targetAlertTime == 0)
+            return;
+
+        this._expirationReminderId = Mainloop.timeout_add_seconds(secondsLeft - targetAlertTime, () => {
+            // We want to show "round" numbers in the notification, matching
+            // whatever is specified in the notificationAlertTimeSecs array.
+            this._notifyPaygReminder(targetAlertTime);
+
+            // Reset _expirationReminderId before _updateExpirationReminders()
+            // to prevent an attempt to remove the same GSourceFunc twice.
+            this._expirationReminderId = 0;
+            this._updateExpirationReminders();
+
+            return GLib.SOURCE_REMOVE;
+        });
     }
 
     addCode(code, callback) {
@@ -200,6 +363,6 @@ var PaygManager = GObject.registerClass({
         if (!this.enabled)
             return false;
 
-        return this._expiryTime <= (GLib.get_real_time() / GLib.USEC_PER_SEC);
+        return this._timeRemainingSecs() <= 0;
     }
 });
