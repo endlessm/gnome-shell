@@ -47,6 +47,7 @@ const WorkspaceMonitor = imports.ui.workspaceMonitor;
 const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
+const PaygManager = imports.misc.paygManager;
 const Watermark = imports.ui.watermark;
 
 const A11Y_SCHEMA = 'org.gnome.desktop.a11y.keyboard';
@@ -88,6 +89,7 @@ let desktopAppClient = null;
 let workspaceMonitor = null;
 let codingManager = null;
 let discoveryFeed = null;
+let paygManager = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
@@ -175,6 +177,11 @@ function _initializeUI() {
     overview = new Overview.Overview();
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();
+
+    // The ScreenShield depends on the PaygManager, so this
+    // module needs to be initialized first.
+    paygManager = new PaygManager.PaygManager();
+
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();
 
@@ -236,7 +243,17 @@ function _initializeUI() {
 
     if (sessionMode.isGreeter && screenShield) {
         layoutManager.connect('startup-prepared', function() {
-            screenShield.showDialog();
+            // We can't show the login dialog (which is managed by the
+            // screenshield) until the PaygManager is initializd, since
+            // we need to check whether the machine is PAYG-locked first.
+            if (paygManager.initialized) {
+                screenShield.showDialog();
+            } else {
+                let paygManagerId = paygManager.connect('initialized', () => {
+                    screenShield.showDialog();
+                    paygManager.disconnect(paygManagerId);
+                });
+            }
         });
     }
 
