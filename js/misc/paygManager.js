@@ -321,7 +321,7 @@ var PaygManager = new Lang.Class({
             return;
 
         let secondsLeft = this._timeRemainingSecs();
-        if (secondsLeft <= notificationAlertTimesSecs[0])
+        if (secondsLeft > 0 && secondsLeft <= notificationAlertTimesSecs[0])
             this._notifyPaygReminder(secondsLeft);
     },
 
