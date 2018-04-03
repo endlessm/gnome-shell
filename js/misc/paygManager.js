@@ -24,6 +24,7 @@
 const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GnomeDesktop = imports.gi.GnomeDesktop;
 
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
@@ -182,6 +183,11 @@ var PaygManager = new Lang.Class({
             return;
         }
 
+        // Keep track of clock changes to update notifications.
+
+        this._wallClock = new GnomeDesktop.WallClock({ time_only: true });
+        this._wallClock.connect('notify::clock', Lang.bind(this, this._clockUpdated));
+
         // D-Bus related initialization code only below this point.
 
         this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(EOS_PAYG_IFACE);
@@ -277,6 +283,10 @@ var PaygManager = new Lang.Class({
             return GLib.MAXUINT64;
 
         return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
+    },
+
+    _clockUpdated: function() {
+        this._updateExpirationReminders();
     },
 
     _notifyPaygReminder: function(secondsLeft) {
