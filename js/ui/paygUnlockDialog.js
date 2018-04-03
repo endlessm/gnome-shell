@@ -429,7 +429,7 @@ var PaygUnlockDialog = new Lang.Class({
 
             // Make sure to clean the status once the time is up (if this dialog is still alive)
             // and make sure that we install this callback at some point in the future (+1 sec).
-            this._clearTooManyAttemptsId = Mainloop.timeout_add_seconds(secondsLeft + 1, () => {
+            this._clearTooManyAttemptsId = Mainloop.timeout_add_seconds(Math.max(1, secondsLeft), () => {
                 this._verificationStatus = UnlockStatus.NOT_VERIFYING;
                 this._clearError();
                 this._updateSensitivity();
