@@ -70,7 +70,7 @@ const NOTIFICATION_DETAILED_FORMAT_STRING = _("Subscription runs out in %s.");
 
 // This list defines the different instants in time where we would
 // want to show notifications to the user reminding that the payg
-// subscription will be expiring soon.
+// subscription will be expiring soon, up to a max GLib.MAXUINT32.
 //
 // It contains a list of integers representing the number of seconds
 // earlier to the expiration time when we want to show a notification,
@@ -332,7 +332,10 @@ var PaygManager = new Lang.Class({
         }
 
         let secondsLeft = this._timeRemainingSecs();
-        if (secondsLeft <= 0)
+
+        // The interval passed to timeout_add_seconds needs to be a 32-bit
+        // unsigned integer, so don't bother with notifications otherwise.
+        if (secondsLeft <= 0 || secondsLeft >= GLib.MAXUINT32)
             return;
 
         // Look for the right time to set the alarm for.
