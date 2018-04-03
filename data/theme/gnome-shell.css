@@ -2806,3 +2806,15 @@ stage {
       color: #eeeeec;
       font-size: 100%;
       text-align: left; }
+
+/* Fix vertical misalignment in login screen */
+
+.login-dialog-user-list-item .login-dialog-timed-login-indicator {
+    height: 0px;
+    margin: 0;
+}
+
+.login-dialog-user-list-item .login-dialog-timed-login-indicator:showing {
+    height: 2px;
+    margin: 2px 0 0 0;
+}
