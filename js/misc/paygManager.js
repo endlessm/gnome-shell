@@ -65,8 +65,8 @@ const DBusErrorsMapping = {
 };
 
 // Title and description text to be shown in the periodic reminders.
-const NOTIFICATION_TITLE_FORMAT_STRING = _("Pay-as-you-go time will expire in %s");
-const NOTIFICATION_DETAILED_TEXT = _("Talk to your sales representative to buy a new code.")
+const NOTIFICATION_TITLE_TEXT = _("Pay as You Go");
+const NOTIFICATION_DETAILED_FORMAT_STRING = _("Subscription runs out in %s.");
 
 // This list defines the different instants in time where we would
 // want to show notifications to the user reminding that the payg
@@ -302,10 +302,10 @@ var PaygManager = new Lang.Class({
         let source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
 
-        let title = timeToString(secondsLeft);
+        let timeLeft = timeToString(secondsLeft);
         this._notification = new MessageTray.Notification(source,
-                                                          NOTIFICATION_TITLE_FORMAT_STRING.format(title),
-                                                          NOTIFICATION_DETAILED_TEXT);
+                                                          NOTIFICATION_TITLE_TEXT,
+                                                          NOTIFICATION_DETAILED_FORMAT_STRING.format(timeLeft));
         this._notification.setUrgency(MessageTray.Urgency.HIGH);
         this._notification.setTransient(false);
         source.notify(this._notification);
