@@ -48,6 +48,7 @@ const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
 const PaygManager = imports.misc.paygManager;
+const CustomerSupport = imports.misc.customerSupport;
 const Watermark = imports.ui.watermark;
 
 const A11Y_SCHEMA = 'org.gnome.desktop.a11y.keyboard';
@@ -86,6 +87,7 @@ let xdndHandler = null;
 let keyboard = null;
 let layoutManager = null;
 let desktopAppClient = null;
+let customerSupport = null;
 let workspaceMonitor = null;
 let codingManager = null;
 let discoveryFeed = null;
@@ -181,6 +183,9 @@ function _initializeUI() {
     // The ScreenShield depends on the PaygManager, so this
     // module needs to be initialized first.
     paygManager = new PaygManager.PaygManager();
+
+    // Centralized handling of things specific to customer support.
+    customerSupport = new CustomerSupport.CustomerSupport();
 
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();
