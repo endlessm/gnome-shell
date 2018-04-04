@@ -46,6 +46,7 @@ const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
 const PaygManager = imports.misc.paygManager;
+const CustomerSupport = imports.misc.customerSupport;
 const Watermark = imports.ui.watermark;
 const WorkspaceMonitor = imports.ui.workspaceMonitor;
 
@@ -86,6 +87,7 @@ var layoutManager = null;
 var discoveryFeed = null;
 var paygManager = null;
 var trayArea = null;
+var customerSupport = null;
 var workspaceMonitor = null;
 let _startDate;
 let _defaultCssStylesheet = null;
@@ -180,6 +182,9 @@ function _initializeUI() {
     // The ScreenShield depends on the PaygManager, so this
     // module needs to be initialized first.
     paygManager = new PaygManager.PaygManager();
+
+    // Centralized handling of things specific to customer support.
+    customerSupport = new CustomerSupport.CustomerSupport();
 
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();
