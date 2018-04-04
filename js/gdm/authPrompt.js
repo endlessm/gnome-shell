@@ -7,9 +7,9 @@ const Signals = imports.signals;
 
 const Animation = imports.ui.animation;
 const Batch = imports.gdm.batch;
-const Config = imports.misc.config;
 const GdmUtil = imports.gdm.util;
 const Keyboard = imports.ui.status.keyboard;
+const Main = imports.ui.main;
 const Params = imports.misc.params;
 const ShellEntry = imports.ui.shellEntry;
 const Tweener = imports.ui.tweener;
@@ -22,17 +22,6 @@ var DEFAULT_BUTTON_WELL_ANIMATION_TIME = 0.3;
 var MESSAGE_FADE_OUT_ANIMATION_TIME = 0.5;
 
 const _RESET_CODE_LENGTH = 7;
-
-const CUSTOMER_SUPPORT_FILENAME = 'vendor-customer-support.ini';
-const CUSTOMER_SUPPORT_LOCATIONS = [
-    Config.LOCALSTATEDIR + '/lib/eos-image-defaults/' + CUSTOMER_SUPPORT_FILENAME,
-    Config.PKGDATADIR + '/' + CUSTOMER_SUPPORT_FILENAME
-];
-
-const CUSTOMER_SUPPORT_GROUP_NAME = 'Customer Support';
-const CUSTOMER_SUPPORT_KEY_EMAIL = 'Email';
-const PASSWORD_RESET_GROUP_NAME = 'Password Reset';
-const PASSWORD_RESET_KEY_SALT = 'Salt';
 
 var AuthPromptMode = {
     UNLOCK_ONLY: 0,
@@ -178,8 +167,6 @@ var AuthPrompt = class {
         this._spinner.actor.opacity = 0;
         this._spinner.actor.show();
         this._defaultButtonWell.add_child(this._spinner.actor);
-
-        this._customerSupportEmail = null;
 
         this._displayingPasswordHint = false;
         this._passwordResetCode = null;
@@ -595,24 +582,6 @@ var AuthPrompt = class {
         this.emit('cancelled');
     }
 
-    _ensureCustomerSupportFile() {
-        if (this._customerSupportKeyFile)
-            return this._customerSupportKeyFile;
-
-        this._customerSupportKeyFile = new GLib.KeyFile();
-
-        for (let path of CUSTOMER_SUPPORT_LOCATIONS) {
-            try {
-                this._customerSupportKeyFile.load_from_file(path, GLib.KeyFileFlags.NONE);
-                break;
-            } catch (e) {
-                logError(e, 'Failed to read customer support data from ' + path);
-            }
-        }
-
-        return this._customerSupportKeyFile;
-    }
-
     _generateResetCode() {
         // Note: These are not secure random numbers. Doesn't matter. The
         // mechanism to convert a reset code to unlock code is well-known, so
@@ -620,7 +589,7 @@ var AuthPrompt = class {
 
         // The fist digit is fixed to "1" as version of the hash code (the zeroth
         // version had one less digit in the code).
-        let resetCode = this._getResetCodeSalt() ? '1' : '';
+        let resetCode = Main.customerSupport.passwordResetSalt ? '1' : '';
 
         for (let n = 0; n < _RESET_CODE_LENGTH; n++)
             resetCode = '%s%d'.format(resetCode, GLib.random_int_range(0, 10));
@@ -628,12 +597,11 @@ var AuthPrompt = class {
     }
 
     _computeUnlockCode(resetCode) {
-        let salt = this._getResetCodeSalt();
         let checksum = new GLib.Checksum(GLib.ChecksumType.MD5);
         checksum.update(ByteArray.fromString(resetCode));
 
-        if (salt) {
-            checksum.update(ByteArray.fromString(salt));
+        if (Main.customerSupport.passwordResetSalt) {
+            checksum.update(ByteArray.fromString(Main.customerSupport.passwordResetSalt));
             checksum.update([0]);
         }
 
@@ -648,35 +616,8 @@ var AuthPrompt = class {
         return unlockCode;
     }
 
-    _getCustomerSupportEmail() {
-        let keyFile = this._ensureCustomerSupportFile();
-
-        try {
-            return keyFile.get_locale_string(CUSTOMER_SUPPORT_GROUP_NAME,
-                                             CUSTOMER_SUPPORT_KEY_EMAIL,
-                                             null);
-        } catch (e) {
-            logError(e, 'Failed to read customer support email');
-            return null;
-        }
-    }
-
-    _getResetCodeSalt() {
-        let keyFile = this._ensureCustomerSupportFile();
-
-        try {
-            return keyFile.get_locale_string(PASSWORD_RESET_GROUP_NAME,
-                                             PASSWORD_RESET_KEY_SALT,
-                                             null);
-        } catch (e) {
-            logError(e, 'Failed to read password reset salt value');
-            return null;
-        }
-    }
-
     _showPasswordResetPrompt() {
-        let customerSupportEmail = this._getCustomerSupportEmail();
-        if (!customerSupportEmail)
+        if (!Main.customerSupport.customerSupportEmail)
             return;
 
         // Stop the normal gdm conversation so it doesn't interfere.
@@ -696,7 +637,7 @@ var AuthPrompt = class {
             // Translators: Password reset. The first %s is a verification code and the second is an email.
             _("Please inform customer support of your verification code %s by emailing %s. The code will remain valid until you click Cancel or turn off your computer.").format(
                 this._passwordResetCode,
-                customerSupportEmail));
+                Main.customerSupport.customerSupportEmail));
 
         // Translators: Button on login dialog, after clicking Forgot Password?
         this.nextButton.set_label(_("Reset Password"));
@@ -738,7 +679,7 @@ var AuthPrompt = class {
                               null, (obj, result) => {
                                   try {
                                       let permission = Polkit.Permission.new_finish(result);
-                                      if (permission.get_allowed() && this._getCustomerSupportEmail())
+                                      if (permission.get_allowed() && Main.customerSupport.customerSupportEmail)
                                           this._passwordResetButton.show();
                                   } catch(e) {
                                       logError(e, 'Failed to determine if password reset is allowed');
@@ -784,4 +725,3 @@ var AuthPrompt = class {
         this._maybeShowPasswordResetButton();
     }
 };
-Signals.addSignalMethods(AuthPrompt.prototype);
