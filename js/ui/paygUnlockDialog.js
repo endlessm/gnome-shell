@@ -263,11 +263,17 @@ var PaygUnlockDialog = new Lang.Class({
         let helpLineMain = new St.Label({ style_class: 'unlock-dialog-payg-help-main',
                                           text: _("Don’t have an unlock code? That’s OK!"),
                                           x_align: Clutter.ActorAlign.START });
+        helpLineMain.clutter_text.line_wrap = true;
+        helpLineMain.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
         promptBox.add_child(helpLineMain);
 
         let helpLineSub = new St.Label({ style_class: 'unlock-dialog-payg-help-sub',
                                          text: _("Talk to your sales representative to purchase a new code."),
                                          x_align: Clutter.ActorAlign.START });
+        helpLineSub.clutter_text.line_wrap = true;
+        helpLineSub.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
         promptBox.add_child(helpLineSub);
 
         Main.ctrlAltTabManager.addGroup(promptBox, _("Unlock Machine"), 'dialog-password-symbolic');
