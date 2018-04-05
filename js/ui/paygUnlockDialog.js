@@ -246,6 +246,8 @@ var PaygUnlockDialog = new Lang.Class({
         let promptLabel = new St.Label({ style_class: 'unlock-dialog-payg-label',
                                          text: _("Enter a new code to unlock your computer:"),
                                          x_align: Clutter.ActorAlign.START });
+        promptLabel.clutter_text.line_wrap = true;
+        promptLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         promptBox.add_child(promptLabel);
 
         this._entry = new PaygUnlockCodeEntry();
