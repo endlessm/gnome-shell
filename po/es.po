@@ -12,6 +12,7 @@
 # goizueta <goizueta@endlessm.com>, 2014
 # Joel Gil León <joel@endlessm.com>, 2013-2014
 # Jorge González <jorgegonz@svn.gnome.org>, 2009-2011
+# Mario Sanchez Prada, 2018
 # Nuritzi Sanchez <ns@endlessm.com>, 2013-2018
 # Philip Chimento <philip.chimento@gmail.com>, 2014
 # Roddy Shuler <roddy@endlessm.com>, 2013-2018
@@ -19,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2018-01-18 12:09-0800\n"
-"PO-Revision-Date: 2018-01-23 05:32+0000\n"
-"Last-Translator: Nuritzi Sanchez <ns@endlessm.com>\n"
+"POT-Creation-Date: 2018-04-04 17:52+0100\n"
+"PO-Revision-Date: 2018-04-05 09:21+0000\n"
+"Last-Translator: Mario Sanchez Prada\n"
 "Language-Team: Spanish (http://www.transifex.com/endless-os/gnome-shell/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -619,32 +620,32 @@ msgstr "network-workgroup"
 msgid "There was an error loading the preferences dialog for %s:"
 msgstr "Hubo un error al lanzar el diálogo de preferencias para %s:"
 
-#: js/gdm/authPrompt.js:145
+#: js/gdm/authPrompt.js:134
 msgid "Show password hint"
 msgstr "Mostrar recordatorio"
 
-#: js/gdm/authPrompt.js:160
+#: js/gdm/authPrompt.js:149
 msgid "Forgot password?"
 msgstr "¿Olvidaste tu contraseña?"
 
-#: js/gdm/authPrompt.js:210 js/ui/audioDeviceSelection.js:71
+#: js/gdm/authPrompt.js:197 js/ui/audioDeviceSelection.js:71
 #: js/ui/components/networkAgent.js:162 js/ui/components/polkitAgent.js:193
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:195
-#: js/ui/shellMountOperation.js:408 js/ui/status/network.js:947
-#: js/ui/forceAppExitDialog.js:78
+#: js/ui/paygUnlockDialog.js:345 js/ui/shellMountOperation.js:408
+#: js/ui/status/network.js:947 js/ui/forceAppExitDialog.js:78
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: js/gdm/authPrompt.js:232 js/gdm/authPrompt.js:287 js/gdm/authPrompt.js:528
+#: js/gdm/authPrompt.js:219 js/gdm/authPrompt.js:274 js/gdm/authPrompt.js:515
 msgid "Next"
 msgstr "Siguiente"
 
-#: js/gdm/authPrompt.js:283 js/ui/shellMountOperation.js:412
-#: js/ui/unlockDialog.js:59
+#: js/gdm/authPrompt.js:270 js/ui/paygUnlockDialog.js:366
+#: js/ui/shellMountOperation.js:412 js/ui/unlockDialog.js:59
 msgid "Unlock"
 msgstr "Desbloquear"
 
-#: js/gdm/authPrompt.js:285
+#: js/gdm/authPrompt.js:272
 msgctxt "button"
 msgid "Sign In"
 msgstr "Iniciar sesión"
@@ -654,13 +655,13 @@ msgstr "Iniciar sesión"
 #. time to translate the shortened version.
 #. Translators: During a password reset, prompt for the "secret code" provided
 #. by customer support.
-#: js/gdm/authPrompt.js:711
+#: js/gdm/authPrompt.js:652
 msgid "Enter unlock code provided by customer support:"
 msgstr "Introduce aquí el código de desbloqueo que recibiste de nuestro atención al cliente:"
 
 #. Translators: Password reset. The first %s is a verification code and the
 #. second is an email.
-#: js/gdm/authPrompt.js:714
+#: js/gdm/authPrompt.js:655
 #, javascript-format
 msgid ""
 "Please inform customer support of your verification code %s by emailing %s. "
@@ -668,28 +669,28 @@ msgid ""
 msgstr "Por favor infórmanos de tu código de verificación %s enviándonos un correo electrónico a %s. El código seguirá siendo válido hasta que hagas clic en Cancelar o apagues tu computadora."
 
 #. Translators: Button on login dialog, after clicking Forgot Password?
-#: js/gdm/authPrompt.js:719
+#: js/gdm/authPrompt.js:660
 msgid "Reset Password"
 msgstr "Restablecer contraseña"
 
-#: js/gdm/authPrompt.js:793
+#: js/gdm/authPrompt.js:734
 msgid "Your unlock code was incorrect. Please try again."
 msgstr "Desbloqueo incorrecto. Por favor, ingresa tu codigo de nuevo."
 
-#: js/gdm/loginDialog.js:285
+#: js/gdm/loginDialog.js:287
 msgid "Choose Session"
 msgstr "Elegir sesión"
 
 #. translators: this message is shown below the user list on the
 #. login screen. It can be activated to reveal an entry for
 #. manually entering the username.
-#: js/gdm/loginDialog.js:435
+#: js/gdm/loginDialog.js:437
 msgid "Not listed?"
 msgstr "¿No estás en la lista?"
 
 #. Translators: this message is shown below the username entry field
 #. to clue the user in on how to login to the local network realm
-#: js/gdm/loginDialog.js:861
+#: js/gdm/loginDialog.js:867
 #, javascript-format
 msgid "(e.g., user or %s)"
 msgstr "(ej., usuario o %s)"
@@ -697,12 +698,12 @@ msgstr "(ej., usuario o %s)"
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
 #. (and don't even care of which one)
-#: js/gdm/loginDialog.js:866 js/ui/components/networkAgent.js:292
+#: js/gdm/loginDialog.js:872 js/ui/components/networkAgent.js:292
 #: js/ui/components/networkAgent.js:310
 msgid "Username: "
 msgstr "Nombre de usuario:"
 
-#: js/gdm/loginDialog.js:1204
+#: js/gdm/loginDialog.js:1210
 msgid "Login Window"
 msgstr "Ventana de inicio de sesión"
 
@@ -718,6 +719,44 @@ msgstr "Error de autenticación"
 #: js/gdm/util.js:478
 msgid "(or swipe finger)"
 msgstr "(o pase el dedo)"
+
+#. Title and description text to be shown in the periodic reminders.
+#: js/misc/paygManager.js:68
+msgid "Pay as You Go"
+msgstr "Endless Prepago"
+
+#: js/misc/paygManager.js:69
+#, javascript-format
+msgid "Subscription runs out in %s."
+msgstr "La suscripción se termina en %s."
+
+#: js/misc/paygManager.js:138
+#, javascript-format
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] "%s segundo"
+msgstr[1] "%s segundos"
+
+#: js/misc/paygManager.js:142 js/misc/paygManager.js:152
+#, javascript-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "%s minuto"
+msgstr[1] "%s minutos"
+
+#: js/misc/paygManager.js:146 js/misc/paygManager.js:163
+#, javascript-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] "%s hora"
+msgstr[1] "%s horas"
+
+#: js/misc/paygManager.js:157
+#, javascript-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s día"
+msgstr[1] "%s días"
 
 #. Translators: The name of the power-off action in search
 #: js/misc/systemActions.js:77
@@ -1632,6 +1671,66 @@ msgstr "Energía"
 msgid "Bottom Bar"
 msgstr "Barra inferior"
 
+#: js/ui/paygUnlockDialog.js:228
+msgid "Your Endless pay-as-you-go usage credit has expired."
+msgstr "Tu credito para Endless Prepago se ha expirado. "
+
+#: js/ui/paygUnlockDialog.js:247
+msgid "Enter a new code to unlock your computer:"
+msgstr "Ingresa un código nuevo para desbloquear tu computadora:"
+
+#: js/ui/paygUnlockDialog.js:265
+msgid "Don’t have an unlock code? That’s OK!"
+msgstr "¿No tienes un código de desbloqueo? No te preocupes."
+
+#. The second possible override is to use the template text below
+#. with the contact's name and phone number, if BOTH are present.
+#: js/ui/paygUnlockDialog.js:284
+#, javascript-format
+msgid ""
+"Talk your sales representative to purchase a new code. Call or text %s at %s"
+msgstr "Habla con un representante de ventas para comprar un código nuevo. Llama a %s o envíale un mensaje al %s"
+
+#. No overrides present, default to fallback text.
+#: js/ui/paygUnlockDialog.js:288
+msgid "Talk to your sales representative to purchase a new code."
+msgstr "Habla con un representante de ventas para comprar un código nuevo."
+
+#: js/ui/paygUnlockDialog.js:299
+msgid "Unlock Machine"
+msgstr "Desbloquear la máquina"
+
+#: js/ui/paygUnlockDialog.js:449
+#, javascript-format
+msgid "Too many attempts. Try again in %s minute."
+msgid_plural "Too many attempts. Try again in %s minutes."
+msgstr[0] "Demasiados intentos. Inténtalo de nuevo en %s minutos."
+msgstr[1] "Demasiados intentos. Inténtalo de nuevo en %s minutos."
+
+#: js/ui/paygUnlockDialog.js:453
+msgid "Too many attempts. Try again in a few seconds."
+msgstr "Demasiados intentos. Inténtalo de nuevo en unos segundos."
+
+#: js/ui/paygUnlockDialog.js:472
+msgid "Invalid code. Please try again."
+msgstr "Código inválido. Inténtalo de nuevo."
+
+#: js/ui/paygUnlockDialog.js:474
+msgid "Code already used. Please enter a new code."
+msgstr "Código ya usado. Por favor ingresa un código nuevo."
+
+#: js/ui/paygUnlockDialog.js:476
+msgid "Time exceeded while verifying the code"
+msgstr "Tiempo excedido al verificar el código"
+
+#. We don't consider any other error here (and we don't consider DISABLED
+#. explicitly,
+#. since that should not happen), but still we need to show something to the
+#. user.
+#: js/ui/paygUnlockDialog.js:480
+msgid "Unknown error"
+msgstr "Error desconocido"
+
 #. Translators: this MUST be either "toggle-switch-us"
 #. (for toggle switches containing the English words
 #. "ON" and "OFF") or "toggle-switch-intl" (for toggle
@@ -1681,7 +1780,7 @@ msgstr[1] "%d notificaciones nuevas"
 msgid "Lock"
 msgstr "Bloquear"
 
-#: js/ui/screenShield.js:722
+#: js/ui/screenShield.js:764
 msgid "GNOME needs to lock the screen"
 msgstr "GNOME necesita bloquear la pantalla"
 
@@ -1691,11 +1790,11 @@ msgstr "GNOME necesita bloquear la pantalla"
 #. Just tell him to stop using this app
 #. XXX: another option is to kick the user into the gdm login
 #. screen, where we're not affected by grabs
-#: js/ui/screenShield.js:848 js/ui/screenShield.js:1334
+#: js/ui/screenShield.js:890 js/ui/screenShield.js:1401
 msgid "Unable to lock"
 msgstr "No se pudo bloquear"
 
-#: js/ui/screenShield.js:849 js/ui/screenShield.js:1335
+#: js/ui/screenShield.js:891 js/ui/screenShield.js:1402
 msgid "Lock was blocked by an application"
 msgstr "Un programa impidió el bloqueo"
 
