@@ -225,7 +225,6 @@ var Indicator = new Lang.Class({
         if (!userSetting) {
             userSetting = new NM.SettingUser();
             connection.add_setting(userSetting);
-            connection.commit_changes(true, null);
         }
         return userSetting;
     },
