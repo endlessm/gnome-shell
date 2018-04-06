@@ -111,6 +111,7 @@ var Indicator = new Lang.Class({
         this.menu.addMenuItem(this._item);
 
         this._activeConnection = null;
+        this._settingChangedSignalId = 0;
 
         NM.Client.new_async(null, this._clientGot.bind(this));
     },
@@ -179,8 +180,10 @@ var Indicator = new Lang.Class({
             return;
 
         // Disconnect from the previous active connection
-        if (this._settingChangedSignalId)
+        if (this._settingChangedSignalId > 0) {
             this._activeConnection.disconnect(this._settingChangedSignalId);
+            this._settingChangedSignalId = 0;
+        }
 
         this._activeConnection = currentActiveConnection;
 
@@ -221,7 +224,7 @@ var Indicator = new Lang.Class({
         let userSetting = connection.get_setting(NM.SettingUser.$gtype);
         if (!userSetting) {
             userSetting = new NM.SettingUser();
-            activeConnection.add_setting(userSetting);
+            connection.add_setting(userSetting);
             connection.commit_changes(true, null);
         }
         return userSetting;
