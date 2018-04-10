@@ -457,7 +457,7 @@ var NetworkSecretDialog = new Lang.Class({
         case '802-11-wireless':
             wirelessSetting = this._connection.get_setting_wireless();
             ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
-            content.title = _("Authentication required by wireless network");
+            content.title = _("Enter the password for “%s”").format(ssid);
             content.message = _("Passwords or encryption keys are required to access the wireless network “%s”.").format(ssid);
             this._getWirelessSecrets(content.secrets, wirelessSetting);
             break;
