@@ -22,14 +22,17 @@ const ShellEntry = imports.ui.shellEntry;
 
 const VPN_UI_GROUP = 'VPN Plugin UI';
 
+const NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED = 'connection.allow-downloads-when-metered';
+
 var NetworkSecretDialog = new Lang.Class({
     Name: 'NetworkSecretDialog',
     Extends: ModalDialog.ModalDialog,
 
-    _init: function(agent, requestId, connection, settingName, hints, contentOverride) {
+    _init: function(client, agent, requestId, connection, settingName, hints, contentOverride) {
         this.parent({ styleClass: 'prompt-dialog' });
 
         this._agent = agent;
+        this._client = client;
         this._requestId = requestId;
         this._connection = connection;
         this._settingName = settingName;
@@ -46,9 +49,7 @@ var NetworkSecretDialog = new Lang.Class({
         manager.addMenu(this._inputSourceIndicator.menu);
         this._inputSourceManager.passwordModeEnabled = true;
 
-        let icon = new Gio.ThemedIcon({ name: 'dialog-password-symbolic' });
-        let contentParams = { icon,
-                              title: this._content.title,
+        let contentParams = { title: this._content.title,
                               body: this._content.message };
         let contentBox = new Dialog.MessageDialogContent(contentParams);
         this.contentLayout.add_actor(contentBox);
@@ -124,6 +125,10 @@ var NetworkSecretDialog = new Lang.Class({
                 secret.entry.clutter_text.set_password_char('\u25cf');
         }
 
+        // Add the Automatic Updates actors on non-VPN connections
+        if (this._settingName != 'vpn')
+            this._addMeteredConnectionToggle(connection, layout, pos);
+
         contentBox.messageBox.add(secretTable);
 
         this._okButton = { label:  _("Connect"),
@@ -138,6 +143,108 @@ var NetworkSecretDialog = new Lang.Class({
                          this._okButton]);
 
         this._updateOkButton();
+    },
+
+    _addMeteredConnectionToggle: function(connection, layout, position) {
+        let updatesLayout = new Clutter.GridLayout({ orientation: Clutter.Orientation.VERTICAL });
+        let updatesTable = new St.Widget({ style_class: 'network-dialog-secret-table',
+                                           layout_manager: updatesLayout });
+        updatesLayout.hookup_style(updatesTable);
+
+        // Separator
+        let separator = new St.Widget({ style_class: 'popup-separator-menu-item',
+                                        y_expand: true,
+                                        y_align: Clutter.ActorAlign.CENTER });
+        updatesLayout.attach(separator, 0, 0, 3, 1);
+
+        // Icon
+        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/endless-auto-updates-on-symbolic.svg');
+        let gicon = new Gio.FileIcon({ file: iconFile });
+        let icon = new St.Icon({ gicon: gicon,
+                                 icon_size: 24 });
+        updatesLayout.attach(icon, 0, 1, 1, 1);
+
+        // Translators: this is a question that shows below the Wi-Fi password
+        // dialog.
+        let title = new St.Label({ text: _("Is this connection paid or limited?"),
+                                   style_class: 'message-dialog-title',
+                                   x_expand: true,
+                                   x_align: Clutter.ActorAlign.START });
+        updatesLayout.attach(title, 1, 1, 1, 1);
+
+        // Subtitle label
+        let subtitle = new St.Label({ style_class: 'message-dialog-body',
+                                      text: _("Enable this option if this connection has usage restrictions, or is paid. This will disable automatic updates."),
+                                      x_align: Clutter.ActorAlign.START,
+                                      y_align: Clutter.ActorAlign.CENTER });
+        subtitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        subtitle.clutter_text.line_wrap = true;
+        subtitle.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+
+        updatesLayout.attach(subtitle, 0, 2, 2, 2);
+
+        // Translators: this is the "answer" to the "Is this connection
+        // paid or limited?" question.
+        this._answerLabel = new St.Label({ text: _("Yes"),
+                                           style_class: 'message-dialog-title',
+                                           x_expand: true,
+                                           x_align: Clutter.ActorAlign.CENTER });
+        updatesLayout.attach(this._answerLabel, 2, 1, 1, 1);
+
+        // Toggle button
+        this._updatesToggle = new St.Button({ style_class: 'toggle-switch',
+                                              toggle_mode: true,
+                                              visible: true,
+                                              reactive: true,
+                                              y_align: Clutter.ActorAlign.START,
+                                              y_expand: true });
+
+        // Translators: this MUST be either "toggle-switch-us"
+        // (for toggle switches containing the English words
+        // "ON" and "OFF") or "toggle-switch-intl" (for toggle
+        // switches containing "◯" and "|"). Other values will
+        // simply result in invisible toggle switches.
+        this._updatesToggle.add_style_class_name(_("toggle-switch-us"));
+
+        updatesLayout.attach(this._updatesToggle, 2, 2, 1, 1);
+        updatesTable.visible = true;
+
+        this._updatesToggle.connect('notify::checked', () => {
+            // Translators: this is the "answer" to the "Is this connection
+            // paid or limited?" question.
+            this._answerLabel.text = this._updatesToggle.checked ? _("Yes") : _("No");
+        });
+
+        this._updatesToggle.checked = this._getDefaultMeteredValue(connection);
+
+        layout.attach(updatesTable, 0, position, 2, 1);
+    },
+
+    _getDefaultMeteredValue: function(connection) {
+        let defaultValue;
+
+        // Try to use the current value
+        let userSetting = connection.get_setting(NM.SettingUser.$gtype);
+        if (userSetting) {
+            let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED);
+            if (allowDownloads)
+                defaultValue = allowDownloads === '1';
+        }
+
+        // If no value was already set before, assume the value from the
+        // current metered value of the connection.
+        if (defaultValue === undefined){
+            let connectionSetting = connection.get_setting_connection();
+
+            if (connectionSetting) {
+                let metered = connectionSetting.get_metered();
+                defaultValue = metered == NM.Metered.YES || metered == NM.Metered.GUESS_YES;
+            } else {
+                defaultValue = false;
+            }
+        }
+
+        return defaultValue;
     },
 
     _updateOkButton: function() {
@@ -164,9 +271,49 @@ var NetworkSecretDialog = new Lang.Class({
 
         if (valid) {
             this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
+
+            // Update the Automatic Updates values
+            if (this._settingName != 'vpn')
+                this._updateMeteredSetting(this._updatesToggle.checked);
+
             this.close(global.get_current_time());
         }
         // do nothing if not valid
+    },
+
+    _updateMeteredSetting: function(isMeteredConnection) {
+        // We cannot change the connection here (it's just a NMSimpleConnection
+        // and it'll discard all our settings after destroyed) so we're forced to
+        // use the NMRemoteConnection that the current connection represents.
+        let remoteConnection = this._client.get_connection_by_path(this._connection.get_path());
+
+        if (!remoteConnection)
+            return;
+
+        // Store the Automatic Updates first
+        let userSetting = remoteConnection.get_setting(NM.SettingUser.$gtype);
+
+        if (!userSetting) {
+            userSetting = new NM.SettingUser();
+            remoteConnection.add_setting(userSetting);
+        }
+
+        userSetting.set_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED, isMeteredConnection ? '0' : '1');
+
+        // And also the Metered connection
+        let connectionSetting = remoteConnection.get_setting_connection();
+
+        if (!connectionSetting) {
+            connectionSetting = new NM.SettingConnection();
+            remoteConnection.add_setting(connectionSetting);
+        }
+
+        connectionSetting.metered = isMeteredConnection ? NM.Metered.YES : NM.Metered.NO;
+
+        // Asynchronously save the remote connection
+        remoteConnection.commit_changes_async(true, null, (con, res, data) => {
+            con.commit_changes_finish(res);
+        });
     },
 
     cancel: function() {
@@ -310,7 +457,7 @@ var NetworkSecretDialog = new Lang.Class({
         case '802-11-wireless':
             wirelessSetting = this._connection.get_setting_wireless();
             ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
-            content.title = _("Authentication required by wireless network");
+            content.title = _("Enter the password for “%s”").format(ssid);
             content.message = _("Passwords or encryption keys are required to access the wireless network “%s”.").format(ssid);
             this._getWirelessSecrets(content.secrets, wirelessSetting);
             break;
@@ -353,8 +500,9 @@ var NetworkSecretDialog = new Lang.Class({
 var VPNRequestHandler = new Lang.Class({
     Name: 'VPNRequestHandler',
 
-    _init: function(agent, requestId, authHelper, serviceType, connection, hints, flags) {
+    _init: function(client, agent, requestId, authHelper, serviceType, connection, hints, flags) {
         this._agent = agent;
+        this._client = client;
         this._requestId = requestId;
         this._connection = connection;
         this._pluginOutBuffer = [];
@@ -571,7 +719,7 @@ var VPNRequestHandler = new Lang.Class({
 
         if (contentOverride && contentOverride.secrets.length) {
             // Only show the dialog if we actually have something to ask
-            this._shellDialog = new NetworkSecretDialog(this._agent, this._requestId, this._connection, 'vpn', [], contentOverride);
+            this._shellDialog = new NetworkSecretDialog(this._client, this._agent, this._requestId, this._connection, 'vpn', [], contentOverride);
             this._shellDialog.open(global.get_current_time());
         } else {
             this._agent.respond(this._requestId, Shell.NetworkAgentResponse.CONFIRMED);
@@ -631,6 +779,8 @@ var NetworkAgent = new Lang.Class({
             this._native = null;
             logError(e, 'error initializing the NetworkManager Agent');
         }
+
+        this._client = NM.Client.new(null);
     },
 
     enable: function() {
@@ -738,7 +888,7 @@ var NetworkAgent = new Lang.Class({
             return;
         }
 
-        let dialog = new NetworkSecretDialog(this._native, requestId, connection, settingName, hints);
+        let dialog = new NetworkSecretDialog(this._client, this._native, requestId, connection, settingName, hints);
         dialog.connect('destroy', Lang.bind(this, function() {
             delete this._dialogs[requestId];
         }));
@@ -772,7 +922,7 @@ var NetworkAgent = new Lang.Class({
             return;
         }
 
-        let vpnRequest = new VPNRequestHandler(this._native, requestId, binary, serviceType, connection, hints, flags);
+        let vpnRequest = new VPNRequestHandler(this._client, this._native, requestId, binary, serviceType, connection, hints, flags);
         vpnRequest.connect('destroy', Lang.bind(this, function() {
             delete this._vpnRequests[requestId];
         }));
