@@ -117,8 +117,7 @@ var IconGridLayout = new Lang.Class({
             })
             .some(function(defaultsFile) {
                 try {
-                    let [success, data] = defaultsFile.load_contents(null, null,
-                                                                     null);
+                    let [success, data] = defaultsFile.load_contents(null);
                     jsonString = data.toString();
                     return true;
                 } catch (e) {
