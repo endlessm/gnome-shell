@@ -330,6 +330,9 @@ var LayoutManager = new Lang.Class({
     },
 
     _animateViewsClone: function(targetOpacity, targetSaturation) {
+        if (!this._viewsClone)
+            return;
+
         // Don't unnecessarily tween the clone's saturation & opacity.
         if (this._viewsClone.opacity == targetOpacity && this._viewsClone.saturation == targetSaturation)
             return;
