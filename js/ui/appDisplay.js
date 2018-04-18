@@ -2240,12 +2240,11 @@ var FolderIcon = new Lang.Class({
         let iconParams = { createIcon: this._createIcon.bind(this),
                            setSizeManually: false,
                            editable: true };
-        this.name = '';
+        this.name = dirInfo.get_name();
         this._parentView = parentView;
 
         this.id = dirInfo.get_id();
         this._dirInfo = dirInfo;
-        this._name = this._dirInfo.get_name();
 
         this.parent(viewIconParams, buttonParams, iconParams);
         this.actor.add_style_class_name('app-folder');
@@ -2272,7 +2271,7 @@ var FolderIcon = new Lang.Class({
     },
 
     getName: function() {
-        return this._name;
+        return this.name;
     },
 
     getIcon: function() {
