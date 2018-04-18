@@ -412,8 +412,8 @@ popup-separator-menu-item {
 %app-well-icon {
     width: 118px;
     height: 118px;
-    padding: 6px 1px 6px 1px;
     spacing: 4px;
+    padding: 6px 0 6px 0;
 }
 
 .app-well-app {
@@ -435,7 +435,7 @@ popup-separator-menu-item {
 .app-folder,
 .app-well-app.app-folder {
 
-    & > .overview-icon,
+    & .overview-icon,
     &:active .overview-icon,
     &:checked .overview-icon {
         background-color: transparent;
@@ -461,7 +461,7 @@ popup-separator-menu-item {
     height: 118px;
     icon-size: 64px;
     spacing: 4px;
-    padding-top: 12px;
+    padding: 6px 0 6px 0;
     padding-bottom: 0px;
     border-radius: 15px;
     font-weight: bold;
@@ -486,8 +486,14 @@ popup-separator-menu-item {
   margin-bottom: 12px;
 }
 
-.overview-icon.dnd {
-    @extend %overview-icon;
+.overview-icon.dnd
+ {
+     @extend %overview-icon;
+     padding-right: 6px;
+     padding-left: 6px;
+     width: 104px;
+
+     & .overview-icon-label { padding: 0px; }
 }
 
 // Desktop Search (text entry widget)
@@ -577,6 +583,7 @@ popup-separator-menu-item {
     .overview-icon-label {
         @extend %search-label-main;
         @extend %search-label-color;
+        height: 20px;
         text-shadow: none;
     }
 
