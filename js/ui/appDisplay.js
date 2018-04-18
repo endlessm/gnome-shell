@@ -2071,7 +2071,12 @@ var FolderIcon = GObject.registerClass({
 
         super._init(viewIconParams, buttonParams, iconParams);
         this.actor.add_style_class_name('app-folder');
-        this.actor.set_child(this.icon.actor);
+
+        this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
+                                              x_expand: true, y_expand: true });
+        this._iconContainer.add_child(this.icon.actor);
+
+        this.actor.set_child(this._iconContainer);
 
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
