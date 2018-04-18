@@ -6,6 +6,7 @@ const Gtk = imports.gi.Gtk;
 const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
+const Pango = imports.gi.Pango;
 const Signals = imports.signals;
 const St = imports.gi.St;
 
@@ -116,12 +117,19 @@ var BaseIcon = new Lang.Class({
 
         this._editable = params.editable;
         if (params.showLabel) {
-            if (this._editable)
+            if (this._editable) {
                 this.label = new EditableLabel.EditableLabel({ text: label,
                                                                style_class: 'overview-icon-label' });
-            else
+            } else {
                 this.label = new St.Label({ text: label,
                                             style_class: 'overview-icon-label' });
+
+                this.label.clutter_text.x_align = Clutter.ActorAlign.CENTER;
+                this.label.clutter_text.y_align = Clutter.ActorAlign.CENTER;
+                this.label.clutter_text.line_wrap = true;
+                this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+            }
+
             box.add_actor(this.label);
         } else {
             this.label = null;
