@@ -1480,7 +1480,15 @@ var FolderIcon = GObject.registerClass({
 
         super._init(buttonParams, iconParams);
         this.actor.add_style_class_name('app-folder');
-        this.actor.set_child(this.icon);
+
+        this._iconContainer = new St.Widget({
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+        });
+        this._iconContainer.add_child(this.icon);
+
+        this.actor.set_child(this._iconContainer);
         this.actor.label_actor = this.icon.label;
 
         this.view = new FolderView(this._dirInfo, parentView);

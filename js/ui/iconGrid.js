@@ -1,7 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported BaseIcon, IconGrid, PaginatedIconGrid */
 
-const { Clutter, GLib, GObject, Meta, St } = imports.gi;
+const { Clutter, GLib, GObject, Meta, Pango, St } = imports.gi;
 
 const Params = imports.misc.params;
 const Main = imports.ui.main;
@@ -93,7 +93,9 @@ class BaseIcon extends St.Bin {
             this.label = new St.Label({ text: label });
             this.label.clutter_text.set({
                 x_align: Clutter.ActorAlign.CENTER,
-                y_align: Clutter.ActorAlign.CENTER
+                y_align: Clutter.ActorAlign.CENTER,
+                line_wrap: true,
+                ellipsize: Pango.EllipsizeMode.END,
             });
             this._box.add_actor(this.label);
         } else {
