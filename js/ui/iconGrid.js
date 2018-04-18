@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { Clutter, GLib, GObject, Meta, St } = imports.gi;
+const { Clutter, GLib, GObject, Meta, Pango, St } = imports.gi;
 
 const Mainloop = imports.mainloop;
 const Params = imports.misc.params;
@@ -100,12 +100,19 @@ class BaseIcon extends St.Bin {
 
         this._editable = params.editable;
         if (params.showLabel) {
-            if (this._editable)
+            if (this._editable) {
                 this.label = new EditableLabel.EditableLabel({ text: label,
                                                                style_class: 'overview-icon-label' });
-            else
+            } else {
                 this.label = new St.Label({ text: label,
                                             style_class: 'overview-icon-label' });
+
+                this.label.clutter_text.x_align = Clutter.ActorAlign.CENTER;
+                this.label.clutter_text.y_align = Clutter.ActorAlign.CENTER;
+                this.label.clutter_text.line_wrap = true;
+                this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+            }
+
             this._box.add_actor(this.label);
         } else {
             this.label = null;
