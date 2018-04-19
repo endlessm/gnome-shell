@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-19 13:37-0700\n"
-"PO-Revision-Date: 2018-04-19 20:40+0000\n"
+"PO-Revision-Date: 2018-04-19 20:56+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/endless-os/gnome-shell/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -85,13 +85,13 @@ msgstr "GNOME Shell 擴充套件有 UUID 屬性；這個設定鍵列出了應載
 
 #: data/org.gnome.shell.gschema.xml.in:42
 msgid "Disable user extensions"
-msgstr "停用所有使用者擴充功能"
+msgstr "停用所有使用者擴充套件"
 
 #: data/org.gnome.shell.gschema.xml.in:43
 msgid ""
 "Disable all extensions the user has enabled without affecting the “enabled-"
 "extension” setting."
-msgstr "停用所有使用者啟用的擴充功能但不影響「enabled-extension」設定值。"
+msgstr "停用所有使用者啟用的擴充套件但不影響「enabled-extension」設定值。"
 
 #: data/org.gnome.shell.gschema.xml.in:50
 msgid "Disables the validation of extension version compatibility"
@@ -529,7 +529,7 @@ msgstr "如果設定為「true」，切換器將僅顯示目前工作區中的�
 
 #: data/org.gnome.shell.gschema.xml.in:472
 msgid "Attach modal dialog to the parent window"
-msgstr "在上層視窗附加強制對話盒"
+msgstr "情態對話盒附連母視窗"
 
 #: data/org.gnome.shell.gschema.xml.in:473
 #: data/org.gnome.shell.gschema.xml.in:482
@@ -719,7 +719,7 @@ msgstr "核對錯誤"
 #. to indicate the user can swipe their finger instead
 #: js/gdm/util.js:478
 msgid "(or swipe finger)"
-msgstr "(或是滑過手指)"
+msgstr "（或是滑過手指）"
 
 #. Title and description text to be shown in the periodic reminders.
 #: js/misc/paygManager.js:68
@@ -765,19 +765,19 @@ msgstr "關閉電源"
 #. by semicolons
 #: js/misc/systemActions.js:102
 msgid "power off;shutdown"
-msgstr "關閉電源；關機"
+msgstr "power off;shutdown;關機;關閉電源"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:106
 msgctxt "search-result"
 msgid "Lock screen"
-msgstr "鎖定螢幕"
+msgstr "螢幕鎖定"
 
 #. Translators: A list of keywords that match the lock screen action,
 #. separated by semicolons
 #: js/misc/systemActions.js:109
 msgid "lock screen"
-msgstr "鎖定螢幕"
+msgstr "lock screen;螢幕鎖定"
 
 #. Translators: The name of the logout action in search
 #: js/misc/systemActions.js:113
@@ -789,7 +789,7 @@ msgstr "登出"
 #. semicolons
 #: js/misc/systemActions.js:116
 msgid "logout;sign off"
-msgstr "登出；簽出"
+msgstr "logout;sign off;登出"
 
 #. Translators: The name of the suspend action in search
 #: js/misc/systemActions.js:120
@@ -801,7 +801,7 @@ msgstr "暫停"
 #. semicolons
 #: js/misc/systemActions.js:123
 msgid "suspend;sleep"
-msgstr "暫緩；休眠"
+msgstr "suspend;sleep;暫停;睡眠"
 
 #. Translators: The name of the switch user action in search
 #: js/misc/systemActions.js:127
@@ -813,19 +813,19 @@ msgstr "切換使用者"
 #. separated by semicolons
 #: js/misc/systemActions.js:130
 msgid "switch user"
-msgstr "切換使用者"
+msgstr "switch user;切換使用者"
 
 #. Translators: The name of the lock orientation action in search
 #: js/misc/systemActions.js:134
 msgctxt "search-result"
 msgid "Lock orientation"
-msgstr ""
+msgstr "方向鎖"
 
 #. Translators: A list of keywords that match the lock orientation action,
 #. separated by semicolons
 #: js/misc/systemActions.js:137
 msgid "lock orientation"
-msgstr ""
+msgstr "lock orientation;方向鎖"
 
 #: js/misc/util.js:187
 msgid "Command not found"
@@ -844,7 +844,7 @@ msgstr "執行「%s」失敗："
 
 #: js/misc/util.js:245
 msgid "Just now"
-msgstr "就是現在"
+msgstr "就在剛才"
 
 #: js/misc/util.js:247
 #, javascript-format
@@ -911,7 +911,7 @@ msgstr "%A %H∶%M"
 #: js/misc/util.js:311
 #, no-c-format
 msgid "%B %d, %H∶%M"
-msgstr "%m月%d日 %H∶%M"
+msgstr "%b%d日 %H∶%M"
 
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 24h format.
@@ -919,7 +919,7 @@ msgstr "%m月%d日 %H∶%M"
 #: js/misc/util.js:317
 #, no-c-format
 msgid "%B %d %Y, %H∶%M"
-msgstr "%Y年%m月%d日 %H:%M"
+msgstr "%Y年%b%d日 %H:%M"
 
 #. Translators: Time in 12h format
 #: js/misc/util.js:322
@@ -946,7 +946,7 @@ msgstr "%A%p %l∶%M"
 #: js/misc/util.js:340
 #, no-c-format
 msgid "%B %d, %l∶%M %p"
-msgstr "%m月%d日%p %l∶%M"
+msgstr "%b%d日%p %l∶%M"
 
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 12h format.
@@ -954,7 +954,7 @@ msgstr "%m月%d日%p %l∶%M"
 #: js/misc/util.js:346
 #, no-c-format
 msgid "%B %d %Y, %l∶%M %p"
-msgstr "%Y年%m月%d日%p %l∶%M"
+msgstr "%Y年%b%d日%p %l∶%M"
 
 #. * Translators: this is the name of the search engine that shows in the
 #. * Shell's desktop search entry.
@@ -1124,12 +1124,12 @@ msgstr "整天"
 #: js/ui/calendar.js:869
 msgctxt "calendar heading"
 msgid "%A, %B %d"
-msgstr "%m月%d日%A"
+msgstr "%b%d日%A"
 
 #: js/ui/calendar.js:873
 msgctxt "calendar heading"
 msgid "%A, %B %d, %Y"
-msgstr "%Y年%m月%d日%A"
+msgstr "%Y年%b%d日%A"
 
 #: js/ui/calendar.js:1093
 msgid "No Notifications"
@@ -1147,21 +1147,21 @@ msgstr "全部清除"
 #: js/ui/closeDialog.js:44
 #, javascript-format
 msgid "“%s” is not responding."
-msgstr ""
+msgstr "「%s」沒有回應。"
 
 #: js/ui/closeDialog.js:45
 msgid ""
 "You may choose to wait a short while for it to continue or force the "
 "application to quit entirely."
-msgstr ""
+msgstr "您可以選擇再等一下讓它繼續，或是強制讓應用程式立刻退出。"
 
 #: js/ui/closeDialog.js:61
 msgid "Force Quit"
-msgstr ""
+msgstr "強制退出"
 
 #: js/ui/closeDialog.js:64
 msgid "Wait"
-msgstr ""
+msgstr "等待"
 
 #: js/ui/components/automountManager.js:91
 msgid "External drive connected"
@@ -1345,14 +1345,14 @@ msgstr "Dash"
 #. AM").
 #: js/ui/dateMenu.js:76
 msgid "%B %e %Y"
-msgstr "%Y年%m月%e日"
+msgstr "%Y年%b%e日"
 
 #. Translators: This is the accessible name of the date button shown
 #. * below the time in the shell; it should combine the weekday and the
 #. * date, e.g. "Tuesday February 17 2015".
 #: js/ui/dateMenu.js:83
 msgid "%A %B %e %Y"
-msgstr "%Y年%m月%e日%A"
+msgstr "%Y年%b%e日%A"
 
 #: js/ui/dateMenu.js:148
 msgid "Add world clocks…"
@@ -1373,7 +1373,7 @@ msgstr "天氣"
 #: js/ui/dateMenu.js:292
 #, javascript-format
 msgid "%s all day."
-msgstr "全天 %s。"
+msgstr "全天%s。"
 
 #. Translators: %s is a weather condition like "Clear sky"; see
 #. libgweather for the possible condition strings. If at all
@@ -1382,7 +1382,7 @@ msgstr "全天 %s。"
 #: js/ui/dateMenu.js:298
 #, javascript-format
 msgid "%s, then %s later."
-msgstr "%s，較晚 %s。"
+msgstr "%s，較晚%s。"
 
 #. Translators: %s is a weather condition like "Clear sky"; see
 #. libgweather for the possible condition strings. If at all
@@ -1391,11 +1391,11 @@ msgstr "%s，較晚 %s。"
 #: js/ui/dateMenu.js:304
 #, javascript-format
 msgid "%s, then %s, followed by %s later."
-msgstr "%s，然後 %s，接著較晚 %s。"
+msgstr "%s，然後%s，接著較晚%s。"
 
 #: js/ui/dateMenu.js:315
 msgid "Select a location…"
-msgstr "選擇地點…"
+msgstr "選擇位置…"
 
 #: js/ui/dateMenu.js:318
 msgid "Loading…"
@@ -1565,25 +1565,25 @@ msgstr "是否從 extensions.gnome.org 下載並安裝「%s」？"
 #: js/ui/inhibitShortcutsDialog.js:59
 #, javascript-format
 msgid "%s wants to inhibit shortcuts"
-msgstr ""
+msgstr "%s 想要抑制快捷鍵"
 
 #: js/ui/inhibitShortcutsDialog.js:60
 msgid "Application wants to inhibit shortcuts"
-msgstr ""
+msgstr "應用程式想要抑制快捷鍵"
 
 #. Translators: %s is a keyboard shortcut like "Super+x"
 #: js/ui/inhibitShortcutsDialog.js:69
 #, javascript-format
 msgid "You can restore shortcuts by pressing %s."
-msgstr ""
+msgstr "您可以按下 %s 還原快捷鍵。"
 
 #: js/ui/inhibitShortcutsDialog.js:74
 msgid "Deny"
-msgstr ""
+msgstr "禁止"
 
 #: js/ui/inhibitShortcutsDialog.js:80
 msgid "Allow"
-msgstr ""
+msgstr "允許"
 
 #: js/ui/keyboard.js:738 js/ui/status/keyboard.js:837
 msgid "Keyboard"
@@ -1665,7 +1665,7 @@ msgstr "概覽"
 
 #: js/ui/padOsd.js:103
 msgid "New shortcut…"
-msgstr "新增捷徑鍵…"
+msgstr "新增快捷鍵…"
 
 #: js/ui/padOsd.js:152
 msgid "Application defined"
@@ -1815,7 +1815,7 @@ msgstr "重新啟動…"
 #. long format
 #: js/ui/screenShield.js:88
 msgid "%A, %B %d"
-msgstr "%m月%d日%A"
+msgstr "%b%d日%A"
 
 #: js/ui/screenShield.js:147
 #, javascript-format
@@ -2310,25 +2310,25 @@ msgstr "音量"
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:21
 msgid "Mirror"
-msgstr ""
+msgstr "相同"
 
 #. Translators: this is for the desktop spanning displays.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:26
 msgid "Join Displays"
-msgstr ""
+msgstr "接合多臺顯示器"
 
 #. Translators: this is for using only an external display.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:31
 msgid "External Only"
-msgstr ""
+msgstr "僅外接"
 
 #. Translators: this is for using only the laptop display.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:36
 msgid "Built-in Only"
-msgstr ""
+msgstr "僅內建"
 
 #: js/ui/unlockDialog.js:67
 msgid "Log in as another user"

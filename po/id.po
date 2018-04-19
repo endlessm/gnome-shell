@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Andika Triwidada <andika@gmail.com>, 2010-2014
+# Andika Triwidada <andika@gmail.com>, 2017
 # dirgita <dirgitadevina@yahoo.co.id>, 2011-2012,2014
 # Hartono <hartono.s10@gmail.com>, 2016-2017
 # Kukuh Syafaat <syafaatkukuh@gmail.com>, 2018
@@ -16,7 +17,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-19 13:37-0700\n"
-"PO-Revision-Date: 2018-04-19 20:40+0000\n"
+"PO-Revision-Date: 2018-04-19 20:58+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/endless-os/gnome-shell/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -624,7 +625,7 @@ msgstr "network-workgroup"
 #: js/extensionPrefs/main.js:120
 #, javascript-format
 msgid "There was an error loading the preferences dialog for %s:"
-msgstr "Terjadi error saat memuat dialog preferensi bagi %s:"
+msgstr "Ada galat saat memuat dialog preferensi bagi %s:"
 
 #: js/gdm/authPrompt.js:134
 msgid "Show password hint"
@@ -699,7 +700,7 @@ msgstr "Tak masuk daftar?"
 #: js/gdm/loginDialog.js:894
 #, javascript-format
 msgid "(e.g., user or %s)"
-msgstr "(cth., pengguna atau %s)"
+msgstr "(cth., pengguna dari %s)"
 
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
@@ -711,11 +712,11 @@ msgstr "Nama pengguna: "
 
 #: js/gdm/loginDialog.js:1242
 msgid "Login Window"
-msgstr "Jendela Login"
+msgstr "Jendela Log Masuk"
 
 #: js/gdm/util.js:346
 msgid "Authentication error"
-msgstr "Error otentikasi"
+msgstr "Galat otentikasi"
 
 #. We don't show fingerprint messages directly since it's
 #. not the main auth service. Instead we use the messages
@@ -770,7 +771,7 @@ msgstr "Matikan"
 #. by semicolons
 #: js/misc/systemActions.js:102
 msgid "power off;shutdown"
-msgstr "matikan;shutdown;mati;off;tutup;power off"
+msgstr "matikan"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:106
@@ -782,7 +783,7 @@ msgstr "Kunci layar"
 #. separated by semicolons
 #: js/misc/systemActions.js:109
 msgid "lock screen"
-msgstr "kunci layar;lock screen"
+msgstr "kunci layar"
 
 #. Translators: The name of the logout action in search
 #: js/misc/systemActions.js:113
@@ -794,7 +795,7 @@ msgstr "Keluar"
 #. semicolons
 #: js/misc/systemActions.js:116
 msgid "logout;sign off"
-msgstr "keluar;logout;sign off;ganti pengguna"
+msgstr "keluar"
 
 #. Translators: The name of the suspend action in search
 #: js/misc/systemActions.js:120
@@ -806,7 +807,7 @@ msgstr "Suspensi"
 #. semicolons
 #: js/misc/systemActions.js:123
 msgid "suspend;sleep"
-msgstr "suspensi;suspend;sleep;tidur"
+msgstr "suspensi;tidur"
 
 #. Translators: The name of the switch user action in search
 #: js/misc/systemActions.js:127
@@ -824,13 +825,13 @@ msgstr "ganti pengguna"
 #: js/misc/systemActions.js:134
 msgctxt "search-result"
 msgid "Lock orientation"
-msgstr ""
+msgstr "Kunci orientasi"
 
 #. Translators: A list of keywords that match the lock orientation action,
 #. separated by semicolons
 #: js/misc/systemActions.js:137
 msgid "lock orientation"
-msgstr ""
+msgstr "kunci orientasi"
 
 #: js/misc/util.js:187
 msgid "Command not found"
@@ -1035,7 +1036,7 @@ msgstr "Mikrofon"
 
 #: js/ui/backgroundMenu.js:22
 msgid "Change Background…"
-msgstr "Ubah Latar Belakang…"
+msgstr "Ubah Latar…"
 
 #: js/ui/backgroundMenu.js:25
 msgid "Add App"
@@ -1152,21 +1153,21 @@ msgstr "Bersihkan Semua"
 #: js/ui/closeDialog.js:44
 #, javascript-format
 msgid "“%s” is not responding."
-msgstr ""
+msgstr "\"%s\" tidak merespon."
 
 #: js/ui/closeDialog.js:45
 msgid ""
 "You may choose to wait a short while for it to continue or force the "
 "application to quit entirely."
-msgstr ""
+msgstr "Anda dapat memilih untuk menunggu sebentar untuk melanjutkan atau memaksa aplikasi keluar."
 
 #: js/ui/closeDialog.js:61
 msgid "Force Quit"
-msgstr ""
+msgstr "Tutup Paksa"
 
 #: js/ui/closeDialog.js:64
 msgid "Wait"
-msgstr ""
+msgstr "Tunggu"
 
 #: js/ui/components/automountManager.js:91
 msgid "External drive connected"
@@ -1183,7 +1184,7 @@ msgstr "Buka dengan %s"
 
 #: js/ui/components/keyring.js:107 js/ui/components/polkitAgent.js:305
 msgid "Password:"
-msgstr "Kata Sandi:"
+msgstr "Sandi:"
 
 #: js/ui/components/keyring.js:140
 msgid "Type again:"
@@ -1226,12 +1227,12 @@ msgstr ""
 #: js/ui/components/networkAgent.js:404 js/ui/components/networkAgent.js:424
 #: js/ui/components/networkAgent.js:434
 msgid "Password: "
-msgstr "Kata Sandi: "
+msgstr "Sandi: "
 
 #. static WEP
 #: js/ui/components/networkAgent.js:369
 msgid "Key: "
-msgstr "Kunci: "
+msgstr "Tombol: "
 
 #: js/ui/components/networkAgent.js:408
 msgid "Identity: "
@@ -1239,7 +1240,7 @@ msgstr "Identitas: "
 
 #: js/ui/components/networkAgent.js:410
 msgid "Private key password: "
-msgstr "Kata sandi kunci privat: "
+msgstr "Sandi kunci privat: "
 
 #: js/ui/components/networkAgent.js:422
 msgid "Service: "
@@ -1276,7 +1277,7 @@ msgstr "PIN: "
 
 #: js/ui/components/networkAgent.js:479 js/ui/components/networkAgent.js:842
 msgid "Mobile broadband network password"
-msgstr "Kata sandi jaringan data seluler"
+msgstr "Sandi jaringan data seluler"
 
 #: js/ui/components/networkAgent.js:480 js/ui/components/networkAgent.js:826
 #: js/ui/components/networkAgent.js:830 js/ui/components/networkAgent.js:843
@@ -1435,13 +1436,13 @@ msgstr "Keluar"
 #, javascript-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
-msgstr[0] "%s akan keluar otomatis dalam %d detik.\t\t"
+msgstr[0] "%s akan log keluar otomatis dalam %d detik.\t\t"
 
 #: js/ui/endSessionDialog.js:72
 #, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
-msgstr[0] "Anda akan keluar otomatis dalam %d detik."
+msgstr[0] "Anda akan log keluar otomatis dalam %d detik."
 
 #: js/ui/endSessionDialog.js:78
 msgctxt "button"
@@ -1488,7 +1489,7 @@ msgstr "Nyalakan Ulang"
 #, javascript-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
-msgstr[0] "Sistem ini akan otomatis dinyalakan ulang dalam %d detik."
+msgstr[0] "Sistem ini akan otomatis dimulai ulang dalam %d detik."
 
 #: js/ui/endSessionDialog.js:119
 msgctxt "title"
@@ -1506,7 +1507,7 @@ msgstr[0] "Sistem ini akan otomatis dimulai ulang dan memasang pemutakhiran dala
 #: js/ui/endSessionDialog.js:127 js/ui/endSessionDialog.js:147
 msgctxt "button"
 msgid "Restart &amp; Install"
-msgstr "Start Ulang &amp; Pasang"
+msgstr "Nyalakan Ulang &amp; Pasang"
 
 #: js/ui/endSessionDialog.js:128
 msgctxt "button"
@@ -1543,7 +1544,7 @@ msgstr "Beberapa aplikasi sedang sibuk atau belum disimpan perubahannya."
 
 #: js/ui/endSessionDialog.js:385
 msgid "Other users are logged in."
-msgstr "Pengguna lain sedang login."
+msgstr "Pengguna lain sedang log masuk."
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:670
@@ -1570,47 +1571,47 @@ msgstr "Unduh dan pasang \"%s\" dari extensions.gnome.org?"
 #: js/ui/inhibitShortcutsDialog.js:59
 #, javascript-format
 msgid "%s wants to inhibit shortcuts"
-msgstr ""
+msgstr "%s ingin mencegah pintasan"
 
 #: js/ui/inhibitShortcutsDialog.js:60
 msgid "Application wants to inhibit shortcuts"
-msgstr ""
+msgstr "Aplikasi ingin mencegah pintasan"
 
 #. Translators: %s is a keyboard shortcut like "Super+x"
 #: js/ui/inhibitShortcutsDialog.js:69
 #, javascript-format
 msgid "You can restore shortcuts by pressing %s."
-msgstr ""
+msgstr "Anda dapat memulihkan pintasan dengan menekan %s."
 
 #: js/ui/inhibitShortcutsDialog.js:74
 msgid "Deny"
-msgstr ""
+msgstr "Tolak"
 
 #: js/ui/inhibitShortcutsDialog.js:80
 msgid "Allow"
-msgstr ""
+msgstr "Izinkan"
 
 #: js/ui/keyboard.js:738 js/ui/status/keyboard.js:837
 msgid "Keyboard"
-msgstr "Keyboard"
+msgstr "Papan Ketik"
 
 #: js/ui/lookingGlass.js:642
 msgid "No extensions installed"
-msgstr "Tidak ada ekstensi yang terpasang"
+msgstr "Tak ada ekstensi terpasang"
 
 #. Translators: argument is an extension UUID.
 #: js/ui/lookingGlass.js:696
 #, javascript-format
 msgid "%s has not emitted any errors."
-msgstr "%s tidak menampilkan error apa pun."
+msgstr "%s tidak menampilkan galat apa pun."
 
 #: js/ui/lookingGlass.js:702
 msgid "Hide Errors"
-msgstr "Sembunyikan Error"
+msgstr "Sembunyikan Galat"
 
 #: js/ui/lookingGlass.js:706 js/ui/lookingGlass.js:766
 msgid "Show Errors"
-msgstr "Tampilkan Error"
+msgstr "Tampilkan Galat"
 
 #: js/ui/lookingGlass.js:715
 msgid "Enabled"
@@ -1624,7 +1625,7 @@ msgstr "Dinonaktifkan"
 
 #: js/ui/lookingGlass.js:720
 msgid "Error"
-msgstr "Error"
+msgstr "Galat"
 
 #: js/ui/lookingGlass.js:722
 msgid "Out of date"
@@ -1636,7 +1637,7 @@ msgstr "Mengunduh"
 
 #: js/ui/lookingGlass.js:748
 msgid "View Source"
-msgstr "Lihat Sumber"
+msgstr "Tilik Sumber"
 
 #: js/ui/lookingGlass.js:757
 msgid "Web Page"
@@ -1670,7 +1671,7 @@ msgstr "Gambaran"
 
 #: js/ui/padOsd.js:103
 msgid "New shortcut…"
-msgstr "Pintasan Baru…"
+msgstr "Pintasan Baru..."
 
 #: js/ui/padOsd.js:152
 msgid "Application defined"
@@ -1814,7 +1815,7 @@ msgstr "Memulai ulang tidak tersedia di Wayland"
 
 #: js/ui/runDialog.js:284
 msgid "Restarting…"
-msgstr "Memulai ulang…"
+msgstr "Memulai ulang..."
 
 #. Translators: This is a time format for a date in
 #. long format
@@ -1850,7 +1851,7 @@ msgstr "GNOME perlu mengunci layar"
 #. screen, where we're not affected by grabs
 #: js/ui/screenShield.js:890 js/ui/screenShield.js:1402
 msgid "Unable to lock"
-msgstr "Tidak bisa mengunci"
+msgstr "Tak bisa mengunci"
 
 #: js/ui/screenShield.js:891 js/ui/screenShield.js:1403
 msgid "Lock was blocked by an application"
@@ -1862,7 +1863,7 @@ msgstr "Mencari…"
 
 #: js/ui/search.js:756
 msgid "No results."
-msgstr "Tidak ditemukan hasil."
+msgstr "Tak ada yang cocok."
 
 #: js/ui/shellEntry.js:38
 msgid "Copy"
@@ -1891,11 +1892,11 @@ msgstr "Telusuri internet dan lainnya…"
 
 #: js/ui/shellMountOperation.js:317
 msgid "Password"
-msgstr "Kata Sandi"
+msgstr "Sandi"
 
 #: js/ui/shellMountOperation.js:345
 msgid "Remember Password"
-msgstr "Ingat Kata Sandi"
+msgstr "Ingat Sandi"
 
 #: js/ui/status/accessibility.js:42
 msgid "Accessibility"
@@ -1903,7 +1904,7 @@ msgstr "Aksesibilitas"
 
 #: js/ui/status/accessibility.js:57
 msgid "Zoom"
-msgstr "Zoom"
+msgstr "Zum"
 
 #: js/ui/status/accessibility.js:64
 msgid "Screen Reader"
@@ -1911,7 +1912,7 @@ msgstr "Pembaca Layar"
 
 #: js/ui/status/accessibility.js:68
 msgid "Screen Keyboard"
-msgstr "Keyboard di Layar"
+msgstr "Papan Tik di Layar"
 
 #: js/ui/status/accessibility.js:72
 msgid "Visual Alerts"
@@ -1919,7 +1920,7 @@ msgstr "Peringatan Visual"
 
 #: js/ui/status/accessibility.js:75
 msgid "Sticky Keys"
-msgstr "Tombol Sticky"
+msgstr "Tombol Lengket"
 
 #: js/ui/status/accessibility.js:78
 msgid "Slow Keys"
@@ -1927,11 +1928,11 @@ msgstr "Tombol Lambat"
 
 #: js/ui/status/accessibility.js:81
 msgid "Bounce Keys"
-msgstr "Tombol Bounce"
+msgstr "Tombol Pantul"
 
 #: js/ui/status/accessibility.js:84
 msgid "Mouse Keys"
-msgstr "Tombol Mouse"
+msgstr "Tombol Tetikus"
 
 #: js/ui/status/accessibility.js:167
 msgid "High Contrast"
@@ -1981,7 +1982,7 @@ msgstr "Kecerahan"
 
 #: js/ui/status/keyboard.js:862
 msgid "Show Keyboard Layout"
-msgstr "Tampilkan Tata Letak Keyboard"
+msgstr "Tampilkan Tata Letak Papan Tik"
 
 #: js/ui/status/location.js:89 js/ui/status/location.js:197
 msgid "Location Enabled"
@@ -2171,13 +2172,13 @@ msgstr "%s Tak Tersambung"
 
 #: js/ui/status/network.js:1419
 msgid "connecting…"
-msgstr "menghubungi…"
+msgstr "menghubungi..."
 
 #. Translators: this is for network connections that require some kind of key
 #. or password
 #: js/ui/status/network.js:1422
 msgid "authentication required"
-msgstr "memerlukan otentikasi"
+msgstr "diperlukan otentikasi"
 
 #: js/ui/status/network.js:1424
 msgid "connection failed"
@@ -2315,25 +2316,25 @@ msgstr "Volume"
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:21
 msgid "Mirror"
-msgstr ""
+msgstr "Kembar"
 
 #. Translators: this is for the desktop spanning displays.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:26
 msgid "Join Displays"
-msgstr ""
+msgstr "Gabung Layar"
 
 #. Translators: this is for using only an external display.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:31
 msgid "External Only"
-msgstr ""
+msgstr "Hanya Eksternal"
 
 #. Translators: this is for using only the laptop display.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:36
 msgid "Built-in Only"
-msgstr ""
+msgstr "Hanya Bawaan"
 
 #: js/ui/unlockDialog.js:67
 msgid "Log in as another user"
@@ -2354,13 +2355,13 @@ msgstr "'%s' siap"
 
 #: js/ui/windowManager.js:80
 msgid "Do you want to keep these display settings?"
-msgstr "Apakah Anda ingin menyimpan pengaturan display ini?"
+msgstr "Apakah Anda ingin mempertahankan pengaturan tampilan ini?"
 
 #. Translators: this and the following message should be limited in lenght,
 #. to avoid ellipsizing the labels.
 #: js/ui/windowManager.js:92
 msgid "Revert Settings"
-msgstr "Kembalikan Pengaturan"
+msgstr "Balikkan Tatanan"
 
 #: js/ui/windowManager.js:95
 msgid "Keep Changes"
@@ -2370,7 +2371,7 @@ msgstr "Simpan Perubahan"
 #, javascript-format
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
-msgstr[0] "Perubahan pengaturan akan dikembalikan ke sebelumnya dalam %d detik"
+msgstr[0] "Perubahan tatanan akan dikembalikan dalam %d detik"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
@@ -2385,7 +2386,7 @@ msgstr "Minimalkan"
 
 #: js/ui/windowMenu.js:41
 msgid "Unmaximize"
-msgstr "Jangan Maksimalkan"
+msgstr "Tak Maksimalkan"
 
 #: js/ui/windowMenu.js:45
 msgid "Maximize"
@@ -2401,39 +2402,39 @@ msgstr "Ubah Ukuran"
 
 #: js/ui/windowMenu.js:65
 msgid "Move Titlebar Onscreen"
-msgstr "Pindahkan Kolom Judul Pada Layar"
+msgstr "Pindahkan Bilah Judul Pada Layar"
 
 #: js/ui/windowMenu.js:70
 msgid "Always on Top"
-msgstr "Selalu di Atas"
+msgstr "Selalu di Puncak"
 
 #: js/ui/windowMenu.js:89
 msgid "Always on Visible Workspace"
-msgstr "Selalu pada Layar Kerja yang Tampak"
+msgstr "Selalu pada Ruang Kerja yang Tampak"
 
 #: js/ui/windowMenu.js:103
 msgid "Move to Workspace Left"
-msgstr "Pindahkan ke Layar Kerja Kiri"
+msgstr "Pindah ke Ruang Kerja Kiri"
 
 #: js/ui/windowMenu.js:108
 msgid "Move to Workspace Right"
-msgstr "Pindahkan ke Layar Kerja Kanan"
+msgstr "Pindah ke Ruang Kerja Kanan"
 
 #: js/ui/windowMenu.js:113
 msgid "Move to Workspace Up"
-msgstr "Pindahkan ke Layar Kerja Atas"
+msgstr "Pindah ke Ruang Kerja Atas"
 
 #: js/ui/windowMenu.js:118
 msgid "Move to Workspace Down"
-msgstr "Pindahkan ke Layar Kerja Bawah"
+msgstr "Pindah ke Ruang Kerja Bawah"
 
 #: js/ui/windowMenu.js:134
 msgid "Move to Monitor Up"
-msgstr "Pindahkan ke Monitor Atas"
+msgstr "Pindah ke Ruang Kerja Atas"
 
 #: js/ui/windowMenu.js:140
 msgid "Move to Monitor Down"
-msgstr "Pindahkan ke Monitor Bawah"
+msgstr "Pindah ke Ruang Kerja Bawah"
 
 #: js/ui/windowMenu.js:146
 msgid "Move to Monitor Left"
@@ -2445,7 +2446,7 @@ msgstr "Pindahkan ke Monitor Kanan"
 
 #: src/calendar-server/evolution-calendar.desktop.in:3
 msgid "Evolution Calendar"
-msgstr "Kalender Evolution"
+msgstr "Evolution Kalender"
 
 #. Translators: Do NOT translate or transliterate this text (this is an icon
 #. file name)!
@@ -2455,19 +2456,19 @@ msgstr "evolution"
 
 #: src/main.c:437
 msgid "Print version"
-msgstr "Versi cetak"
+msgstr "Versi Cetak"
 
 #: src/main.c:443
 msgid "Mode used by GDM for login screen"
-msgstr "Mode yang dipakai oleh GDM untuk layar login"
+msgstr "Mode yang dipakai oleh layar log masuk GDM"
 
 #: src/main.c:449
 msgid "Use a specific mode, e.g. “gdm” for login screen"
-msgstr "Menggunakan mode tertentu, misalnya \"gdm\" untuk layar login"
+msgstr "Menggunakan mode tertentu, mis. \"gdm\" untuk layar masuk"
 
 #: src/main.c:455
 msgid "List possible modes"
-msgstr "Menampilkan mode yang ada"
+msgstr "Menampilkan mode yang mungkin"
 
 #: src/shell-app.c:271
 msgctxt "program"
@@ -2481,11 +2482,11 @@ msgstr "Gagal meluncurkan \"%s\""
 
 #: src/shell-keyring-prompt.c:730
 msgid "Passwords do not match."
-msgstr "Kata sandi tidak cocok."
+msgstr "Sandi tidak cocok."
 
 #: src/shell-keyring-prompt.c:738
 msgid "Password cannot be blank"
-msgstr "Kata sandi tidak boleh kosong"
+msgstr "Sandi tidak boleh kosong"
 
 #: src/shell-polkit-authentication-agent.c:353
 msgid "Authentication dialog was dismissed by the user"
@@ -2497,7 +2498,7 @@ msgstr "Dialog otentikasi ditolak oleh pengguna"
 #, c-format
 msgid "%u Output"
 msgid_plural "%u Outputs"
-msgstr[0] "%u Output"
+msgstr[0] "%u Keluaran"
 
 #. translators:
 #. * The number of sound inputs on a particular device
@@ -2505,7 +2506,7 @@ msgstr[0] "%u Output"
 #, c-format
 msgid "%u Input"
 msgid_plural "%u Inputs"
-msgstr[0] "%u Input"
+msgstr[0] "%u Masukan"
 
 #: subprojects/gvc/gvc-mixer-control.c:2738
 msgid "System Sounds"
