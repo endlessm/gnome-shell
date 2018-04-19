@@ -569,6 +569,26 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
       g_hash_table_insert (self->priv->starting_apps, g_object_ref (app), NULL);
       break;
     case SHELL_APP_STATE_STOPPED:
+      /* Applications associated to multiple .desktop files (e.g. gnome-control-center)
+       * will create different ShellApp instances during the startup process when not
+       * launched via the main .desktop file: one initial instance for the .desktop file
+       * originally launched (that will end up in the starting_apps table) and a different
+       * one associated to the main .desktop file for the application.
+       *
+       * Thus, we can not rely on the initial ShellApp being removed from the starting_apps
+       * table in the SHELL_APP_STATE_RUNNING case above because the instance will be different
+       * than the one being added to running_apps, resulting in a rogue ShellApp instance being
+       * kept forever in the starting_apps table, that will confuse the shell.
+       *
+       * The solution is to make sure that we remove that rogue ShellApp instance from the
+       * starting_apps table, if needed, when moving to SHELL_APP_STATE_STOPPED, since that
+       * state change will be enforced from _shell_app_handle_startup_sequence() for this kind
+       * of apps launched from a secondary .desktop file, before moving the real ShellApp instance
+       * into the running state.
+       */
+      if (g_hash_table_contains (self->priv->starting_apps, app))
+        g_hash_table_remove (self->priv->starting_apps, app);
+
       if (g_hash_table_remove (self->priv->running_apps, app) && app_info_id != NULL)
         {
           emtr_event_recorder_record_stop (emtr_event_recorder_get_default (),
