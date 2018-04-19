@@ -28,7 +28,10 @@ var EditableLabel = new Lang.Class({
         this.clutter_text.editable = false;
         this.clutter_text.selectable = false;
         this.clutter_text.x_align = Clutter.ActorAlign.CENTER;
+        this.clutter_text.y_align = Clutter.ActorAlign.CENTER;
         this.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+        this.clutter_text.line_wrap = true;
+        this.clutter_text.single_line_mode = false;
 
         this.clutter_text.bind_property('editable', this.clutter_text, 'selectable',
             GObject.BindingFlags.BIDIRECTIONAL | GObject.BindingFlags.SYNC_CREATE);
@@ -146,6 +149,8 @@ var EditableLabel = new Lang.Class({
         this.clutter_text.editable = true;
         this.clutter_text.cursor_position = 0;
         this.clutter_text.selection_bound = text.length;
+        this.clutter_text.line_wrap = false;
+        this.clutter_text.single_line_mode = true;
 
         // save the current contents of the label, in case we
         // need to roll back
@@ -176,6 +181,9 @@ var EditableLabel = new Lang.Class({
         // programmatically (without a click in another actor) didn't
         // apparently remove it
         this.remove_style_pseudo_class('focus');
+
+        this.clutter_text.line_wrap = true;
+        this.clutter_text.single_line_mode = false;
     },
 
     _cancelEditing: function() {

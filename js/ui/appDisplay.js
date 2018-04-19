@@ -2240,16 +2240,20 @@ var FolderIcon = new Lang.Class({
         let iconParams = { createIcon: this._createIcon.bind(this),
                            setSizeManually: false,
                            editable: true };
-        this.name = '';
+        this.name = dirInfo.get_name();
         this._parentView = parentView;
 
         this.id = dirInfo.get_id();
         this._dirInfo = dirInfo;
-        this._name = this._dirInfo.get_name();
 
         this.parent(viewIconParams, buttonParams, iconParams);
         this.actor.add_style_class_name('app-folder');
-        this.actor.set_child(this.icon.actor);
+
+        this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
+                                              x_expand: true, y_expand: true });
+        this._iconContainer.add_child(this.icon.actor);
+
+        this.actor.set_child(this._iconContainer);
 
         // whether we need to update arrow side, position etc.
         this._popupInvalidated = false;
@@ -2272,7 +2276,7 @@ var FolderIcon = new Lang.Class({
     },
 
     getName: function() {
-        return this._name;
+        return this.name;
     },
 
     getIcon: function() {

@@ -428,8 +428,9 @@ popup-separator-menu-item {
 %app-well-icon {
     width: 118px;
     height: 118px;
-    padding: 6px 1px 6px 1px;
     spacing: 4px;
+    padding-top: 12px;
+    padding-bottom: 0px;
 }
 
 .app-well-app {
@@ -451,19 +452,20 @@ popup-separator-menu-item {
     }
 }
 
+/* Need to declare this one outside of .app-folder for DnD */
+.app-folder-icon {
+    border-radius: 12px;
+    background: rgba(23, 25, 26, 0.3);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
 .app-folder,
 .app-well-app.app-folder {
     /* Avoid folder popups being positioned too far away */
     width: 118px;
     height: 118px;
 
-    .app-folder-icon {
-        border-radius: 12px;
-        background: rgba(23, 25, 26, 0.3);
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
-    }
-
-    & > .overview-icon,
+    & .overview-icon,
     &:active .overview-icon,
     &:checked .overview-icon {
         @extend %app-well-icon;
@@ -487,7 +489,7 @@ popup-separator-menu-item {
 
 %overview-icon {
     icon-size: 64px;
-    spacing: 8px;
+    spacing: 0px;
     border-radius: 15px;
     font-weight: bold;
     text-align: center;
@@ -511,8 +513,14 @@ popup-separator-menu-item {
   margin-bottom: 12px;
 }
 
-.overview-icon.dnd {
-    @extend %overview-icon;
+.overview-icon.dnd
+ {
+     @extend %overview-icon;
+     padding-right: 6px;
+     padding-left: 6px;
+     width: 104px;
+
+     & .overview-icon-label { padding: 0px; }
 }
 
 // Desktop Search (text entry widget)
@@ -602,8 +610,9 @@ popup-separator-menu-item {
     .overview-icon-label {
         @extend %search-label-main;
         @extend %search-label-color;
+        width: 118px;
+        height: 20px;
         text-shadow: none;
-        width: 100px;
     }
 
     #searchResultsContent {
@@ -796,6 +805,7 @@ popup-separator-menu-item {
 .overview-icon-label {
     padding: 4px 0 4px 0;
     width: 118px;
+    height: 40px;
     text-shadow: black 0px 2px 2px;
 
     border: none;
@@ -813,6 +823,9 @@ popup-separator-menu-item {
 
         box-shadow: inset 0px 1px 2px rgba(0,0,0,0.6);
         text-shadow: none;
+
+        margin: 10px 0px;
+        height: 20px;
     }
 
     &:highlighted,
