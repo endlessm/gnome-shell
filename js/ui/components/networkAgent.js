@@ -155,41 +155,28 @@ var NetworkSecretDialog = new Lang.Class({
         let separator = new St.Widget({ style_class: 'popup-separator-menu-item',
                                         y_expand: true,
                                         y_align: Clutter.ActorAlign.CENTER });
-        updatesLayout.attach(separator, 0, 0, 3, 1);
-
-        // Icon
-        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/endless-auto-updates-on-symbolic.svg');
-        let gicon = new Gio.FileIcon({ file: iconFile });
-        let icon = new St.Icon({ gicon: gicon,
-                                 icon_size: 24 });
-        updatesLayout.attach(icon, 0, 1, 1, 1);
+        updatesLayout.attach(separator, 0, 0, 2, 1);
 
         // Translators: this is a question that shows below the Wi-Fi password
         // dialog.
-        let title = new St.Label({ text: _("Is this connection paid or limited?"),
-                                   style_class: 'message-dialog-title',
-                                   x_expand: true,
-                                   x_align: Clutter.ActorAlign.START });
-        updatesLayout.attach(title, 1, 1, 1, 1);
+        this._updatesTitle = new St.Label({ text: _("Limited Data"),
+                                            style_class: 'message-dialog-title',
+                                            x_expand: true,
+                                            x_align: Clutter.ActorAlign.START,
+                                            y_expand: true,
+                                            y_align: Clutter.ActorAlign.END });
+        updatesLayout.attach(this._updatesTitle, 0, 1, 1, 1);
 
         // Subtitle label
-        let subtitle = new St.Label({ style_class: 'message-dialog-body',
-                                      text: _("Enable this option if this connection has usage restrictions, or is paid. This will disable automatic updates."),
-                                      x_align: Clutter.ActorAlign.START,
-                                      y_align: Clutter.ActorAlign.CENTER });
-        subtitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        subtitle.clutter_text.line_wrap = true;
-        subtitle.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+        this._updatesSubtitle = new St.Label({ style_class: 'message-dialog-body',
+                                               text: _("Enable if your connection has limits on how much you can download."),
+                                               x_align: Clutter.ActorAlign.START,
+                                               y_align: Clutter.ActorAlign.CENTER });
+        this._updatesSubtitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._updatesSubtitle.clutter_text.line_wrap = true;
+        this._updatesSubtitle.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
 
-        updatesLayout.attach(subtitle, 0, 2, 2, 2);
-
-        // Translators: this is the "answer" to the "Is this connection
-        // paid or limited?" question.
-        this._answerLabel = new St.Label({ text: _("Yes"),
-                                           style_class: 'message-dialog-title',
-                                           x_expand: true,
-                                           x_align: Clutter.ActorAlign.CENTER });
-        updatesLayout.attach(this._answerLabel, 2, 1, 1, 1);
+        updatesLayout.attach(this._updatesSubtitle, 0, 2, 1, 1);
 
         // Toggle button
         this._updatesToggle = new St.Button({ style_class: 'toggle-switch',
@@ -206,13 +193,17 @@ var NetworkSecretDialog = new Lang.Class({
         // simply result in invisible toggle switches.
         this._updatesToggle.add_style_class_name(_("toggle-switch-us"));
 
-        updatesLayout.attach(this._updatesToggle, 2, 2, 1, 1);
+        updatesLayout.attach(this._updatesToggle, 1, 1, 1, 1);
         updatesTable.visible = true;
 
         this._updatesToggle.connect('notify::checked', () => {
-            // Translators: this is the "answer" to the "Is this connection
-            // paid or limited?" question.
-            this._answerLabel.text = this._updatesToggle.checked ? _("Yes") : _("No");
+            if (this._updatesToggle.checked) {
+                this._updatesTitle.text = _("Limited Data");
+                this._updatesSubtitle.text = _("Enable if your connection has limits on how much you can download.");
+            } else {
+                this._updatesTitle.text = _("Unlimited Data");
+                this._updatesSubtitle.text = _("This connection doesn't have limits on how much you can download.");
+            }
         });
 
         this._updatesToggle.checked = this._getDefaultMeteredValue(connection);
@@ -228,7 +219,7 @@ var NetworkSecretDialog = new Lang.Class({
         if (userSetting) {
             let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED);
             if (allowDownloads)
-                defaultValue = allowDownloads === '1';
+                defaultValue = (allowDownloads === '0');
         }
 
         // If no value was already set before, assume the value from the
@@ -457,8 +448,8 @@ var NetworkSecretDialog = new Lang.Class({
         case '802-11-wireless':
             wirelessSetting = this._connection.get_setting_wireless();
             ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
-            content.title = _("Enter the password for “%s”").format(ssid);
-            content.message = _("Passwords or encryption keys are required to access the wireless network “%s”.").format(ssid);
+            content.title = _("Enter the Wi-Fi password for “%s”").format(ssid);
+            content.message = null;
             this._getWirelessSecrets(content.secrets, wirelessSetting);
             break;
         case '802-3-ethernet':
