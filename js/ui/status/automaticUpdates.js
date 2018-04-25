@@ -35,7 +35,7 @@ const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
-const NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED = 'connection.allow-downloads-when-metered';
+const NM_SETTING_ALLOW_DOWNLOADS = 'connection.allow-downloads';
 const NM_SETTING_TARIFF_ENABLED = "connection.tariff-enabled";
 
 const SchedulerInterface = '\
@@ -153,7 +153,7 @@ var Indicator = new Lang.Class({
 
         // Update the current active connection. This will connect to the
         // NM.SettingUser signal to sync every time someone updates the
-        // NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED setting.
+        // NM_SETTING_ALLOW_DOWNLOADS setting.
         this._updateActiveConnection();
 
         // Toggle item name
@@ -209,10 +209,10 @@ var Indicator = new Lang.Class({
 
         // The string representation here is the oposite of the value
         let value = '0';
-        if (userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED) != '1')
+        if (userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS) != '1')
             value = '1';
 
-        userSetting.set_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED, value);
+        userSetting.set_data(NM_SETTING_ALLOW_DOWNLOADS, value);
 
         this._activeConnection.commit_changes_async(true, null, (con, res, data) => {
             this._activeConnection.commit_changes_finish(res);
@@ -261,7 +261,7 @@ var Indicator = new Lang.Class({
         //  * A schedule was set
         //  * Something is being downloaded
 
-        let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED) === '1';
+        let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS) === '1';
         if (!allowDownloads)
             return AutomaticUpdatesState.DISABLED;
 

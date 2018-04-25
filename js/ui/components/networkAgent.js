@@ -22,7 +22,7 @@ const ShellEntry = imports.ui.shellEntry;
 
 const VPN_UI_GROUP = 'VPN Plugin UI';
 
-const NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED = 'connection.allow-downloads-when-metered';
+const NM_SETTING_ALLOW_DOWNLOADS = 'connection.allow-downloads';
 
 var NetworkSecretDialog = new Lang.Class({
     Name: 'NetworkSecretDialog',
@@ -217,7 +217,7 @@ var NetworkSecretDialog = new Lang.Class({
         // Try to use the current value
         let userSetting = connection.get_setting(NM.SettingUser.$gtype);
         if (userSetting) {
-            let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED);
+            let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS);
             if (allowDownloads)
                 defaultValue = (allowDownloads === '0');
         }
@@ -289,7 +289,7 @@ var NetworkSecretDialog = new Lang.Class({
             remoteConnection.add_setting(userSetting);
         }
 
-        userSetting.set_data(NM_SETTING_ALLOW_DOWNLOADS_WHEN_METERED, isMeteredConnection ? '0' : '1');
+        userSetting.set_data(NM_SETTING_ALLOW_DOWNLOADS, isMeteredConnection ? '0' : '1');
 
         // And also the Metered connection
         let connectionSetting = remoteConnection.get_setting_connection();
