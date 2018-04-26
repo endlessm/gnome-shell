@@ -32,9 +32,11 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
+const NM_SETTING_AUTOMATIC_UPDATES_NOTIFICATION_TIME = "connection.automatic-updates-notification-time";
 const NM_SETTING_ALLOW_DOWNLOADS = 'connection.allow-downloads';
 const NM_SETTING_TARIFF_ENABLED = "connection.tariff-enabled";
 
@@ -85,6 +87,8 @@ var Indicator = new Lang.Class({
         this.parent();
 
         this._indicator = this._addIndicator();
+        this._indicator.visible = false;
+
         this._item = new PopupMenu.PopupSubMenuMenuItem("", true);
         this._toggleItem = this._item.menu.addAction("", this._toggleAutomaticUpdates.bind(this));
         this._item.menu.addAction(_("Updates Queue…"), () => {
@@ -112,6 +116,10 @@ var Indicator = new Lang.Class({
 
         this._activeConnection = null;
         this._settingChangedSignalId = 0;
+        this._updateTimeoutId = 0;
+        this._notification = null;
+
+        this._state = AutomaticUpdatesState.UNKNOWN;
 
         NM.Client.new_async(null, this._clientGot.bind(this));
     },
@@ -119,10 +127,7 @@ var Indicator = new Lang.Class({
     _clientGot: function(obj, result) {
         this._client = NM.Client.new_finish(result);
 
-        this._client.connect('notify::activating-connection', this._sync.bind(this));
         this._client.connect('notify::primary-connection', this._sync.bind(this));
-
-        this._sync();
 
         Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
@@ -138,8 +143,10 @@ var Indicator = new Lang.Class({
                                               }
                                               this._proxy.connect('g-properties-changed',
                                                                   this._sync.bind(this));
-                                              this._sync();
+                                              this._updateStatus();
                                           });
+
+        this._sync();
     },
 
     _sessionUpdated: function() {
@@ -151,6 +158,31 @@ var Indicator = new Lang.Class({
         if (!this._client || !this._proxy)
             return;
 
+        if (this._updateTimeoutId > 0) {
+            GLib.source_remove(this._updateTimeoutId);
+            this._updateTimeoutId = 0;
+        }
+
+        // When disconnected, don't timeout before updating
+        if (!this._getActiveConnection()) {
+            this._updateStatus();
+            return;
+        }
+
+        // Use a timeout to avoid instantly throwing the notification at
+        // the user's face, and to avoid a series of unecessary updates
+        // that happen when NetworkManager is still figuring out details.
+        this._updateTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                                                         4,
+                                                         () => {
+                                                            this._updateStatus();
+                                                            this._updateTimeoutId = 0;
+                                                            return GLib.SOURCE_REMOVE;
+                                                         });
+        GLib.Source.set_name_by_id(this._updateTimeoutId, '[automaticUpdates] updateStatus');
+    },
+
+    _updateStatus: function() {
         // Update the current active connection. This will connect to the
         // NM.SettingUser signal to sync every time someone updates the
         // NM_SETTING_ALLOW_DOWNLOADS setting.
@@ -171,6 +203,8 @@ var Indicator = new Lang.Class({
 
         // The status label
         this._item.label.text = _("Automatic Updates");
+
+        this._state = this._getState();
     },
 
     _updateActiveConnection: function() {
@@ -187,9 +221,86 @@ var Indicator = new Lang.Class({
 
         this._activeConnection = currentActiveConnection;
 
+        // Maybe send a notification if the connection changed and
+        // with it, the automatic updates setting
+        this._updateNotification();
+
         // Connect from the current active connection
         if (currentActiveConnection)
-            this._settingChangedSignalId = currentActiveConnection.connect('changed', this._sync.bind(this));
+            this._settingChangedSignalId = currentActiveConnection.connect('changed', this._updateStatus.bind(this));
+    },
+
+    _updateNotification: function() {
+        // Only notify when in an regular session, not in GDM or initial-setup.
+        if (Main.sessionMode.currentMode != 'user' &&
+            Main.sessionMode.currentMode != 'user-coding') {
+            return;
+        }
+
+        // Also don't notify when starting up
+        if (this._state == AutomaticUpdatesState.UNKNOWN)
+            return;
+
+        let alreadySentNotification = this._alreadySentNotification();
+        let newState = this._getState();
+
+        let wasDisconnected = this._state == AutomaticUpdatesState.DISCONNECTED;
+        let wasActive = this._state >= AutomaticUpdatesState.IDLE;
+        let isActive = newState >= AutomaticUpdatesState.IDLE;
+
+        // The criteria to notify about the Automatic Updates setting is:
+        //   1. If the user was disconnected and connects to a new network; or
+        //   2. If the user was connected and connects to a network with different status;
+        if ((wasDisconnected && alreadySentNotification) || (!wasDisconnected && isActive == wasActive))
+            return;
+
+        if (this._notification)
+            this._notification.destroy();
+
+        if (newState == AutomaticUpdatesState.DISCONNECTED)
+            return;
+
+        let source = new MessageTray.SystemNotificationSource();
+        Main.messageTray.add(source);
+
+        // Figure out the title, subtitle and icon
+        let title, subtitle, iconFile;
+
+        if (isActive) {
+            title = _("Automatic updates on");
+            subtitle = _("You have Unlimited Data so automatic updates have been turned on for this connection.");
+            iconFile = automaticUpdatesStateToString(AutomaticUpdatesState.IDLE);
+        } else {
+            title = _("Automatic updates are turned off to save your data");
+            subtitle = _("You will need to choose which Endless updates to apply when on this connection.");
+            iconFile = automaticUpdatesStateToString(AutomaticUpdatesState.DISABLED);
+        }
+
+        let gicon = new Gio.FileIcon({ file: Gio.File.new_for_uri(iconFile) });
+
+        // Create the notification
+        this._notification = new MessageTray.Notification(source, title, subtitle, { gicon: gicon });
+        this._notification.setUrgency(MessageTray.Urgency.NORMAL);
+        this._notification.setTransient(false);
+
+        this._notification.addAction(_("Change Settings…"), () => {
+            let app = Shell.AppSystem.get_default().lookup_app('gnome-updates-panel.desktop');
+            Main.overview.hide();
+            app.activate();
+        });
+
+        source.notify(this._notification);
+
+        this._notification.connect('destroy', () => {
+            this._notification = null;
+        });
+
+        // Now that we first detected this connection, mark it as such
+        let userSetting = this._ensureUserSetting(this._activeConnection);
+        userSetting.set_data(NM_SETTING_AUTOMATIC_UPDATES_NOTIFICATION_TIME,
+                             '{}'.format(GLib.get_real_time()));
+
+        this._activeConnection.commit_changes(true, null);
     },
 
     _updateAutomaticUpdatesItem: function() {
@@ -216,7 +327,7 @@ var Indicator = new Lang.Class({
 
         this._activeConnection.commit_changes_async(true, null, (con, res, data) => {
             this._activeConnection.commit_changes_finish(res);
-            this._sync();
+            this._updateStatus();
         });
     },
 
@@ -248,7 +359,6 @@ var Indicator = new Lang.Class({
         this._item.actor.visible = (state != AutomaticUpdatesState.DISCONNECTED);
         this._indicator.visible = (state == AutomaticUpdatesState.DOWNLOADING);
     },
-
 
     _getState: function() {
         if (!this._activeConnection)
@@ -286,12 +396,22 @@ var Indicator = new Lang.Class({
             return AutomaticUpdatesState.IDLE;
     },
 
+    _alreadySentNotification: function() {
+        let connection = this._getActiveConnection();
+
+        if (!connection)
+            return false;
+
+        let userSetting = connection.get_setting(NM.SettingUser.$gtype);
+
+        if (!userSetting)
+            return false;
+
+        return userSetting.get_data(NM_SETTING_AUTOMATIC_UPDATES_NOTIFICATION_TIME) != null;
+    },
+
     _getActiveConnection: function() {
         let activeConnection = this._client.get_primary_connection();
-
-        if (!activeConnection)
-            activeConnection = this._client.get_activating_connection();
-
         return activeConnection ? activeConnection.get_connection() : null;
     }
 });
