@@ -9,14 +9,15 @@
 # Khaled Hosny <khaledhosny@eglug.org>, 2009-2017
 # Muhammed Abdulaziz <thenubianmuha_idrecy@yahoo.co.uk>, 2012
 # Muhammed Abdulaziz <thenubianmuha_idrecy@yahoo.co.uk>, 2012
+# Oussama Nehar <nehardido@gmail.com>, 2018
 # Roddy Shuler <roddy@endlessm.com>, 2014-2015,2017-2018
 # Yasmin Diab <yasmin.diab.lopez@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-19 13:37-0700\n"
-"PO-Revision-Date: 2018-04-19 20:58+0000\n"
+"POT-Creation-Date: 2018-04-27 14:07-0700\n"
+"PO-Revision-Date: 2018-04-27 21:10+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-os/gnome-shell/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -203,14 +204,14 @@ msgstr "يسمح هذا بتعديل وتشغيل القائمة البيضاء 
 
 #: data/org.gnome.shell.gschema.xml.in:144
 msgid "Whether the Tray Area will be enabled"
-msgstr ""
+msgstr "ما إذا كان سيتم تمكين منطقة الدرج"
 
 #: data/org.gnome.shell.gschema.xml.in:147
 msgid ""
 "This enables an area on the right side of the bottom panel where the icons "
 "for those applications still relying on the tray area will display their "
 "status icons (e.g. Steam, Dropbox, Skype...)."
-msgstr ""
+msgstr "هذا يفعل تلك المنطقة على الجانب الأيمن من اللوحة السفلية حيث ستعرض التطبيقات التي لا تزال تعتمد على منطقة الدرج أيوقونات الحالة الخاصة بها (مثل Steam و Dropbox و Skype ...)."
 
 #: data/org.gnome.shell.gschema.xml.in:155
 msgid "Enables the hot corner for the window picker"
@@ -637,8 +638,8 @@ msgstr "هل نسيت كلمة المرور؟"
 #: js/gdm/authPrompt.js:199 js/ui/audioDeviceSelection.js:71
 #: js/ui/components/networkAgent.js:139 js/ui/components/polkitAgent.js:160
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:197
-#: js/ui/paygUnlockDialog.js:347 js/ui/shellMountOperation.js:353
-#: js/ui/status/network.js:925 js/ui/forceAppExitDialog.js:78
+#: js/ui/forceAppExitDialog.js:78 js/ui/paygUnlockDialog.js:347
+#: js/ui/shellMountOperation.js:353 js/ui/status/network.js:925
 msgid "Cancel"
 msgstr "ألغِ"
 
@@ -1063,6 +1064,27 @@ msgstr "شغل باستخدام بطاقة الرسوميات المنفصلة"
 msgid "Delete"
 msgstr "حذف"
 
+#: js/ui/appIconBar.js:209
+msgid "Other workspaces"
+msgstr "مساحات عمل أخرى"
+
+#: js/ui/appIconBar.js:218
+msgid "Current workspace"
+msgstr "مساحة العمل الحالية "
+
+#: js/ui/appIconBar.js:287
+msgid "Pin to Taskbar"
+msgstr "قُم بالتثبيت إلى شريط المهام"
+
+#: js/ui/appIconBar.js:291
+msgid "Unpin from Taskbar"
+msgstr "إلغاء التثبيت من شريط المهام"
+
+#: js/ui/appIconBar.js:307
+#, javascript-format
+msgid "Quit %s"
+msgstr "إغلاق %s"
+
 #: js/ui/audioDeviceSelection.js:59
 msgid "Select Audio Device"
 msgstr "اختر جهاز صوت"
@@ -1248,7 +1270,7 @@ msgstr "اتصل"
 #. dialog.
 #: js/ui/components/networkAgent.js:162 js/ui/components/networkAgent.js:201
 msgid "Limited Data"
-msgstr ""
+msgstr "بيانات محدودة"
 
 #: js/ui/components/networkAgent.js:172 js/ui/components/networkAgent.js:202
 msgid "Enable if your connection has limits on how much you can download."
@@ -1265,7 +1287,7 @@ msgstr "toggle-switch-intl"
 
 #: js/ui/components/networkAgent.js:204
 msgid "Unlimited Data"
-msgstr ""
+msgstr "بيانات غير محدودة"
 
 #: js/ui/components/networkAgent.js:205
 msgid "This connection doesn't have limits on how much you can download."
@@ -1298,7 +1320,7 @@ msgstr "الخدمة: "
 #: js/ui/components/networkAgent.js:451
 #, javascript-format
 msgid "Enter the Wi-Fi password for “%s”"
-msgstr ""
+msgstr "ادخل الرمز السري لشبكة الواي فاي \"%s\""
 
 #: js/ui/components/networkAgent.js:456 js/ui/components/networkAgent.js:825
 msgid "Wired 802.1X authentication"
@@ -1376,6 +1398,54 @@ msgstr "للأسف لم يُفلح هذا. أعِد المحاولة."
 #, javascript-format
 msgid "%s is now known as %s"
 msgstr "غيّر %s اسمه إلى %s"
+
+#: js/ui/components/updaterManager.js:191
+msgid "Software Update"
+msgstr "تحديث البرامج"
+
+#: js/ui/components/updaterManager.js:206
+msgid "Updates Available"
+msgstr "التحديثات المتوفرة"
+
+#: js/ui/components/updaterManager.js:207
+msgid "Software updates are available for your system"
+msgstr "تتوفر تحديثات برامج لنظامك"
+
+#: js/ui/components/updaterManager.js:208
+msgid "Download Now"
+msgstr "تنزيل الآن"
+
+#: js/ui/components/updaterManager.js:223
+msgid "Updates Ready"
+msgstr "التحديثات جاهزة"
+
+#: js/ui/components/updaterManager.js:224
+msgid "Software updates are ready to be installed on your system"
+msgstr "تحديثات البرامج جاهزة ليتم تثبيتها على النظام الخاص بك"
+
+#: js/ui/components/updaterManager.js:225
+msgid "Install Now"
+msgstr "تثبيت الآن"
+
+#: js/ui/components/updaterManager.js:237
+msgid "Updates Installed"
+msgstr "التحديثات المثبّتة"
+
+#: js/ui/components/updaterManager.js:238
+msgid "Software updates were installed on your system"
+msgstr "تم تثبيت تحديثات البرامج على جهازك"
+
+#: js/ui/components/updaterManager.js:239
+msgid "Restart Now"
+msgstr "أعِد التشغيل الآن"
+
+#: js/ui/components/updaterManager.js:269
+msgid "Update Failed"
+msgstr "فشل تحديث"
+
+#: js/ui/components/updaterManager.js:270
+msgid "We could not update your system"
+msgstr "لم نتمكن من تحديث نظامك"
 
 #: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:635
 msgid "Windows"
@@ -1469,6 +1539,18 @@ msgstr "اتصل بالإنترنت لمعلومات الطقس"
 #: js/ui/dateMenu.js:329
 msgid "Weather information is currently unavailable"
 msgstr "معلومات الطقس غير متاحة حاليًا"
+
+#: js/ui/endlessButton.js:17
+msgid "Endless Button"
+msgstr "زر Endless "
+
+#: js/ui/endlessButton.js:56
+msgid "Show Desktop"
+msgstr "عرض سطح المكتب"
+
+#: js/ui/endlessButton.js:61
+msgid "Show Apps"
+msgstr "عرض التطبيقات"
 
 #: js/ui/endSessionDialog.js:64
 #, javascript-format
@@ -1641,6 +1723,45 @@ msgstr "ثبت"
 msgid "Download and install “%s” from extensions.gnome.org?"
 msgstr "هل تريد تنزيل و تثبيت ”%s“ من extensions.gnome.org؟"
 
+#: js/ui/forceAppExitDialog.js:55
+msgid "Quit applications"
+msgstr "الخروج من التطبيقات"
+
+#: js/ui/forceAppExitDialog.js:61
+msgid ""
+"If an application doesn't respond for a while, select its name and click "
+"Quit Application."
+msgstr "إذا ظل أحد التطبيقات في حالة عدم استجابة لفترة، حدد اسمه وانقر على 'الخروج من التطبيق'."
+
+#: js/ui/forceAppExitDialog.js:84
+msgid "System Monitor"
+msgstr "شاشة النظام"
+
+#: js/ui/forceAppExitDialog.js:88
+msgid "Quit Application"
+msgstr "الخروج من التطبيق"
+
+#: js/ui/hotCorner.js:19
+msgid "Hot Corner"
+msgstr "الركن الساخن"
+
+#: js/ui/hotCorner.js:32
+msgid "Enable Hot Corner"
+msgstr "تمكين الزاوية الساخنة"
+
+#: js/ui/hotCorner.js:36
+msgid "Disable Hot Corner"
+msgstr "تعطيل الزاوية الساخنة"
+
+#: js/ui/iconGridLayout.js:270
+#, javascript-format
+msgid "%s has been deleted"
+msgstr "%s تم حذفه"
+
+#: js/ui/iconGridLayout.js:459
+msgid "New Folder"
+msgstr "مجلد جديد"
+
 #. Translators: %s is an application name like "Settings"
 #: js/ui/inhibitShortcutsDialog.js:59
 #, javascript-format
@@ -1664,6 +1785,23 @@ msgstr "ارفض"
 #: js/ui/inhibitShortcutsDialog.js:80
 msgid "Allow"
 msgstr "اسمح"
+
+#: js/ui/internetSearch.js:73
+#, javascript-format
+msgid "Open \"%s\" in browser"
+msgstr "افتح \"%s\" في مستعرض الإنترنت"
+
+#. Translators: the first %s is the search engine name, and the second
+#. * is the search string. For instance, 'Search Google for "hello"'.
+#: js/ui/internetSearch.js:82
+#, javascript-format
+msgid "Search %s for \"%s\""
+msgstr "بحث %s من أجل \"%s\" "
+
+#: js/ui/internetSearch.js:84
+#, javascript-format
+msgid "Search the internet for \"%s\""
+msgstr "البحث في الإنترنت عن \"%s\" "
 
 #: js/ui/keyboard.js:738 js/ui/status/keyboard.js:837
 msgid "Keyboard"
@@ -1822,11 +1960,11 @@ msgstr ""
 
 #: js/ui/paygUnlockDialog.js:247
 msgid "Enter a new code to unlock your computer:"
-msgstr ""
+msgstr "ادخل رمزاً جديداً لإلغاء قفل حاسوبك:"
 
 #: js/ui/paygUnlockDialog.js:267
 msgid "Don’t have an unlock code? That’s OK!"
-msgstr ""
+msgstr "لا تملك رمز الغاء القفل ؟ لا مشكلة!"
 
 #. The second possible override is to use the template text below
 #. with the contact's name and phone number, if BOTH are present.
@@ -1839,38 +1977,38 @@ msgstr ""
 #. No overrides present, default to fallback text.
 #: js/ui/paygUnlockDialog.js:290
 msgid "Talk to your sales representative to purchase a new code."
-msgstr ""
+msgstr "إتصل بممثل المبيعات الخاص بك لشراء رمزجديد."
 
 #: js/ui/paygUnlockDialog.js:301
 msgid "Unlock Machine"
-msgstr ""
+msgstr "إلغاء قفل الجهاز"
 
 #: js/ui/paygUnlockDialog.js:451
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد لحظات %s."
+msgstr[1] "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد دقيقة واحدة %s."
+msgstr[2] "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد دقيقتين %s."
+msgstr[3] "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد %s دقائق."
+msgstr[4] "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد %s دقائق."
+msgstr[5] "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد %s دقائق."
 
 #: js/ui/paygUnlockDialog.js:455
 msgid "Too many attempts. Try again in a few seconds."
-msgstr ""
+msgstr "العديد من المحاولات الفاشلة. يرجى إعادة المحاولة بعد لحظات."
 
 #: js/ui/paygUnlockDialog.js:474
 msgid "Invalid code. Please try again."
-msgstr ""
+msgstr "الرمز خاطئ. من فضلك حاول مرة أُخرى"
 
 #: js/ui/paygUnlockDialog.js:476
 msgid "Code already used. Please enter a new code."
-msgstr ""
+msgstr "الرمز مستخدم من قبل. يرجى إدخال رمز جديد."
 
 #: js/ui/paygUnlockDialog.js:478
 msgid "Time exceeded while verifying the code"
-msgstr ""
+msgstr "تم تجاوز الوقت المسموح أثناء التحقق من الرمز."
 
 #. We don't consider any other error here (and we don't consider DISABLED
 #. explicitly,
@@ -1878,7 +2016,7 @@ msgstr ""
 #. user.
 #: js/ui/paygUnlockDialog.js:482
 msgid "Unknown error"
-msgstr ""
+msgstr "خطأ غير معروف"
 
 #: js/ui/runDialog.js:71
 msgid "Enter a Command"
@@ -2031,6 +2169,56 @@ msgstr "تباين عال"
 msgid "Large Text"
 msgstr "نص كبير"
 
+#: js/ui/status/automaticUpdates.js:94
+msgid "Updates Queue…"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:114
+msgid "Set a Schedule…"
+msgstr ""
+
+#. The status label
+#: js/ui/status/automaticUpdates.js:205
+msgid "Automatic Updates"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:270
+msgid "Automatic updates on"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:271
+msgid ""
+"You have Unlimited Data so automatic updates have been turned on for this "
+"connection."
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:274
+msgid "Automatic updates are turned off to save your data"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:275
+msgid ""
+"You will need to choose which Endless updates to apply when on this "
+"connection."
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:286
+msgid "Change Settings…"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:310 js/ui/status/bluetooth.js:146
+#: js/ui/status/network.js:1287
+msgid "Turn On"
+msgstr "شغّل"
+
+#: js/ui/status/automaticUpdates.js:312 js/ui/status/bluetooth.js:146
+#: js/ui/status/network.js:154 js/ui/status/network.js:339
+#: js/ui/status/network.js:1287 js/ui/status/network.js:1402
+#: js/ui/status/nightLight.js:47 js/ui/status/rfkill.js:90
+#: js/ui/status/rfkill.js:117
+msgid "Turn Off"
+msgstr "أوقف"
+
 #: js/ui/status/bluetooth.js:48
 msgid "Bluetooth"
 msgstr "بلوتوث"
@@ -2052,27 +2240,20 @@ msgstr[4] "%d مُتصل"
 msgstr[5] "%d مُتصل"
 
 #: js/ui/status/bluetooth.js:142
-msgid "Off"
-msgstr "مغلق"
+msgid "Bluetooth Off"
+msgstr ""
 
 #: js/ui/status/bluetooth.js:144
-msgid "On"
-msgstr "مفعّل"
-
-#: js/ui/status/bluetooth.js:146 js/ui/status/network.js:1287
-msgid "Turn On"
-msgstr "شغّل"
-
-#: js/ui/status/bluetooth.js:146 js/ui/status/network.js:154
-#: js/ui/status/network.js:339 js/ui/status/network.js:1287
-#: js/ui/status/network.js:1402 js/ui/status/nightLight.js:47
-#: js/ui/status/rfkill.js:90 js/ui/status/rfkill.js:117
-msgid "Turn Off"
-msgstr "أوقف"
+msgid "Bluetooth On"
+msgstr ""
 
 #: js/ui/status/brightness.js:44
 msgid "Brightness"
 msgstr "السطوع"
+
+#: js/ui/status/codingGame.js:20
+msgid "Coding"
+msgstr "الترميز"
 
 #: js/ui/status/keyboard.js:862
 msgid "Show Keyboard Layout"
@@ -2355,6 +2536,10 @@ msgstr "استكمل"
 msgid "Disable Until Tomorrow"
 msgstr "أوقف حتى الغد"
 
+#: js/ui/status/orientation.js:49
+msgid "Orientation Lock"
+msgstr "قفل الاتجاه"
+
 #: js/ui/status/power.js:61
 msgid "Power Settings"
 msgstr "إعدادات الطاقة"
@@ -2452,6 +2637,18 @@ msgstr "لِج كمستخدم آخر"
 #: js/ui/unlockDialog.js:84
 msgid "Unlock Window"
 msgstr "افتح قفل النافذة"
+
+#: js/ui/userMenu.js:22
+msgid "Social Accounts"
+msgstr "حسابات اجتماعية"
+
+#: js/ui/userMenu.js:25
+msgid "Settings"
+msgstr "الإعدادات"
+
+#: js/ui/userMenu.js:30
+msgid "Help"
+msgstr "المساعدة"
 
 #: js/ui/viewSelector.js:639
 msgid "Applications"
@@ -2594,6 +2791,15 @@ msgstr "غير معروف"
 msgid "Failed to launch “%s”"
 msgstr "فشل تشغيل ”%s“"
 
+#: src/shell-desktop-dir-info.c:485
+msgid "Unnamed"
+msgstr "مجهول"
+
+#: src/shell-desktop-dir-info.c:745
+#, c-format
+msgid "Custom definition for %s"
+msgstr "تعريف مخصص ل%s"
+
 #: src/shell-keyring-prompt.c:730
 msgid "Passwords do not match."
 msgstr "لا تتطابق كلمتا السر."
@@ -2635,169 +2841,3 @@ msgstr[5] "%u مدخل"
 #: subprojects/gvc/gvc-mixer-control.c:2738
 msgid "System Sounds"
 msgstr "أصوات النظام"
-
-#: js/ui/appIconBar.js:209
-msgid "Other workspaces"
-msgstr "مساحات عمل أخرى"
-
-#: js/ui/appIconBar.js:218
-msgid "Current workspace"
-msgstr "مساحة العمل الحالية "
-
-#: js/ui/appIconBar.js:287
-msgid "Pin to Taskbar"
-msgstr "قُم بالتثبيت إلى شريط المهام"
-
-#: js/ui/appIconBar.js:291
-msgid "Unpin from Taskbar"
-msgstr "إلغاء التثبيت من شريط المهام"
-
-#: js/ui/appIconBar.js:307
-#, javascript-format
-msgid "Quit %s"
-msgstr "إغلاق %s"
-
-#: js/ui/components/updaterManager.js:191
-msgid "Software Update"
-msgstr "تحديث البرامج"
-
-#: js/ui/components/updaterManager.js:206
-msgid "Updates Available"
-msgstr "التحديثات المتوفرة"
-
-#: js/ui/components/updaterManager.js:207
-msgid "Software updates are available for your system"
-msgstr "تتوفر تحديثات برامج لنظامك"
-
-#: js/ui/components/updaterManager.js:208
-msgid "Download Now"
-msgstr "تنزيل الآن"
-
-#: js/ui/components/updaterManager.js:223
-msgid "Updates Ready"
-msgstr "التحديثات جاهزة"
-
-#: js/ui/components/updaterManager.js:224
-msgid "Software updates are ready to be installed on your system"
-msgstr "تحديثات البرامج جاهزة ليتم تثبيتها على النظام الخاص بك"
-
-#: js/ui/components/updaterManager.js:225
-msgid "Install Now"
-msgstr "تثبيت الآن"
-
-#: js/ui/components/updaterManager.js:237
-msgid "Updates Installed"
-msgstr "التحديثات المثبّتة"
-
-#: js/ui/components/updaterManager.js:238
-msgid "Software updates were installed on your system"
-msgstr "تم تثبيت تحديثات البرامج على جهازك"
-
-#: js/ui/components/updaterManager.js:239
-msgid "Restart Now"
-msgstr "أعِد التشغيل الآن"
-
-#: js/ui/components/updaterManager.js:269
-msgid "Update Failed"
-msgstr "فشل تحديث"
-
-#: js/ui/components/updaterManager.js:270
-msgid "We could not update your system"
-msgstr "لم نتمكن من تحديث نظامك"
-
-#: js/ui/endlessButton.js:17
-msgid "Endless Button"
-msgstr "زر Endless "
-
-#: js/ui/endlessButton.js:56
-msgid "Show Desktop"
-msgstr "عرض سطح المكتب"
-
-#: js/ui/endlessButton.js:61
-msgid "Show Apps"
-msgstr "عرض التطبيقات"
-
-#: js/ui/forceAppExitDialog.js:55
-msgid "Quit applications"
-msgstr "الخروج من التطبيقات"
-
-#: js/ui/forceAppExitDialog.js:61
-msgid ""
-"If an application doesn't respond for a while, select its name and click "
-"Quit Application."
-msgstr "إذا ظل أحد التطبيقات في حالة عدم استجابة لفترة، حدد اسمه وانقر على 'الخروج من التطبيق'."
-
-#: js/ui/forceAppExitDialog.js:84
-msgid "System Monitor"
-msgstr "شاشة النظام"
-
-#: js/ui/forceAppExitDialog.js:88
-msgid "Quit Application"
-msgstr "الخروج من التطبيق"
-
-#: js/ui/hotCorner.js:19
-msgid "Hot Corner"
-msgstr "الركن الساخن"
-
-#: js/ui/hotCorner.js:32
-msgid "Enable Hot Corner"
-msgstr "تمكين الزاوية الساخنة"
-
-#: js/ui/hotCorner.js:36
-msgid "Disable Hot Corner"
-msgstr "تعطيل الزاوية الساخنة"
-
-#: js/ui/iconGridLayout.js:270
-#, javascript-format
-msgid "%s has been deleted"
-msgstr "%s تم حذفه"
-
-#: js/ui/iconGridLayout.js:459
-msgid "New Folder"
-msgstr "مجلد جديد"
-
-#: js/ui/internetSearch.js:73
-#, javascript-format
-msgid "Open \"%s\" in browser"
-msgstr "افتح \"%s\" في مستعرض الإنترنت"
-
-#. Translators: the first %s is the search engine name, and the second
-#. * is the search string. For instance, 'Search Google for "hello"'.
-#: js/ui/internetSearch.js:82
-#, javascript-format
-msgid "Search %s for \"%s\""
-msgstr "بحث %s من أجل \"%s\" "
-
-#: js/ui/internetSearch.js:84
-#, javascript-format
-msgid "Search the internet for \"%s\""
-msgstr "البحث في الإنترنت عن \"%s\" "
-
-#: js/ui/status/codingGame.js:20
-msgid "Coding"
-msgstr "الترميز"
-
-#: js/ui/status/orientation.js:49
-msgid "Orientation Lock"
-msgstr "قفل الاتجاه"
-
-#: js/ui/userMenu.js:22
-msgid "Social Accounts"
-msgstr "حسابات اجتماعية"
-
-#: js/ui/userMenu.js:25
-msgid "Settings"
-msgstr "الإعدادات"
-
-#: js/ui/userMenu.js:30
-msgid "Help"
-msgstr "المساعدة"
-
-#: src/shell-desktop-dir-info.c:485
-msgid "Unnamed"
-msgstr "مجهول"
-
-#: src/shell-desktop-dir-info.c:745
-#, c-format
-msgid "Custom definition for %s"
-msgstr "تعريف مخصص ل%s"
