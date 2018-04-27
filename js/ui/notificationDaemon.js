@@ -454,6 +454,7 @@ var FdoNotificationDaemon = new Lang.Class({
     },
 
     _emitActionInvoked: function(id, action) {
+        Main.overview.hide();
         this._dbusImpl.emit_signal('ActionInvoked',
                                    GLib.Variant.new('(us)', [id, action]));
     }
