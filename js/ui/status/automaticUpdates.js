@@ -307,9 +307,9 @@ var Indicator = new Lang.Class({
         let state = this._getState();
 
         if (state == AutomaticUpdatesState.DISABLED)
-            this._toggleItem.label.text = _("Turn Automatic Updates ON");
+            this._toggleItem.label.text = _("Turn On");
         else
-            this._toggleItem.label.text = _("Turn Automatic Updates OFF");
+            this._toggleItem.label.text = _("Turn Off");
     },
 
     _toggleAutomaticUpdates: function() {
