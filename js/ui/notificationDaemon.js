@@ -374,7 +374,6 @@ var FdoNotificationDaemon = new Lang.Class({
         if (hasDefaultAction) {
             notification.connect('activated', Lang.bind(this, function() {
                 this._emitActionInvoked(ndata.id, 'default');
-                Main.overview.hide();
             }));
         } else {
             notification.connect('activated', Lang.bind(this, function() {
@@ -455,6 +454,7 @@ var FdoNotificationDaemon = new Lang.Class({
     },
 
     _emitActionInvoked: function(id, action) {
+        Main.overview.hide();
         this._dbusImpl.emit_signal('ActionInvoked',
                                    GLib.Variant.new('(us)', [id, action]));
     }
