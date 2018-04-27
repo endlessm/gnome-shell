@@ -130,9 +130,9 @@ var Indicator = class extends PanelMenu.SystemIndicator {
             /* Translators: this is the number of connected bluetooth devices */
             this._item.label.text = ngettext("%d Connected", "%d Connected", nConnectedDevices).format(nConnectedDevices);
         else if (isBluetoothOff)
-            this._item.label.text = _("Off");
+            this._item.label.text = _("Bluetooth Off");
         else
-            this._item.label.text = _("On");
+            this._item.label.text = _("Bluetooth On");
 
         this._toggleItem.label.text = isBluetoothOff ? _("Turn On") : _("Turn Off");
     }
