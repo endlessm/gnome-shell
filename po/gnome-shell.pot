@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-19 13:37-0700\n"
+"POT-Creation-Date: 2018-04-27 14:07-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -626,8 +626,8 @@ msgstr ""
 #: js/gdm/authPrompt.js:199 js/ui/audioDeviceSelection.js:71
 #: js/ui/components/networkAgent.js:139 js/ui/components/polkitAgent.js:160
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:197
-#: js/ui/paygUnlockDialog.js:347 js/ui/shellMountOperation.js:353
-#: js/ui/status/network.js:925 js/ui/forceAppExitDialog.js:78
+#: js/ui/forceAppExitDialog.js:78 js/ui/paygUnlockDialog.js:347
+#: js/ui/shellMountOperation.js:353 js/ui/status/network.js:925
 msgid "Cancel"
 msgstr ""
 
@@ -1006,6 +1006,27 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+#: js/ui/appIconBar.js:209
+msgid "Other workspaces"
+msgstr ""
+
+#: js/ui/appIconBar.js:218
+msgid "Current workspace"
+msgstr ""
+
+#: js/ui/appIconBar.js:287
+msgid "Pin to Taskbar"
+msgstr ""
+
+#: js/ui/appIconBar.js:291
+msgid "Unpin from Taskbar"
+msgstr ""
+
+#: js/ui/appIconBar.js:307
+#, javascript-format
+msgid "Quit %s"
+msgstr ""
+
 #: js/ui/audioDeviceSelection.js:59
 msgid "Select Audio Device"
 msgstr ""
@@ -1320,6 +1341,54 @@ msgstr ""
 msgid "%s is now known as %s"
 msgstr ""
 
+#: js/ui/components/updaterManager.js:191
+msgid "Software Update"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:206
+msgid "Updates Available"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:207
+msgid "Software updates are available for your system"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:208
+msgid "Download Now"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:223
+msgid "Updates Ready"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:224
+msgid "Software updates are ready to be installed on your system"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:225
+msgid "Install Now"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:237
+msgid "Updates Installed"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:238
+msgid "Software updates were installed on your system"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:239
+msgid "Restart Now"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:269
+msgid "Update Failed"
+msgstr ""
+
+#: js/ui/components/updaterManager.js:270
+msgid "We could not update your system"
+msgstr ""
+
 #: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:635
 msgid "Windows"
 msgstr ""
@@ -1412,6 +1481,18 @@ msgstr ""
 
 #: js/ui/dateMenu.js:329
 msgid "Weather information is currently unavailable"
+msgstr ""
+
+#: js/ui/endlessButton.js:17
+msgid "Endless Button"
+msgstr ""
+
+#: js/ui/endlessButton.js:56
+msgid "Show Desktop"
+msgstr ""
+
+#: js/ui/endlessButton.js:61
+msgid "Show Apps"
 msgstr ""
 
 #: js/ui/endSessionDialog.js:64
@@ -1564,6 +1645,45 @@ msgstr ""
 msgid "Download and install “%s” from extensions.gnome.org?"
 msgstr ""
 
+#: js/ui/forceAppExitDialog.js:55
+msgid "Quit applications"
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:61
+msgid ""
+"If an application doesn't respond for a while, select its name and click "
+"Quit Application."
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:84
+msgid "System Monitor"
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:88
+msgid "Quit Application"
+msgstr ""
+
+#: js/ui/hotCorner.js:19
+msgid "Hot Corner"
+msgstr ""
+
+#: js/ui/hotCorner.js:32
+msgid "Enable Hot Corner"
+msgstr ""
+
+#: js/ui/hotCorner.js:36
+msgid "Disable Hot Corner"
+msgstr ""
+
+#: js/ui/iconGridLayout.js:270
+#, javascript-format
+msgid "%s has been deleted"
+msgstr ""
+
+#: js/ui/iconGridLayout.js:459
+msgid "New Folder"
+msgstr ""
+
 #. Translators: %s is an application name like "Settings"
 #: js/ui/inhibitShortcutsDialog.js:59
 #, javascript-format
@@ -1586,6 +1706,24 @@ msgstr ""
 
 #: js/ui/inhibitShortcutsDialog.js:80
 msgid "Allow"
+msgstr ""
+
+#: js/ui/internetSearch.js:73
+#, javascript-format
+msgid "Open \"%s\" in browser"
+msgstr ""
+
+#. Translators: the first %s is the search engine name, and the second
+#. * is the search string. For instance, 'Search Google for "hello"'.
+#.
+#: js/ui/internetSearch.js:82
+#, javascript-format
+msgid "Search %s for \"%s\""
+msgstr ""
+
+#: js/ui/internetSearch.js:84
+#, javascript-format
+msgid "Search the internet for \"%s\""
 msgstr ""
 
 #: js/ui/keyboard.js:738 js/ui/status/keyboard.js:837
@@ -1941,6 +2079,56 @@ msgstr ""
 msgid "Large Text"
 msgstr ""
 
+#: js/ui/status/automaticUpdates.js:94
+msgid "Updates Queue…"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:114
+msgid "Set a Schedule…"
+msgstr ""
+
+#. The status label
+#: js/ui/status/automaticUpdates.js:205
+msgid "Automatic Updates"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:270
+msgid "Automatic updates on"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:271
+msgid ""
+"You have Unlimited Data so automatic updates have been turned on for this "
+"connection."
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:274
+msgid "Automatic updates are turned off to save your data"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:275
+msgid ""
+"You will need to choose which Endless updates to apply when on this "
+"connection."
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:286
+msgid "Change Settings…"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:310 js/ui/status/bluetooth.js:146
+#: js/ui/status/network.js:1287
+msgid "Turn On"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:312 js/ui/status/bluetooth.js:146
+#: js/ui/status/network.js:154 js/ui/status/network.js:339
+#: js/ui/status/network.js:1287 js/ui/status/network.js:1402
+#: js/ui/status/nightLight.js:47 js/ui/status/rfkill.js:90
+#: js/ui/status/rfkill.js:117
+msgid "Turn Off"
+msgstr ""
+
 #: js/ui/status/bluetooth.js:48
 msgid "Bluetooth"
 msgstr ""
@@ -1958,26 +2146,19 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: js/ui/status/bluetooth.js:142
-msgid "Off"
+msgid "Bluetooth Off"
 msgstr ""
 
 #: js/ui/status/bluetooth.js:144
-msgid "On"
-msgstr ""
-
-#: js/ui/status/bluetooth.js:146 js/ui/status/network.js:1287
-msgid "Turn On"
-msgstr ""
-
-#: js/ui/status/bluetooth.js:146 js/ui/status/network.js:154
-#: js/ui/status/network.js:339 js/ui/status/network.js:1287
-#: js/ui/status/network.js:1402 js/ui/status/nightLight.js:47
-#: js/ui/status/rfkill.js:90 js/ui/status/rfkill.js:117
-msgid "Turn Off"
+msgid "Bluetooth On"
 msgstr ""
 
 #: js/ui/status/brightness.js:44
 msgid "Brightness"
+msgstr ""
+
+#: js/ui/status/codingGame.js:20
+msgid "Coding"
 msgstr ""
 
 #: js/ui/status/keyboard.js:862
@@ -2244,6 +2425,10 @@ msgstr ""
 msgid "Disable Until Tomorrow"
 msgstr ""
 
+#: js/ui/status/orientation.js:49
+msgid "Orientation Lock"
+msgstr ""
+
 #: js/ui/status/power.js:61
 msgid "Power Settings"
 msgstr ""
@@ -2344,6 +2529,18 @@ msgstr ""
 
 #: js/ui/unlockDialog.js:84
 msgid "Unlock Window"
+msgstr ""
+
+#: js/ui/userMenu.js:22
+msgid "Social Accounts"
+msgstr ""
+
+#: js/ui/userMenu.js:25
+msgid "Settings"
+msgstr ""
+
+#: js/ui/userMenu.js:30
+msgid "Help"
 msgstr ""
 
 #: js/ui/viewSelector.js:639
@@ -2483,6 +2680,15 @@ msgstr ""
 msgid "Failed to launch “%s”"
 msgstr ""
 
+#: src/shell-desktop-dir-info.c:485
+msgid "Unnamed"
+msgstr ""
+
+#: src/shell-desktop-dir-info.c:745
+#, c-format
+msgid "Custom definition for %s"
+msgstr ""
+
 #: src/shell-keyring-prompt.c:730
 msgid "Passwords do not match."
 msgstr ""
@@ -2515,171 +2721,4 @@ msgstr[1] ""
 
 #: subprojects/gvc/gvc-mixer-control.c:2738
 msgid "System Sounds"
-msgstr ""
-
-#: js/ui/appIconBar.js:209
-msgid "Other workspaces"
-msgstr ""
-
-#: js/ui/appIconBar.js:218
-msgid "Current workspace"
-msgstr ""
-
-#: js/ui/appIconBar.js:287
-msgid "Pin to Taskbar"
-msgstr ""
-
-#: js/ui/appIconBar.js:291
-msgid "Unpin from Taskbar"
-msgstr ""
-
-#: js/ui/appIconBar.js:307
-#, javascript-format
-msgid "Quit %s"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:191
-msgid "Software Update"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:206
-msgid "Updates Available"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:207
-msgid "Software updates are available for your system"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:208
-msgid "Download Now"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:223
-msgid "Updates Ready"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:224
-msgid "Software updates are ready to be installed on your system"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:225
-msgid "Install Now"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:237
-msgid "Updates Installed"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:238
-msgid "Software updates were installed on your system"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:239
-msgid "Restart Now"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:269
-msgid "Update Failed"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:270
-msgid "We could not update your system"
-msgstr ""
-
-#: js/ui/endlessButton.js:17
-msgid "Endless Button"
-msgstr ""
-
-#: js/ui/endlessButton.js:56
-msgid "Show Desktop"
-msgstr ""
-
-#: js/ui/endlessButton.js:61
-msgid "Show Apps"
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:55
-msgid "Quit applications"
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:61
-msgid ""
-"If an application doesn't respond for a while, select its name and click "
-"Quit Application."
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:84
-msgid "System Monitor"
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:88
-msgid "Quit Application"
-msgstr ""
-
-#: js/ui/hotCorner.js:19
-msgid "Hot Corner"
-msgstr ""
-
-#: js/ui/hotCorner.js:32
-msgid "Enable Hot Corner"
-msgstr ""
-
-#: js/ui/hotCorner.js:36
-msgid "Disable Hot Corner"
-msgstr ""
-
-#: js/ui/iconGridLayout.js:270
-#, javascript-format
-msgid "%s has been deleted"
-msgstr ""
-
-#: js/ui/iconGridLayout.js:459
-msgid "New Folder"
-msgstr ""
-
-#: js/ui/internetSearch.js:73
-#, javascript-format
-msgid "Open \"%s\" in browser"
-msgstr ""
-
-#. Translators: the first %s is the search engine name, and the second
-#. * is the search string. For instance, 'Search Google for "hello"'.
-#.
-#: js/ui/internetSearch.js:82
-#, javascript-format
-msgid "Search %s for \"%s\""
-msgstr ""
-
-#: js/ui/internetSearch.js:84
-#, javascript-format
-msgid "Search the internet for \"%s\""
-msgstr ""
-
-#: js/ui/status/codingGame.js:20
-msgid "Coding"
-msgstr ""
-
-#: js/ui/status/orientation.js:49
-msgid "Orientation Lock"
-msgstr ""
-
-#: js/ui/userMenu.js:22
-msgid "Social Accounts"
-msgstr ""
-
-#: js/ui/userMenu.js:25
-msgid "Settings"
-msgstr ""
-
-#: js/ui/userMenu.js:30
-msgid "Help"
-msgstr ""
-
-#: src/shell-desktop-dir-info.c:485
-msgid "Unnamed"
-msgstr ""
-
-#: src/shell-desktop-dir-info.c:745
-#, c-format
-msgid "Custom definition for %s"
 msgstr ""
