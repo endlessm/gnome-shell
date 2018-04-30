@@ -318,10 +318,16 @@ var Indicator = new Lang.Class({
 
         let userSetting = this._ensureUserSetting(this._activeConnection);
 
-        // The string representation here is the oposite of the value
-        let value = '0';
-        if (userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS) != '1')
+        let state = this._getState();
+        let value;
+
+        if (state == AutomaticUpdatesState.IDLE ||
+            state == AutomaticUpdatesState.SCHEDULED ||
+            state == AutomaticUpdatesState.DOWNLOADING) {
+            value = '0';
+        } else {
             value = '1';
+        }
 
         userSetting.set_data(NM_SETTING_ALLOW_DOWNLOADS, value);
 
@@ -371,9 +377,25 @@ var Indicator = new Lang.Class({
         //  * A schedule was set
         //  * Something is being downloaded
 
-        let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS) === '1';
-        if (!allowDownloads)
-            return AutomaticUpdatesState.DISABLED;
+        let allowDownloadsValue = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS);
+        if (allowDownloadsValue) {
+            let allowDownloads = (allowDownloadsValue === '1');
+
+            if (!allowDownloads)
+                return AutomaticUpdatesState.DISABLED;
+        } else {
+            // Guess the default value from the metered state. Only return
+            // if it's disabled - if it's not, we want to follow the regular
+            // code paths and fetch the correct state
+            let connectionSetting = this._activeConnection.get_setting_connection();
+
+            if (!connectionSetting)
+                return AutomaticUpdatesState.DISABLED;
+
+            let metered = connectionSetting.get_metered();
+            if (metered == NM.Metered.YES || metered == NM.Metered.GUESS_YES)
+                return AutomaticUpdatesState.DISABLED;
+        }
 
         // Without the proxy, we can't really know the state
         if (!this._proxy)
