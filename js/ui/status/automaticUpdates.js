@@ -298,7 +298,7 @@ var Indicator = new Lang.Class({
         // Now that we first detected this connection, mark it as such
         let userSetting = this._ensureUserSetting(this._activeConnection);
         userSetting.set_data(NM_SETTING_AUTOMATIC_UPDATES_NOTIFICATION_TIME,
-                             '{}'.format(GLib.get_real_time()));
+                             '%s'.format(GLib.get_real_time()));
 
         this._activeConnection.commit_changes(true, null);
     },
