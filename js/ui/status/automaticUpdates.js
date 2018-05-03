@@ -280,7 +280,7 @@ var Indicator = new Lang.Class({
 
         // Create the notification
         this._notification = new MessageTray.Notification(source, title, subtitle, { gicon: gicon });
-        this._notification.setUrgency(MessageTray.Urgency.NORMAL);
+        this._notification.setUrgency(alreadySentNotification ? MessageTray.Urgency.NORMAL : MessageTray.Urgency.CRITICAL);
         this._notification.setTransient(false);
 
         this._notification.addAction(_("Change Settings…"), () => {
