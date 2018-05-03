@@ -173,7 +173,7 @@ var Indicator = new Lang.Class({
         // the user's face, and to avoid a series of unecessary updates
         // that happen when NetworkManager is still figuring out details.
         this._updateTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
-                                                         4,
+                                                         2,
                                                          () => {
                                                             this._updateStatus();
                                                             this._updateTimeoutId = 0;
