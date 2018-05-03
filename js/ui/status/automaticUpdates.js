@@ -278,7 +278,14 @@ var Indicator = new Lang.Class({
 
         let gicon = new Gio.FileIcon({ file: Gio.File.new_for_uri(iconFile) });
 
-        // Create the notification
+        // Create the notification.
+        // The first time we notify the user for a given connection,
+        // we set the urgency to critical so that we make sure the
+        // user understands how we may be changing their settings.
+        // On subsequent notifications for the given connection,
+        // for instance if the user regularly switches between
+        // metered and unmetered connections, we set the urgency
+        // to normal so as not to be too obtrusive.
         this._notification = new MessageTray.Notification(source, title, subtitle, { gicon: gicon });
         this._notification.setUrgency(alreadySentNotification ? MessageTray.Urgency.NORMAL : MessageTray.Urgency.CRITICAL);
         this._notification.setTransient(false);
