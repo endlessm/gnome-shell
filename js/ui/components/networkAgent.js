@@ -50,7 +50,8 @@ var NetworkSecretDialog = new Lang.Class({
         this._inputSourceManager.passwordModeEnabled = true;
 
         let contentParams = { title: this._content.title,
-                              body: this._content.message };
+                              body: this._content.message,
+                              center_title: true };
         let contentBox = new Dialog.MessageDialogContent(contentParams);
         this.contentLayout.add_actor(contentBox);
 
@@ -153,32 +154,46 @@ var NetworkSecretDialog = new Lang.Class({
 
         // Separator
         let separator = new St.Widget({ style_class: 'popup-separator-menu-item',
+                                        x_expand: true,
                                         y_expand: true,
                                         y_align: Clutter.ActorAlign.CENTER });
-        updatesLayout.attach(separator, 0, 0, 2, 1);
+        updatesLayout.attach(separator, 0, 0, 3, 1);
 
-        // Translators: this is a question that shows below the Wi-Fi password
-        // dialog.
-        this._updatesTitle = new St.Label({ text: _("Limited Data"),
-                                            style_class: 'message-dialog-title',
-                                            x_expand: true,
-                                            x_align: Clutter.ActorAlign.START,
-                                            y_expand: true,
-                                            y_align: Clutter.ActorAlign.END });
-        updatesLayout.attach(this._updatesTitle, 0, 1, 1, 1);
+
+        let firstTitle = new St.Label({ text: _("Limited Data"),
+                                        style_class: 'message-dialog-title',
+                                        x_expand: true,
+                                        x_align: Clutter.ActorAlign.END,
+                                        y_expand: true,
+                                        y_align: Clutter.ActorAlign.END });
+        updatesLayout.attach(firstTitle, 0, 1, 1, 1);
+
+        let secondTitle = new St.Label({ text: _("Unlimited Data"),
+                                         style_class: 'message-dialog-title',
+                                         x_expand: true,
+                                         x_align: Clutter.ActorAlign.START,
+                                         y_expand: true,
+                                         y_align: Clutter.ActorAlign.END });
+        updatesLayout.attach(secondTitle, 2, 1, 1, 1);
 
         // Subtitle label
         this._updatesSubtitle = new St.Label({ style_class: 'message-dialog-body',
                                                text: _("Enable if your connection has limits on how much you can download."),
-                                               x_align: Clutter.ActorAlign.START,
+                                               x_expand: true,
+                                               x_align: Clutter.ActorAlign.CENTER,
                                                y_align: Clutter.ActorAlign.CENTER });
-        this._updatesSubtitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._updatesSubtitle.clutter_text.line_wrap = true;
-        this._updatesSubtitle.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
 
-        updatesLayout.attach(this._updatesSubtitle, 0, 2, 1, 1);
+        Object.assign(this._updatesSubtitle.clutter_text, { x_expand: true,
+                                                            x_align: Clutter.ActorAlign.CENTER,
+                                                            ellipsize: Pango.EllipsizeMode.NONE,
+                                                            line_alignment: Pango.Alignment.CENTER,
+                                                            line_wrap: true,
+                                                            line_wrap_mode: Pango.WrapMode.WORD_CHAR });
 
-        // Toggle button
+        updatesLayout.attach(this._updatesSubtitle, 0, 2, 3, 1);
+
+        // Toggle button (checked means both "Automatic Updates enabled" and
+        // "unmetered connection", and vice-versa)
         this._updatesToggle = new St.Button({ style_class: 'toggle-switch',
                                               toggle_mode: true,
                                               visible: true,
@@ -186,24 +201,16 @@ var NetworkSecretDialog = new Lang.Class({
                                               y_align: Clutter.ActorAlign.START,
                                               y_expand: true });
 
-        // Translators: this MUST be either "toggle-switch-us"
-        // (for toggle switches containing the English words
-        // "ON" and "OFF") or "toggle-switch-intl" (for toggle
-        // switches containing "◯" and "|"). Other values will
-        // simply result in invisible toggle switches.
-        this._updatesToggle.add_style_class_name(_("toggle-switch-us"));
+        this._updatesToggle.add_style_class_name("metered-data-switch");
 
         updatesLayout.attach(this._updatesToggle, 1, 1, 1, 1);
         updatesTable.visible = true;
 
         this._updatesToggle.connect('notify::checked', () => {
-            if (this._updatesToggle.checked) {
-                this._updatesTitle.text = _("Limited Data");
+            if (!this._updatesToggle.checked)
                 this._updatesSubtitle.text = _("Enable if your connection has limits on how much you can download.");
-            } else {
-                this._updatesTitle.text = _("Unlimited Data");
+            else
                 this._updatesSubtitle.text = _("This connection doesn't have limits on how much you can download.");
-            }
         });
 
         this._updatesToggle.checked = this._getDefaultMeteredValue(connection);
@@ -219,7 +226,7 @@ var NetworkSecretDialog = new Lang.Class({
         if (userSetting) {
             let allowDownloads = userSetting.get_data(NM_SETTING_ALLOW_DOWNLOADS);
             if (allowDownloads)
-                defaultValue = (allowDownloads === '0');
+                defaultValue = (allowDownloads === '1');
         }
 
         // If no value was already set before, assume the value from the
@@ -229,9 +236,9 @@ var NetworkSecretDialog = new Lang.Class({
 
             if (connectionSetting) {
                 let metered = connectionSetting.get_metered();
-                defaultValue = metered == NM.Metered.YES || metered == NM.Metered.GUESS_YES;
+                defaultValue = metered != NM.Metered.YES && metered != NM.Metered.GUESS_YES;
             } else {
-                defaultValue = false;
+                defaultValue = true;
             }
         }
 
@@ -265,7 +272,7 @@ var NetworkSecretDialog = new Lang.Class({
 
             // Update the Automatic Updates values
             if (this._settingName != 'vpn')
-                this._updateMeteredSetting(this._updatesToggle.checked);
+                this._updateMeteredSetting(!this._updatesToggle.checked);
 
             this.close(global.get_current_time());
         }
