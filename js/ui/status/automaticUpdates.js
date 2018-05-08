@@ -128,6 +128,7 @@ var Indicator = new Lang.Class({
         this._client = NM.Client.new_finish(result);
 
         this._client.connect('notify::primary-connection', this._sync.bind(this));
+        this._client.connect('notify::state', this._sync.bind(this));
 
         Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
@@ -163,11 +164,10 @@ var Indicator = new Lang.Class({
             this._updateTimeoutId = 0;
         }
 
-        // When disconnected, don't timeout before updating
-        if (!this._getActiveConnection()) {
-            this._updateStatus();
+        // Intermediate states (connecting or disconnecting) must not trigger
+        // any kind of state change.
+        if (this._client.state == NM.State.CONNECTING || this._client.state == NM.State.DISCONNECTING)
             return;
-        }
 
         // Use a timeout to avoid instantly throwing the notification at
         // the user's face, and to avoid a series of unecessary updates
@@ -289,6 +289,10 @@ var Indicator = new Lang.Class({
         this._notification = new MessageTray.Notification(source, title, subtitle, { gicon: gicon });
         this._notification.setUrgency(alreadySentNotification ? MessageTray.Urgency.NORMAL : MessageTray.Urgency.CRITICAL);
         this._notification.setTransient(false);
+
+        this._notification.addAction(_("Close"), () => {
+            this._notification.destroy();
+        });
 
         this._notification.addAction(_("Change Settings…"), () => {
             let app = Shell.AppSystem.get_default().lookup_app('gnome-updates-panel.desktop');
