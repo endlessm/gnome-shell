@@ -290,6 +290,10 @@ var Indicator = new Lang.Class({
         this._notification.setUrgency(alreadySentNotification ? MessageTray.Urgency.NORMAL : MessageTray.Urgency.CRITICAL);
         this._notification.setTransient(false);
 
+        this._notification.addAction(_("Close"), () => {
+            this._notification.destroy();
+        });
+
         this._notification.addAction(_("Change Settings…"), () => {
             let app = Shell.AppSystem.get_default().lookup_app('gnome-updates-panel.desktop');
             Main.overview.hide();
