@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-27 14:07-0700\n"
-"PO-Revision-Date: 2018-04-29 03:10+0000\n"
+"POT-Creation-Date: 2018-05-09 14:41-0700\n"
+"PO-Revision-Date: 2018-05-09 21:49+0000\n"
 "Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-os/gnome-shell/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -636,7 +636,7 @@ msgid "Forgot password?"
 msgstr "هل نسيت كلمة المرور؟"
 
 #: js/gdm/authPrompt.js:199 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:139 js/ui/components/polkitAgent.js:160
+#: js/ui/components/networkAgent.js:140 js/ui/components/polkitAgent.js:160
 #: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:197
 #: js/ui/forceAppExitDialog.js:78 js/ui/paygUnlockDialog.js:347
 #: js/ui/shellMountOperation.js:353 js/ui/status/network.js:925
@@ -705,8 +705,8 @@ msgstr "(مثلا مستخدم أو %s)"
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
 #. (and don't even care of which one)
-#: js/gdm/loginDialog.js:899 js/ui/components/networkAgent.js:402
-#: js/ui/components/networkAgent.js:420
+#: js/gdm/loginDialog.js:899 js/ui/components/networkAgent.js:409
+#: js/ui/components/networkAgent.js:427
 msgid "Username: "
 msgstr "اسم المستخدم: "
 
@@ -1261,110 +1261,99 @@ msgstr "كلمة السرّ:"
 msgid "Type again:"
 msgstr "أدخلها ثانية:"
 
-#: js/ui/components/networkAgent.js:134 js/ui/status/network.js:245
+#: js/ui/components/networkAgent.js:135 js/ui/status/network.js:245
 #: js/ui/status/network.js:338 js/ui/status/network.js:928
 msgid "Connect"
 msgstr "اتصل"
 
-#. Translators: this is a question that shows below the Wi-Fi password
-#. dialog.
-#: js/ui/components/networkAgent.js:162 js/ui/components/networkAgent.js:201
+#: js/ui/components/networkAgent.js:163
 msgid "Limited Data"
 msgstr "بيانات محدودة"
 
-#: js/ui/components/networkAgent.js:172 js/ui/components/networkAgent.js:202
-msgid "Enable if your connection has limits on how much you can download."
-msgstr "قم بتمكينه إذا كان الاتصال لديك به قيود على كمية التنزيلات."
-
-#. Translators: this MUST be either "toggle-switch-us"
-#. (for toggle switches containing the English words
-#. "ON" and "OFF") or "toggle-switch-intl" (for toggle
-#. switches containing "◯" and "|"). Other values will
-#. simply result in invisible toggle switches.
-#: js/ui/components/networkAgent.js:194 js/ui/popupMenu.js:291
-msgid "toggle-switch-us"
-msgstr "toggle-switch-intl"
-
-#: js/ui/components/networkAgent.js:204
+#: js/ui/components/networkAgent.js:171
 msgid "Unlimited Data"
 msgstr "بيانات غير محدودة"
 
-#: js/ui/components/networkAgent.js:205
+#: js/ui/components/networkAgent.js:181 js/ui/components/networkAgent.js:211
+msgid "Enable if your connection has limits on how much you can download."
+msgstr "قم بتمكينه إذا كان الاتصال لديك به قيود على كمية التنزيلات."
+
+#: js/ui/components/networkAgent.js:213
 msgid "This connection doesn't have limits on how much you can download."
 msgstr "هذا الاتصال ليست به قيود على كمية التنزيلات."
 
 #. Cisco LEAP
-#: js/ui/components/networkAgent.js:364 js/ui/components/networkAgent.js:376
-#: js/ui/components/networkAgent.js:404 js/ui/components/networkAgent.js:424
-#: js/ui/components/networkAgent.js:434
+#: js/ui/components/networkAgent.js:371 js/ui/components/networkAgent.js:383
+#: js/ui/components/networkAgent.js:411 js/ui/components/networkAgent.js:431
+#: js/ui/components/networkAgent.js:441
 msgid "Password: "
 msgstr "كلمة السرّ: "
 
 #. static WEP
-#: js/ui/components/networkAgent.js:369
+#: js/ui/components/networkAgent.js:376
 msgid "Key: "
 msgstr "المفتاح: "
 
-#: js/ui/components/networkAgent.js:408
+#: js/ui/components/networkAgent.js:415
 msgid "Identity: "
 msgstr "التعريف: "
 
-#: js/ui/components/networkAgent.js:410
+#: js/ui/components/networkAgent.js:417
 msgid "Private key password: "
 msgstr "كلمة سرّ المفتاح الخاص: "
 
-#: js/ui/components/networkAgent.js:422
+#: js/ui/components/networkAgent.js:429
 msgid "Service: "
 msgstr "الخدمة: "
 
-#: js/ui/components/networkAgent.js:451
+#: js/ui/components/networkAgent.js:458
 #, javascript-format
 msgid "Enter the Wi-Fi password for “%s”"
 msgstr "ادخل الرمز السري لشبكة الواي فاي \"%s\""
 
-#: js/ui/components/networkAgent.js:456 js/ui/components/networkAgent.js:825
+#: js/ui/components/networkAgent.js:463 js/ui/components/networkAgent.js:832
 msgid "Wired 802.1X authentication"
 msgstr "استيثاق 802.1X سلكي"
 
-#: js/ui/components/networkAgent.js:458
+#: js/ui/components/networkAgent.js:465
 msgid "Network name: "
 msgstr "اسم الشبكة: "
 
-#: js/ui/components/networkAgent.js:463 js/ui/components/networkAgent.js:829
+#: js/ui/components/networkAgent.js:470 js/ui/components/networkAgent.js:836
 msgid "DSL authentication"
 msgstr "استيثاق اتصال DSL"
 
-#: js/ui/components/networkAgent.js:470 js/ui/components/networkAgent.js:835
+#: js/ui/components/networkAgent.js:477 js/ui/components/networkAgent.js:842
 msgid "PIN code required"
 msgstr "رمز PIN مطلوب"
 
-#: js/ui/components/networkAgent.js:471 js/ui/components/networkAgent.js:836
+#: js/ui/components/networkAgent.js:478 js/ui/components/networkAgent.js:843
 msgid "PIN code is needed for the mobile broadband device"
 msgstr "جهاز شبكة الهاتف المحمول يتطلب رمز PIN"
 
-#: js/ui/components/networkAgent.js:472
+#: js/ui/components/networkAgent.js:479
 msgid "PIN: "
 msgstr "PIN: "
 
-#: js/ui/components/networkAgent.js:479 js/ui/components/networkAgent.js:842
+#: js/ui/components/networkAgent.js:486 js/ui/components/networkAgent.js:849
 msgid "Mobile broadband network password"
 msgstr "كلمة سرّ شبكة الهاتف المحمول"
 
-#: js/ui/components/networkAgent.js:480 js/ui/components/networkAgent.js:826
-#: js/ui/components/networkAgent.js:830 js/ui/components/networkAgent.js:843
+#: js/ui/components/networkAgent.js:487 js/ui/components/networkAgent.js:833
+#: js/ui/components/networkAgent.js:837 js/ui/components/networkAgent.js:850
 #, javascript-format
 msgid "A password is required to connect to “%s”."
 msgstr "كلمة السرّ مطلوبة للاتصال ب‍ ”%s“."
 
-#: js/ui/components/networkAgent.js:810 js/ui/status/network.js:1699
+#: js/ui/components/networkAgent.js:817 js/ui/status/network.js:1699
 msgid "Network Manager"
 msgstr "مدير الشبكة"
 
-#: js/ui/components/networkAgent.js:821
+#: js/ui/components/networkAgent.js:828
 msgid "Authentication required by wireless network"
 msgstr "تتطلب الشبكة اللاسلكية الاستيثاق"
 
-#: js/ui/components/networkAgent.js:822
+#: js/ui/components/networkAgent.js:829
 #, javascript-format
 msgid ""
 "Passwords or encryption keys are required to access the wireless network "
@@ -2018,11 +2007,21 @@ msgstr "تم تجاوز الوقت المسموح أثناء التحقق من �
 msgid "Unknown error"
 msgstr "خطأ غير معروف"
 
+#. Translators: this MUST be either "toggle-switch-us"
+#. (for toggle switches containing the English words
+#. "ON" and "OFF") or "toggle-switch-intl" (for toggle
+#. switches containing "◯" and "|"). Other values will
+#. simply result in invisible toggle switches.
+#: js/ui/popupMenu.js:291
+msgid "toggle-switch-us"
+msgstr "toggle-switch-intl"
+
 #: js/ui/runDialog.js:71
 msgid "Enter a Command"
 msgstr "اكتب أمرًا"
 
-#: js/ui/runDialog.js:111 js/ui/windowMenu.js:160
+#: js/ui/runDialog.js:111 js/ui/status/automaticUpdates.js:293
+#: js/ui/windowMenu.js:160
 msgid "Close"
 msgstr "أغلِق"
 
@@ -2170,12 +2169,12 @@ msgid "Large Text"
 msgstr "نص كبير"
 
 #: js/ui/status/automaticUpdates.js:94
-msgid "Updates Queue…"
-msgstr "طابور التحديثات..."
+msgid "Updates Queue"
+msgstr "طابور التحديثات"
 
 #: js/ui/status/automaticUpdates.js:114
-msgid "Set a Schedule…"
-msgstr "تعيين جدول ..."
+msgid "Set a Schedule"
+msgstr "تعيين جدول"
 
 #. The status label
 #: js/ui/status/automaticUpdates.js:205
@@ -2202,16 +2201,16 @@ msgid ""
 "connection."
 msgstr "ستحتاج إلى تحديد تحديثات نظام Endless التي يمكن تنزيلها أثناء استخدام هذا الاتصال."
 
-#: js/ui/status/automaticUpdates.js:286
+#: js/ui/status/automaticUpdates.js:297
 msgid "Change Settings…"
 msgstr "تغيير الإعدادات..."
 
-#: js/ui/status/automaticUpdates.js:310 js/ui/status/bluetooth.js:146
+#: js/ui/status/automaticUpdates.js:321 js/ui/status/bluetooth.js:146
 #: js/ui/status/network.js:1287
 msgid "Turn On"
 msgstr "شغّل"
 
-#: js/ui/status/automaticUpdates.js:312 js/ui/status/bluetooth.js:146
+#: js/ui/status/automaticUpdates.js:323 js/ui/status/bluetooth.js:146
 #: js/ui/status/network.js:154 js/ui/status/network.js:339
 #: js/ui/status/network.js:1287 js/ui/status/network.js:1402
 #: js/ui/status/nightLight.js:47 js/ui/status/rfkill.js:90
