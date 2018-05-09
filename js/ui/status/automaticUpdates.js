@@ -91,7 +91,7 @@ var Indicator = new Lang.Class({
 
         this._item = new PopupMenu.PopupSubMenuMenuItem("", true);
         this._toggleItem = this._item.menu.addAction("", this._toggleAutomaticUpdates.bind(this));
-        this._item.menu.addAction(_("Updates Queue…"), () => {
+        this._item.menu.addAction(_("Updates Queue"), () => {
             let params = new GLib.Variant('(sava{sv})', [ 'set-mode', [ new GLib.Variant('s', 'updates') ], {} ]);
             Gio.DBus.session.call('org.gnome.Software',
                                   '/org/gnome/Software',
@@ -111,7 +111,7 @@ var Indicator = new Lang.Class({
                                   });
 
         });
-        this._item.menu.addSettingsAction(_("Set a Schedule…"), 'gnome-updates-panel.desktop');
+        this._item.menu.addSettingsAction(_("Set a Schedule"), 'gnome-updates-panel.desktop');
         this.menu.addMenuItem(this._item);
 
         this._activeConnection = null;
