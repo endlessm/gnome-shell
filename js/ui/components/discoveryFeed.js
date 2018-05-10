@@ -10,6 +10,7 @@ const DISCOVERY_FEED_PATH = '/com/endlessm/DiscoveryFeed';
 
 const DiscoveryFeedIface = '<node> \
 <interface name="' + DISCOVERY_FEED_NAME + '"> \
+<method name="notifyHideAnimationCompleted" /> \
 <method name="show"> \
   <arg type="u" direction="in" name="timestamp"/> \
 </method> \
@@ -34,6 +35,10 @@ class DiscoveryFeed extends SideComponent.SideComponent {
     disable() {
         super.disable();
         Main.discoveryFeed = null;
+    }
+
+    notifyHideAnimationCompleted() {
+        this.proxy.notifyHideAnimationCompletedRemote();
     }
 
     callShow(timestamp) {
