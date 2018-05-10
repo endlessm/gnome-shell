@@ -283,7 +283,7 @@ var PaygUnlockDialog = new Lang.Class({
         } else if (Main.customerSupport.paygContactName && Main.customerSupport.paygContactNumber) {
             // The second possible override is to use the template text below
             // with the contact's name and phone number, if BOTH are present.
-            instructionsLine2 = _("Talk your sales representative to purchase a new code. Call or text %s at %s")
+            instructionsLine2 = _("Talk to your sales representative to purchase a new code. Call or text %s at %s")
                 .format(Main.customerSupport.paygContactName, Main.customerSupport.paygContactNumber);
         } else {
             // No overrides present, default to fallback text.
