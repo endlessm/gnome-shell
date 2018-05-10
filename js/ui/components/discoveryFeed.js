@@ -10,6 +10,7 @@ const DISCOVERY_FEED_PATH = '/com/endlessm/DiscoveryFeed';
 
 const DiscoveryFeedIface = '<node> \
 <interface name="' + DISCOVERY_FEED_NAME + '"> \
+<method name="notifyHideAnimationCompleted" /> \
 <method name="show"> \
   <arg type="u" direction="in" name="timestamp"/> \
 </method> \
@@ -38,12 +39,16 @@ var DiscoveryFeed = new Lang.Class({
         Main.discoveryFeed = null;
     },
 
+    notifyHideAnimationCompleted: function() {
+        this.proxy.notifyHideAnimationCompletedRemote();
+    },
+
     callShow: function(timestamp) {
         this.proxy.showRemote(timestamp);
     },
 
-    callHide: function(timestamp) {
-        this.proxy.hideRemote(timestamp);
+    callHide: function() {
+        this.proxy.hideRemote();
     }
 });
 var Component = DiscoveryFeed;
