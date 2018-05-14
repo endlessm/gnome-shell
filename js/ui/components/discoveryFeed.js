@@ -47,8 +47,8 @@ var DiscoveryFeed = new Lang.Class({
         this.proxy.showRemote(timestamp);
     },
 
-    callHide: function() {
-        this.proxy.hideRemote();
+    callHide: function(timestamp) {
+        this.proxy.hideRemote(timestamp);
     }
 });
 var Component = DiscoveryFeed;
