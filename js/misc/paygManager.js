@@ -135,7 +135,7 @@ function _isPaygEnabled() {
 //   - 172800 seconds => "2 days"
 function timeToString(seconds) {
     if (seconds < 60)
-        return Gettext.ngettext("%s second", "%s seconds", seconds).format(seconds);
+        return Gettext.ngettext("%s second", "%s seconds", seconds).format(Math.floor(seconds));
 
     let minutes = Math.floor(seconds / 60);
     if (minutes < 120)
