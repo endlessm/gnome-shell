@@ -1,613 +1,1320 @@
-# Thai translation for gnome-shell.
-# Copyright (C) 2010-2012 Free Software Foundation, Inc.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-shell package.
-# Sira Nokyoongtong <gumaraa@gmail.com>, 2010, 2011.
-# Theppitak Karoonboonyanan <thep@linux.thai.net>, 2012.
-#
+# 
+# Translators:
+# e2f_th_c4 <e2f_th_c4@outlook.com>, 2016
+# e2f_th_c4 <e2f_th_c4@outlook.com>, 2016
+# Roddy Shuler <roddy@endlessm.com>, 2016-2018
+# Sira Nokyoongtong <gumaraa@gmail.com>, 2010-2011
+# Theppitak Karoonboonyanan <thep@linux.thai.net>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-"
-"shell&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-10-04 06:59+0000\n"
-"PO-Revision-Date: 2012-10-09 18:31+0700\n"
-"Last-Translator: Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
-"Language-Team: Thai <thai-l10n@googlegroups.com>\n"
-"Language: th\n"
+"Project-Id-Version: gnome-shell\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-09 23:25-0700\n"
+"PO-Revision-Date: 2018-05-10 06:29+0000\n"
+"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
+"Language-Team: Thai (http://www.transifex.com/endless-os/gnome-shell/language/th/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../data/50-gnome-shell-screenshot.xml.in.h:1
-msgid "Screenshots"
-msgstr "จับภาพหน้าจอ"
-
-#: ../data/50-gnome-shell-screenshot.xml.in.h:2
-msgid "Record a screencast"
-msgstr "อัดภาพถ่ายทอดหน้าจอ"
-
-#: ../data/50-gnome-shell-system.xml.in.h:1
+#: data/50-gnome-shell-system.xml:6
 msgid "System"
 msgstr "ระบบ"
 
-#: ../data/50-gnome-shell-system.xml.in.h:2
-msgid "Show the message tray"
-msgstr "แสดงถาดข้อความ"
+#: data/50-gnome-shell-system.xml:9
+msgid "Show the notification list"
+msgstr "แสดงรายการแจ้งเตือน"
 
-#: ../data/gnome-shell.desktop.in.in.h:1
-msgid "GNOME Shell"
-msgstr "เชลล์ GNOME"
+#: data/50-gnome-shell-system.xml:12
+msgid "Focus the active notification"
+msgstr "มุ่งที่การแจ้งเตือนที่ทำงานอยู่"
 
-#: ../data/gnome-shell.desktop.in.in.h:2
-msgid "Window management and application launching"
-msgstr "การจัดการหน้าต่างและการเรียกใช้โปรแกรม"
+#: data/50-gnome-shell-system.xml:15
+msgid "Show the overview"
+msgstr "แสดงภาพรวม"
 
-#: ../data/gnome-shell-extension-prefs.desktop.in.in.h:1
-#: ../js/extensionPrefs/main.js:152
-msgid "GNOME Shell Extension Preferences"
-msgstr "ปรับแต่งส่วนขยายของเชลล์ GNOME"
+#: data/50-gnome-shell-system.xml:18
+msgid "Show all applications"
+msgstr "แสดงแอปพลิเคชันทั้งหมด"
 
-#: ../data/gnome-shell-extension-prefs.desktop.in.in.h:2
+#: data/50-gnome-shell-system.xml:21
+msgid "Open the application menu"
+msgstr "เปิดเมนูแอปพลิเคชัน"
+
+#: data/gnome-shell-extension-prefs.desktop.in.in:4
+#: js/extensionPrefs/main.js:152
+msgid "Shell Extensions"
+msgstr "Shell Extensions"
+
+#: data/gnome-shell-extension-prefs.desktop.in.in:5
 msgid "Configure GNOME Shell Extensions"
 msgstr "ตั้งค่าส่วนขยายต่างๆ ของเชลล์ GNOME"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:1
+#: data/org.gnome.Shell.desktop.in.in:4
+msgid "GNOME Shell"
+msgstr "เชลล์ GNOME"
+
+#: data/org.gnome.Shell.desktop.in.in:5
+msgid "Window management and application launching"
+msgstr "การจัดการหน้าต่างและการเรียกใช้โปรแกรม"
+
+#: data/org.gnome.shell.gschema.xml.in:22
 msgid "Enable internal tools useful for developers and testers from Alt-F2"
 msgstr "เปิดใช้เครื่องมือภายในที่เป็นประโยชน์ต่อนักพัฒนาและนักทดสอบ ผ่านปุ่ม Alt-F2"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:2
+#: data/org.gnome.shell.gschema.xml.in:25
 msgid ""
 "Allows access to internal debugging and monitoring tools using the Alt-F2 "
 "dialog."
 msgstr "เปิดให้เข้าถึงเครื่องมือภายในสำหรับดีบั๊กและเฝ้าสังเกต ซึ่งเรียกผ่านกล่องโต้ตอบ Alt-F2"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:3
-msgid "Uuids of extensions to enable"
-msgstr "UUID ของส่วนขยายที่จะเปิดใช้งาน"
+#: data/org.gnome.shell.gschema.xml.in:32
+msgid "UUIDs of extensions to enable"
+msgstr "UUID ของส่วนขยายเพื่อเปิดใช้งาน"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:4
+#: data/org.gnome.shell.gschema.xml.in:33
 msgid ""
-"GNOME Shell extensions have a uuid property; this key lists extensions which "
-"should be loaded. Any extension that wants to be loaded needs to be in this "
-"list. You can also manipulate this list with the EnableExtension and "
-"DisableExtension DBus methods on org.gnome.Shell."
-msgstr ""
-"ส่วนขยายต่างๆ ของเชลล์ GNOME จะมี UUID ประจำตัว คีย์นี้จะเก็บรายชื่อของส่วนขยายที่จะโหลดใช้ "
-"ส่วนขยายใดๆ ที่ต้องการให้โหลดจะต้องอยู่ในรายชื่อนี้ คุณยังสามารถจัดการรายชื่อนี้ผ่านเมธอด "
-"EnableExtension และ DisableExtension ของ DBus ที่หัวข้อ org.gnome.Shell ได้"
+"GNOME Shell extensions have a UUID property; this key lists extensions which"
+" should be loaded. Any extension that wants to be loaded needs to be in this"
+" list. You can also manipulate this list with the EnableExtension and "
+"DisableExtension D-Bus methods on org.gnome.Shell."
+msgstr "ส่วนขยายต่างๆ ของเชลล์ GNOME จะมี UUID ประจำตัว คีย์นี้จะระบุรายชื่อของส่วนขยายที่จะโหลดใช้ ส่วนขยายใดๆ ที่ต้องการให้โหลดจะต้องอยู่ในรายชื่อนี้ คุณยังสามารถจัดการรายชื่อนี้ได้ผ่านเมธอด EnableExtension และ DisableExtension ของ DBus ใน org.gnome.Shell"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:5
-msgid "Whether to collect stats about applications usage"
-msgstr "กำหนดว่าจะเก็บสถิติการใช้งานโปรแกรมต่างๆ หรือไม่"
+#: data/org.gnome.shell.gschema.xml.in:42
+msgid "Disable user extensions"
+msgstr "ปิดการใช้งานส่วนขยายผู้ใช้งาน"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:6
+#: data/org.gnome.shell.gschema.xml.in:43
 msgid ""
-"The shell normally monitors active applications in order to present the most "
-"used ones (e.g. in launchers). While this data will be kept private, you may "
-"want to disable this for privacy reasons. Please note that doing so won't "
-"remove already saved data."
-msgstr ""
-"โดยปกติ เชลล์ GNOME จะเฝ้าสังเกตการเรียกใช้งานโปรแกรมต่างๆ เพื่อนำเสนอโปรแกรมที่ใช้บ่อย "
-"(เช่น ในตัวเรียกโปรแกรม) แม้ข้อมูลนี้จะถูกเก็บไว้ไม่มีการเผยแพร่อยู่แล้ว "
-"แต่คุณอาจต้องการปิดการทำงานส่วนนี้ด้วยเหตุผลเรื่องความเป็นส่วนตัว "
-"แต่อย่าลืมว่าการปิดดังกล่าวไม่ได้เป็นการลบข้อมูลที่บันทึกไว้ก่อนหน้านี้"
+"Disable all extensions the user has enabled without affecting the “enabled-"
+"extension” setting."
+msgstr "ปิดใช้งานส่วนขยายทั้งหมดที่ผู้ใช้งานเปิดใช้โดยไม่ส่งผลกระทบต่อการตั้งค่า \"เปิดใช้งานส่วนขยาย\""
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:7
+#: data/org.gnome.shell.gschema.xml.in:50
+msgid "Disables the validation of extension version compatibility"
+msgstr "ปิดใช้งานการตรวจสอบความถูกต้องของความเข้ากันได้เวอร์ชันส่วนขยาย"
+
+#: data/org.gnome.shell.gschema.xml.in:51
+msgid ""
+"GNOME Shell will only load extensions that claim to support the current "
+"running version. Enabling this option will disable this check and try to "
+"load all extensions regardless of the versions they claim to support."
+msgstr "GNOME Shell จะโหลดเฉพาะส่วนขยายที่ระบุว่าสนับสนุนเวอร์ชันที่ใช้ในปัจจุบันเท่านั้น การเปิดใช้ตัวเลือกนี้จะปิดการตรวจสอบ และจะพยายามโหลดทุกส่วนขยายโดยไม่สนใจเวอร์ชันที่สนับสนุน"
+
+#: data/org.gnome.shell.gschema.xml.in:59
 msgid "List of desktop file IDs for favorite applications"
 msgstr "รายชื่อของแฟ้มเดสก์ท็อปสำหรับโปรแกรมโปรด"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:8
+#: data/org.gnome.shell.gschema.xml.in:60
 msgid ""
-"The applications corresponding to these identifiers will be displayed in the "
-"favorites area."
+"The applications corresponding to these identifiers will be displayed in the"
+" favorites area."
 msgstr "โปรแกรมที่แทนด้วยแฟ้มเดสก์ท็อปเหล่านี้จะถูกแสดงในบริเวณโปรแกรมโปรด"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:9
+#: data/org.gnome.shell.gschema.xml.in:67
+msgid "App Picker View"
+msgstr "มุมมองเครื่องมือเลือกแอพ"
+
+#: data/org.gnome.shell.gschema.xml.in:68
+msgid "Index of the currently selected view in the application picker."
+msgstr "ดัชนีมุมมองที่เลือกไว้ในปัจจุบันในเครื่องมือเลือกแอพพลิเคชัน"
+
+#: data/org.gnome.shell.gschema.xml.in:74
 msgid "History for command (Alt-F2) dialog"
 msgstr "ประวัติคำสั่งของกล่องโต้ตอบเรียกโปรแกรม (Alt-F2)"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:10
+#. Translators: looking glass is a debugger and inspector tool, see
+#. https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
+#: data/org.gnome.shell.gschema.xml.in:79
 msgid "History for the looking glass dialog"
 msgstr "ประวัติคำสั่งของกล่องโต้ตอบ looking glass"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:11
+#: data/org.gnome.shell.gschema.xml.in:83
+msgid "Always show the “Log out” menu item in the user menu."
+msgstr "แสดงรายการเมนู 'ออกจากระบบ' ในเมนูผู้ใช้เสมอ"
+
+#: data/org.gnome.shell.gschema.xml.in:84
 msgid ""
-"Internally used to store the last IM presence explicitly set by the user. "
-"The value here is from the TpConnectionPresenceType enumeration."
-msgstr ""
-"ใช้เป็นการภายในเพื่อเก็บสถานะอยู่/ไม่อยู่ล่าสุดของ IM ที่ผู้ใช้เปลี่ยนเองโดยตรง ค่านี้เป็นค่าจาก "
-"enumeration ชนิด TpConnectionPresenceType"
+"This key overrides the automatic hiding of the “Log out” menu item in "
+"single-user, single-session situations."
+msgstr "คีย์นี้จะแทนที่การซ่อนอัตโนมัติของรายการเมนู 'ออกจากระบบ' ในสถานการณ์ที่มีผู้ใช้คนเดียว เซสชันเดียว"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:12
+#: data/org.gnome.shell.gschema.xml.in:91
 msgid ""
-"Internally used to store the last session presence status for the user. The "
-"value here is from the GsmPresenceStatus enumeration."
-msgstr ""
-"ใช้เป็นการภายในเพื่อเก็บสถานะอยู่/ไม่อยู่ของผู้ใช้ในวาระล่าสุด ค่านี้เป็นค่าจาก enumeration ชนิด "
-"GsmPresenceStatus"
+"Whether to remember password for mounting encrypted or remote filesystems"
+msgstr "ให้จดจำรหัสผ่านสำหรับการติดตั้งระบบไฟล์ที่มีการเข้ารหัสลับหรืออยู่ระยะไกลหรือไม่"
 
-# See http://en.wikipedia.org/wiki/ISO_week_date
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:13
-msgid "Show the week date in the calendar"
-msgstr "แสดงวันที่แบบสัปดาห์ในปฏิทิน"
+#: data/org.gnome.shell.gschema.xml.in:92
+msgid ""
+"The shell will request a password when an encrypted device or a remote "
+"filesystem is mounted. If the password can be saved for future use a "
+"“Remember Password” checkbox will be present. This key sets the default "
+"state of the checkbox."
+msgstr "เชลล์ต้องการรหัสผ่านเมื่อต่อเชื่อมกับอุปกรณ์ที่ต้องเข้ารหัสหรือระบบไฟล์ระยะไกล กล่องกาเครื่องหมาย 'จดจำรหัสผ่าน' จะปรากฏขึ้นหากสามารถบันทึกรหัสผ่านสำหรับการใช้ในอนาคตได้ คีย์นี้จะตั้งค่าเริ่มต้นของกล่องกาเครื่องหมาย"
 
-# See http://en.wikipedia.org/wiki/ISO_week_date
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:14
-msgid "If true, display the ISO week date in the calendar."
-msgstr "ถ้าเลือก จะแสดงวันที่แบบสัปดาห์ของ ISO ในปฏิทิน"
+#: data/org.gnome.shell.gschema.xml.in:101
+msgid ""
+"Whether the default Bluetooth adapter had set up devices associated to it"
+msgstr "อะแดปเตอร์ Bluetooth ในค่าเริ่มต้นได้จัดเตรียมอุปกรณ์ที่เกี่ยวข้องแล้วหรือไม่"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:15
+#: data/org.gnome.shell.gschema.xml.in:102
+msgid ""
+"The shell will only show a Bluetooth menu item if a Bluetooth adapter is "
+"powered, or if there were devices set up associated with the default "
+"adapter. This will be reset if the default adapter is ever seen not to have "
+"devices associated to it."
+msgstr "เชลล์จะแสดงรายการเมนูบลูทูธถ้าอะแด็ปเตอร์บลูทูธมีพลังงาน หรือมีอุปกรณ์ถูกตั้งค่าให้เชื่อมโยงกับอะแด็ปเตอร์เริ่มต้น สิ่งนี้จะรีเซ็ตถ้าพบว่าอะแด็ปเตอร์เริ่มต้นไม่ได้เชื่อมโยงกับอุปกรณ์"
+
+#: data/org.gnome.shell.gschema.xml.in:114
+msgid "Whether the App Center is displayed"
+msgstr "ศูนย์แอพจะปรากฏหรือไม่"
+
+#: data/org.gnome.shell.gschema.xml.in:117
+msgid "Whether the application grid displays the App Center icon."
+msgstr "ตารางกริดบนแอพพลิเคชันแสดงไอคอนศูนย์แอพหรือไม่"
+
+#: data/org.gnome.shell.gschema.xml.in:123
+msgid "Whether the coding game is enabled"
+msgstr "มีการเปิดใช้งานเกมเขียนโค้ดหรือไม่"
+
+#: data/org.gnome.shell.gschema.xml.in:126
+msgid ""
+"Whether the coding game is enabled. You will need to restart the shell for "
+"this setting to take effect, as it is intended for product developers."
+msgstr "เปิดใช้งานเกมเขียนโค้ดแล้วหรือไม่ คุณจะต้องทำการรีสตาร์ทเชลล์เพื่อให้การตั้งค่านี้เป็นผล เนื่องจากสิ่งนี้มีวัตถุประสงค์เพื่อนักพัฒนาผลิตภัณฑ์"
+
+#: data/org.gnome.shell.gschema.xml.in:134
+msgid "Whether the 'Code View' feature is enabled"
+msgstr "เปิดใช้ฟีเจอร์ 'มุมมองโค้ด' แล้วหรือไม่"
+
+#: data/org.gnome.shell.gschema.xml.in:137
+msgid ""
+"This allows to modify and run a whitelist of applications using GNOME "
+"Builder."
+msgstr "สิ่งนี้อนุญาตให้ปรับเปลี่ยนและรันรายการที่ได้รับอนุญาตของแอปพลิเคชันที่ใช้ GNOME Builder"
+
+#: data/org.gnome.shell.gschema.xml.in:144
+msgid "Whether the Tray Area will be enabled"
+msgstr "ว่าจะเปิดใช้งานพื้นที่ถาดหรือไม่"
+
+#: data/org.gnome.shell.gschema.xml.in:147
+msgid ""
+"This enables an area on the right side of the bottom panel where the icons "
+"for those applications still relying on the tray area will display their "
+"status icons (e.g. Steam, Dropbox, Skype...)."
+msgstr "การดำเนินการนี้จะทำให้พื้นที่ทางด้านขวาของแผงด้านล่างซึ่งเป็นจุดที่แอพพลิเคชันดังกล่าวยังต้องอาศัยพื้นที่ถาดสามารถแสดงไอคอนสถานะได้ (เช่น Steam, Dropbox, Skype...)"
+
+#: data/org.gnome.shell.gschema.xml.in:155
+msgid "Enables the hot corner for the window picker"
+msgstr "เปิดใช้คำสั่งมุมจอสำหรับเครื่องมือเลือกหน้าต่าง"
+
+#: data/org.gnome.shell.gschema.xml.in:158
+msgid ""
+"By default, the hot corner for the window picker is enabled. Set false to "
+"disable the hot corner."
+msgstr "คำสั่งมุมจอสำหรับเครื่องมือเลือกหน้าต่างเปิดใช้งานตามค่าเริ่มต้น ตั้งค่า false เพื่อปิดใช้งานคำสั่งมุมจอ"
+
+#: data/org.gnome.shell.gschema.xml.in:165
+msgid "Set the left/right position of the hot corner for the window picker"
+msgstr "ตั้งค่าตำแหน่งซ้าย/ขวาของคำสั่งมุมจอสำหรับเครื่องมือเลือกหน้าต่าง"
+
+#: data/org.gnome.shell.gschema.xml.in:168
+msgid ""
+"Default position of the hot corner is in a right corner. Set false to move "
+"the hot corner to a left corner. The position is not affected by the RTL vs."
+" LTR text direction."
+msgstr "ตำแหน่งเริ่มต้นของคำสั่งมุมจอ คือ ในมุมด้านขวา ให้ตั้งค่าเป็นผิดเพื่อย้ายคำสั่งมุมจอไปยังมุมด้านซ้าย ตำแหน่งนี้จะไม่ได้รับผลกระทบจากทิศทางข้อความขวาไปซ้ายเทียบกับซ้ายไปขวา"
+
+#: data/org.gnome.shell.gschema.xml.in:176
+msgid "Set the top/bottom position of the hot corner for the window picker"
+msgstr "ตั้งค่าตำแหน่งบน/ล่างของคำสั่งมุมจอสำหรับเครื่องมือเลือกหน้าต่าง"
+
+#: data/org.gnome.shell.gschema.xml.in:179
+msgid ""
+"Default position of the hot corner is in a bottom corner. Set false to move "
+"the hot corner to a top corner."
+msgstr "ตำแหน่งเริ่มต้นของคำสั่งมุมจอคือที่มุมด้านล่าง ตั้งค่า false เพื่อย้ายคำสั่งมุมจอไปที่มุมด้านบน"
+
+#: data/org.gnome.shell.gschema.xml.in:186
+msgid "Set the size of the hot corner target"
+msgstr "กำหนดขนาดของคำสั่งมุมจอที่ต้องการ"
+
+#: data/org.gnome.shell.gschema.xml.in:189
+msgid ""
+"Number of pixels in one dimension of the square target for the hot corner. "
+"Default is for a single pixel in the very corner. For some virtual machines,"
+" this value may need to be set larger than the default."
+msgstr "จำนวนพิกเซลใน 1 มิติของเป้าหมายสี่เหลี่ยมสำหรับมุมลัด ค่าเริ่มต้นเท่ากับมุมละ 1 พิกเซลเท่านั้น ทั้งนี้สำหรับเครื่องเสมือนบางรุ่น อาจจำเป็นต้องกำหนดค่านี้ให้มากกว่าค่าเริ่มต้น"
+
+#: data/org.gnome.shell.gschema.xml.in:199
+msgid "Prevent apps from being automatically maximized on launch"
+msgstr "ป้องกันแอพไม่ให้ถูกขยายอัตโนมัติเมื่อเปิดใช้"
+
+#: data/org.gnome.shell.gschema.xml.in:202
+msgid ""
+"Makes window management more like standard Gnome. Hides application splash "
+"screens, prevents applications from being forced to open maximized, and does"
+" not automatically switch to the app selector when a window is minimized."
+msgstr "ทำให้การจัดการหน้าต่างเป็นเหมือน Gnome มาตรฐาน โดยซ่อนหน้าจอเริ่มต้นแอพพลิเคชัน ป้องกันแอพพลิเคชันไม่ให้ถูกบังคับเปิดขยาย และไม่สลับไปยังเครื่องมือเลือกแอพโดยอัตโนมัติเมื่อหน้าต่างถูกย่อ"
+
+#: data/org.gnome.shell.gschema.xml.in:211
+msgid "Whether password reset is allowed"
+msgstr "การอนุญาตให้ตั้งรหัสผ่านใหม่"
+
+#: data/org.gnome.shell.gschema.xml.in:212
+msgid ""
+"This key controls whether to show the \"Forgot Password?\" button on the "
+"login screen. 'default' tells GNOME Shell to use the vendor default setting."
+" 'enable' and 'disable' can be used to explicitly enable or disable the "
+"reset button, respectively. Note that it only makes sense to set this key "
+"for the Debian-gdm user; changing it for your own user account will have no "
+"effect."
+msgstr "คีย์นี้จะควบคุมการแสดงปุ่ม \"ลืมรหัสผ่าน?\" ในหน้าจอการเข้าสู่ระบบ ตัวเลือก 'ค่าเริ่มต้น' จะเป็นการสั่งให้ GNOME Shell ใช้การตั้งค่าเริ่มต้นจากผู้จำหน่าย ส่วนตัวเลือก 'เปิดใช้งาน' และ 'ปิดใช้งาน' จะใช้เพื่อสั่งให้เปิดหรือปิดการใช้งานปุ่มรีเซ็ต ตามลำดับ โปรดทราบว่าการตั้งค่าคีย์นี้จะสมเหตุสมผลในกรณีของผู้ใช้ Debian-gdm เท่านั้น การเปลี่ยนแปลงการตั้งค่านี้ในบัญชีผู้ใช้ของคุณเองจะไม่มีผลใดๆ"
+
+#: data/org.gnome.shell.gschema.xml.in:223
+msgid ""
+"List of desktop file IDs for applications pinned to taskbar (DEPRECATED)"
+msgstr "รายการของ ID ไฟล์เดสก์ท็อปสำหรับแอปพลิเคชันปักหมุดไว้บนแถบงาน (ไม่สนับสนุน)"
+
+#: data/org.gnome.shell.gschema.xml.in:224
+msgid ""
+"The applications corresponding to these identifiers will be displayed in the"
+" taskbar at the bottom of the Endless desktop. THIS IS DEPRECATED NOW: any "
+"value in here will be automatically copied over to the favorite-apps key by "
+"the shell on start, and then cleared from here."
+msgstr "แอพพลิเคชันที่สอดคล้องกับตัวระบุเหล่านี้จะปรากฏขึ้นในแถบงานทางด้านล่างของหน้าเดสก์ท็อปของ Endless แต่ระบบยังไม่สนับสนุนสิ่งนี้ในขณะนี้: ค่าใดๆ ในที่นี้จะถูกคัดลอกไปยังคีย์แอพโปรดโดยอัตโนมัติโดยเชลล์ในขั้นเริ่มต้น จากนั้นจะถูกลบออกจากที่นี่"
+
+#: data/org.gnome.shell.gschema.xml.in:233
+msgid "Layout of application launcher icons in the grid"
+msgstr "เค้าโครงของไอคอนตัวเปิดใช้แอพพลิเคชันในตารางกริด"
+
+#: data/org.gnome.shell.gschema.xml.in:234
+msgid ""
+"This key specifies the exact order of the icons shown in the applications "
+"launcher view."
+msgstr "คีย์นี้จะระบุถึงลำดับที่แน่ชัดของไอคอนที่ปรากฏบนมุมมองตัวเปิดใช้แอพพลิเคชัน"
+
+#: data/org.gnome.shell.gschema.xml.in:240
+msgid "Whether or not to enable the wobbly effect"
+msgstr "จะเปิดใช้ว็อบบลีเอฟเฟ็กต์หรือไม่"
+
+#: data/org.gnome.shell.gschema.xml.in:243
+msgid "WOBBLY!"
+msgstr "สั่น!"
+
+#: data/org.gnome.shell.gschema.xml.in:250
+msgid "Wobbly effect Spring Constant"
+msgstr "ค่าคงตัวของสปริงในว็อบบลีเอฟเฟ็กต์"
+
+#: data/org.gnome.shell.gschema.xml.in:253
+msgid "Springiness of wobbly effect"
+msgstr "ความยืดหยุ่นของว็อบบลีเอฟเฟ็กต์"
+
+#: data/org.gnome.shell.gschema.xml.in:260
+msgid "Wobbly effect Friction"
+msgstr "แรงเสียดทานในว็อบบลีเอฟเฟ็กต์"
+
+#: data/org.gnome.shell.gschema.xml.in:263
+msgid "Friction of wobbly effect"
+msgstr "การเสียดสีจากการสั่นไหว"
+
+#: data/org.gnome.shell.gschema.xml.in:270
+msgid "Wobbly effect slowdown factor"
+msgstr "ปัจจัยที่ชะลอการสั่นไหว"
+
+#: data/org.gnome.shell.gschema.xml.in:273
+msgid "Slowdown factor of wobbly effect (1.0 being normal speed)"
+msgstr "ปัจจัยหน่วงเวลาในว็อบบลีเอฟเฟ็กต์ (ความเร็วปกติ คือ 1.0)"
+
+#: data/org.gnome.shell.gschema.xml.in:280
+msgid "Wobbly effect object movement range"
+msgstr "ระยะการเคลื่อนที่ของวัตถุในว็อบบลีเอฟเฟ็กต์"
+
+#: data/org.gnome.shell.gschema.xml.in:283
+msgid ""
+"How much objects are allowed to move in the mesh. A higher range allows for "
+"a more pronounced effect."
+msgstr "ความมากน้อยที่อนุญาตให้วัตถุเคลื่อนที่ได้ในตาข่าย การกำหนดค่าสูงๆ จะให้เอฟเฟ็กต์ที่ชัดเจนขึ้น"
+
+#: data/org.gnome.shell.gschema.xml.in:290
+msgid "Languages for which the discovery feed feature is enabled."
+msgstr "เปิดใช้ภาษาสำหรับฟีเจอร์ค้นหาฟีดแล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:293
+msgid ""
+"If the system language matches any of these languages, the discovery feed "
+"will be enabled. You will need to restart the shell for changes to this "
+"setting to take effect."
+msgstr "หากภาษาในระบบตรงกับภาษาใดๆ เหล่านี้ ฟีดค้นหาจะเปิดทำงานขึ้น โดยคุณจะต้องทำการรีสตาร์ทเชลล์เพื่อให้การแก้ไขที่ดำเนินการในการตั้งค่านี้เป็นผล"
+
+#: data/org.gnome.shell.gschema.xml.in:305
 msgid "Keybinding to open the application menu"
 msgstr "ปุ่มลัดสำหรับเปิดเมนูโปรแกรม"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:16
+#: data/org.gnome.shell.gschema.xml.in:306
 msgid "Keybinding to open the application menu."
 msgstr "ปุ่มลัดสำหรับเปิดเมนูโปรแกรม"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:17
-msgid "Keybinding to toggle the visibility of the message tray"
-msgstr "ปุ่มลัดสำหรับสลับการซ่อน/แสดงของถาดข้อความ"
+#: data/org.gnome.shell.gschema.xml.in:312
+msgid "Keybinding to open the “Show Applications” view"
+msgstr "การผูกคีย์เพื่อเปิดมุมมอง \"แสดงแอพพลิเคชัน\""
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:18
-msgid "Keybinding to toggle the visibility of the message tray."
-msgstr "ปุ่มลัดสำหรับสลับการซ่อน/แสดงของถาดข้อความ"
+#: data/org.gnome.shell.gschema.xml.in:313
+msgid ""
+"Keybinding to open the “Show Applications” view of the Activities Overview."
+msgstr "การผูกคีย์เพื่อเปิดมุมมอง \"แสดงแอพพลิเคชัน\" ของภาพรวมกิจกรรม"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:19
-msgid "Keybinding to toggle the screen recorder"
-msgstr "ปุ่มลัดสำหรับสลับเครื่องมืออัดภาพถ่ายทอดหน้าจอ"
+#: data/org.gnome.shell.gschema.xml.in:320
+msgid "Keybinding to open the overview"
+msgstr "การผูกคีย์เพื่อเปิดภาพรวม"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:20
-msgid "Keybinding to start/stop the builtin screen recorder."
-msgstr "ปุ่มลัดสำหรับเริ่ม/หยุดเครื่องมืออัดภาพถ่ายทอดหน้าจอที่มีมากับเชลล์"
+#: data/org.gnome.shell.gschema.xml.in:321
+msgid "Keybinding to open the Activities Overview."
+msgstr "การผูกคีย์เพื่อเปิดภาพรวมกิจกรรม"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:21
+#: data/org.gnome.shell.gschema.xml.in:327
+msgid "Keybinding to toggle the visibility of the notification list"
+msgstr "เชื่อมโยงคีย์เพื่อสลับการมองเห็นรายการแจ้งเตือน"
+
+#: data/org.gnome.shell.gschema.xml.in:328
+msgid "Keybinding to toggle the visibility of the notification list."
+msgstr "การผูกคีย์เพื่อสลับสถานะการมองเห็นรายการแจ้งเตือน"
+
+#: data/org.gnome.shell.gschema.xml.in:334
+msgid "Keybinding to focus the active notification"
+msgstr "การผูกคีย์เพื่อโฟกัสไปที่การแจ้งเตือนที่ทำงานอยู่"
+
+#: data/org.gnome.shell.gschema.xml.in:335
+msgid "Keybinding to focus the active notification."
+msgstr "การผูกคีย์เพื่อโฟกัสไปที่การแจ้งเตือนที่ทำงานอยู่"
+
+#: data/org.gnome.shell.gschema.xml.in:341
+msgid ""
+"Keybinding that pauses and resumes all running tweens, for debugging "
+"purposes"
+msgstr "การผูกคีย์ที่ทำหน้าที่หยุดและเล่นต่อ Tween ที่กำลังเคลื่อนที่อยู่ทั้งหมดเพื่อทำการแก้ไขจุดบกพร่อง"
+
+#: data/org.gnome.shell.gschema.xml.in:349
+msgid "Keybinding that shows the force app exit dialog"
+msgstr "เชื่อมโยงคีย์ที่แสดงกล่องข้อความบังคับออกจากแอป"
+
+#: data/org.gnome.shell.gschema.xml.in:354
+msgid "Keybinding to activate the first app in the icon bar."
+msgstr "เชื่อมโยงคีย์เพื่อเปิดแอปแรกในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:355
+msgid ""
+"Keybinding to open the first app in the icon bar, or switch to the app if "
+"already open."
+msgstr "การผูกคีย์เพื่อเปิดแอพลำดับแรกในแถบไอคอน หรือสลับไปยังแอพดังกล่าวหากเปิดไว้แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:361
+msgid "Keybinding to activate the second app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพลำดับที่ 2 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:362
+msgid ""
+"Keybinding to open the second app in the icon bar, or switch to the app if "
+"already open."
+msgstr "เชื่อมโยงคีย์เพื่อเปิดแอปที่ 2 ในแถบไอคอน หรือสลับไปยังแอปถ้าเปิดอยู่แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:368
+msgid "Keybinding to activate the third app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพลำดับที่ 3 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:369
+msgid ""
+"Keybinding to open the third app in the icon bar, or switch to the app if "
+"already open."
+msgstr "การผูกคีย์เพื่อเปิดแอพลำดับที่ 3 ในแถบไอคอน หรือสลับไปยังแอพดังกล่าวหากเปิดไว้แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:375
+msgid "Keybinding to activate the fourth app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพลำดับที่ 4 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:376
+msgid ""
+"Keybinding to open the fourth app in the icon bar, or switch to the app if "
+"already open."
+msgstr "เชื่อมโยงคีย์เพื่อเปิดแอปที่ 4 ในแถบไอคอน หรือสลับไปยังแอปถ้าเปิดอยู่แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:382
+msgid "Keybinding to activate the fifth app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพลำดับที่ 5 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:383
+msgid ""
+"Keybinding to open the fifth app in the icon bar, or switch to the app if "
+"already open."
+msgstr "เชื่อมโยงคีย์เพื่อเปิดแอปลำดับที่ 5 ในแถบไอคอน หรือสลับไปยังแอปถ้าเปิดอยู่แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:389
+msgid "Keybinding to activate the sixth app in the icon bar."
+msgstr "เชื่อมโยงคีย์เพื่อเปิดใช้งานแอปที่ 6 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:390
+msgid ""
+"Keybinding to open the sixth app in the icon bar, or switch to the app if "
+"already open."
+msgstr "การผูกคีย์เพื่อเปิดแอพลำดับที่ 6 ในแถบไอคอน หรือสลับไปยังแอพดังกล่าวหากเปิดไว้แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:396
+msgid "Keybinding to activate the seventh app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพลำดับที่ 7 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:397
+msgid ""
+"Keybinding to open the seventh app in the icon bar, or switch to the app if "
+"already open."
+msgstr "การผูกคีย์เพื่อเปิดแอพลำดับที่ 7 ในแถบไอคอน หรือสลับไปยังแอพดังกล่าวหากเปิดไว้แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:403
+msgid "Keybinding to activate the eighth app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพลำดับที่ 8 ในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:404
+msgid ""
+"Keybinding to open the eighth app in the icon bar, or switch to the app if "
+"already open."
+msgstr "เชื่อมโยงคีย์เพื่อเปิดแอปที่ 8 ในแถบไอคอน หรือสลับไปยังแอปถ้าเปิดอยู่แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:410
+msgid "Keybinding to activate the last app in the icon bar."
+msgstr "การผูกคีย์เพื่อเปิดใช้งานแอพสุดท้ายในแถบไอคอน"
+
+#: data/org.gnome.shell.gschema.xml.in:411
+msgid ""
+"Keybinding to open the last app in the icon bar, or switch to the app if "
+"already open."
+msgstr "การผูกคีย์เพื่อเปิดแอพลำดับสุดท้ายในแถบไอคอน หรือสลับไปยังแอพดังกล่าวหากเปิดไว้แล้ว"
+
+#: data/org.gnome.shell.gschema.xml.in:421
 msgid "Which keyboard to use"
 msgstr "ใช้แป้นพิมพ์ชนิดไหน"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:22
+#: data/org.gnome.shell.gschema.xml.in:422
 msgid "The type of keyboard to use."
 msgstr "ชนิดของแป้นพิมพ์ที่ใช้"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:23
-msgid "Framerate used for recording screencasts."
-msgstr "อัตราเฟรมที่จะใช้อัดภาพถ่ายทอดหน้าจอ"
+#: data/org.gnome.shell.gschema.xml.in:433
+#: data/org.gnome.shell.gschema.xml.in:460
+msgid "Limit switcher to current workspace."
+msgstr "จำกัดการสลับไปยังพื้นที่ทำงานปัจจุบัน"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:24
+#: data/org.gnome.shell.gschema.xml.in:434
 msgid ""
-"The framerate of the resulting screencast recordered by GNOME Shell's "
-"screencast recorder in frames-per-second."
-msgstr ""
-"อัตราเฟรมของภาพถ่ายทอดหน้าจอที่จะอัดด้วยเครื่องมืออัดภาพถ่ายทอดหน้าจอของเชลล์ GNOME "
-"ในหน่วยเฟรมต่อวินาที"
+"If true, only applications that have windows on the current workspace are "
+"shown in the switcher. Otherwise, all applications are included."
+msgstr "หากถูกต้อง แอพพลิเคชันที่ปรากฏในตัวสลับจะมีเพียงแอพพลิเคชันที่มีหน้าต่างจากพื้นที่ทำงานปัจจุบันเท่านั้น ไม่เช่นนั้น แอพพลิเคชันทั้งหมดจะถูกรวมเข้าไว้"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:25
-msgid "The gstreamer pipeline used to encode the screencast"
-msgstr "ไปป์ไลน์ของ GStreamer ที่จะใช้ลงรหัสภาพถ่ายทอดหน้าจอ"
+#: data/org.gnome.shell.gschema.xml.in:451
+msgid "The application icon mode."
+msgstr "โหมดไอคอนแอพพลิเคชัน"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:27
-#, no-c-format
+#: data/org.gnome.shell.gschema.xml.in:452
 msgid ""
-"Sets the GStreamer pipeline used to encode recordings. It follows the syntax "
-"used for gst-launch. The pipeline should have an unconnected sink pad where "
-"the recorded video is recorded. It will normally have a unconnected source "
-"pad; output from that pad will be written into the output file. However the "
-"pipeline can also take care of its own output - this might be used to send "
-"the output to an icecast server via shout2send or similar. When unset or set "
-"to an empty value, the default pipeline will be used. This is currently "
-"'vp8enc min_quantizer=13 max_quantizer=13 cpu-used=5 deadline=1000000 "
-"threads=%T ! queue ! webmmux' and records to WEBM using the VP8 codec. %T is "
-"used as a placeholder for a guess at the optimal thread count on the system."
-msgstr ""
-"กำหนดไปป์ไลน์ของ GStreamer ที่จะใช้ในการลงรหัสวีดิทัศน์ที่อัด โดยกำหนดในรูปแบบที่ gst-launch "
-"ใช้ ไปป์ไลน์นี้ควรจะมี sink pad ปลายเปิดซึ่งจะรับสัญญาณวีดิทัศน์ที่อัด และโดยปกติก็จะมี source "
-"pad ปลายเปิดด้วย ซึ่งจะใช้ปล่อยข้อมูลที่จะเขียนลงแฟ้มปลายทาง อย่างไรก็ดี "
-"ไปป์ไลน์สามารถจัดการข้อมูลออกของตัวเองได้ด้วย ซึ่งอาจจะใช้ในการส่งข้อมูลออกไปยังเซิร์ฟเวอร์ "
-"icecast ผ่าน shout2send หรืออะไรทำนองนี้ ถ้าค่านี้ไม่ได้กำหนดไว้ หรือกำหนดเป็นค่าว่างเปล่า "
-"ก็จะใช้ไปป์ไลน์ปริยาย ซึ่งขณะนี้ืคือ 'vp8enc min_quantizer=13 max_quantizer=13 cpu-"
-"used=5 deadline=1000000 threads=%T ! queue ! webmmux' และจะอัดวีดิทัศน์เป็น WEBM "
-"โดยใช้ตัวอ่าน/ลงรหัส VP8 ตัวแปร %T จะถูกแทนที่ด้วยค่าคาดเดาของจำนวนเธรดที่เหมาะสมของระบบ"
+"Configures how the windows are shown in the switcher. Valid possibilities "
+"are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only” "
+"(shows only the application icon) or “both”."
+msgstr "กำหนดค่ารูปแบบการแสดงหน้าต่างในตัวสลับ การดำเนินการที่สามารถทำได้ ได้แก่ 'รูปขนาดย่อเท่านั้น' (แสดงรูปขนาดย่อของหน้าต่าง) และ 'ไอคอนแอพเท่านั้น' (แสดงเฉพาะไอคอนแอพพลิเคชัน) หรือ 'ทั้งคู่'"
 
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:28
-msgid "File extension used for storing the screencast"
-msgstr "นามสกุลแฟ้มที่จะใช้เก็บภาพถ่ายทอดหน้าจอ"
-
-#: ../data/org.gnome.shell.gschema.xml.in.in.h:29
+#: data/org.gnome.shell.gschema.xml.in:461
 msgid ""
-"The filename for recorded screencasts will be a unique filename based on the "
-"current date, and use this extension. It should be changed when recording to "
-"a different container format."
-msgstr ""
-"ชื่อแฟ้มของภาพถ่ายทอดหน้าจอที่อัดจะเป็นชื่อที่ไม่ซ้ำ โดยสร้างจากวันเวลาปัจจุบัน แล้วตามด้วยนามสกุลนี้ "
-"ซึ่งควรเปลี่ยนให้ตรงตามฟอร์แมตที่อัด"
+"If true, only windows from the current workspace are shown in the switcher. "
+"Otherwise, all windows are included."
+msgstr "หากถูกต้อง หน้าต่างที่ปรากฏในตัวสลับจะมีเพียงหน้าต่างจากพื้นที่ทำงานปัจจุบันเท่านั้น ไม่เช่นนั้น หน้าต่างทั้งหมดจะถูกรวมเข้าไว้"
 
-#: ../js/extensionPrefs/main.js:124
-#, c-format
+#: data/org.gnome.shell.gschema.xml.in:472
+msgid "Attach modal dialog to the parent window"
+msgstr "แนบกล่องข้อความโมดอลกับหน้าต่างหลัก"
+
+#: data/org.gnome.shell.gschema.xml.in:473
+#: data/org.gnome.shell.gschema.xml.in:482
+#: data/org.gnome.shell.gschema.xml.in:490
+#: data/org.gnome.shell.gschema.xml.in:498
+#: data/org.gnome.shell.gschema.xml.in:506
+msgid ""
+"This key overrides the key in org.gnome.mutter when running GNOME Shell."
+msgstr "คีย์นี้จะเข้าแทนที่คีย์ใน org.gnome.mutter เมื่อมีการเรียกใช้เชลล์ GNOME"
+
+#: data/org.gnome.shell.gschema.xml.in:481
+msgid "Enable edge tiling when dropping windows on screen edges"
+msgstr "เปิดใช้การเรียงขอบเมื่อวางหน้าต่างบนขอบจอ"
+
+#: data/org.gnome.shell.gschema.xml.in:489
+msgid "Workspaces are managed dynamically"
+msgstr "พื้นที่ทำงานได้รับการจัดการแบบไดนามิก"
+
+#: data/org.gnome.shell.gschema.xml.in:497
+msgid "Workspaces only on primary monitor"
+msgstr "พื้นที่ทำงานอยู่บนจอภาพหลักเท่านั้น"
+
+#: data/org.gnome.shell.gschema.xml.in:505
+msgid "Delay focus changes in mouse mode until the pointer stops moving"
+msgstr "หน่วงเวลาการปรับโฟกัสในโหมดเมาส์จนกระทั่งตัวชี้หยุดเคลื่อนที่"
+
+#: data/org.gnome.shell.gschema.xml.in:518
+msgid "Watermark file"
+msgstr "ไฟล์ลายน้ำ"
+
+#: data/org.gnome.shell.gschema.xml.in:519
+msgid "The full watermark file path"
+msgstr "เส้นทางแฟ้มลายน้ำแบบเต็ม"
+
+#: data/org.gnome.shell.gschema.xml.in:523
+msgid "Watermark position"
+msgstr "ตำแหน่งลายน้ำ"
+
+#: data/org.gnome.shell.gschema.xml.in:524
+msgid ""
+"The position of the watermark; valid values are 'center', 'bottom-left', "
+"'bottom-center' and 'bottom-right'"
+msgstr "ตำแหน่งของลายน้ำ ค่าที่ถูกต้อง ได้แก่ 'กึ่งกลาง', 'ด้านล่างซ้าย', 'กึ่งกลางด้านล่าง' และ 'ด้านล่างขวา'"
+
+#: data/org.gnome.shell.gschema.xml.in:532
+msgid "Watermark size"
+msgstr "ขนาดลายน้ำ"
+
+#: data/org.gnome.shell.gschema.xml.in:533
+msgid "The watermark size in percent relative to the screen width"
+msgstr "เปอร์เซ็นต์ของขนาดลายน้ำเทียบกับความกว้างหน้าจอ"
+
+#: data/org.gnome.shell.gschema.xml.in:538
+msgid "Watermark border"
+msgstr "เส้นขอบลายน้ำ"
+
+#: data/org.gnome.shell.gschema.xml.in:539
+msgid "The watermark around the logo"
+msgstr "ลายน้ำรอบโลโก้"
+
+#: data/org.gnome.shell.gschema.xml.in:544
+msgid "Watermark opacity"
+msgstr "ความทึบของลายน้ำ"
+
+#: data/org.gnome.shell.gschema.xml.in:545
+msgid "The watermark of the logo"
+msgstr "ลายน้ำของโลโก้"
+
+#: data/org.gnome.shell.gschema.xml.in:549
+msgid "Watermark always visible"
+msgstr "มองเห็นลายน้ำตลอดเวลา"
+
+#: data/org.gnome.shell.gschema.xml.in:550
+msgid "Show the watermark even on a non default background"
+msgstr "แสดงลายน้ำ รวมถึงบนพื้นหลังที่ไม่ใช่ค่าเริ่มต้น"
+
+#: data/org.gnome.Shell.PortalHelper.desktop.in.in:3
+msgid "Network Login"
+msgstr "เข้าสู่ระบบเครือข่าย"
+
+#. Translators: Do NOT translate or transliterate this text (this is an icon
+#. file name)!
+#: data/org.gnome.Shell.PortalHelper.desktop.in.in:9
+msgid "network-workgroup"
+msgstr "เครือข่าย-กลุ่มงาน"
+
+#: js/extensionPrefs/main.js:120
+#, javascript-format
 msgid "There was an error loading the preferences dialog for %s:"
 msgstr "เกิดข้อผิดพลาดขณะโหลดกล่องโต้ตอบปรับแต่งสำหรับ %s:"
 
-#: ../js/extensionPrefs/main.js:164
-msgid "Extension"
-msgstr "ส่วนขยาย"
+#: js/gdm/authPrompt.js:134
+msgid "Show password hint"
+msgstr "แสดงบอกนัยรหัสผ่าน"
 
-#: ../js/extensionPrefs/main.js:188
-msgid "Select an extension to configure using the combobox above."
-msgstr "เลือกส่วนขยายที่จะตั้งค่าโดยใช้กล่องคอมโบด้านบน"
+#: js/gdm/authPrompt.js:149
+msgid "Forgot password?"
+msgstr "ลืมรหัสผ่านใช่หรือไม่"
 
-#: ../js/gdm/loginDialog.js:528
-msgid "Session..."
-msgstr "วาระ..."
-
-#: ../js/gdm/loginDialog.js:676
-msgctxt "title"
-msgid "Sign In"
-msgstr "เข้าระบบ"
-
-#. translators: this message is shown below the user list on the
-#. login screen. It can be activated to reveal an entry for
-#. manually entering the username.
-#: ../js/gdm/loginDialog.js:743
-msgid "Not listed?"
-msgstr "ไม่มีชื่อของคุณงั้นหรือ?"
-
-#: ../js/gdm/loginDialog.js:896 ../js/ui/components/networkAgent.js:137
-#: ../js/ui/components/polkitAgent.js:162 ../js/ui/endSessionDialog.js:373
-#: ../js/ui/extensionDownloader.js:195 ../js/ui/shellMountOperation.js:396
-#: ../js/ui/status/bluetooth.js:427 ../js/ui/unlockDialog.js:166
+#: js/gdm/authPrompt.js:199 js/ui/audioDeviceSelection.js:71
+#: js/ui/components/networkAgent.js:140 js/ui/components/polkitAgent.js:160
+#: js/ui/endSessionDialog.js:482 js/ui/extensionDownloader.js:197
+#: js/ui/forceAppExitDialog.js:78 js/ui/paygUnlockDialog.js:347
+#: js/ui/shellMountOperation.js:353 js/ui/status/network.js:925
 msgid "Cancel"
 msgstr "ยกเลิก"
 
-#: ../js/gdm/loginDialog.js:901
+#: js/gdm/authPrompt.js:221 js/gdm/authPrompt.js:276 js/gdm/authPrompt.js:517
+msgid "Next"
+msgstr "ถัดไป"
+
+#: js/gdm/authPrompt.js:272 js/ui/paygUnlockDialog.js:368
+#: js/ui/shellMountOperation.js:357 js/ui/unlockDialog.js:59
+msgid "Unlock"
+msgstr "ปลดล็อค"
+
+#: js/gdm/authPrompt.js:274
 msgctxt "button"
 msgid "Sign In"
 msgstr "เข้าระบบ"
 
-#: ../js/gdm/loginDialog.js:1240
-msgid "Login Window"
-msgstr "หน้าต่างเข้าระบบ"
+#. FIXME: This string is too long. It is ellipsized, even in English.
+#. It must be shortened after the Endless 3.2 release, once there is
+#. time to translate the shortened version.
+#. Translators: During a password reset, prompt for the "secret code" provided
+#. by customer support.
+#: js/gdm/authPrompt.js:653
+msgid "Enter unlock code provided by customer support:"
+msgstr "ใส่รหัสปลดล็อคที่ได้จากฝ่ายช่วยเหลือลูกค้า:"
 
-#. Translators: accessible name of the power menu in the login screen
-#: ../js/gdm/powerMenu.js:35
-msgid "Power"
-msgstr "เปิด/ปิด"
+#. Translators: Password reset. The first %s is a verification code and the
+#. second is an email.
+#: js/gdm/authPrompt.js:656
+#, javascript-format
+msgid ""
+"Please inform customer support of your verification code %s by emailing %s. "
+"The code will remain valid until you click Cancel or turn off your computer."
+msgstr "กรุณาแจ้งรหัสในการยืนยันของคุณแก่ฝ่ายช่วยเหลือลูกค้า %s ทางโออีเมล %s. รหัสจะยังคงใช้ได้จนกว่าคุณจะกดยกเลิกหรือปิดคอมพิวเตอร์"
 
-#: ../js/gdm/powerMenu.js:89 ../js/ui/userMenu.js:660 ../js/ui/userMenu.js:664
-#: ../js/ui/userMenu.js:775
-msgid "Suspend"
-msgstr "พักเครื่อง"
+#. Translators: Button on login dialog, after clicking Forgot Password?
+#: js/gdm/authPrompt.js:661
+msgid "Reset Password"
+msgstr "ตั้งค่ารหัสผ่านใหม่"
 
-#: ../js/gdm/powerMenu.js:94
-msgid "Restart"
-msgstr "เปิดเครื่องใหม่"
+#: js/gdm/authPrompt.js:734
+msgid "Your unlock code was incorrect. Please try again."
+msgstr "รหัสปลดล็อคของคุณไม่ถูกต้อง กรุณาลองอีกครั้ง"
 
-#: ../js/gdm/powerMenu.js:99 ../js/ui/userMenu.js:662 ../js/ui/userMenu.js:664
-#: ../js/ui/userMenu.js:774
-msgid "Power Off"
-msgstr "ปิดเครื่อง"
+#: js/gdm/loginDialog.js:310
+msgid "Choose Session"
+msgstr "เลือกเซสชัน"
 
-#: ../js/gdm/util.js:148
-msgid "Authentication error"
-msgstr "ยืนยันตัวบุคคลผิดพลาด"
+#. translators: this message is shown below the user list on the
+#. login screen. It can be activated to reveal an entry for
+#. manually entering the username.
+#: js/gdm/loginDialog.js:460
+msgid "Not listed?"
+msgstr "ไม่มีชื่อของคุณงั้นหรือ?"
 
-#. Translators: this message is shown below the password entry field
-#. to indicate the user can swipe their finger instead
-#: ../js/gdm/util.js:265
-msgid "(or swipe finger)"
-msgstr "(หรือลูบจอ)"
-
-#: ../js/gdm/util.js:290
-#, c-format
+#. Translators: this message is shown below the username entry field
+#. to clue the user in on how to login to the local network realm
+#: js/gdm/loginDialog.js:894
+#, javascript-format
 msgid "(e.g., user or %s)"
 msgstr "(เช่น ผู้ใช้ หรือ %s)"
 
-#: ../js/misc/util.js:92
+#. TTLS and PEAP are actually much more complicated, but this complication
+#. is not visible here since we only care about phase2 authentication
+#. (and don't even care of which one)
+#: js/gdm/loginDialog.js:899 js/ui/components/networkAgent.js:409
+#: js/ui/components/networkAgent.js:427
+msgid "Username: "
+msgstr "ชื่อผู้ใช้: "
+
+#: js/gdm/loginDialog.js:1242
+msgid "Login Window"
+msgstr "หน้าต่างเข้าระบบ"
+
+#: js/gdm/util.js:346
+msgid "Authentication error"
+msgstr "ยืนยันตัวบุคคลผิดพลาด"
+
+#. We don't show fingerprint messages directly since it's
+#. not the main auth service. Instead we use the messages
+#. as a cue to display our own message.
+#. Translators: this message is shown below the password entry field
+#. to indicate the user can swipe their finger instead
+#: js/gdm/util.js:478
+msgid "(or swipe finger)"
+msgstr "(หรือลูบจอ)"
+
+#. Title and description text to be shown in the periodic reminders.
+#: js/misc/paygManager.js:68
+msgid "Pay as You Go"
+msgstr "ชำระค่าบริการแบบเติมเงิน"
+
+#: js/misc/paygManager.js:69
+#, javascript-format
+msgid "Subscription runs out in %s."
+msgstr "หมดอายุสมาชิกใน %s"
+
+#: js/misc/paygManager.js:138
+#, javascript-format
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] "%s วินาที"
+
+#: js/misc/paygManager.js:142 js/misc/paygManager.js:152
+#, javascript-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "%s นาที"
+
+#: js/misc/paygManager.js:146 js/misc/paygManager.js:163
+#, javascript-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] "%s ชั่วโมง"
+
+#: js/misc/paygManager.js:157
+#, javascript-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s วัน"
+
+#. Translators: The name of the power-off action in search
+#: js/misc/systemActions.js:99
+msgctxt "search-result"
+msgid "Power off"
+msgstr "ปิดเครื่อง"
+
+#. Translators: A list of keywords that match the power-off action, separated
+#. by semicolons
+#: js/misc/systemActions.js:102
+msgid "power off;shutdown"
+msgstr "ปิดเครื่อง:ปิด"
+
+#. Translators: The name of the lock screen action in search
+#: js/misc/systemActions.js:106
+msgctxt "search-result"
+msgid "Lock screen"
+msgstr "หน้าจอล็อก"
+
+#. Translators: A list of keywords that match the lock screen action,
+#. separated by semicolons
+#: js/misc/systemActions.js:109
+msgid "lock screen"
+msgstr "หน้าจอล็อก"
+
+#. Translators: The name of the logout action in search
+#: js/misc/systemActions.js:113
+msgctxt "search-result"
+msgid "Log out"
+msgstr "ออกจากระบบ"
+
+#. Translators: A list of keywords that match the logout action, separated by
+#. semicolons
+#: js/misc/systemActions.js:116
+msgid "logout;sign off"
+msgstr "ออก;ลงชื่อออก"
+
+#. Translators: The name of the suspend action in search
+#: js/misc/systemActions.js:120
+msgctxt "search-result"
+msgid "Suspend"
+msgstr "พักเครื่อง"
+
+#. Translators: A list of keywords that match the suspend action, separated by
+#. semicolons
+#: js/misc/systemActions.js:123
+msgid "suspend;sleep"
+msgstr "ระงับ;พัก"
+
+#. Translators: The name of the switch user action in search
+#: js/misc/systemActions.js:127
+msgctxt "search-result"
+msgid "Switch user"
+msgstr "สลับผู้ใช้"
+
+#. Translators: A list of keywords that match the switch user action,
+#. separated by semicolons
+#: js/misc/systemActions.js:130
+msgid "switch user"
+msgstr "สลับผู้ใช้"
+
+#. Translators: The name of the lock orientation action in search
+#: js/misc/systemActions.js:134
+msgctxt "search-result"
+msgid "Lock orientation"
+msgstr "ล็อกการหมุน"
+
+#. Translators: A list of keywords that match the lock orientation action,
+#. separated by semicolons
+#: js/misc/systemActions.js:137
+msgid "lock orientation"
+msgstr "ล็อกการวางแนว"
+
+#: js/misc/util.js:187
 msgid "Command not found"
 msgstr "ไม่พบคำสั่ง"
 
 #. Replace "Error invoking GLib.shell_parse_argv: " with
 #. something nicer
-#: ../js/misc/util.js:125
+#: js/misc/util.js:220
 msgid "Could not parse command:"
 msgstr "ไม่สามารถแจงคำสั่ง:"
 
-#: ../js/misc/util.js:133
-#, c-format
-msgid "Execution of '%s' failed:"
-msgstr "คำสั่ง '%s' ทำงานล้มเหลว:"
+#: js/misc/util.js:228
+#, javascript-format
+msgid "Execution of “%s” failed:"
+msgstr "การดำเนินการของ \"%s\" ล้มเหลว:"
 
-#. Translators: Filter to display all applications
-#: ../js/ui/appDisplay.js:252
-msgid "All"
-msgstr "ทั้งหมด"
+#: js/misc/util.js:245
+msgid "Just now"
+msgstr "เดี๋ยวนี้"
 
-#: ../js/ui/appDisplay.js:310
-msgid "APPLICATIONS"
-msgstr "โปรแกรม"
+#: js/misc/util.js:247
+#, javascript-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "%d นาทีก่อน"
 
-#: ../js/ui/appDisplay.js:370
-msgid "SETTINGS"
-msgstr "ค่าตั้ง"
+#: js/misc/util.js:250
+#, javascript-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "%d ชั่วโมงก่อน"
 
-#: ../js/ui/appDisplay.js:675
+#: js/misc/util.js:253
+msgid "Yesterday"
+msgstr "เมื่อวาน"
+
+#: js/misc/util.js:255
+#, javascript-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] "%d วันก่อน"
+
+#: js/misc/util.js:258
+#, javascript-format
+msgid "%d week ago"
+msgid_plural "%d weeks ago"
+msgstr[0] "%d สัปดาห์ก่อน"
+
+#: js/misc/util.js:261
+#, javascript-format
+msgid "%d month ago"
+msgid_plural "%d months ago"
+msgstr[0] "%d เดือนก่อน"
+
+#: js/misc/util.js:263
+#, javascript-format
+msgid "%d year ago"
+msgid_plural "%d years ago"
+msgstr[0] "%d ปีก่อน"
+
+#. Translators: Time in 24h format
+#: js/misc/util.js:293
+msgid "%H∶%M"
+msgstr "%H∶%M"
+
+#. Translators: this is the word "Yesterday" followed by a
+#. time string in 24h format. i.e. "Yesterday, 14:30"
+#: js/misc/util.js:299
+#, no-c-format
+msgid "Yesterday, %H∶%M"
+msgstr "เมื่อวาน %H∶%M"
+
+#. Translators: this is the week day name followed by a time
+#. string in 24h format. i.e. "Monday, 14:30"
+#: js/misc/util.js:305
+#, no-c-format
+msgid "%A, %H∶%M"
+msgstr "%A, %H∶%M"
+
+#. Translators: this is the month name and day number
+#. followed by a time string in 24h format.
+#. i.e. "May 25, 14:30"
+#: js/misc/util.js:311
+#, no-c-format
+msgid "%B %d, %H∶%M"
+msgstr "%B %d, %H∶%M"
+
+#. Translators: this is the month name, day number, year
+#. number followed by a time string in 24h format.
+#. i.e. "May 25 2012, 14:30"
+#: js/misc/util.js:317
+#, no-c-format
+msgid "%B %d %Y, %H∶%M"
+msgstr "%B %d %Y, %H∶%M"
+
+#. Translators: Time in 12h format
+#: js/misc/util.js:322
+msgid "%l∶%M %p"
+msgstr "%l∶%M %p"
+
+#. Translators: this is the word "Yesterday" followed by a
+#. time string in 12h format. i.e. "Yesterday, 2:30 pm"
+#: js/misc/util.js:328
+#, no-c-format
+msgid "Yesterday, %l∶%M %p"
+msgstr "เมื่อวานนี้, %l∶%M %p"
+
+#. Translators: this is the week day name followed by a time
+#. string in 12h format. i.e. "Monday, 2:30 pm"
+#: js/misc/util.js:334
+#, no-c-format
+msgid "%A, %l∶%M %p"
+msgstr "%A, %l∶%M %p"
+
+#. Translators: this is the month name and day number
+#. followed by a time string in 12h format.
+#. i.e. "May 25, 2:30 pm"
+#: js/misc/util.js:340
+#, no-c-format
+msgid "%B %d, %l∶%M %p"
+msgstr "%B %d, %l∶%M %p"
+
+#. Translators: this is the month name, day number, year
+#. number followed by a time string in 12h format.
+#. i.e. "May 25 2012, 2:30 pm"
+#: js/misc/util.js:346
+#, no-c-format
+msgid "%B %d %Y, %l∶%M %p"
+msgstr "%ด %ว %ป, %l∶%M %p"
+
+#. * Translators: this is the name of the search engine that shows in the
+#. * Shell's desktop search entry.
+#: js/misc/util.js:540
+msgid "Google"
+msgstr "Google"
+
+#. TRANSLATORS: this is the title of the wifi captive portal login window
+#: js/portalHelper/main.js:66
+msgid "Hotspot Login"
+msgstr "ลงชื่อเข้าใช้ Hotspot "
+
+#: js/portalHelper/main.js:112
+msgid ""
+"Your connection to this hotspot login is not secure. Passwords or other "
+"information you enter on this page can be viewed by people nearby."
+msgstr "การเชื่อมต่อจุดลงทะเบียนฮอตสปอตนี้ไม่ปลอดภัย รหัสผ่านหรือข้อมูลอื่นๆ ที่คุณกรอกในหน้านี้อาจถูกพบเห็นได้โดยบุคคลที่อยู่ใกล้"
+
+#. No support for non-modal system dialogs, so ignore the option
+#. let modal = options['modal'] || true;
+#: js/ui/accessDialog.js:63 js/ui/status/location.js:395
+msgid "Deny Access"
+msgstr "ปฏิเสธการเข้าถึง"
+
+#: js/ui/accessDialog.js:64 js/ui/status/location.js:398
+msgid "Grant Access"
+msgstr "อนุญาตให้เข้าถึง"
+
+#: js/ui/appDisplay.js:1386
+msgid "Frequently used applications will appear here"
+msgstr "แอพพลิเคชันที่ใช้บ่อยจะปรากฏที่นี่"
+
+#: js/ui/appDisplay.js:1669
+msgid "No apps in this folder! To add an app, drag it onto the folder."
+msgstr "ไม่มีแอพในโฟลเดอร์นี้! ลากแอพลงในโฟลเดอร์เพื่อทำการเพิ่มแอพ"
+
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1855
+msgid "Remove from desktop"
+msgstr "ลบออกจากเดสก์ท้อป"
+
+#: js/ui/appDisplay.js:2774
 msgid "New Window"
 msgstr "หน้าต่างใหม่"
 
-#: ../js/ui/appDisplay.js:678 ../js/ui/dash.js:271
-msgid "Remove from Favorites"
-msgstr "ลบออกจากรายการโปรด"
+#: js/ui/appDisplay.js:2790
+msgid "Launch using Dedicated Graphics Card"
+msgstr "เปิดโดยใช้ Dedicated Graphics Card"
 
-#: ../js/ui/appDisplay.js:679
-msgid "Add to Favorites"
-msgstr "เพิ่มเข้าในรายการโปรด"
+#: js/ui/appDisplay.js:2910
+msgid "Delete"
+msgstr "ลบ"
 
-#: ../js/ui/appFavorites.js:87
-#, c-format
-msgid "%s has been added to your favorites."
-msgstr "%s ถูกเพิ่มเข้าในรายการโปรดของคุณแล้ว"
+#: js/ui/appIconBar.js:209
+msgid "Other workspaces"
+msgstr "พื้นที่ทำงานอื่นๆ"
 
-#: ../js/ui/appFavorites.js:118
-#, c-format
-msgid "%s has been removed from your favorites."
-msgstr "%s ถูกลบออกจากรายการโปรดของคุณแล้ว"
+#: js/ui/appIconBar.js:218
+msgid "Current workspace"
+msgstr "พื้นที่ทำงานปัจจุบัน"
 
-#. Translators: Shown in calendar event list for all day events
-#. * Keep it short, best if you can use less then 10 characters
-#.
-#: ../js/ui/calendar.js:62
-msgctxt "event list time"
-msgid "All Day"
-msgstr "ทั้งวัน"
+#: js/ui/appIconBar.js:287
+msgid "Pin to Taskbar"
+msgstr "ปักหมุดที่ทาสก์บาร์"
 
-#. Translators: Shown in calendar event list, if 24h format
-#: ../js/ui/calendar.js:67
-msgctxt "event list time"
-msgid "%H:%M"
-msgstr "%H:%M"
+#: js/ui/appIconBar.js:291
+msgid "Unpin from Taskbar"
+msgstr "ถอดหมุดจากทาสก์บาร์"
 
-#. Transators: Shown in calendar event list, if 12h format
-#: ../js/ui/calendar.js:74
-msgctxt "event list time"
-msgid "%l:%M %p"
-msgstr "%l:%M %p"
+#: js/ui/appIconBar.js:307
+#, javascript-format
+msgid "Quit %s"
+msgstr "จบการทำงาน %s "
+
+#: js/ui/audioDeviceSelection.js:59
+msgid "Select Audio Device"
+msgstr "เลือกอุปกรณ์เสียง"
+
+#: js/ui/audioDeviceSelection.js:69
+msgid "Sound Settings"
+msgstr "ตั้งค่าเสียง"
+
+#: js/ui/audioDeviceSelection.js:78
+msgid "Headphones"
+msgstr "หูฟัง"
+
+#: js/ui/audioDeviceSelection.js:80
+msgid "Headset"
+msgstr "ชุดหูฟัง"
+
+#: js/ui/audioDeviceSelection.js:82 js/ui/status/volume.js:221
+msgid "Microphone"
+msgstr "ไมโครโฟน"
+
+#: js/ui/backgroundMenu.js:22
+msgid "Change Background…"
+msgstr "เปลี่ยนพื้นหลัง…"
+
+#: js/ui/backgroundMenu.js:25
+msgid "Add App"
+msgstr "เพิ่มแอพ"
+
+#: js/ui/backgroundMenu.js:31
+msgid "Add Website"
+msgstr "เพิ่มเว็บไซค์"
+
+#: js/ui/backgroundMenu.js:35
+msgid "Add Folder"
+msgstr "เพิ่มโฟลเดอร์"
+
+#. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0"
+#. (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
+#: js/ui/calendar.js:47
+msgctxt "calendar-no-work"
+msgid "06"
+msgstr "06"
 
 #. Translators: Calendar grid abbreviation for Sunday.
 #. *
 #. * NOTE: These grid abbreviations are always shown together
 #. * and in order, e.g. "S M T W T F S".
-#.
-#: ../js/ui/calendar.js:114
+#: js/ui/calendar.js:76
 msgctxt "grid sunday"
 msgid "S"
 msgstr "อา"
 
 #. Translators: Calendar grid abbreviation for Monday
-#: ../js/ui/calendar.js:116
+#: js/ui/calendar.js:78
 msgctxt "grid monday"
 msgid "M"
 msgstr "จ"
 
 #. Translators: Calendar grid abbreviation for Tuesday
-#: ../js/ui/calendar.js:118
+#: js/ui/calendar.js:80
 msgctxt "grid tuesday"
 msgid "T"
 msgstr "อ"
 
 #. Translators: Calendar grid abbreviation for Wednesday
-#: ../js/ui/calendar.js:120
+#: js/ui/calendar.js:82
 msgctxt "grid wednesday"
 msgid "W"
 msgstr "พ"
 
 #. Translators: Calendar grid abbreviation for Thursday
-#: ../js/ui/calendar.js:122
+#: js/ui/calendar.js:84
 msgctxt "grid thursday"
 msgid "T"
 msgstr "พฤ"
 
 #. Translators: Calendar grid abbreviation for Friday
-#: ../js/ui/calendar.js:124
+#: js/ui/calendar.js:86
 msgctxt "grid friday"
 msgid "F"
 msgstr "ศ"
 
 #. Translators: Calendar grid abbreviation for Saturday
-#: ../js/ui/calendar.js:126
+#: js/ui/calendar.js:88
 msgctxt "grid saturday"
 msgid "S"
 msgstr "ส"
 
-#. Translators: Event list abbreviation for Sunday.
-#. *
-#. * NOTE: These list abbreviations are normally not shown together
-#. * so they need to be unique (e.g. Tuesday and Thursday cannot
-#. * both be 'T').
-#.
-#: ../js/ui/calendar.js:139
-msgctxt "list sunday"
-msgid "Su"
-msgstr "อา."
+#: js/ui/calendar.js:449
+msgid "Previous month"
+msgstr "เดือนก่อนหน้า"
 
-#. Translators: Event list abbreviation for Monday
-#: ../js/ui/calendar.js:141
-msgctxt "list monday"
-msgid "M"
-msgstr "จ."
+#: js/ui/calendar.js:459
+msgid "Next month"
+msgstr "เดือนถัดไป"
 
-#. Translators: Event list abbreviation for Tuesday
-#: ../js/ui/calendar.js:143
-msgctxt "list tuesday"
-msgid "T"
-msgstr "อ."
+#: js/ui/calendar.js:612
+#, no-javascript-format
+msgctxt "date day number format"
+msgid "%d"
+msgstr "%d"
 
-#. Translators: Event list abbreviation for Wednesday
-#: ../js/ui/calendar.js:145
-msgctxt "list wednesday"
-msgid "W"
-msgstr "พ."
+#: js/ui/calendar.js:667
+msgid "Week %V"
+msgstr "สัปดาห์ที่ %V"
 
-#. Translators: Event list abbreviation for Thursday
-#: ../js/ui/calendar.js:147
-msgctxt "list thursday"
-msgid "Th"
-msgstr "พฤ."
+#. Translators: Shown in calendar event list for all day events
+#. * Keep it short, best if you can use less then 10 characters
+#: js/ui/calendar.js:736
+msgctxt "event list time"
+msgid "All Day"
+msgstr "ทั้งวัน"
 
-#. Translators: Event list abbreviation for Friday
-#: ../js/ui/calendar.js:149
-msgctxt "list friday"
-msgid "F"
-msgstr "ศ."
-
-#. Translators: Event list abbreviation for Saturday
-#: ../js/ui/calendar.js:151
-msgctxt "list saturday"
-msgid "S"
-msgstr "ส."
-
-#. Translators: Text to show if there are no events
-#: ../js/ui/calendar.js:699
-msgid "Nothing Scheduled"
-msgstr "ไม่มีกำหนดการ"
-
-#. Translators: Shown on calendar heading when selected day occurs on current year
-#: ../js/ui/calendar.js:715
+#: js/ui/calendar.js:869
 msgctxt "calendar heading"
 msgid "%A, %B %d"
 msgstr "%A %d %B"
 
-#. Translators: Shown on calendar heading when selected day occurs on different year
-#: ../js/ui/calendar.js:718
+#: js/ui/calendar.js:873
 msgctxt "calendar heading"
 msgid "%A, %B %d, %Y"
 msgstr "%A %d %B %Ey"
 
-#: ../js/ui/calendar.js:728
-msgid "Today"
-msgstr "วันนี้"
+#: js/ui/calendar.js:1093
+msgid "No Notifications"
+msgstr "ไม่มีการแจ้งเตือน"
 
-#: ../js/ui/calendar.js:732
-msgid "Tomorrow"
-msgstr "พรุ่งนี้"
+#: js/ui/calendar.js:1096
+msgid "No Events"
+msgstr "ไม่มีเหตุการณ์ใดๆ"
 
-#: ../js/ui/calendar.js:743
-msgid "This week"
-msgstr "สัปดาห์นี้"
+#: js/ui/calendar.js:1124
+msgid "Clear All"
+msgstr "ล้างทั้งหมด"
 
-#: ../js/ui/calendar.js:751
-msgid "Next week"
-msgstr "สัปดาห์หน้า"
+#. Translators: %s is an application name
+#: js/ui/closeDialog.js:44
+#, javascript-format
+msgid "“%s” is not responding."
+msgstr "“%s” ไม่ตอบสนอง"
 
-#: ../js/ui/components/autorunManager.js:297
-msgid "Removable Devices"
-msgstr "อุปกรณ์ถอดเสียบ"
+#: js/ui/closeDialog.js:45
+msgid ""
+"You may choose to wait a short while for it to continue or force the "
+"application to quit entirely."
+msgstr "คุณอาจเลือกรอสักครู่ให้แอปพลิเคชันดำเนินการต่อ หรือบังคับให้ออกทั้งหมดเลย"
 
-#: ../js/ui/components/autorunManager.js:594
-#, c-format
+#: js/ui/closeDialog.js:61
+msgid "Force Quit"
+msgstr "บังคับออก"
+
+#: js/ui/closeDialog.js:64
+msgid "Wait"
+msgstr "รอ"
+
+#: js/ui/components/automountManager.js:91
+msgid "External drive connected"
+msgstr "เชื่อมต่อไดรฟ์ภายนอกแล้ว"
+
+#: js/ui/components/automountManager.js:102
+msgid "External drive disconnected"
+msgstr "ขาดการเชื่อมต่อไดรฟ์ภายนอก"
+
+#: js/ui/components/autorunManager.js:358
+#, javascript-format
 msgid "Open with %s"
 msgstr "เปิดด้วย %s"
 
-#: ../js/ui/components/autorunManager.js:620
-msgid "Eject"
-msgstr "เอาสื่อออก"
-
-#: ../js/ui/components/keyring.js:86 ../js/ui/components/polkitAgent.js:260
+#: js/ui/components/keyring.js:107 js/ui/components/polkitAgent.js:305
 msgid "Password:"
 msgstr "รหัสผ่าน:"
 
-#: ../js/ui/components/keyring.js:105
+#: js/ui/components/keyring.js:140
 msgid "Type again:"
 msgstr "ป้อนซ้ำอีกครั้ง:"
 
-#: ../js/ui/components/networkAgent.js:132
+#: js/ui/components/networkAgent.js:135 js/ui/status/network.js:245
+#: js/ui/status/network.js:338 js/ui/status/network.js:928
 msgid "Connect"
 msgstr "เชื่อมต่อ"
 
+#: js/ui/components/networkAgent.js:163
+msgid "Limited Data"
+msgstr "ข้อมูลจำกัด"
+
+#: js/ui/components/networkAgent.js:171
+msgid "Unlimited Data"
+msgstr "ไม่จำกัดข้อมูล"
+
+#: js/ui/components/networkAgent.js:181 js/ui/components/networkAgent.js:211
+msgid "Enable if your connection has limits on how much you can download."
+msgstr "เปิดใช้งานหากการเชื่อมต่อของคุณมีการจำกัดว่าคุณจะสามารถดาวน์โหลดได้มากแค่ไหน"
+
+#: js/ui/components/networkAgent.js:213
+msgid "This connection doesn't have limits on how much you can download."
+msgstr "การเชื่อมต่อนี้ไม่มีการจำกัดว่าคุณจะสามารถดาวน์โหลดได้มากแค่ไหน"
+
 #. Cisco LEAP
-#: ../js/ui/components/networkAgent.js:223
-#: ../js/ui/components/networkAgent.js:235
-#: ../js/ui/components/networkAgent.js:262
-#: ../js/ui/components/networkAgent.js:282
-#: ../js/ui/components/networkAgent.js:292
+#: js/ui/components/networkAgent.js:371 js/ui/components/networkAgent.js:383
+#: js/ui/components/networkAgent.js:411 js/ui/components/networkAgent.js:431
+#: js/ui/components/networkAgent.js:441
 msgid "Password: "
 msgstr "รหัสผ่าน: "
 
 #. static WEP
-#: ../js/ui/components/networkAgent.js:228
+#: js/ui/components/networkAgent.js:376
 msgid "Key: "
 msgstr "กุญแจ: "
 
-#. TTLS and PEAP are actually much more complicated, but this complication
-#. is not visible here since we only care about phase2 authentication
-#. (and don't even care of which one)
-#: ../js/ui/components/networkAgent.js:260
-#: ../js/ui/components/networkAgent.js:278
-msgid "Username: "
-msgstr "ชื่อผู้ใช้: "
-
-#: ../js/ui/components/networkAgent.js:266
+#: js/ui/components/networkAgent.js:415
 msgid "Identity: "
 msgstr "ข้อมูลบุคคล: "
 
-#: ../js/ui/components/networkAgent.js:268
+#: js/ui/components/networkAgent.js:417
 msgid "Private key password: "
 msgstr "รหัสผ่านกุญแจส่วนตัว: "
 
-#: ../js/ui/components/networkAgent.js:280
+#: js/ui/components/networkAgent.js:429
 msgid "Service: "
 msgstr "บริการ: "
 
-#: ../js/ui/components/networkAgent.js:309
-msgid "Authentication required by wireless network"
-msgstr "เครือข่ายไร้สายต้องการการยืนยันตัวบุคคล"
+#: js/ui/components/networkAgent.js:458
+#, javascript-format
+msgid "Enter the Wi-Fi password for “%s”"
+msgstr "ระบุรหัสผ่าน Wi-Fi ของ “%s”"
 
-#: ../js/ui/components/networkAgent.js:310
-#, c-format
-msgid ""
-"Passwords or encryption keys are required to access the wireless network "
-"'%s'."
-msgstr "ต้องป้อนรหัสผ่านหรือกุญแจสำหรับเข้ารหัสลับเพื่อจะเข้าใช้เครือข่ายไร้สาย '%s'"
-
-#: ../js/ui/components/networkAgent.js:314
+#: js/ui/components/networkAgent.js:463 js/ui/components/networkAgent.js:832
 msgid "Wired 802.1X authentication"
 msgstr "การยืนยันตัวบุคคลกับเครือข่ายมีสาย 802.1X"
 
-#: ../js/ui/components/networkAgent.js:316
+#: js/ui/components/networkAgent.js:465
 msgid "Network name: "
 msgstr "ชื่อเครือข่าย: "
 
-#: ../js/ui/components/networkAgent.js:321
+#: js/ui/components/networkAgent.js:470 js/ui/components/networkAgent.js:836
 msgid "DSL authentication"
 msgstr "การยืนยันตัวบุคคลกับ DSL"
 
-#: ../js/ui/components/networkAgent.js:328
+#: js/ui/components/networkAgent.js:477 js/ui/components/networkAgent.js:842
 msgid "PIN code required"
 msgstr "ต้องการรหัส PIN"
 
-#: ../js/ui/components/networkAgent.js:329
+#: js/ui/components/networkAgent.js:478 js/ui/components/networkAgent.js:843
 msgid "PIN code is needed for the mobile broadband device"
 msgstr "ต้องการรหัส PIN ของอุปกรณ์บรอดแบนด์มือถือ"
 
-#: ../js/ui/components/networkAgent.js:330
+#: js/ui/components/networkAgent.js:479
 msgid "PIN: "
 msgstr "PIN: "
 
-#: ../js/ui/components/networkAgent.js:336
+#: js/ui/components/networkAgent.js:486 js/ui/components/networkAgent.js:849
 msgid "Mobile broadband network password"
 msgstr "รหัสผ่านของเครือข่ายบรอดแบนด์มือถือ"
 
-#: ../js/ui/components/networkAgent.js:337
-#, c-format
-msgid "A password is required to connect to '%s'."
-msgstr "ต้องการรหัสผ่านในการเชื่อมต่อกับ '%s'"
+#: js/ui/components/networkAgent.js:487 js/ui/components/networkAgent.js:833
+#: js/ui/components/networkAgent.js:837 js/ui/components/networkAgent.js:850
+#, javascript-format
+msgid "A password is required to connect to “%s”."
+msgstr "จำเป็นต้องใช้รหัสผ่านเพื่อเชื่อมต่อ \"%s\""
 
-#: ../js/ui/components/polkitAgent.js:55
+#: js/ui/components/networkAgent.js:817 js/ui/status/network.js:1699
+msgid "Network Manager"
+msgstr "โปรแกรมจัดการเครือข่าย"
+
+#: js/ui/components/networkAgent.js:828
+msgid "Authentication required by wireless network"
+msgstr "เครือข่ายไร้สายต้องการการยืนยันตัวบุคคล"
+
+#: js/ui/components/networkAgent.js:829
+#, javascript-format
+msgid ""
+"Passwords or encryption keys are required to access the wireless network "
+"“%s”."
+msgstr "จำเป็นต้องมีรหัสผ่านหรือคีย์การเข้ารหัสลับเพื่อเข้าถึงเครือข่ายไร้สาย \"%s\""
+
+#: js/ui/components/polkitAgent.js:50
 msgid "Authentication Required"
 msgstr "จำเป็นต้องยืนยันตัวบุคคล"
 
-#: ../js/ui/components/polkitAgent.js:93
+#: js/ui/components/polkitAgent.js:74
 msgid "Administrator"
 msgstr "ผู้ดูแลระบบ"
 
-#: ../js/ui/components/polkitAgent.js:166
+#: js/ui/components/polkitAgent.js:163
 msgid "Authenticate"
 msgstr "ยืนยันตัวบุคคล"
 
@@ -615,1065 +1322,1380 @@ msgstr "ยืนยันตัวบุคคล"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: ../js/ui/components/polkitAgent.js:248 ../js/ui/shellMountOperation.js:381
-msgid "Sorry, that didn't work. Please try again."
-msgstr "ขออภัย ยังไม่ผ่าน โปรดลองใหม่"
+#: js/ui/components/polkitAgent.js:291 js/ui/shellMountOperation.js:337
+msgid "Sorry, that didn’t work. Please try again."
+msgstr "ขออภัย คำสั่งไม่ทำงาน กรุณาลองอีกครั้ง"
 
-#. Translators: this is a filename used for screencast recording
-#: ../js/ui/components/recorder.js:44
-#, no-c-format
-msgid "Screencast from %d %t"
-msgstr "Screencast from %d %t"
-
-#. FIXME: We don't have a 'chat room' icon (bgo #653737) use
-#. system-users for now as Empathy does.
-#: ../js/ui/components/telepathyClient.js:237
-msgid "Invitation"
-msgstr "คำเชิญ"
-
-#. We got the TpContact
-#: ../js/ui/components/telepathyClient.js:297
-msgid "Call"
-msgstr "สายเรียก"
-
-#. We got the TpContact
-#: ../js/ui/components/telepathyClient.js:313
-msgid "File Transfer"
-msgstr "การถ่ายโอนแฟ้ม"
-
-#: ../js/ui/components/telepathyClient.js:394
-msgid "Subscription request"
-msgstr "การขอสมัคร"
-
-#: ../js/ui/components/telepathyClient.js:430
-msgid "Connection error"
-msgstr "ข้อผิดพลาดในการเชื่อมต่อ"
-
-#: ../js/ui/components/telepathyClient.js:491
-msgid "Unmute"
-msgstr "เลิกเงียบ"
-
-#: ../js/ui/components/telepathyClient.js:491
-msgid "Mute"
-msgstr "เงียบ"
-
-#. Translators: this is a time format string followed by a date.
-#. If applicable, replace %X with a strftime format valid for your
-#. locale, without seconds.
-#: ../js/ui/components/telepathyClient.js:948
-#, no-c-format
-msgid "Sent at <b>%X</b> on <b>%A</b>"
-msgstr "ส่งเมื่อ<b>วัน%A</b> เวลา <b>%H:%M น.</b>"
-
-#. Translators: this is a time format in the style of "Wednesday, May 25",
-#. shown when you get a chat message in the same year.
-#: ../js/ui/components/telepathyClient.js:954
-#, no-c-format
-msgid "Sent on <b>%A</b>, <b>%B %d</b>"
-msgstr "ส่งเมื่อ<b>วัน%Aที่ %d %B</b>"
-
-#. Translators: this is a time format in the style of "Wednesday, May 25, 2012",
-#. shown when you get a chat message in a different year.
-#: ../js/ui/components/telepathyClient.js:959
-#, no-c-format
-msgid "Sent on <b>%A</b>, <b>%B %d</b>, %Y"
-msgstr "ส่งเมื่อ<b>วัน%Aที่ %d %B %Ey</b>"
-
-#. Translators: this is the other person changing their old IM name to their new
+#. Translators: this is the other person changing their old IM name to their
+#. new
 #. IM name.
-#: ../js/ui/components/telepathyClient.js:988
-#, c-format
+#: js/ui/components/telepathyClient.js:799
+#, javascript-format
 msgid "%s is now known as %s"
 msgstr "%s เปลี่ยนชื่อเป็น %s"
 
-#. translators: argument is a room name like
-#. * room@jabber.org for example.
-#: ../js/ui/components/telepathyClient.js:1088
-#, c-format
-msgid "Invitation to %s"
-msgstr "คำเชิญให้เข้าห้อง %s"
+#: js/ui/components/updaterManager.js:191
+msgid "Software Update"
+msgstr "อัปเดตซอฟท์แวร์"
 
-#. translators: first argument is the name of a contact and the second
-#. * one the name of a room. "Alice is inviting you to join room@jabber.org
-#. * for example.
-#: ../js/ui/components/telepathyClient.js:1096
-#, c-format
-msgid "%s is inviting you to join %s"
-msgstr "%s เชิญคุณเข้าร่วมสนทนาที่ห้อง %s"
+#: js/ui/components/updaterManager.js:206
+msgid "Updates Available"
+msgstr "สามารถทำการอัปเดต"
 
-#: ../js/ui/components/telepathyClient.js:1098
-#: ../js/ui/components/telepathyClient.js:1177
-#: ../js/ui/components/telepathyClient.js:1240
-msgid "Decline"
-msgstr "ปฏิเสธ"
+#: js/ui/components/updaterManager.js:207
+msgid "Software updates are available for your system"
+msgstr "ระบบของคุณสามารถอัปเดตซอฟท์แวร์ได้"
 
-#: ../js/ui/components/telepathyClient.js:1099
-#: ../js/ui/components/telepathyClient.js:1178
-#: ../js/ui/components/telepathyClient.js:1241
-msgid "Accept"
-msgstr "ตอบรับ"
+#: js/ui/components/updaterManager.js:208
+msgid "Download Now"
+msgstr "ดาวน์โหลดตอนนี้"
 
-#. translators: argument is a contact name like Alice for example.
-#: ../js/ui/components/telepathyClient.js:1129
-#, c-format
-msgid "Video call from %s"
-msgstr "สายเรียกแบบวีดิทัศน์จาก %s"
+#: js/ui/components/updaterManager.js:223
+msgid "Updates Ready"
+msgstr "พร้อมอัปเดต"
 
-#. translators: argument is a contact name like Alice for example.
-#: ../js/ui/components/telepathyClient.js:1132
-#, c-format
-msgid "Call from %s"
-msgstr "สายเรียกจาก %s"
+#: js/ui/components/updaterManager.js:224
+msgid "Software updates are ready to be installed on your system"
+msgstr "พร้อมที่จะติดตั้งอัปเดตซอฟท์แวร์ลงบนระบบของคุณ"
 
-#: ../js/ui/components/telepathyClient.js:1137
-#: ../js/ui/status/bluetooth.js:346
-msgid "Reject"
-msgstr "ปฏิเสธ"
+#: js/ui/components/updaterManager.js:225
+msgid "Install Now"
+msgstr "ติดตั้งตอนนี้"
 
-#. translators: this is a button label (verb), not a noun
-#: ../js/ui/components/telepathyClient.js:1139
-msgid "Answer"
-msgstr "ตอบรับ"
+#: js/ui/components/updaterManager.js:237
+msgid "Updates Installed"
+msgstr "ติดตั้งอัปเดตแล้ว"
 
-#. To translators: The first parameter is
-#. * the contact's alias and the second one is the
-#. * file name. The string will be something
-#. * like: "Alice is sending you test.ogg"
-#.
-#: ../js/ui/components/telepathyClient.js:1171
-#, c-format
-msgid "%s is sending you %s"
-msgstr "%s กำลังส่ง %s ให้คุณ"
+#: js/ui/components/updaterManager.js:238
+msgid "Software updates were installed on your system"
+msgstr "ติดตั้งอัปเดตซอฟท์แวร์บนระบบของคุณแล้ว"
 
-#. To translators: The parameter is the contact's alias
-#: ../js/ui/components/telepathyClient.js:1206
-#, c-format
-msgid "%s would like permission to see when you are online"
-msgstr "%s ขออนุญาตติดต่อกับคุณแบบออนไลน์"
+#: js/ui/components/updaterManager.js:239
+msgid "Restart Now"
+msgstr "เริ่มระบบใหม่ตอนนี้"
 
-#: ../js/ui/components/telepathyClient.js:1298
-msgid "Network error"
-msgstr "ข้อผิดพลาดเกี่ยวกับเครือข่าย"
+#: js/ui/components/updaterManager.js:269
+msgid "Update Failed"
+msgstr "อัปเดตล้มเหลว"
 
-#: ../js/ui/components/telepathyClient.js:1300
-msgid "Authentication failed"
-msgstr "การยืนยันตัวบุคคลไม่ผ่าน"
+#: js/ui/components/updaterManager.js:270
+msgid "We could not update your system"
+msgstr "เราไม่สามารถอัปเดตระบบของคุณ"
 
-#: ../js/ui/components/telepathyClient.js:1302
-msgid "Encryption error"
-msgstr "ข้อผิดพลาดเกี่ยวกับการเข้ารหัสลับ"
+#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:635
+msgid "Windows"
+msgstr "หน้าต่าง"
 
-#: ../js/ui/components/telepathyClient.js:1304
-msgid "Certificate not provided"
-msgstr "ไม่มีใบรับรอง"
-
-#: ../js/ui/components/telepathyClient.js:1306
-msgid "Certificate untrusted"
-msgstr "ไม่เชื่อถือใบรับรอง"
-
-#: ../js/ui/components/telepathyClient.js:1308
-msgid "Certificate expired"
-msgstr "ใบรับรองหมดอายุแล้ว"
-
-#: ../js/ui/components/telepathyClient.js:1310
-msgid "Certificate not activated"
-msgstr "ใบรับรองยังไม่มีการเริ่มใช้"
-
-#: ../js/ui/components/telepathyClient.js:1312
-msgid "Certificate hostname mismatch"
-msgstr "ชื่อโฮสต์ในใบรับรองไม่ตรงกัน"
-
-#: ../js/ui/components/telepathyClient.js:1314
-msgid "Certificate fingerprint mismatch"
-msgstr "ลายนิ้วมือในใบรับรองไม่ตรงกัน"
-
-#: ../js/ui/components/telepathyClient.js:1316
-msgid "Certificate self-signed"
-msgstr "ใบรับรองเซ็นรับรองตัวเอง"
-
-#: ../js/ui/components/telepathyClient.js:1318
-msgid "Status is set to offline"
-msgstr "สถานะเปลี่ยนเป็นออฟไลน์"
-
-#: ../js/ui/components/telepathyClient.js:1320
-msgid "Encryption is not available"
-msgstr "ไม่มีการเข้ารหัสลับให้ใช้งาน"
-
-#: ../js/ui/components/telepathyClient.js:1322
-msgid "Certificate is invalid"
-msgstr "ใบรับรองไม่ถูกต้อง"
-
-#: ../js/ui/components/telepathyClient.js:1324
-msgid "Connection has been refused"
-msgstr "การเชื่อมต่อถูกปฏิเสธ"
-
-#: ../js/ui/components/telepathyClient.js:1326
-msgid "Connection can't be established"
-msgstr "เชื่อมต่อไม่สำเร็จ"
-
-#: ../js/ui/components/telepathyClient.js:1328
-msgid "Connection has been lost"
-msgstr "การเชื่อมต่อถูกตัดขาด"
-
-#: ../js/ui/components/telepathyClient.js:1330
-msgid "This account is already connected to the server"
-msgstr "บัญชีนี้ได้เชื่อมต่อกับเซิร์ฟเวอร์อยู่ก่อนแล้ว"
-
-#: ../js/ui/components/telepathyClient.js:1332
-msgid ""
-"Connection has been replaced by a new connection using the same resource"
-msgstr "การเชื่อมต่อถูกแทนที่ด้วยการเชื่อมต่อใหม่โดยใช้ทรัพยากรเดียวกัน"
-
-#: ../js/ui/components/telepathyClient.js:1334
-msgid "The account already exists on the server"
-msgstr "บัญชีนี้มีอยู่แล้วที่เซิร์ฟเวอร์"
-
-#: ../js/ui/components/telepathyClient.js:1336
-msgid "Server is currently too busy to handle the connection"
-msgstr "เซิร์ฟเวอร์ไม่ว่างพอที่จะจัดการการเชื่อมต่อ"
-
-#: ../js/ui/components/telepathyClient.js:1338
-msgid "Certificate has been revoked"
-msgstr "ใบรับรองถูกเพิกถอนไปแล้ว"
-
-#: ../js/ui/components/telepathyClient.js:1340
-msgid ""
-"Certificate uses an insecure cipher algorithm or is cryptographically weak"
-msgstr "ใบรับรองใช้อัลกอริทึมการเข้ารหัสลับที่ไม่ปลอดภัยหรืออ่อนเกินไป"
-
-#: ../js/ui/components/telepathyClient.js:1342
-msgid ""
-"The length of the server certificate, or the depth of the server certificate "
-"chain, exceed the limits imposed by the cryptography library"
-msgstr ""
-"ความยาวของใบรับรอง หรือความลึกของห่วงโซ่ใบรับรองของเซิร์ฟเวอร์ "
-"มีขนาดเกินขีดจำกัดที่ไลบรารีระบบเข้ารหัสลับกำหนดไว้"
-
-#: ../js/ui/components/telepathyClient.js:1344
-msgid "Internal error"
-msgstr "ข้อผิดพลาดภายใน"
-
-#. translators: argument is the account name, like
-#. * name@jabber.org for example.
-#: ../js/ui/components/telepathyClient.js:1354
-#, c-format
-msgid "Connection to %s failed"
-msgstr "เชื่อมต่อไปยัง %s ไม่สำเร็จ"
-
-#: ../js/ui/components/telepathyClient.js:1363
-msgid "Reconnect"
-msgstr "เชื่อมต่อใหม่"
-
-#: ../js/ui/components/telepathyClient.js:1364
-msgid "Edit account"
-msgstr "แก้ไขบัญชี"
-
-#: ../js/ui/components/telepathyClient.js:1409
-msgid "Unknown reason"
-msgstr "ไม่ทราบสาเหตุ"
-
-#: ../js/ui/dash.js:245 ../js/ui/dash.js:273
+#: js/ui/dash.js:246 js/ui/dash.js:287
 msgid "Show Applications"
 msgstr "แสดงโปรแกรมต่างๆ"
 
-#: ../js/ui/dateMenu.js:86
-msgid "Date and Time Settings"
-msgstr "ตั้งค่าวันที่และเวลา"
+#: js/ui/dash.js:285
+msgid "Remove from Favorites"
+msgstr "ลบออกจากรายการโปรด"
 
-#: ../js/ui/dateMenu.js:109
-msgid "Open Calendar"
-msgstr "เปิดปฏิทิน"
+#. Translators: this is the name of the dock/favorites area on
+#. the left of the overview
+#: js/ui/dash.js:445
+msgid "Dash"
+msgstr "แผงปุ่ม"
 
 #. Translators: This is the date format to use when the calendar popup is
-#. * shown - it is shown just below the time in the shell (e.g. "Tue 9:29 AM").
-#.
-#: ../js/ui/dateMenu.js:175
-msgid "%A %B %e, %Y"
-msgstr "%A %d %B %Ey"
+#. * shown - it is shown just below the time in the shell (e.g. "Tue 9:29
+#. AM").
+#: js/ui/dateMenu.js:76
+msgid "%B %e %Y"
+msgstr "%B %e %Y"
 
-#: ../js/ui/endSessionDialog.js:61
-#, c-format
+#. Translators: This is the accessible name of the date button shown
+#. * below the time in the shell; it should combine the weekday and the
+#. * date, e.g. "Tuesday February 17 2015".
+#: js/ui/dateMenu.js:83
+msgid "%A %B %e %Y"
+msgstr "%A %B %e %Y"
+
+#: js/ui/dateMenu.js:148
+msgid "Add world clocks…"
+msgstr "เพิ่มนาฬิกาเทียบเวลาโลก…"
+
+#: js/ui/dateMenu.js:149
+msgid "World Clocks"
+msgstr "นาฬิกาเทียบเวลาโลก"
+
+#: js/ui/dateMenu.js:228
+msgid "Weather"
+msgstr "สภาพอากาศ"
+
+#. Translators: %s is a weather condition like "Clear sky"; see
+#. libgweather for the possible condition strings. If at all
+#. possible, the sentence should match the grammatical case etc. of
+#. the inserted conditions.
+#: js/ui/dateMenu.js:292
+#, javascript-format
+msgid "%s all day."
+msgstr "%s  ตลอดวัน"
+
+#. Translators: %s is a weather condition like "Clear sky"; see
+#. libgweather for the possible condition strings. If at all
+#. possible, the sentence should match the grammatical case etc. of
+#. the inserted conditions.
+#: js/ui/dateMenu.js:298
+#, javascript-format
+msgid "%s, then %s later."
+msgstr "%s จากนั้น %s ในภายหลัง"
+
+#. Translators: %s is a weather condition like "Clear sky"; see
+#. libgweather for the possible condition strings. If at all
+#. possible, the sentence should match the grammatical case etc. of
+#. the inserted conditions.
+#: js/ui/dateMenu.js:304
+#, javascript-format
+msgid "%s, then %s, followed by %s later."
+msgstr "%s จากนั้น %s ตามด้วย %s ในภายหลัง"
+
+#: js/ui/dateMenu.js:315
+msgid "Select a location…"
+msgstr "เลือกตำแหน่ง…"
+
+#: js/ui/dateMenu.js:318
+msgid "Loading…"
+msgstr "กำลังโหลด…"
+
+#. Translators: %s is a temperature with unit, e.g. "23℃"
+#: js/ui/dateMenu.js:324
+#, javascript-format
+msgid "Feels like %s."
+msgstr "รู้สึก %s"
+
+#: js/ui/dateMenu.js:327
+msgid "Go online for weather information"
+msgstr "ออนไลน์เพื่อรับข้อมูลสภาพอากาศ"
+
+#: js/ui/dateMenu.js:329
+msgid "Weather information is currently unavailable"
+msgstr "ข้อมูลสภาพอากาศไม่พร้อมให้บริการในขณะนี้"
+
+#: js/ui/endlessButton.js:17
+msgid "Endless Button"
+msgstr "ปุ่ม Endless"
+
+#: js/ui/endlessButton.js:56
+msgid "Show Desktop"
+msgstr "แสดงเดสก์ท็อป"
+
+#: js/ui/endlessButton.js:61
+msgid "Show Apps"
+msgstr "แสดงแอพต่างๆ"
+
+#: js/ui/endSessionDialog.js:64
+#, javascript-format
 msgctxt "title"
 msgid "Log Out %s"
 msgstr "%s ออกจากระบบ"
 
-#: ../js/ui/endSessionDialog.js:62
+#: js/ui/endSessionDialog.js:65
 msgctxt "title"
 msgid "Log Out"
 msgstr "ออกจากระบบ"
 
-#: ../js/ui/endSessionDialog.js:63
-msgid "Click Log Out to quit these applications and log out of the system."
-msgstr "คลิก \"ออกจากระบบ\" เพื่อปิดโปรแกรมเหล่านี้ และออกจากระบบ"
-
-#: ../js/ui/endSessionDialog.js:65
-#, c-format
+#: js/ui/endSessionDialog.js:67
+#, javascript-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s จะออกจากระบบโดยอัตโนมัติใน %d วินาที"
 
-#: ../js/ui/endSessionDialog.js:70
-#, c-format
+#: js/ui/endSessionDialog.js:72
+#, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
 msgstr[0] "คุณจะออกจากระบบโดยอัตโนมัติใน %d วินาที"
 
-#: ../js/ui/endSessionDialog.js:74
-msgid "Logging out of the system."
-msgstr "กำลังออกจากระบบ"
-
-#: ../js/ui/endSessionDialog.js:76
+#: js/ui/endSessionDialog.js:78
 msgctxt "button"
 msgid "Log Out"
 msgstr "ออกจากระบบ"
 
-#: ../js/ui/endSessionDialog.js:81
+#: js/ui/endSessionDialog.js:84
 msgctxt "title"
 msgid "Power Off"
 msgstr "ปิดเครื่อง"
 
-#: ../js/ui/endSessionDialog.js:82
-msgid "Click Power Off to quit these applications and power off the system."
-msgstr "คลิก \"ปิดเครื่อง\" เพื่อออกจากโปรแกรมเหล่านี้ และปิดเครื่อง"
+#: js/ui/endSessionDialog.js:85
+msgctxt "title"
+msgid "Install Updates & Power Off"
+msgstr "ติดตั้งการอัพเดทและปิดเครื่อง"
 
-#: ../js/ui/endSessionDialog.js:84
-#, c-format
+#: js/ui/endSessionDialog.js:87
+#, javascript-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] "ระบบจะปิดโดยอัตโนมัติใน %d วินาที"
 
-#: ../js/ui/endSessionDialog.js:88
-msgid "Powering off the system."
-msgstr "กำลังปิดระบบ"
+#: js/ui/endSessionDialog.js:91
+msgctxt "checkbox"
+msgid "Install pending software updates"
+msgstr "ติดตั้งการอัพเดทซอฟต์แวร์ที่รอดำเนินการ"
 
-#: ../js/ui/endSessionDialog.js:90 ../js/ui/endSessionDialog.js:107
+#: js/ui/endSessionDialog.js:94 js/ui/endSessionDialog.js:111
 msgctxt "button"
 msgid "Restart"
 msgstr "เปิดเครื่องใหม่"
 
-#: ../js/ui/endSessionDialog.js:92
+#: js/ui/endSessionDialog.js:96
 msgctxt "button"
 msgid "Power Off"
 msgstr "ปิดเครื่อง"
 
-#: ../js/ui/endSessionDialog.js:98
+#: js/ui/endSessionDialog.js:103
 msgctxt "title"
 msgid "Restart"
 msgstr "เปิดเครื่องใหม่"
 
-#: ../js/ui/endSessionDialog.js:99
-msgid "Click Restart to quit these applications and restart the system."
-msgstr "คลิก \"เปิดเครื่องใหม่\" เพื่อออกจากโปรแกรมเหล่านี้ และเปิดเครื่องใหม่"
-
-#: ../js/ui/endSessionDialog.js:101
-#, c-format
+#: js/ui/endSessionDialog.js:105
+#, javascript-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
 msgstr[0] "ระบบจะเปิดใหม่โดยอัตโนมัติใน %d วินาที"
 
-#: ../js/ui/endSessionDialog.js:105
-msgid "Restarting the system."
-msgstr "กำลังเปิดเครื่องใหม่"
+#: js/ui/endSessionDialog.js:119
+msgctxt "title"
+msgid "Restart & Install Updates"
+msgstr "รีสตาร์ทและติดตั้งการอัพเดท"
 
-#: ../js/ui/extensionDownloader.js:199
+#: js/ui/endSessionDialog.js:121
+#, javascript-format
+msgid ""
+"The system will automatically restart and install updates in %d second."
+msgid_plural ""
+"The system will automatically restart and install updates in %d seconds."
+msgstr[0] "ระบบจะรีสตาร์ทโดยอัตโนมัติเพื่อติดตั้งการอัพเดทในอีก %d วินาที"
+
+#: js/ui/endSessionDialog.js:127 js/ui/endSessionDialog.js:147
+msgctxt "button"
+msgid "Restart &amp; Install"
+msgstr "รีสตาร์ตและติดตั้ง"
+
+#: js/ui/endSessionDialog.js:128
+msgctxt "button"
+msgid "Install &amp; Power Off"
+msgstr "ติดตั้งและปิดเครื่อง"
+
+#: js/ui/endSessionDialog.js:129
+msgctxt "checkbox"
+msgid "Power off after updates are installed"
+msgstr "ปิดเครื่องหลังจากติดตั้งการอัพเดท"
+
+#: js/ui/endSessionDialog.js:137
+msgctxt "title"
+msgid "Restart & Install Upgrade"
+msgstr "รีสตาร์ตและติดตั้งการอัปเกรด"
+
+#. Translators: This is the text displayed for system upgrades in the
+#. shut down dialog. First %s gets replaced with the distro name and
+#. second %s with the distro version to upgrade to
+#: js/ui/endSessionDialog.js:142
+#, javascript-format
+msgid ""
+"%s %s will be installed after restart. Upgrade installation can take a long "
+"time: ensure that you have backed up and that the computer is plugged in."
+msgstr "%s %s จะถูกติดตั้งหลังการรีสตาร์ท การติดตั้งการอัพเกรดอาจใช้เวลานาน คุณจึงต้องแน่ใจว่าได้ทำการสำรองข้อมูลและเสียบปลั๊กคอมพิวเตอร์แล้ว"
+
+#: js/ui/endSessionDialog.js:361
+msgid "Running on battery power: please plug in before installing updates."
+msgstr "กำลังใช้พลังงานจากแบตเตอรี่: กรุณาเสียบปลั๊กก่อนติดตั้งการอัปเดต"
+
+#: js/ui/endSessionDialog.js:378
+msgid "Some applications are busy or have unsaved work."
+msgstr "แอพพลิเคชันบางตัวไม่ว่างหรือมีงานที่ยังไม่ได้บันทึก"
+
+#: js/ui/endSessionDialog.js:385
+msgid "Other users are logged in."
+msgstr "ผู้ใช้รายอื่นได้เข้าระบบ"
+
+#. Translators: Remote here refers to a remote session, like a ssh login
+#: js/ui/endSessionDialog.js:670
+#, javascript-format
+msgid "%s (remote)"
+msgstr "%s (รีโมท)"
+
+#. Translators: Console here refers to a tty like a VT console
+#: js/ui/endSessionDialog.js:673
+#, javascript-format
+msgid "%s (console)"
+msgstr "%s (คอนโซล)"
+
+#: js/ui/extensionDownloader.js:201
 msgid "Install"
 msgstr "ติดตั้ง"
 
-#: ../js/ui/extensionDownloader.js:204
-#, c-format
-msgid "Download and install '%s' from extensions.gnome.org?"
-msgstr "จะดาวน์โหลดและติดตั้ง '%s' จาก extensions.gnome.org หรือไม่?"
+#: js/ui/extensionDownloader.js:206
+#, javascript-format
+msgid "Download and install “%s” from extensions.gnome.org?"
+msgstr "ดาวน์โหลดและติดตั้ง “%s” จาก extensions.gnome.org หรือไม่?"
 
-#: ../js/ui/keyboard.js:337
-msgid "tray"
-msgstr "ถาด"
+#: js/ui/forceAppExitDialog.js:55
+msgid "Quit applications"
+msgstr "ออกจากแอพพลิเคชัน"
 
-#: ../js/ui/keyboard.js:584 ../js/ui/status/keyboard.js:195
-#: ../js/ui/status/power.js:205
+#: js/ui/forceAppExitDialog.js:61
+msgid ""
+"If an application doesn't respond for a while, select its name and click "
+"Quit Application."
+msgstr "หากแอปพลิเคชันไม่ตอบสนองสักระยะนึง ให้เลือกชื่อแอปพลิเคชันและคลิกออกจากแอปพลิเคชัน"
+
+#: js/ui/forceAppExitDialog.js:84
+msgid "System Monitor"
+msgstr "โปรแกรมตรวจสอบระบบ"
+
+#: js/ui/forceAppExitDialog.js:88
+msgid "Quit Application"
+msgstr "ออกจากแอพพลิเคชัน"
+
+#: js/ui/hotCorner.js:19
+msgid "Hot Corner"
+msgstr "คำสั่งมุมจอ"
+
+#: js/ui/hotCorner.js:32
+msgid "Enable Hot Corner"
+msgstr "เปิดใช้ Hot Corner"
+
+#: js/ui/hotCorner.js:36
+msgid "Disable Hot Corner"
+msgstr "ปิดการใช้ Hot Corner"
+
+#: js/ui/iconGridLayout.js:270
+#, javascript-format
+msgid "%s has been deleted"
+msgstr "%s ได้ถูกลบแล้ว"
+
+#: js/ui/iconGridLayout.js:459
+msgid "New Folder"
+msgstr "โฟลเดอร์ใหม่"
+
+#. Translators: %s is an application name like "Settings"
+#: js/ui/inhibitShortcutsDialog.js:59
+#, javascript-format
+msgid "%s wants to inhibit shortcuts"
+msgstr "%s ต้องการขัดขวางทางลัด"
+
+#: js/ui/inhibitShortcutsDialog.js:60
+msgid "Application wants to inhibit shortcuts"
+msgstr "แอปพลิเคชันต้องการขัดขวางทางลัด"
+
+#. Translators: %s is a keyboard shortcut like "Super+x"
+#: js/ui/inhibitShortcutsDialog.js:69
+#, javascript-format
+msgid "You can restore shortcuts by pressing %s."
+msgstr "คุณสามารถเรียกคืนปุ่มลัดได้โดยกด %s"
+
+#: js/ui/inhibitShortcutsDialog.js:74
+msgid "Deny"
+msgstr "ปฏิเสธ"
+
+#: js/ui/inhibitShortcutsDialog.js:80
+msgid "Allow"
+msgstr "อนุญาต"
+
+#: js/ui/internetSearch.js:73
+#, javascript-format
+msgid "Open \"%s\" in browser"
+msgstr "เปิด \"%s\" ในเบราว์เซอร์"
+
+#. Translators: the first %s is the search engine name, and the second
+#. * is the search string. For instance, 'Search Google for "hello"'.
+#: js/ui/internetSearch.js:82
+#, javascript-format
+msgid "Search %s for \"%s\""
+msgstr "ค้นหา %s สำหรับ \"%s\""
+
+#: js/ui/internetSearch.js:84
+#, javascript-format
+msgid "Search the internet for \"%s\""
+msgstr "ค้นหา \"%s\" ในอินเตอร์เน็ต"
+
+#: js/ui/keyboard.js:738 js/ui/status/keyboard.js:837
 msgid "Keyboard"
 msgstr "แป้นพิมพ์"
 
-#: ../js/ui/lookingGlass.js:691
+#: js/ui/lookingGlass.js:642
 msgid "No extensions installed"
 msgstr "ไม่มีส่วนขยายติดตั้งอยู่"
 
 #. Translators: argument is an extension UUID.
-#: ../js/ui/lookingGlass.js:745
-#, c-format
+#: js/ui/lookingGlass.js:696
+#, javascript-format
 msgid "%s has not emitted any errors."
 msgstr "%s ไม่ได้ให้ข้อผิดพลาดใดออกมา"
 
-#: ../js/ui/lookingGlass.js:751
+#: js/ui/lookingGlass.js:702
 msgid "Hide Errors"
 msgstr "ซ่อนข้อผิดพลาด"
 
-#: ../js/ui/lookingGlass.js:755 ../js/ui/lookingGlass.js:815
+#: js/ui/lookingGlass.js:706 js/ui/lookingGlass.js:766
 msgid "Show Errors"
 msgstr "แสดงข้อผิดพลาด"
 
-#: ../js/ui/lookingGlass.js:764
+#: js/ui/lookingGlass.js:715
 msgid "Enabled"
 msgstr "เปิดใช้งาน"
 
 #. translators:
 #. * The device has been disabled
-#: ../js/ui/lookingGlass.js:767 ../src/gvc/gvc-mixer-control.c:1082
+#: js/ui/lookingGlass.js:718 subprojects/gvc/gvc-mixer-control.c:1866
 msgid "Disabled"
 msgstr "ปิดใช้"
 
-#: ../js/ui/lookingGlass.js:769
+#: js/ui/lookingGlass.js:720
 msgid "Error"
 msgstr "ผิดพลาด"
 
-#: ../js/ui/lookingGlass.js:771
+#: js/ui/lookingGlass.js:722
 msgid "Out of date"
 msgstr "ตกรุ่น"
 
-#: ../js/ui/lookingGlass.js:773
+#: js/ui/lookingGlass.js:724
 msgid "Downloading"
 msgstr "กำลังดาวน์โหลด"
 
-#: ../js/ui/lookingGlass.js:797
+#: js/ui/lookingGlass.js:748
 msgid "View Source"
 msgstr "ดูซอร์ส"
 
-#: ../js/ui/lookingGlass.js:806
+#: js/ui/lookingGlass.js:757
 msgid "Web Page"
 msgstr "หน้าเว็บ"
 
-#: ../js/ui/messageTray.js:1081
-msgid "Open"
-msgstr "เปิด"
-
-#: ../js/ui/messageTray.js:1088
-msgid "Remove"
-msgstr "ลบ"
-
-#: ../js/ui/messageTray.js:1533
-msgid "Message Tray"
-msgstr "ถาดข้อความ"
-
-#: ../js/ui/messageTray.js:2544
+#: js/ui/messageTray.js:1494
 msgid "System Information"
 msgstr "ข้อมูลระบบ"
 
-#: ../js/ui/notificationDaemon.js:506 ../src/shell-app.c:373
-msgctxt "program"
-msgid "Unknown"
-msgstr "ไม่ทราบชื่อ"
+#: js/ui/mpris.js:211
+msgid "Unknown artist"
+msgstr "ไม่ทราบศิลปิน"
 
-#: ../js/ui/overview.js:82
+#: js/ui/mpris.js:212
+msgid "Unknown title"
+msgstr "ชื่อที่ไม่รู้จัก"
+
+#: js/ui/overview.js:108
 msgid "Undo"
 msgstr "เรียกคืน"
 
-#: ../js/ui/overview.js:127
+#: js/ui/overview.js:126
+msgid "No apps are open"
+msgstr "ไม่มีแอพใดๆ เปิดอยู่"
+
+#. Translators: This is the main view to select
+#. activities. See also note for "Activities" string.
+#: js/ui/overview.js:194
 msgid "Overview"
 msgstr "ภาพรวม"
 
-#. Translators: this is the text displayed
-#. in the search entry when no search is
-#. active; it should not exceed ~30
-#. characters.
-#: ../js/ui/overview.js:201
-msgid "Type to search..."
-msgstr "ป้อนเพื่อค้นหา..."
+#: js/ui/padOsd.js:103
+msgid "New shortcut…"
+msgstr "ทางลัดใหม่…"
 
-#. Translators: this is the name of the dock/favorites area on
-#. the left of the overview
-#: ../js/ui/overview.js:222
-msgid "Dash"
-msgstr "แผงปุ่ม"
+#: js/ui/padOsd.js:152
+msgid "Application defined"
+msgstr "ระบุแอปพลิเคชั่นแล้ว"
 
-#: ../js/ui/panel.js:567
+#: js/ui/padOsd.js:153
+msgid "Show on-screen help"
+msgstr "แสดงความช่วยเหลือบนหน้าจอ"
+
+#: js/ui/padOsd.js:154
+msgid "Switch monitor"
+msgstr "สลับจอแสดงผล"
+
+#: js/ui/padOsd.js:155
+msgid "Assign keystroke"
+msgstr "กำหนด keystroke"
+
+#: js/ui/padOsd.js:220
+msgid "Done"
+msgstr "เสร็จ"
+
+#: js/ui/padOsd.js:734
+msgid "Edit…"
+msgstr "แก้ไข…"
+
+#: js/ui/padOsd.js:774 js/ui/padOsd.js:879
+msgid "None"
+msgstr "ไม่มี"
+
+#: js/ui/padOsd.js:833
+msgid "Press a button to configure"
+msgstr "กดปุ่มเพื่อตั้งค่า"
+
+#: js/ui/padOsd.js:834
+msgid "Press Esc to exit"
+msgstr "กด Esc เพื่อออก"
+
+#: js/ui/padOsd.js:837
+msgid "Press any key to exit"
+msgstr "กดปุ่มใดก็ได้เพื่อออก"
+
+#: js/ui/panel.js:361
 msgid "Quit"
 msgstr "ออก"
 
 #. Translators: If there is no suitable word for "Activities"
 #. in your language, you can use the word for "Overview".
-#: ../js/ui/panel.js:599
+#: js/ui/panel.js:417
 msgid "Activities"
 msgstr "กิจกรรม"
 
-#: ../js/ui/panel.js:965
-msgid "Top Bar"
-msgstr "แถบด้านบน"
+#: js/ui/panel.js:698
+msgctxt "System menu in the top bar"
+msgid "System"
+msgstr "ระบบ"
+
+#: js/ui/panel.js:780
+msgctxt "User menu"
+msgid "User Menu"
+msgstr "เมนูผู้ใช้"
+
+#: js/ui/panel.js:814
+msgctxt "Power menu"
+msgid "Power"
+msgstr "เปิด/ปิด"
+
+#: js/ui/panel.js:895
+msgid "Bottom Bar"
+msgstr "แถบบาร์ล่าง"
+
+#: js/ui/paygUnlockDialog.js:228
+msgid "Your Endless pay-as-you-go usage credit has expired."
+msgstr "เครดิตการใช้งาน Endless แบบเติมเงินของคุณหมดอายุแล้ว"
+
+#: js/ui/paygUnlockDialog.js:247
+msgid "Enter a new code to unlock your computer:"
+msgstr "ระบุรหัสใหม่เพื่อปลดล็อกคอมพิวเตอร์ของคุณ:"
+
+#: js/ui/paygUnlockDialog.js:267
+msgid "Don’t have an unlock code? That’s OK!"
+msgstr "ไม่มีรหัสปลดล็อกใช่ไหม ไม่เป็นไร"
+
+#. The second possible override is to use the template text below
+#. with the contact's name and phone number, if BOTH are present.
+#: js/ui/paygUnlockDialog.js:286
+#, javascript-format
+msgid ""
+"Talk to your sales representative to purchase a new code. Call or text %s at"
+" %s"
+msgstr "ติดต่อตัวแทนขายเพื่อซื้อรหัสใหม่ โปรดโทรหรือส่งข้อความถึง %s ที่ %s"
+
+#. No overrides present, default to fallback text.
+#: js/ui/paygUnlockDialog.js:290
+msgid "Talk to your sales representative to purchase a new code."
+msgstr "คุยกับตัวแทนขายของคุณเพื่อซื้อรหัสใหม่"
+
+#: js/ui/paygUnlockDialog.js:301
+msgid "Unlock Machine"
+msgstr "ปลดล็อกเครื่อง"
+
+#: js/ui/paygUnlockDialog.js:451
+#, javascript-format
+msgid "Too many attempts. Try again in %s minute."
+msgid_plural "Too many attempts. Try again in %s minutes."
+msgstr[0] "ลองทำมากเกินไป โปรดลองอีกครั้งในอีก %s นาที"
+
+#: js/ui/paygUnlockDialog.js:455
+msgid "Too many attempts. Try again in a few seconds."
+msgstr "ลองทำมากเกินไป โปรดลองใหม่อีกครั้งในอีกสักครู่"
+
+#: js/ui/paygUnlockDialog.js:474
+msgid "Invalid code. Please try again."
+msgstr "โค้ดไม่ถูกต้อง โปรดลองอีกครั้ง"
+
+#: js/ui/paygUnlockDialog.js:476
+msgid "Code already used. Please enter a new code."
+msgstr "รหัสถูกใช้งานแล้ว โปรดใส่รหัสใหม่"
+
+#: js/ui/paygUnlockDialog.js:478
+msgid "Time exceeded while verifying the code"
+msgstr "ใช้เวลาเกินขณะกำลังยืนยันรหัส"
+
+#. We don't consider any other error here (and we don't consider DISABLED
+#. explicitly,
+#. since that should not happen), but still we need to show something to the
+#. user.
+#: js/ui/paygUnlockDialog.js:482
+msgid "Unknown error"
+msgstr "ข้อผิดพลาดที่ไม่ทราบสาเหตุ"
 
 #. Translators: this MUST be either "toggle-switch-us"
 #. (for toggle switches containing the English words
 #. "ON" and "OFF") or "toggle-switch-intl" (for toggle
 #. switches containing "◯" and "|"). Other values will
 #. simply result in invisible toggle switches.
-#: ../js/ui/popupMenu.js:731
+#: js/ui/popupMenu.js:291
 msgid "toggle-switch-us"
 msgstr "toggle-switch-intl"
 
-#: ../js/ui/runDialog.js:205
-msgid "Please enter a command:"
-msgstr "โปรดป้อนคำสั่ง:"
+#: js/ui/runDialog.js:71
+msgid "Enter a Command"
+msgstr "ป้อนคำสั่ง"
+
+#: js/ui/runDialog.js:111 js/ui/status/automaticUpdates.js:293
+#: js/ui/windowMenu.js:160
+msgid "Close"
+msgstr "ปิด"
+
+#: js/ui/runDialog.js:279
+msgid "Restart is not available on Wayland"
+msgstr "ไม่สามารถรีสตาร์ทได้บน Wayland"
+
+#: js/ui/runDialog.js:284
+msgid "Restarting…"
+msgstr "กำลังรีสตาร์ท…"
 
 #. Translators: This is a time format for a date in
 #. long format
-#: ../js/ui/screenShield.js:79
+#: js/ui/screenShield.js:88
 msgid "%A, %B %d"
 msgstr "%A %d %B"
 
-#: ../js/ui/screenShield.js:144
-#, c-format
+#: js/ui/screenShield.js:147
+#, javascript-format
 msgid "%d new message"
 msgid_plural "%d new messages"
 msgstr[0] "ข้อความใหม่ %d ข้อความ"
 
-#: ../js/ui/screenShield.js:146
-#, c-format
+#: js/ui/screenShield.js:149
+#, javascript-format
 msgid "%d new notification"
 msgid_plural "%d new notifications"
 msgstr[0] "รายการแจ้งเหตุ %d รายการ"
 
-#: ../js/ui/searchDisplay.js:275
-msgid "Searching..."
-msgstr "กำลังค้นหา..."
-
-#: ../js/ui/searchDisplay.js:323
-msgid "No results."
-msgstr "ไม่พบรายการ"
-
-#: ../js/ui/shellEntry.js:26
-msgid "Copy"
-msgstr "คัดลอก"
-
-#: ../js/ui/shellEntry.js:31
-msgid "Paste"
-msgstr "แปะ"
-
-#: ../js/ui/shellEntry.js:102
-msgid "Show Text"
-msgstr "แสดงข้อความ"
-
-#: ../js/ui/shellEntry.js:104
-msgid "Hide Text"
-msgstr "ซ่อนข้อความ"
-
-#: ../js/ui/shellMountOperation.js:368
-msgid "Password"
-msgstr "รหัสผ่าน"
-
-#: ../js/ui/shellMountOperation.js:389
-msgid "Remember Password"
-msgstr "จำรหัสผ่าน"
-
-#: ../js/ui/shellMountOperation.js:400 ../js/ui/unlockDialog.js:169
-msgid "Unlock"
-msgstr "ปลดล็อค"
-
-#: ../js/ui/status/accessibility.js:39
-msgid "Accessibility"
-msgstr "สิ่งอำนวยความสะดวก"
-
-#: ../js/ui/status/accessibility.js:44
-msgid "Zoom"
-msgstr "ซูม"
-
-#: ../js/ui/status/accessibility.js:51
-msgid "Screen Reader"
-msgstr "โปรแกรมอ่านหน้าจอ"
-
-#: ../js/ui/status/accessibility.js:55
-msgid "Screen Keyboard"
-msgstr "แป้นพิมพ์บนจอ"
-
-#: ../js/ui/status/accessibility.js:59
-msgid "Visual Alerts"
-msgstr "แจ้งเหตุด้วยภาพ"
-
-#: ../js/ui/status/accessibility.js:62
-msgid "Sticky Keys"
-msgstr "ค้างปุ่มกด"
-
-#: ../js/ui/status/accessibility.js:65
-msgid "Slow Keys"
-msgstr "พิมพ์แบบช้า"
-
-#: ../js/ui/status/accessibility.js:68
-msgid "Bounce Keys"
-msgstr "ป้องกันการกดแป้นรัว"
-
-#: ../js/ui/status/accessibility.js:71
-msgid "Mouse Keys"
-msgstr "บังคับเมาส์ด้วยแป้น"
-
-#: ../js/ui/status/accessibility.js:75
-msgid "Universal Access Settings"
-msgstr "ตั้งค่าการเข้าถึงหลากหลาย"
-
-#: ../js/ui/status/accessibility.js:109
-msgid "High Contrast"
-msgstr "สีตัดกัน"
-
-#: ../js/ui/status/accessibility.js:146
-msgid "Large Text"
-msgstr "อักษรขนาดใหญ่"
-
-#: ../js/ui/status/bluetooth.js:27 ../js/ui/status/bluetooth.js:31
-#: ../js/ui/status/bluetooth.js:251 ../js/ui/status/bluetooth.js:304
-#: ../js/ui/status/bluetooth.js:335 ../js/ui/status/bluetooth.js:371
-#: ../js/ui/status/bluetooth.js:400 ../js/ui/status/network.js:867
-msgid "Bluetooth"
-msgstr "บลูทูท"
-
-#: ../js/ui/status/bluetooth.js:44
-msgid "Visibility"
-msgstr "ความปรากฏเห็น"
-
-#: ../js/ui/status/bluetooth.js:58
-msgid "Send Files to Device..."
-msgstr "ส่งแฟ้มไปยังอุปกรณ์..."
-
-#: ../js/ui/status/bluetooth.js:59
-msgid "Set up a New Device..."
-msgstr "ตั้งค่าอุปกรณ์ชิ้นใหม่..."
-
-#: ../js/ui/status/bluetooth.js:83
-msgid "Bluetooth Settings"
-msgstr "ตั้งค่าบลูทูท"
-
-#. TRANSLATORS: this means that bluetooth was disabled by hardware rfkill
-#: ../js/ui/status/bluetooth.js:103 ../js/ui/status/network.js:208
-msgid "hardware disabled"
-msgstr "ฮาร์ดแวร์ปิดการใช้งานอยู่"
-
-#: ../js/ui/status/bluetooth.js:196
-msgid "Connection"
-msgstr "การเชื่อมต่อ"
-
-#: ../js/ui/status/bluetooth.js:207 ../js/ui/status/network.js:458
-msgid "disconnecting..."
-msgstr "กำลังตัดการเชื่อมต่อ..."
-
-#: ../js/ui/status/bluetooth.js:220 ../js/ui/status/network.js:464
-#: ../js/ui/status/network.js:934
-msgid "connecting..."
-msgstr "กำลังเชื่อมต่อ..."
-
-#: ../js/ui/status/bluetooth.js:238
-msgid "Send Files..."
-msgstr "ส่งแฟ้ม..."
-
-#: ../js/ui/status/bluetooth.js:243
-msgid "Browse Files..."
-msgstr "เรียกดูแฟ้ม..."
-
-#: ../js/ui/status/bluetooth.js:252
-msgid "Error browsing device"
-msgstr "เกิดข้อผิดพลาดขณะเรียกดูแฟ้มในอุปกรณ์"
-
-#: ../js/ui/status/bluetooth.js:253
-#, c-format
-msgid "The requested device cannot be browsed, error is '%s'"
-msgstr "อุปกรณ์ที่ร้องขอไม่สามารถเรียกดูแฟ้มได้ ข้อผิดพลาดคือ '%s'"
-
-#: ../js/ui/status/bluetooth.js:261
-msgid "Keyboard Settings"
-msgstr "ตั้งค่าแป้นพิมพ์"
-
-#: ../js/ui/status/bluetooth.js:264
-msgid "Mouse Settings"
-msgstr "ตั้งค่าเมาส์"
-
-#: ../js/ui/status/bluetooth.js:269 ../js/ui/status/volume.js:234
-msgid "Sound Settings"
-msgstr "ตั้งค่าเสียง"
-
-#: ../js/ui/status/bluetooth.js:336
-#, c-format
-msgid "Authorization request from %s"
-msgstr "มีการขออนุญาตจาก %s"
-
-#: ../js/ui/status/bluetooth.js:342
-#, c-format
-msgid "Device %s wants access to the service '%s'"
-msgstr "อุปกรณ์ %s ต้องการเข้าถึงบริการ '%s'"
-
-#: ../js/ui/status/bluetooth.js:344
-msgid "Always grant access"
-msgstr "อนุญาตให้เข้าใช้เสมอ"
-
-#: ../js/ui/status/bluetooth.js:345
-msgid "Grant this time only"
-msgstr "อนุญาตครั้งนี้เท่านั้น"
-
-#: ../js/ui/status/bluetooth.js:372
-#, c-format
-msgid "Pairing confirmation for %s"
-msgstr "การยืนยันการจับคู่สำหรับ %s"
-
-#: ../js/ui/status/bluetooth.js:378 ../js/ui/status/bluetooth.js:408
-#, c-format
-msgid "Device %s wants to pair with this computer"
-msgstr "อุปกรณ์ %s ต้องการจับคู่กับคอมพิวเตอร์เครื่องนี้"
-
-#: ../js/ui/status/bluetooth.js:379
-#, c-format
-msgid "Please confirm whether the PIN '%06d' matches the one on the device."
-msgstr "กรุณายืนยันว่ารหัส PIN '%06d' ตรงกันกับของอุปกรณ์ดังกล่าวหรือไม่"
-
-#: ../js/ui/status/bluetooth.js:381
-msgid "Matches"
-msgstr "ตรงกัน"
-
-#: ../js/ui/status/bluetooth.js:382
-msgid "Does not match"
-msgstr "ไม่ตรงกัน"
-
-#: ../js/ui/status/bluetooth.js:401
-#, c-format
-msgid "Pairing request for %s"
-msgstr "คำร้องขอจับคู่สำหรับ %s"
-
-#: ../js/ui/status/bluetooth.js:409
-msgid "Please enter the PIN mentioned on the device."
-msgstr "กรุณาป้อนรหัส PIN ที่ระบุบนอุปกรณ์ดังกล่าว"
-
-#: ../js/ui/status/bluetooth.js:426
-msgid "OK"
-msgstr "ตกลง"
-
-#: ../js/ui/status/keyboard.js:228
-msgid "Show Keyboard Layout"
-msgstr "แสดงผังแป้นพิมพ์"
-
-#: ../js/ui/status/keyboard.js:233
-msgid "Region and Language Settings"
-msgstr "ตั้งค่าท้องที่และภาษา"
-
-#: ../js/ui/status/lockScreenMenu.js:18
-msgid "Volume, network, battery"
-msgstr "ความดังเสียง, เครือข่าย, แบตเตอรี่"
-
-#: ../js/ui/status/network.js:94
-msgid "<unknown>"
-msgstr "<ไม่ทราบ>"
-
-#. Translators: this indicates that wireless or wwan is disabled by hardware killswitch
-#: ../js/ui/status/network.js:230
-msgid "disabled"
-msgstr "ปิดใช้"
-
-#. Translators: this is for network devices that are physically present but are not
-#. under NetworkManager's control (and thus cannot be used in the menu)
-#: ../js/ui/status/network.js:456
-msgid "unmanaged"
-msgstr "ไม่ถูกจัดการ"
-
-#. Translators: this is for network connections that require some kind of key or password
-#: ../js/ui/status/network.js:467 ../js/ui/status/network.js:937
-msgid "authentication required"
-msgstr "ต้องยืนยันตัวบุคคล"
-
-#. Translators: this is for devices that require some kind of firmware or kernel
-#. module, which is missing
-#: ../js/ui/status/network.js:477
-msgid "firmware missing"
-msgstr "ขาดเฟิร์มแวร์"
-
-#. Translators: this is for wired network devices that are physically disconnected
-#: ../js/ui/status/network.js:484
-msgid "cable unplugged"
-msgstr "ไม่ได้เสียบสายเคเบิล"
-
-#. Translators: this is for a network device that cannot be activated (for example it
-#. is disabled by rfkill, or it has no coverage
-#: ../js/ui/status/network.js:489
-msgid "unavailable"
-msgstr "ไม่สามารถใช้งานได้"
-
-#: ../js/ui/status/network.js:491 ../js/ui/status/network.js:939
-msgid "connection failed"
-msgstr "เชื่อมต่อไม่สำเร็จ"
-
-#: ../js/ui/status/network.js:552 ../js/ui/status/network.js:1529
-msgid "More..."
-msgstr "เพิ่มเติม..."
-
-#. TRANSLATORS: this is the indication that a connection for another logged in user is active,
-#. and we cannot access its settings (including the name)
-#: ../js/ui/status/network.js:588 ../js/ui/status/network.js:1459
-msgid "Connected (private)"
-msgstr "เชื่อมต่อแล้ว (ส่วนตัว)"
-
-#: ../js/ui/status/network.js:663
-msgid "Auto Ethernet"
-msgstr "อีเทอร์เน็ตอัตโนมัติ"
-
-#: ../js/ui/status/network.js:721
-msgid "Auto broadband"
-msgstr "บรอดแบนด์อัตโนมัติ"
-
-#: ../js/ui/status/network.js:724
-msgid "Auto dial-up"
-msgstr "หมุนโทรศัพท์อัตโนมัติ"
-
-#. TRANSLATORS: this the automatic wireless connection name (including the network name)
-#: ../js/ui/status/network.js:853 ../js/ui/status/network.js:1476
-#, c-format
-msgid "Auto %s"
-msgstr "%s อัตโนมัติ"
-
-#: ../js/ui/status/network.js:855
-msgid "Auto bluetooth"
-msgstr "บลูทูทอัตโนมัติ"
-
-#: ../js/ui/status/network.js:1478
-msgid "Auto wireless"
-msgstr "ไร้สายอัตโนมัติ"
-
-#: ../js/ui/status/network.js:1575
-msgid "Enable networking"
-msgstr "เปิดใช้งานเครือข่าย"
-
-#: ../js/ui/status/network.js:1597
-msgid "Wired"
-msgstr "ใช้สาย"
-
-#: ../js/ui/status/network.js:1608
-msgid "Wireless"
-msgstr "ไร้สาย"
-
-#: ../js/ui/status/network.js:1618
-msgid "Mobile broadband"
-msgstr "บรอดแบนด์มือถือ"
-
-#: ../js/ui/status/network.js:1628
-msgid "VPN Connections"
-msgstr "การเชื่อมต่อ VPN"
-
-#: ../js/ui/status/network.js:1635
-msgid "Network Settings"
-msgstr "ตั้งค่าเครือข่าย"
-
-#: ../js/ui/status/network.js:1679
-msgid "Network Manager"
-msgstr "โปรแกรมจัดการเครือข่าย"
-
-#: ../js/ui/status/network.js:1769
-msgid "Connection failed"
-msgstr "เชื่อมต่อไม่สำเร็จ"
-
-#: ../js/ui/status/network.js:1770
-msgid "Activation of network connection failed"
-msgstr "เปิดใช้ช่องเชื่อมต่อไม่สำเร็จ"
-
-#: ../js/ui/status/network.js:2065
-msgid "Networking is disabled"
-msgstr "การใช้เครือข่ายถูกปิด"
-
-#: ../js/ui/status/power.js:55
-msgid "Battery"
-msgstr "แบตเตอรี่"
-
-#: ../js/ui/status/power.js:72
-msgid "Power Settings"
-msgstr "ตั้งค่าพลังงาน"
-
-#. 0 is reported when UPower does not have enough data
-#. to estimate battery life
-#: ../js/ui/status/power.js:94
-msgid "Estimating..."
-msgstr "กำลังประเมิน..."
-
-#: ../js/ui/status/power.js:101
-#, c-format
-msgid "%d hour remaining"
-msgid_plural "%d hours remaining"
-msgstr[0] "เหลืออีก %d ชั่วโมง"
-
-#. TRANSLATORS: this is a time string, as in "%d hours %d minutes remaining"
-#: ../js/ui/status/power.js:104
-#, c-format
-msgid "%d %s %d %s remaining"
-msgstr "เหลืออีก %d %s %d %s"
-
-#: ../js/ui/status/power.js:106
-msgid "hour"
-msgid_plural "hours"
-msgstr[0] "ชั่วโมง"
-
-#: ../js/ui/status/power.js:106
-msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "นาที"
-
-#: ../js/ui/status/power.js:109
-#, c-format
-msgid "%d minute remaining"
-msgid_plural "%d minutes remaining"
-msgstr[0] "เหลืออีก %d นาที"
-
-#: ../js/ui/status/power.js:112 ../js/ui/status/power.js:186
-#, c-format
-msgctxt "percent of battery remaining"
-msgid "%d%%"
-msgstr "%d%%"
-
-#: ../js/ui/status/power.js:195
-msgid "AC adapter"
-msgstr "ที่แปลงไฟ AC"
-
-#: ../js/ui/status/power.js:197
-msgid "Laptop battery"
-msgstr "แบตเตอรี่แล็ปท็อป"
-
-#: ../js/ui/status/power.js:199
-msgid "UPS"
-msgstr "UPS"
-
-#: ../js/ui/status/power.js:201
-msgid "Monitor"
-msgstr "จอภาพ"
-
-#: ../js/ui/status/power.js:203
-msgid "Mouse"
-msgstr "เมาส์"
-
-#: ../js/ui/status/power.js:207
-msgid "PDA"
-msgstr "PDA"
-
-#: ../js/ui/status/power.js:209
-msgid "Cell phone"
-msgstr "โทรศัพท์มือถือ"
-
-#: ../js/ui/status/power.js:211
-msgid "Media player"
-msgstr "เครื่องเล่นสื่อ"
-
-#: ../js/ui/status/power.js:213
-msgid "Tablet"
-msgstr "แท็บเบล็ต"
-
-#: ../js/ui/status/power.js:215
-msgid "Computer"
-msgstr "คอมพิวเตอร์"
-
-#: ../js/ui/status/power.js:217
-msgctxt "device"
-msgid "Unknown"
-msgstr "ไม่ทราบ"
-
-#. Translators: This is the label for audio volume
-#: ../js/ui/status/volume.js:47 ../js/ui/status/volume.js:221
-msgid "Volume"
-msgstr "ความดังเสียง"
-
-#: ../js/ui/status/volume.js:59
-msgid "Microphone"
-msgstr "ไมโครโฟน"
-
-#: ../js/ui/unlockDialog.js:176
-msgid "Log in as another user"
-msgstr "เข้าระบบในนามผู้ใช้อื่น"
-
-#: ../js/ui/userMenu.js:180
-msgid "Available"
-msgstr "อยู่"
-
-#: ../js/ui/userMenu.js:183
-msgid "Busy"
-msgstr "ไม่ว่าง"
-
-#: ../js/ui/userMenu.js:186
-msgid "Invisible"
-msgstr "ซ่อนตัว"
-
-#: ../js/ui/userMenu.js:189
-msgid "Away"
-msgstr "ไม่อยู่"
-
-#: ../js/ui/userMenu.js:192
-msgid "Idle"
-msgstr "ไม่มีกิจกรรม"
-
-#: ../js/ui/userMenu.js:195
-msgid "Unavailable"
-msgstr "ออฟไลน์"
-
-#: ../js/ui/userMenu.js:740
-msgid "Notifications"
-msgstr "การแจ้งเหตุ"
-
-#: ../js/ui/userMenu.js:748
-msgid "System Settings"
-msgstr "ตั้งค่าระบบ"
-
-#: ../js/ui/userMenu.js:756
-msgid "Switch User"
-msgstr "สลับผู้ใช้"
-
-#: ../js/ui/userMenu.js:761
-msgid "Log Out"
-msgstr "ออกจากระบบ"
-
-#: ../js/ui/userMenu.js:766
+#: js/ui/screenShield.js:477 js/ui/status/system.js:347
 msgid "Lock"
 msgstr "ล็อค"
 
-#: ../js/ui/userMenu.js:781
-msgid "Install Updates & Restart"
-msgstr "ติดตั้งรายการปรับรุ่น & เปิดเครื่องใหม่"
+#: js/ui/screenShield.js:764
+msgid "GNOME needs to lock the screen"
+msgstr "GNOME ต้องการการล็อคหน้าจอ"
 
-#: ../js/ui/userMenu.js:799
-msgid "Your chat status will be set to busy"
-msgstr "จะกำหนดสถานะการสนทนาของคุณเป็นไม่ว่าง"
+#. We could not become modal, so we can't activate the
+#. screenshield. The user is probably very upset at this
+#. point, but any application using global grabs is broken
+#. Just tell him to stop using this app
+#. XXX: another option is to kick the user into the gdm login
+#. screen, where we're not affected by grabs
+#: js/ui/screenShield.js:890 js/ui/screenShield.js:1402
+msgid "Unable to lock"
+msgstr "ไม่สามารถล็อค"
 
-#: ../js/ui/userMenu.js:800
+#: js/ui/screenShield.js:891 js/ui/screenShield.js:1403
+msgid "Lock was blocked by an application"
+msgstr "ล็อคได้ถูกบล็อคโดยแอปพลิเคชันนึง"
+
+#: js/ui/search.js:754
+msgid "Searching…"
+msgstr "กำลังค้นหา…"
+
+#: js/ui/search.js:756
+msgid "No results."
+msgstr "ไม่พบรายการ"
+
+#: js/ui/shellEntry.js:38
+msgid "Copy"
+msgstr "คัดลอก"
+
+#: js/ui/shellEntry.js:43
+msgid "Paste"
+msgstr "แปะ"
+
+#: js/ui/shellEntry.js:110
+msgid "Show Text"
+msgstr "แสดงข้อความ"
+
+#: js/ui/shellEntry.js:112
+msgid "Hide Text"
+msgstr "ซ่อนข้อความ"
+
+#: js/ui/shellEntry.js:166
+#, javascript-format
+msgid "Search %s and more…"
+msgstr "ค้นหา %s และอื่นๆ…"
+
+#: js/ui/shellEntry.js:168
+msgid "Search the internet and more…"
+msgstr "ค้นหาในอินเทอร์เน็ตและอื่นๆ…"
+
+#: js/ui/shellMountOperation.js:317
+msgid "Password"
+msgstr "รหัสผ่าน"
+
+#: js/ui/shellMountOperation.js:345
+msgid "Remember Password"
+msgstr "จำรหัสผ่าน"
+
+#: js/ui/status/accessibility.js:42
+msgid "Accessibility"
+msgstr "สิ่งอำนวยความสะดวก"
+
+#: js/ui/status/accessibility.js:57
+msgid "Zoom"
+msgstr "ซูม"
+
+#: js/ui/status/accessibility.js:64
+msgid "Screen Reader"
+msgstr "โปรแกรมอ่านหน้าจอ"
+
+#: js/ui/status/accessibility.js:68
+msgid "Screen Keyboard"
+msgstr "แป้นพิมพ์บนจอ"
+
+#: js/ui/status/accessibility.js:72
+msgid "Visual Alerts"
+msgstr "แจ้งเหตุด้วยภาพ"
+
+#: js/ui/status/accessibility.js:75
+msgid "Sticky Keys"
+msgstr "ค้างปุ่มกด"
+
+#: js/ui/status/accessibility.js:78
+msgid "Slow Keys"
+msgstr "พิมพ์แบบช้า"
+
+#: js/ui/status/accessibility.js:81
+msgid "Bounce Keys"
+msgstr "ป้องกันการกดแป้นรัว"
+
+#: js/ui/status/accessibility.js:84
+msgid "Mouse Keys"
+msgstr "บังคับเมาส์ด้วยแป้น"
+
+#: js/ui/status/accessibility.js:167
+msgid "High Contrast"
+msgstr "สีตัดกัน"
+
+#: js/ui/status/accessibility.js:202
+msgid "Large Text"
+msgstr "อักษรขนาดใหญ่"
+
+#: js/ui/status/automaticUpdates.js:94
+msgid "Updates Queue"
+msgstr "คิวการอัปเดต"
+
+#: js/ui/status/automaticUpdates.js:114
+msgid "Set a Schedule"
+msgstr "ตั้งกำหนดเวลา"
+
+#. The status label
+#: js/ui/status/automaticUpdates.js:205
+msgid "Automatic Updates"
+msgstr "อัปเดตอัตโนมัติ"
+
+#: js/ui/status/automaticUpdates.js:270
+msgid "Automatic updates on"
+msgstr "อัปเดตอัตโนมัติใน"
+
+#: js/ui/status/automaticUpdates.js:271
 msgid ""
-"Notifications are now disabled, including chat messages. Your online status "
-"has been adjusted to let others know that you might not see their messages."
-msgstr ""
-"จะปิดการแจ้งเหตุ รวมถึงข้อความสนทนาด้วย "
-"และได้ปรับสถานะออนไลน์ของคุณเพื่อให้คนอื่นทราบว่าคุณอาจไม่เห็นข้อความจากพวกเขาแล้ว"
+"You have Unlimited Data so automatic updates have been turned on for this "
+"connection."
+msgstr "คุณมีอินเตอร์เน็ตแบบไม่จำกัด ระบบจึงเปิดการอัพเดทอัตโนมัติในการเชื่อมต่อนี้"
 
-#: ../js/ui/viewSelector.js:85
-msgid "Windows"
-msgstr "หน้าต่าง"
+#: js/ui/status/automaticUpdates.js:274
+msgid "Automatic updates are turned off to save your data"
+msgstr "การอัพเดทอัตโนมัติถูกปิดเพื่อบันทึกข้อมูลของคุณ"
 
-#: ../js/ui/viewSelector.js:89
+#: js/ui/status/automaticUpdates.js:275
+msgid ""
+"You will need to choose which Endless updates to apply when on this "
+"connection."
+msgstr "คุณจะต้องเลือกว่าจะปรับใช้อัปเดต Endless อันไหนเมื่ออยู่ในการเชื่อมต่อนี้"
+
+#: js/ui/status/automaticUpdates.js:297
+msgid "Change Settings…"
+msgstr "เปลี่ยนการตั้งค่า..."
+
+#: js/ui/status/automaticUpdates.js:321 js/ui/status/bluetooth.js:146
+#: js/ui/status/network.js:1287
+msgid "Turn On"
+msgstr "เปิด"
+
+#: js/ui/status/automaticUpdates.js:323 js/ui/status/bluetooth.js:146
+#: js/ui/status/network.js:154 js/ui/status/network.js:339
+#: js/ui/status/network.js:1287 js/ui/status/network.js:1402
+#: js/ui/status/nightLight.js:47 js/ui/status/rfkill.js:90
+#: js/ui/status/rfkill.js:117
+msgid "Turn Off"
+msgstr "ปิด"
+
+#: js/ui/status/bluetooth.js:48
+msgid "Bluetooth"
+msgstr "บลูทูท"
+
+#: js/ui/status/bluetooth.js:57 js/ui/status/network.js:616
+msgid "Bluetooth Settings"
+msgstr "ตั้งค่าบลูทูท"
+
+#. Translators: this is the number of connected bluetooth devices
+#: js/ui/status/bluetooth.js:140
+#, javascript-format
+msgid "%d Connected"
+msgid_plural "%d Connected"
+msgstr[0] "เชื่อมต่อ %d แล้ว"
+
+#: js/ui/status/bluetooth.js:142
+msgid "Bluetooth Off"
+msgstr "Bluetooth ถูกปิด"
+
+#: js/ui/status/bluetooth.js:144
+msgid "Bluetooth On"
+msgstr "Bluetooth ทำงาน"
+
+#: js/ui/status/brightness.js:44
+msgid "Brightness"
+msgstr "การผูกคีย์เพื่อโฟกัสการแจ้งเตือนที่ทำงานอยู่"
+
+#: js/ui/status/codingGame.js:20
+msgid "Coding"
+msgstr "การเขียนโค้ด"
+
+#: js/ui/status/keyboard.js:862
+msgid "Show Keyboard Layout"
+msgstr "แสดงผังแป้นพิมพ์"
+
+#: js/ui/status/location.js:89 js/ui/status/location.js:197
+msgid "Location Enabled"
+msgstr "เปิดใช้ตำแหน่งแล้ว"
+
+#: js/ui/status/location.js:90 js/ui/status/location.js:198
+#: js/ui/status/orientation.js:52 js/ui/status/orientation.js:81
+msgid "Disable"
+msgstr "ปิดใช้งาน"
+
+#: js/ui/status/location.js:91
+msgid "Privacy Settings"
+msgstr "ตั้งค่าความเป็นส่วนตัว"
+
+#: js/ui/status/location.js:196
+msgid "Location In Use"
+msgstr "ตำแหน่งที่กำลังใช้งาน"
+
+#: js/ui/status/location.js:200
+msgid "Location Disabled"
+msgstr "ตำแหน่งถูกปิดใช้งาน"
+
+#: js/ui/status/location.js:201 js/ui/status/orientation.js:84
+msgid "Enable"
+msgstr "เปิดใช้งาน"
+
+#. Translators: %s is an application name
+#: js/ui/status/location.js:388
+#, javascript-format
+msgid "Give %s access to your location?"
+msgstr "อนุญาตให้ %s เข้าถึงตำแหน่งของคุณหรือไม่"
+
+#: js/ui/status/location.js:389
+msgid "Location access can be changed at any time from the privacy settings."
+msgstr "คุณสามารถปรับการเข้าถึงตำแหน่งได้ทุกเมื่อผ่านการตั้งค่าความเป็นส่วนตัว"
+
+#: js/ui/status/network.js:90
+msgid "<unknown>"
+msgstr "<ไม่ทราบ>"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:443 js/ui/status/network.js:1316
+#, javascript-format
+msgid "%s Off"
+msgstr "%s ปิดทำงาน"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:446
+#, javascript-format
+msgid "%s Connected"
+msgstr "เชื่อมต่อ %s แล้ว"
+
+#. Translators: this is for network devices that are physically present but
+#. are not
+#. under NetworkManager's control (and thus cannot be used in the menu);
+#. %s is a network identifier
+#: js/ui/status/network.js:451
+#, javascript-format
+msgid "%s Unmanaged"
+msgstr "%s ยังไม่ได้รับการจัดการ"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:454
+#, javascript-format
+msgid "%s Disconnecting"
+msgstr "%s กำลังยกเลิกการเชื่อมต่อ"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:461 js/ui/status/network.js:1308
+#, javascript-format
+msgid "%s Connecting"
+msgstr "%s กำลังเชื่อมต่อ"
+
+#. Translators: this is for network connections that require some kind of key
+#. or password; %s is a network identifier
+#: js/ui/status/network.js:464
+#, javascript-format
+msgid "%s Requires Authentication"
+msgstr "%s จำเป็นต้องมีการรับรองความถูกต้อง"
+
+#. Translators: this is for devices that require some kind of firmware or
+#. kernel
+#. module, which is missing; %s is a network identifier
+#: js/ui/status/network.js:472
+#, javascript-format
+msgid "Firmware Missing For %s"
+msgstr "มีเฟิร์มแวร์หายไปสำหรับ %s"
+
+#. Translators: this is for a network device that cannot be activated (for
+#. example it
+#. is disabled by rfkill, or it has no coverage; %s is a network identifier
+#: js/ui/status/network.js:476
+#, javascript-format
+msgid "%s Unavailable"
+msgstr "%s ไม่พร้อมใช้งาน"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:479
+#, javascript-format
+msgid "%s Connection Failed"
+msgstr "การเชื่อมต่อ %s ล้มเหลว"
+
+#: js/ui/status/network.js:495
+msgid "Wired Settings"
+msgstr "ตั้งค่าผ่านสาย"
+
+#: js/ui/status/network.js:537
+msgid "Mobile Broadband Settings"
+msgstr "ตั้งค่าบรอดแบนด์มือถือ"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:580 js/ui/status/network.js:1313
+#, javascript-format
+msgid "%s Hardware Disabled"
+msgstr "ฮาร์ดแวร์ %s ถูกปิดใช้งาน"
+
+#. Translators: this is for a network device that cannot be activated
+#. because it's disabled by rfkill (airplane mode); %s is a network identifier
+#: js/ui/status/network.js:584
+#, javascript-format
+msgid "%s Disabled"
+msgstr "%s ถูกปิดใช้งาน"
+
+#: js/ui/status/network.js:624
+msgid "Connect to Internet"
+msgstr "เชื่อมต่ออินเทอร์เน็ต"
+
+#: js/ui/status/network.js:822
+msgid "Airplane Mode is On"
+msgstr "โหมดโดยสารเครื่องบินเปิดทำงาน"
+
+#: js/ui/status/network.js:823
+msgid "Wi-Fi is disabled when airplane mode is on."
+msgstr "Wi-Fi จะถูกปิดเมื่อเปิดใช้โหมดการบิน"
+
+#: js/ui/status/network.js:824
+msgid "Turn Off Airplane Mode"
+msgstr "ปิดโหมดโดยสารเครื่องบิน"
+
+#: js/ui/status/network.js:833
+msgid "Wi-Fi is Off"
+msgstr "Wi-Fi ปิดทำงาน"
+
+#: js/ui/status/network.js:834
+msgid "Wi-Fi needs to be turned on in order to connect to a network."
+msgstr "จำเป็นต้องเปิด Wi-Fi เพื่อเชื่อมต่อเครือข่าย"
+
+#: js/ui/status/network.js:835
+msgid "Turn On Wi-Fi"
+msgstr "เปิด Wi-Fi"
+
+#: js/ui/status/network.js:860
+msgid "Wi-Fi Networks"
+msgstr "เครือข่าย Wi-Fi"
+
+#: js/ui/status/network.js:862
+msgid "Select a network"
+msgstr "เลือกเครือข่าย"
+
+#: js/ui/status/network.js:892
+msgid "No Networks"
+msgstr "ไม่มีเครือข่าย"
+
+#: js/ui/status/network.js:913 js/ui/status/rfkill.js:115
+msgid "Use hardware switch to turn off"
+msgstr "ใช้สวิตช์ฮาร์ดแวร์เพื่อปิด"
+
+#: js/ui/status/network.js:1179
+msgid "Select Network"
+msgstr "เลือกเครือข่าย"
+
+#: js/ui/status/network.js:1185
+msgid "Wi-Fi Settings"
+msgstr "ตั้งค่า Wi-Fi"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:1304
+#, javascript-format
+msgid "%s Hotspot Active"
+msgstr "ฮอตสปอต %s กำลังทำงาน"
+
+#. Translators: %s is a network identifier
+#: js/ui/status/network.js:1319
+#, javascript-format
+msgid "%s Not Connected"
+msgstr "ยังไม่เชื่อมต่อ %s"
+
+#: js/ui/status/network.js:1419
+msgid "connecting…"
+msgstr "กำลังเชื่อมต่อ…"
+
+#. Translators: this is for network connections that require some kind of key
+#. or password
+#: js/ui/status/network.js:1422
+msgid "authentication required"
+msgstr "ต้องยืนยันตัวบุคคล"
+
+#: js/ui/status/network.js:1424
+msgid "connection failed"
+msgstr "เชื่อมต่อไม่สำเร็จ"
+
+#: js/ui/status/network.js:1478
+msgid "VPN Settings"
+msgstr "การตั้งค่า VPN"
+
+#: js/ui/status/network.js:1491
+msgid "VPN"
+msgstr "VPN"
+
+#: js/ui/status/network.js:1501
+msgid "VPN Off"
+msgstr "VPN ปิดอยู่"
+
+#: js/ui/status/network.js:1565 js/ui/status/rfkill.js:93
+msgid "Network Settings"
+msgstr "ตั้งค่าเครือข่าย"
+
+#: js/ui/status/network.js:1596
+#, javascript-format
+msgid "%s Wired Connection"
+msgid_plural "%s Wired Connections"
+msgstr[0] "การเชื่อมต่อผ่านสาย %s"
+
+#: js/ui/status/network.js:1600
+#, javascript-format
+msgid "%s Wi-Fi Connection"
+msgid_plural "%s Wi-Fi Connections"
+msgstr[0] "การเชื่อมต่อ Wi-Fi %s "
+
+#: js/ui/status/network.js:1604
+#, javascript-format
+msgid "%s Modem Connection"
+msgid_plural "%s Modem Connections"
+msgstr[0] "การเชื่อมต่อโมเดม %s "
+
+#: js/ui/status/network.js:1738
+msgid "Connection failed"
+msgstr "เชื่อมต่อไม่สำเร็จ"
+
+#: js/ui/status/network.js:1739
+msgid "Activation of network connection failed"
+msgstr "เปิดใช้ช่องเชื่อมต่อไม่สำเร็จ"
+
+#: js/ui/status/nightLight.js:51
+msgid "Display Settings"
+msgstr "การตั้งค่าการแสดงผล"
+
+#: js/ui/status/nightLight.js:68
+msgid "Night Light Disabled"
+msgstr "ปิดการใช้งานแสงกลางคืน"
+
+#: js/ui/status/nightLight.js:69
+msgid "Night Light On"
+msgstr "เปิดแสงกลางคืน"
+
+#: js/ui/status/nightLight.js:70
+msgid "Resume"
+msgstr "ทำต่อ"
+
+#: js/ui/status/nightLight.js:71
+msgid "Disable Until Tomorrow"
+msgstr "ปิดการใช้งานจนถึงพรุ่งนี้"
+
+#: js/ui/status/orientation.js:49
+msgid "Orientation Lock"
+msgstr "ล็อกการวางแนว"
+
+#: js/ui/status/power.js:61
+msgid "Power Settings"
+msgstr "ตั้งค่าพลังงาน"
+
+#: js/ui/status/power.js:77
+msgid "Fully Charged"
+msgstr "ชาร์จเต็มแล้ว"
+
+#. 0 is reported when UPower does not have enough data
+#. to estimate battery life
+#: js/ui/status/power.js:84 js/ui/status/power.js:90
+msgid "Estimating…"
+msgstr "กำลังประเมิน…"
+
+#. Translators: this is <hours>:<minutes> Remaining (<percentage>)
+#: js/ui/status/power.js:98
+#, javascript-format
+msgid "%d∶%02d Remaining (%d %%)"
+msgstr "คงเหลือ %d∶%02d (%d %%)"
+
+#. Translators: this is <hours>:<minutes> Until Full (<percentage>)
+#: js/ui/status/power.js:103
+#, javascript-format
+msgid "%d∶%02d Until Full (%d %%)"
+msgstr "%d∶%02d จนกว่าจะเต็ม (%d %%)"
+
+#: js/ui/status/power.js:132 js/ui/status/power.js:134
+#, javascript-format
+msgid "%d %%"
+msgstr "%d %%"
+
+#. The menu only appears when airplane mode is on, so just
+#. statically build it as if it was on, rather than dynamically
+#. changing the menu contents.
+#: js/ui/status/rfkill.js:88
+msgid "Airplane Mode On"
+msgstr "โหมดโดยสารเครื่องบินเปิดทำงาน"
+
+#: js/ui/status/system.js:306
+msgid "Switch User"
+msgstr "สลับผู้ใช้"
+
+#: js/ui/status/system.js:318 js/ui/status/system.js:341
+msgid "Log Out"
+msgstr "ออกจากระบบ"
+
+#: js/ui/status/system.js:330
+msgid "Account Settings"
+msgstr "ตั้งค่าบัญชี"
+
+#: js/ui/status/system.js:357
+msgid "Suspend"
+msgstr "พักเครื่อง"
+
+#: js/ui/status/system.js:366
+msgid "Power Off"
+msgstr "ปิดเครื่อง"
+
+#: js/ui/status/volume.js:128
+msgid "Volume changed"
+msgstr "เปลี่ยนระดับเสียงแล้ว"
+
+#: js/ui/status/volume.js:170
+msgid "Volume"
+msgstr "ความดังเสียง"
+
+#. Translators: this is for display mirroring i.e. cloning.
+#. * Try to keep it under around 15 characters.
+#: js/ui/switchMonitor.js:21
+msgid "Mirror"
+msgstr "มิเรอร์"
+
+#. Translators: this is for the desktop spanning displays.
+#. * Try to keep it under around 15 characters.
+#: js/ui/switchMonitor.js:26
+msgid "Join Displays"
+msgstr "รวมจอแสดงผล"
+
+#. Translators: this is for using only an external display.
+#. * Try to keep it under around 15 characters.
+#: js/ui/switchMonitor.js:31
+msgid "External Only"
+msgstr "เฉพาะภายนอก"
+
+#. Translators: this is for using only the laptop display.
+#. * Try to keep it under around 15 characters.
+#: js/ui/switchMonitor.js:36
+msgid "Built-in Only"
+msgstr "ที่มีอยู่แล้วภายในเท่านั้น"
+
+#: js/ui/unlockDialog.js:67
+msgid "Log in as another user"
+msgstr "เข้าระบบในนามผู้ใช้อื่น"
+
+#: js/ui/unlockDialog.js:84
+msgid "Unlock Window"
+msgstr "ปลดล็อคหน้าต่าง"
+
+#: js/ui/userMenu.js:22
+msgid "Social Accounts"
+msgstr "บัญชีโซเชียล"
+
+#: js/ui/userMenu.js:25
+msgid "Settings"
+msgstr "การตั้งค่า"
+
+#: js/ui/userMenu.js:30
+msgid "Help"
+msgstr "วิธีใช้"
+
+#: js/ui/viewSelector.js:639
 msgid "Applications"
 msgstr "โปรแกรม"
 
-#: ../js/ui/viewSelector.js:93
-msgid "Search"
-msgstr "ค้นหา"
+#: js/ui/windowAttentionHandler.js:20
+#, javascript-format
+msgid "“%s” is ready"
+msgstr "“%s” พร้อมใช้งาน"
 
-#: ../js/ui/wanda.js:117
-#, c-format
-msgid ""
-"Sorry, no wisdom for you today:\n"
-"%s"
-msgstr ""
-"เสียใจด้วย วันนี้ไม่มีคำคมสำหรับคุณ:\n"
-"%s"
+#: js/ui/windowManager.js:80
+msgid "Do you want to keep these display settings?"
+msgstr "คุณต้องการที่จะเก็บการตั้งค่าการแสดงผลเหล่านี้หรือไม่"
 
-#: ../js/ui/wanda.js:121
-#, c-format
-msgid "%s the Oracle says"
-msgstr "หมอดู %s กล่าว"
+#. Translators: this and the following message should be limited in lenght,
+#. to avoid ellipsizing the labels.
+#: js/ui/windowManager.js:92
+msgid "Revert Settings"
+msgstr "ย้อนกลับการตั้งค่า"
 
-#: ../js/ui/wanda.js:162
-msgid "Your favorite Easter Egg"
-msgstr "ไข่อีสเตอร์สุดโปรดของคุณ"
+#: js/ui/windowManager.js:95
+msgid "Keep Changes"
+msgstr "เก็บการเปลี่ยนแปลง"
 
-#: ../js/ui/windowAttentionHandler.js:19
-#, c-format
-msgid "'%s' is ready"
-msgstr "'%s' พร้อมแล้ว"
+#: js/ui/windowManager.js:113
+#, javascript-format
+msgid "Settings changes will revert in %d second"
+msgid_plural "Settings changes will revert in %d seconds"
+msgstr[0] "การเปลี่ยนการตั้งค่าจะย้อนกลับใน %d วินาที"
 
-#: ../src/calendar-server/evolution-calendar.desktop.in.in.h:1
+#. Translators: This represents the size of a window. The first number is
+#. * the width of the window and the second is the height.
+#: js/ui/windowManager.js:720
+#, javascript-format
+msgid "%d × %d"
+msgstr "%d × %d"
+
+#: js/ui/windowMenu.js:34
+msgid "Minimize"
+msgstr "ย่อเล็กสุด"
+
+#: js/ui/windowMenu.js:41
+msgid "Unmaximize"
+msgstr "ยกเลิกขยายใหญ่สุด"
+
+#: js/ui/windowMenu.js:45
+msgid "Maximize"
+msgstr "ขยายใหญ่สุด"
+
+#: js/ui/windowMenu.js:52
+msgid "Move"
+msgstr "ย้าย"
+
+#: js/ui/windowMenu.js:58
+msgid "Resize"
+msgstr "ปรับขนาด"
+
+#: js/ui/windowMenu.js:65
+msgid "Move Titlebar Onscreen"
+msgstr "ย้ายแถบชื่อเรื่องบนหน้าจอ"
+
+#: js/ui/windowMenu.js:70
+msgid "Always on Top"
+msgstr "อยู่ด้านบนเสมอ"
+
+#: js/ui/windowMenu.js:89
+msgid "Always on Visible Workspace"
+msgstr "อยู่บนพื้นที่ทำงานที่มองเห็นได้เสมอ"
+
+#: js/ui/windowMenu.js:103
+msgid "Move to Workspace Left"
+msgstr "ย้ายพื้นที่ทำงานไปด้านซ้าย"
+
+#: js/ui/windowMenu.js:108
+msgid "Move to Workspace Right"
+msgstr "ย้ายพื้นที่ทำงานไปด้านขวา"
+
+#: js/ui/windowMenu.js:113
+msgid "Move to Workspace Up"
+msgstr "ย้ายพื้นที่ทำงานไปด้านบน"
+
+#: js/ui/windowMenu.js:118
+msgid "Move to Workspace Down"
+msgstr "ย้ายพื้นที่ทำงานไปด้านล่าง"
+
+#: js/ui/windowMenu.js:134
+msgid "Move to Monitor Up"
+msgstr "ย้ายจอภาพไปด้านบน"
+
+#: js/ui/windowMenu.js:140
+msgid "Move to Monitor Down"
+msgstr "ย้ายจอภาพไปด้านล่าง"
+
+#: js/ui/windowMenu.js:146
+msgid "Move to Monitor Left"
+msgstr "ย้ายจอภาพไปด้านซ้าย"
+
+#: js/ui/windowMenu.js:152
+msgid "Move to Monitor Right"
+msgstr "ย้ายจอภาพไปด้านขวา"
+
+#: src/calendar-server/evolution-calendar.desktop.in:3
 msgid "Evolution Calendar"
 msgstr "ปฏิทิน Evolution"
 
+#. Translators: Do NOT translate or transliterate this text (this is an icon
+#. file name)!
+#: src/calendar-server/evolution-calendar.desktop.in:6
+msgid "evolution"
+msgstr "ความก้าวหน้า"
+
+#: src/main.c:437
+msgid "Print version"
+msgstr "แสดงเลขรุ่น"
+
+#: src/main.c:443
+msgid "Mode used by GDM for login screen"
+msgstr "โหมดสำหรับให้ GDM เรียกใช้ในหน้าจอเข้าระบบ"
+
+#: src/main.c:449
+msgid "Use a specific mode, e.g. “gdm” for login screen"
+msgstr "ใช้โหมดเฉพาะ เช่น \"gdm\" สำหรับหน้าจอเข้าระบบ"
+
+#: src/main.c:455
+msgid "List possible modes"
+msgstr "แสดงโหมดทั้งหมดที่เป็นไปได้"
+
+#: src/shell-app.c:271
+msgctxt "program"
+msgid "Unknown"
+msgstr "ไม่ทราบชื่อ"
+
+#: src/shell-app.c:551
+#, c-format
+msgid "Failed to launch “%s”"
+msgstr "การเปิดใช้ “%s” ล้มเหลว"
+
+#: src/shell-desktop-dir-info.c:485
+msgid "Unnamed"
+msgstr "ไม่มีชื่อ"
+
+#: src/shell-desktop-dir-info.c:745
+#, c-format
+msgid "Custom definition for %s"
+msgstr "คำนิยามที่กำหนดเองสำหรับ %s"
+
+#: src/shell-keyring-prompt.c:730
+msgid "Passwords do not match."
+msgstr "รหัสผ่านไม่ตรงกัน"
+
+#: src/shell-keyring-prompt.c:738
+msgid "Password cannot be blank"
+msgstr "รหัสผ่านว่างเปล่าไม่ได้"
+
+#: src/shell-polkit-authentication-agent.c:353
+msgid "Authentication dialog was dismissed by the user"
+msgstr "กล่องโต้ตอบยืนยันตัวบุคคลถูกผู้ใช้ปิดทิ้ง"
+
 #. translators:
 #. * The number of sound outputs on a particular device
-#: ../src/gvc/gvc-mixer-control.c:1089
+#: subprojects/gvc/gvc-mixer-control.c:1873
 #, c-format
 msgid "%u Output"
 msgid_plural "%u Outputs"
@@ -1681,261 +2703,12 @@ msgstr[0] "ช่องเสียงออก %u ช่อง"
 
 #. translators:
 #. * The number of sound inputs on a particular device
-#: ../src/gvc/gvc-mixer-control.c:1099
+#: subprojects/gvc/gvc-mixer-control.c:1883
 #, c-format
 msgid "%u Input"
 msgid_plural "%u Inputs"
 msgstr[0] "ช่องเสียงเข้า %u ช่อง"
 
-#: ../src/gvc/gvc-mixer-control.c:1397
+#: subprojects/gvc/gvc-mixer-control.c:2738
 msgid "System Sounds"
 msgstr "เสียงของระบบ"
-
-#: ../src/main.c:330
-msgid "Print version"
-msgstr "แสดงเลขรุ่น"
-
-#: ../src/main.c:336
-msgid "Mode used by GDM for login screen"
-msgstr "โหมดสำหรับให้ GDM เรียกใช้ในหน้าจอเข้าระบบ"
-
-#: ../src/main.c:342
-msgid "Use a specific mode, e.g. \"gdm\" for login screen"
-msgstr "ใช้โหมดเฉพาะ เช่น \"gdm\" สำหรับหน้าจอเข้าระบบ"
-
-#: ../src/main.c:348
-msgid "List possible modes"
-msgstr "แสดงโหมดทั้งหมดที่เป็นไปได้"
-
-#: ../src/shell-app.c:621
-#, c-format
-msgid "Failed to launch '%s'"
-msgstr "เรียก '%s' ไม่สำเร็จ"
-
-#: ../src/shell-keyring-prompt.c:708
-msgid "Passwords do not match."
-msgstr "รหัสผ่านไม่ตรงกัน"
-
-#: ../src/shell-keyring-prompt.c:716
-msgid "Password cannot be blank"
-msgstr "รหัสผ่านว่างเปล่าไม่ได้"
-
-#: ../src/shell-mobile-providers.c:80
-msgid "United Kingdom"
-msgstr "สหราชอาณาจักร"
-
-#: ../src/shell-mobile-providers.c:526
-msgid "Default"
-msgstr "ปริยาย"
-
-#: ../src/shell-polkit-authentication-agent.c:343
-msgid "Authentication dialog was dismissed by the user"
-msgstr "กล่องโต้ตอบยืนยันตัวบุคคลถูกผู้ใช้ปิดทิ้ง"
-
-#~ msgid "Switch Session"
-#~ msgstr "สลับวาระ"
-
-#~ msgid "Failed to unmount '%s'"
-#~ msgstr "เลิกเมานท์ '%s' ไม่สำเร็จ"
-
-#~ msgid "Retry"
-#~ msgstr "ลองใหม่"
-
-#~ msgid "PLACES & DEVICES"
-#~ msgstr "ที่หลักๆ และอุปกรณ์"
-
-#~ msgid "Home"
-#~ msgstr "บ้าน"
-
-#~ msgid ""
-#~ "GNOME Shell extensions have a uuid property; this key lists extensions "
-#~ "which should not be loaded."
-#~ msgstr ""
-#~ "ส่วนขยายต่างๆ ของเชลล์ GNOME จะมี uuid ประจำตัว "
-#~ "ค่านี้จะเก็บรายชื่อของส่วนขยายที่จะไม่เรียกใช้"
-
-#~ msgid ""
-#~ "If true and format is either \"12-hour\" or \"24-hour\", display date in "
-#~ "the clock, in addition to time."
-#~ msgstr ""
-#~ "ถ้าเลือก และรูปแบบเวลาเป็น \"12-hour\" หรือ \"24-hour\" "
-#~ "ก็จะแสดงวันที่ในนาฬิกาควบคู่กับเวลาด้วย"
-
-#~ msgid "Show date in clock"
-#~ msgstr "แสดงวันที่ในนาฬิกา"
-
-#~ msgid "Show time with seconds"
-#~ msgstr "แสดงเวลาพร้อมวินาที"
-
-#~ msgid "%a %b %e, %R:%S"
-#~ msgstr "%a %d %b, %R:%S"
-
-#~ msgid "%a %b %e, %R"
-#~ msgstr "%a %d %b, %R"
-
-#~ msgid "%a %R:%S"
-#~ msgstr "%a %R:%S"
-
-#~ msgid "%a %R"
-#~ msgstr "%a %R"
-
-#~ msgid "%a %b %e, %l:%M:%S %p"
-#~ msgstr "%a %d %b, %l:%M:%S %p"
-
-#~ msgid "%a %b %e, %l:%M %p"
-#~ msgstr "%a %d %b, %l:%M %p"
-
-#~ msgid "%a %l:%M:%S %p"
-#~ msgstr "%a %l:%M:%S %p"
-
-#~ msgid "%a %l:%M %p"
-#~ msgstr "%a %l:%M %p"
-
-#~ msgid "RECENT ITEMS"
-#~ msgstr "รายการล่าสุด"
-
-#~ msgid "Connect to..."
-#~ msgstr "เชื่อมต่อไปยัง..."
-
-#~ msgid "Power Off..."
-#~ msgstr "ปิดเครื่อง..."
-
-#~ msgid "Lock Screen"
-#~ msgstr "ล็อคหน้าจอ"
-
-#~ msgid "Log Out..."
-#~ msgstr "ออกจากระบบ..."
-
-#~ msgid "You're now connected to wireless network '%s'"
-#~ msgstr "คุณเชื่อมต่อกับเครือข่ายไร้สาย '%s' แล้ว"
-
-#~ msgid "You're now connected to wired network '%s'"
-#~ msgstr "คุณเชื่อมต่อกับเครือข่ายใช้สาย '%s' แล้ว"
-
-#~ msgid "You're now connected to VPN network '%s'"
-#~ msgstr "คุณเชื่อมต่อกับเครือข่าย VPN '%s' แล้ว"
-
-#~ msgid "%s is online."
-#~ msgstr "%s ออนไลน์"
-
-#~ msgid "%s is away."
-#~ msgstr "%s ไม่อยู่"
-
-#~ msgid "%s is busy."
-#~ msgstr "%s ไม่ว่าง"
-
-#~ msgid "%s has finished starting"
-#~ msgstr "%s เปิดเสร็จแล้ว"
-
-#~ msgid "Less than a minute ago"
-#~ msgstr "ไม่ถึงหนึ่งนาทีก่อน"
-
-#~ msgid "%d minute ago"
-#~ msgid_plural "%d minutes ago"
-#~ msgstr[0] "%d นาทีก่อน"
-
-#~ msgid "%d hour ago"
-#~ msgid_plural "%d hours ago"
-#~ msgstr[0] "%d ชั่วโมงก่อน"
-
-#~ msgid "%d day ago"
-#~ msgid_plural "%d days ago"
-#~ msgstr[0] "%d วันก่อน"
-
-#~ msgid "%d week ago"
-#~ msgid_plural "%d weeks ago"
-#~ msgstr[0] "%d สัปดาห์ก่อน"
-
-#~ msgid "Home Folder"
-#~ msgstr "โฟลเดอร์บ้าน"
-
-#~ msgid "Customize the panel clock"
-#~ msgstr "ปรับแต่งนาฬิกาบนพาเนล"
-
-#~ msgid "Custom format of the clock"
-#~ msgstr "รูปแบบนาฬิกากำหนดเอง"
-
-#~ msgid "Hour format"
-#~ msgstr "รูปแบบชั่วโมง"
-
-#~ msgid ""
-#~ "If true and format is either \"12-hour\" or \"24-hour\", display seconds "
-#~ "in time."
-#~ msgstr ""
-#~ "ถ้าเลือก และรูปแบบเวลาเป็น \"12-hour\" หรือ \"24-hour\" ก็จะแสดงวินาทีในเวลาด้วย"
-
-#~ msgid ""
-#~ "This key specifies the format used by the panel clock when the format key "
-#~ "is set to \"custom\". You can use conversion specifiers understood by "
-#~ "strftime() to obtain a specific format. See the strftime() manual for "
-#~ "more information."
-#~ msgstr ""
-#~ "ค่านี้กำหนดรูปแบบของเวลาในแอพเพล็ตนาฬิกาเมื่อกำหนดรูปแบบเป็น \"custom\" "
-#~ "คุณสามารถใช้รหัสการแปลงของ strftime() เพื่อระบุรูปแบบที่ต้องการได้ "
-#~ "ดูข้อมูลเพิ่มเติมได้จากคู่มือของ strftime()"
-
-#~ msgid ""
-#~ "This key specifies the hour format used by the panel clock. Possible "
-#~ "values are \"12-hour\", \"24-hour\", \"unix\" and \"custom\". If set to "
-#~ "\"unix\", the clock will display time in seconds since Epoch, i.e. "
-#~ "1970-01-01. If set to \"custom\", the clock will display time according "
-#~ "to the format specified in the custom_format key. Note that if set to "
-#~ "either \"unix\" or \"custom\", the show_date and show_seconds keys are "
-#~ "ignored."
-#~ msgstr ""
-#~ "ค่านี้กำหนดรูปแบบชั่วโมงที่จะใช้ในแอพเพล็ตนาฬิกา ค่าที่เป็นไปได้คือ\"12-hour\", \"24-hour"
-#~ "\", \"unix\" และ \"custom\" ถ้ากำหนดเป็น \"unix\" "
-#~ "นาฬิกาจะแสดงเวลาเป็นวินาทีนับจาก 1970-01-01 ถ้ากำหนดเป็น \"custom\" "
-#~ "นาฬิกาจะแสดงตามรูปแบบที่กำหนดใน custom_format สังเกตว่าถ้ากำหนดเป็น \"unix\" หรือ "
-#~ "\"custom\" ค่า show_date และ show_seconds ก็จะไม่มีผล"
-
-#~ msgid "Enable lens mode"
-#~ msgstr "เปิดใช้โหมดแว่นขยาย"
-
-#~ msgid ""
-#~ "The magnified view either fills the entire screen, or occupies the top-"
-#~ "half, bottom-half, left-half, or right-half of the screen."
-#~ msgstr ""
-#~ "ช่องแสดงภาพขยายอาจจะใหญ่เต็มจอภาพ (full-screen) หรืออาจจะกินที่แค่ครึ่งบน (top-"
-#~ "half) ครึ่งล่าง (bottom-half) ครึ่งซ้าย (left-half) หรือครึ่งขวา (right-half)"
-
-#~ msgid ""
-#~ "Whether the magnified view should be centered over the location of the "
-#~ "system mouse and move with it."
-#~ msgstr "กำหนดว่าจะให้ภาพขยายหน้าจอวางตำแหน่งกึ่งกลางที่เมาส์และเคลื่อนย้ายไปตามเมาส์หรือไม่"
-
-#~ msgid "Clock Format"
-#~ msgstr "รูปแบบนาฬิกา"
-
-#~ msgid "Clock Preferences"
-#~ msgstr "ปรับแต่งค่านาฬิกา"
-
-#~ msgid "Panel Display"
-#~ msgstr "การแสดงบนพาเนล"
-
-#~ msgid "Show seco_nds"
-#~ msgstr "แสดง_วินาที"
-
-#~ msgid "_12 hour format"
-#~ msgstr "แ_บบ AM/PM"
-
-#~ msgid "_24 hour format"
-#~ msgstr "แบบ _24 ขั่วโมง"
-
-#~ msgid "PREFERENCES"
-#~ msgstr "ปรับแต่ง"
-
-#~ msgid "Drag here to add favorites"
-#~ msgstr "ลากมาที่นี่เพื่อเพิ่มเป็นรายการโปรด"
-
-#~ msgid "Find"
-#~ msgstr "หา"
-
-#~ msgid "Preferences"
-#~ msgstr "ปรับแต่ง"
-
-#~ msgid "Shut Down..."
-#~ msgstr "ปิดเครื่อง..."
-
-#~ msgid "Can't remove the first workspace."
-#~ msgstr "ไม่สามารถลบพื้นที่ทำงานแรกได้"
