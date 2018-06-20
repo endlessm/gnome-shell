@@ -5,6 +5,7 @@ import GObject from 'gi://GObject';
 import Soup from 'gi://Soup';
 
 import * as Config from '../misc/config.js';
+import * as Desktop from '../misc/desktop.js';
 import * as Dialog from './dialog.js';
 import * as ExtensionUtils from '../misc/extensionUtils.js';
 import * as FileUtils from '../misc/fileUtils.js';
@@ -41,6 +42,14 @@ export async function installExtension(uuid, invocation) {
         uuid,
         shell_version: Config.PACKAGE_VERSION,
     };
+
+    if (Desktop.is('endless') && Main.extensionManager.isModeExtension(uuid)) {
+        const title = _("Can't install “%s”:").format(uuid);
+        const message = _("This is an extension enabled by your current mode, you can't install manually any update in that session.");
+        Main.notifyError(title, message);
+        invocation.return_dbus_error('org.gnome.Shell.CantInstallError', message);
+        return;
+    }
 
     const message = Soup.Message.new_from_encoded_form('GET',
         REPOSITORY_URL_INFO,
@@ -198,6 +207,9 @@ export async function checkForUpdates() {
     let metadatas = {};
     Main.extensionManager.getUuids().forEach(uuid => {
         let extension = Main.extensionManager.lookup(uuid);
+        // don't updates out of repository mode extension
+        if (Desktop.is('endless') && Main.extensionManager.isModeExtension(uuid))
+            return;
         if (extension.type !== ExtensionUtils.ExtensionType.PER_USER)
             return;
         if (extension.hasUpdate)

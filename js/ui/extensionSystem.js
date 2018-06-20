@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import * as Signals from '../misc/signals.js';
 
 import * as Config from '../misc/config.js';
+import * as Desktop from '../misc/desktop.js';
 import * as ExtensionDownloader from './extensionDownloader.js';
 import {formatError} from '../misc/errorUtils.js';
 import {
@@ -481,6 +482,10 @@ export class ExtensionManager extends Signals.EventEmitter {
         await this.loadExtension(newExtension);
     }
 
+    isModeExtension(uuid) {
+        return this._getModeExtensions().indexOf(uuid) !== -1;
+    }
+
     async _callExtensionInit(uuid) {
         if (!this._extensionSupportsSessionMode(uuid))
             return false;
@@ -726,6 +731,10 @@ export class ExtensionManager extends Signals.EventEmitter {
             let type = dir.has_prefix(perUserDir)
                 ? ExtensionType.PER_USER
                 : ExtensionType.SYSTEM;
+            if (Desktop.is('endless') && this.isModeExtension(uuid) && type === ExtensionType.PER_USER) {
+                log(`Found user extension ${uuid}, but not loading from ${dir.get_path()} directory as part of session mode.`);
+                return;
+            }
             try {
                 extension = this.createExtensionObject(uuid, dir, type);
             } catch (error) {
