@@ -858,11 +858,16 @@ const PANEL_ITEM_IMPLEMENTATIONS = {
 
 var Panel = new Lang.Class({
     Name: 'Panel',
+    Extends: St.Widget,
 
     _init : function() {
-        this.actor = new Shell.GenericContainer({ name: 'panel',
-                                                  reactive: true });
-        this.actor._delegate = this;
+        this.parent({ name: 'panel',
+                      reactive: true });
+
+        // For compatibility with extensions that still use the
+        // this.actor field
+        this.actor = this;
+        this._delegate = this;
         this.actor.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
 
         this._sessionStyle = null;
@@ -872,34 +877,32 @@ var Panel = new Lang.Class({
         this.menuManager = new PopupMenu.PopupMenuManager(this);
 
         this._leftBox = new St.BoxLayout({ name: 'panelLeft' });
-        this.actor.add_actor(this._leftBox);
+        this.add_child(this._leftBox);
         this._centerBox = new St.BoxLayout({ name: 'panelCenter' });
-        this.actor.add_actor(this._centerBox);
+        this.add_child(this._centerBox);
         this._rightBox = new St.BoxLayout({ name: 'panelRight' });
-        this.actor.add_actor(this._rightBox);
+        this.add_child(this._rightBox);
 
         this._leftCorner = new PanelCorner(St.Side.LEFT);
-        this.actor.add_actor(this._leftCorner.actor);
+        this.add_child(this._leftCorner.actor);
 
         this._rightCorner = new PanelCorner(St.Side.RIGHT);
-        this.actor.add_actor(this._rightCorner.actor);
+        this.add_child(this._rightCorner.actor);
 
-        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
-        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
-        this.actor.connect('allocate', Lang.bind(this, this._allocate));
         this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
+        this.actor.connect('touch-event', Lang.bind(this, this._onButtonPress));
 
         Main.overview.connect('showing', Lang.bind(this, function () {
-            this.actor.add_style_pseudo_class('overview');
+            this.add_style_pseudo_class('overview');
             this._updateSolidStyle();
         }));
         Main.overview.connect('hiding', Lang.bind(this, function () {
-            this.actor.remove_style_pseudo_class('overview');
+            this.remove_style_pseudo_class('overview');
             this._updateSolidStyle();
         }));
 
-        Main.layoutManager.panelBox.add(this.actor);
-        Main.ctrlAltTabManager.addGroup(this.actor, _("Bottom Bar"), 'focus-top-bar-symbolic',
+        Main.layoutManager.panelBox.add(this);
+        Main.ctrlAltTabManager.addGroup(this, _("Bottom Bar"), 'focus-top-bar-symbolic',
                                         { sortGroup: CtrlAltTab.SortGroup.TOP,
                                           flipVertical: true });
 
@@ -929,24 +932,18 @@ var Panel = new Lang.Class({
         this._updateSolidStyle();
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
+    vfunc_get_preferred_width: function(actor, forHeight) {
         let primaryMonitor = Main.layoutManager.primaryMonitor;
 
-        alloc.min_size = -1;
-
         if (primaryMonitor)
-            alloc.natural_size = primaryMonitor.width;
-        else
-            alloc.natural_size = -1;
+            return [0, primaryMonitor.width];
+
+        return [0,  0];
     },
 
-    _getPreferredHeight: function(actor, forWidth, alloc) {
-        // We don't need to implement this; it's forced by the CSS
-        alloc.min_size = -1;
-        alloc.natural_size = -1;
-    },
+    vfunc_allocate: function(box, flags) {
+        this.parent(box, flags);
 
-    _allocate: function(actor, box, flags) {
         let allocWidth = box.x2 - box.x1;
         let allocHeight = box.y2 - box.y1;
 
@@ -962,7 +959,7 @@ var Panel = new Lang.Class({
 
         childBox.y1 = 0;
         childBox.y2 = allocHeight;
-        if (this.actor.get_text_direction() == Clutter.TextDirection.RTL) {
+        if (this.get_text_direction() == Clutter.TextDirection.RTL) {
             childBox.x1 = Math.max(allocWidth - Math.min(Math.floor(sideWidth),
                                                          leftNaturalWidth),
                                    0);
@@ -982,7 +979,7 @@ var Panel = new Lang.Class({
 
         childBox.y1 = 0;
         childBox.y2 = allocHeight;
-        if (this.actor.get_text_direction() == Clutter.TextDirection.RTL) {
+        if (this.get_text_direction() == Clutter.TextDirection.RTL) {
             childBox.x1 = 0;
             childBox.x2 = Math.min(Math.floor(sideWidth),
                                    rightNaturalWidth);
@@ -1128,7 +1125,7 @@ var Panel = new Lang.Class({
         if (this._sessionStyle)
             this._addStyleClassName(this._sessionStyle);
 
-        if (this.actor.get_text_direction() == Clutter.TextDirection.RTL) {
+        if (this.get_text_direction() == Clutter.TextDirection.RTL) {
             this._leftCorner.setStyleParent(this._rightBox);
             this._rightCorner.setStyleParent(this._leftBox);
         } else {
@@ -1138,7 +1135,7 @@ var Panel = new Lang.Class({
     },
 
     _updateSolidStyle: function() {
-        if (this.actor.has_style_pseudo_class('overview') || !Main.sessionMode.hasWindows) {
+        if (this.has_style_pseudo_class('overview') || !Main.sessionMode.hasWindows) {
             this._removeStyleClassName('solid');
             return;
         }
@@ -1155,7 +1152,7 @@ var Panel = new Lang.Class({
         });
 
         /* Check if at least one window is near enough to the panel */
-        let [, panelTop] = this.actor.get_transformed_position();
+        let [, panelTop] = this.get_transformed_position();
         let scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         let isNearEnough = windows.some(Lang.bind(this, function(metaWindow) {
             let verticalPosition = metaWindow.get_frame_rect().y;
@@ -1248,13 +1245,13 @@ var Panel = new Lang.Class({
     },
 
     _addStyleClassName: function(className) {
-        this.actor.add_style_class_name(className);
+        this.add_style_class_name(className);
         this._rightCorner.actor.add_style_class_name(className);
         this._leftCorner.actor.add_style_class_name(className);
     },
 
     _removeStyleClassName: function(className) {
-        this.actor.remove_style_class_name(className);
+        this.remove_style_class_name(className);
         this._rightCorner.actor.remove_style_class_name(className);
         this._leftCorner.actor.remove_style_class_name(className);
     },
