@@ -370,8 +370,6 @@ var WorkspaceThumbnail = new Lang.Class({
     },
 
     _doRemoveWindow : function(metaWin) {
-        let win = metaWin.get_compositor_private();
-
         // find the position of the window in our list
         let index = this._lookupIndex (metaWin);
 
