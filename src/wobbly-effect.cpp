@@ -327,6 +327,36 @@ endless_shell_fx_wobbly_move_by (EndlessShellFXWobbly *effect,
     }
 }
 
+/* This constant is used to deal with rounding error in computing
+ * paint boxes. See also https://gitlab.gnome.org/GNOME/mutter/blob/master/clutter/clutter/clutter-paint-volume.c#L1212 */
+#define PAINT_BOX_OFFSET 1
+
+static gboolean
+endless_shell_fx_get_untransformed_paint_box (ClutterActor    *actor,
+                                              ClutterActorBox *box)
+{
+  /* Get the actor's paint volume, bypassing affine
+   * transformations which would usually be applied
+   * if we just queried the paint box. */
+  const ClutterPaintVolume *volume = clutter_actor_get_paint_volume (actor);
+  ClutterVertex origin;
+
+  if (volume == NULL)
+    return FALSE;
+
+  /* We don't have access to the stage projection matrix
+   * so the best we can do is hope here that the volume is
+   * two dimensional and orthogonal. */
+  clutter_paint_volume_get_origin (volume, &origin);
+
+  box->x1 = floor (origin.x + clutter_actor_get_x (actor)) - PAINT_BOX_OFFSET;
+  box->y1 = floor (origin.y + clutter_actor_get_y (actor)) - PAINT_BOX_OFFSET;
+  box->x2 = box->x1 + ceil (clutter_paint_volume_get_width (volume)) + PAINT_BOX_OFFSET * 2;
+  box->y2 = box->y1 + ceil (clutter_paint_volume_get_height (volume)) + PAINT_BOX_OFFSET * 2;
+
+  return TRUE;
+}
+
 static void
 endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
                                                 ClutterActor         *actor,
@@ -344,9 +374,9 @@ endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
   RAIIActorPaintBox forced_client_paint_box (effect_class);
   ClutterActorBox   rect;
 
-  /* If clutter_actor_get_paint_box fails
+  /* If endless_shell_fx_get_untransformed_paint_box fails
    * we should fall back to the actor size at this point */
-  if (clutter_actor_get_paint_box (actor, &rect))
+  if (endless_shell_fx_get_untransformed_paint_box (actor, &rect))
     clutter_actor_box_get_size (&rect, width, height);
   else
     clutter_actor_get_size (actor, width, height);
