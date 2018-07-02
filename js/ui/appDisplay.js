@@ -166,7 +166,7 @@ var BaseAppView = new Lang.Class({
             this._keyFocusIn(actor);
         }));
         // Standard hack for ClutterBinLayout
-        this._grid.actor.x_expand = true;
+        this._grid.x_expand = true;
 
         this._items = {};
         this._allItems = [];
@@ -407,8 +407,8 @@ var BaseAppView = new Lang.Class({
         }
     },
 
-    _doSpringAnimation: function(animationDirection) {
-        this._grid.actor.opacity = 255;
+    _doSpringAnimation(animationDirection) {
+        this._grid.opacity = 255;
 
         // We don't do the icon grid animations on Endless, but we still need
         // to call this method so that the animation-done signal gets emitted,
@@ -426,8 +426,8 @@ var BaseAppView = new Lang.Class({
         }
 
         if (animationDirection == IconGrid.AnimationDirection.IN) {
-            let id = this._grid.actor.connect('paint', () => {
-                this._grid.actor.disconnect(id);
+            let id = this._grid.connect('paint', () => {
+                this._grid.disconnect(id);
                 this._doSpringAnimation(animationDirection);
             });
         } else {
@@ -437,7 +437,7 @@ var BaseAppView = new Lang.Class({
 
     animateSwitch: function(animationDirection) {
         Tweener.removeTweens(this.actor);
-        Tweener.removeTweens(this._grid.actor);
+        Tweener.removeTweens(this._grid);
 
         let params = { time: VIEWS_SWITCH_TIME,
                        transition: 'easeOutQuad' };
@@ -451,7 +451,7 @@ var BaseAppView = new Lang.Class({
             params.onComplete = Lang.bind(this, function() { this.actor.hide() });
         }
 
-        Tweener.addTween(this._grid.actor, params);
+        Tweener.addTween(this._grid, params);
     },
 
     get gridActor() {
@@ -1437,7 +1437,7 @@ var FrequentView = new Lang.Class({
         box.x2 = width;
         box.y2 = height;
         box = this.actor.get_theme_node().get_content_box(box);
-        box = this._grid.actor.get_theme_node().get_content_box(box);
+        box = this._grid.get_theme_node().get_content_box(box);
         let availWidth = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
         this._grid.adaptToSize(availWidth, availHeight);
@@ -1661,7 +1661,7 @@ var FolderView = new Lang.Class({
 
         // If it not expand, the parent doesn't take into account its preferred_width when allocating
         // the second time it allocates, so we apply the "Standard hack for ClutterBinLayout"
-        this._grid.actor.x_expand = true;
+        this._grid.x_expand = true;
 
         this.actor = new St.ScrollView({ overlay_scrollbars: true });
         this.actor.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
@@ -1669,7 +1669,7 @@ var FolderView = new Lang.Class({
         this._noAppsLabel = new St.Label({ text: _("No apps in this folder! To add an app, drag it onto the folder."),
                                            style_class: 'folder-no-apps-label'});
         scrollableContainer.add_actor(this._noAppsLabel);
-        scrollableContainer.add_actor(this._grid.actor);
+        scrollableContainer.add_actor(this._grid);
         this.actor.add_actor(scrollableContainer);
 
         let action = new Clutter.PanAction({ interpolate: true });
@@ -2357,7 +2357,7 @@ var FolderIcon = new Lang.Class({
 
     _updatePopupSize: function() {
         // StWidget delays style calculation until needed, make sure we use the correct values
-        this.view._grid.actor.ensure_style();
+        this.view._grid.ensure_style();
 
         let offsetForEachSide = Math.ceil((this._popup.getOffset(St.Side.TOP) +
                                            this._popup.getOffset(St.Side.BOTTOM) -
