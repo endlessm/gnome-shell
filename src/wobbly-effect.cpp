@@ -20,7 +20,6 @@
  */
 
 #include <array>
-#include <boost/noncopyable.hpp>
 
 #include <glib-object.h>
 #include <gio/gio.h>
@@ -116,8 +115,7 @@ namespace
 {
   /* Utility class to force the usage of the actor-only paint volume as opposed
    * to our expanded paint volume from the effect running */
-  class RAIIActorPaintBox :
-    boost::noncopyable
+  class RAIIActorPaintBox
   {
     public:
 
@@ -133,6 +131,12 @@ namespace
       }
 
     private:
+
+      RAIIActorPaintBox (const RAIIActorPaintBox &) = delete;
+      RAIIActorPaintBox & operator= (const RAIIActorPaintBox &) = delete;
+
+      RAIIActorPaintBox (RAIIActorPaintBox &&) = delete;
+      RAIIActorPaintBox & operator= (RAIIActorPaintBox &&) = delete;
 
       ClutterEffectClass *effect_class;
   };
