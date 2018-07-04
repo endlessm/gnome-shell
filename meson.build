@@ -106,7 +106,7 @@ endif
 eosmetrics_dep = dependency('eosmetrics-0')
 
 # Endless-specific: Wobbly windows
-libwobbly_dep = dependency('libwindowfx_wobbly')
+libwobbly_dep = dependency('libwindowfx_wobbly-0.3')
 libeos_shell_fx_deps = [mutter_dep, gdk_pixbuf_dep, libwobbly_dep]
 
 # Endless-specific: Required for keyboard layout switcher in password entries

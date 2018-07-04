@@ -26,11 +26,11 @@
 #include <gio/gio.h>
 #include <clutter/clutter.h>
 
-#include <windowfx/wobbly/wobbly.h>
+#include <wobbly/wobbly.h>
 
 #include "wobbly-effect.h"
 
-namespace bg = boost::geometry;
+namespace wgd = wobbly::geometry::dimension;
 
 typedef struct _EndlessShellFXWobblyPrivate
 {
@@ -93,10 +93,10 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
     {
       std::array <wobbly::Point, 4> const extremes = priv->model->Extremes ();
 
-      float x1 = std::min (bg::get <0> (extremes[0]), bg::get <0> (extremes[2]));
-      float y1 = std::min (bg::get <1> (extremes[0]), bg::get <1> (extremes[1]));
-      float x2 = std::max (bg::get <0> (extremes[1]), bg::get <0> (extremes[3]));
-      float y2 = std::max (bg::get <1> (extremes[2]), bg::get <1> (extremes[3]));
+      float x1 = std::min (wgd::get <0> (extremes[0]), wgd::get <0> (extremes[2]));
+      float y1 = std::min (wgd::get <1> (extremes[0]), wgd::get <1> (extremes[1]));
+      float x2 = std::max (wgd::get <0> (extremes[1]), wgd::get <0> (extremes[3]));
+      float y2 = std::max (wgd::get <1> (extremes[2]), wgd::get <1> (extremes[3]));
 
       ClutterActorBox const extremesBox =
         {
@@ -171,8 +171,8 @@ endless_shell_fx_wobbly_deform_vertex (ClutterDeformEffect *effect,
   wobbly::Point deformed =
     priv->model->DeformTexcoords (wobbly::Point (vertex->ty,
                                   vertex->tx));
-  vertex->x = bg::get <0> (deformed);
-  vertex->y = bg::get <1> (deformed);
+  vertex->x = wgd::get <0> (deformed);
+  vertex->y = wgd::get <1> (deformed);
 }
 
 static void
@@ -319,7 +319,7 @@ endless_shell_fx_wobbly_move_by (EndlessShellFXWobbly *effect,
       priv->anchor->MoveBy (delta);
 
       wobbly::Vector reverse_delta (delta);
-      bg::multiply_value (reverse_delta, -1);
+      wgd::scale (reverse_delta, -1);
 
       /* Now move the entire model back - this ensures that
        * we stay in sync with the actor's relative position */
