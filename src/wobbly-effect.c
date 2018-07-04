@@ -1,7 +1,7 @@
 /*
- * wobbly-effect.cpp
+ * wobbly-effect.c
  *
- * Copyright © 2013-2016 Endless Mobile, Inc.
+ * Copyright © 2013-2018 Endless Mobile, Inc.
  *
  * This library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,36 +19,31 @@
  * Authors: Sam Spilsbury <sam@endlessm.com>
  */
 
-#include <array>
-#include <boost/noncopyable.hpp>
+#include <math.h>
 
 #include <glib-object.h>
 #include <gio/gio.h>
 #include <clutter/clutter.h>
 
-#include <windowfx/wobbly/wobbly.h>
+#include <wobbly-glib/anchor.h>
+#include <wobbly-glib/model.h>
+#include <wobbly-glib/vector.h>
 
 #include "wobbly-effect.h"
 
-namespace bg = boost::geometry;
-
 typedef struct _EndlessShellFXWobblyPrivate
 {
-  float      slowdown_factor;
-
-  wobbly::Model  *model;
-  wobbly::Anchor *anchor;
-  gint64     last_msecs;
-  guint      timeout_id;
-  guint      width_changed_signal;
-  guint      height_changed_signal;
-
-  /* We'll be touching this seldomly, so put
-   * it down here for now */
-  wobbly::Model::Settings model_settings;
-
-  /* Single bit at the end of the struct */
-  bool      ungrab_pending : 1;
+  float         slowdown_factor;
+  double        spring_constant;
+  double        friction;
+  double        movement_range;
+  WobblyModel  *model;
+  WobblyAnchor *anchor;
+  gint64        last_msecs;
+  guint         timeout_id;
+  guint         width_changed_signal;
+  guint         height_changed_signal;
+  gboolean      ungrab_pending;
 } EndlessShellFXWobblyPrivate;
 
 enum
@@ -83,7 +78,7 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
 {
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (effect);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
   /* We assume that the parent's get_paint_volume method always returns
    * TRUE here. */
@@ -91,19 +86,25 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
 
   if (priv->model)
     {
-      std::array <wobbly::Point, 4> const extremes = priv->model->Extremes ();
+      WobblyVector extremes[4];
 
-      float x1 = std::min (bg::get <0> (extremes[0]), bg::get <0> (extremes[2]));
-      float y1 = std::min (bg::get <1> (extremes[0]), bg::get <1> (extremes[1]));
-      float x2 = std::max (bg::get <0> (extremes[1]), bg::get <0> (extremes[3]));
-      float y2 = std::max (bg::get <1> (extremes[2]), bg::get <1> (extremes[3]));
+      wobbly_model_query_extremes (priv->model,
+                                   &extremes[0],
+                                   &extremes[1],
+                                   &extremes[2],
+                                   &extremes[3]);
+
+      float x1 = MIN (extremes[0].x, extremes[2].x);
+      float y1 = MIN (extremes[0].y, extremes[1].y);
+      float x2 = MAX (extremes[1].x, extremes[3].x);
+      float y2 = MAX (extremes[2].y, extremes[3].y);
 
       ClutterActorBox const extremesBox =
         {
-          static_cast <float> (std::floor (x1)),
-          static_cast <float> (std::floor (y1)),
-          static_cast <float> (std::ceil (x2)),
-          static_cast <float> (std::ceil (y2))
+          floor (x1),
+          floor (y1),
+          ceil (x2),
+          ceil (y2)
         };
 
       clutter_paint_volume_union_box (volume, &extremesBox);
@@ -112,31 +113,27 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
   return TRUE;
 }
 
-namespace
+typedef struct
 {
-  /* Utility class to force the usage of the actor-only paint volume as opposed
-   * to our expanded paint volume from the effect running */
-  class RAIIActorPaintBox :
-    boost::noncopyable
-  {
-    public:
+  ClutterEffectClass *effect_class;
+} EnforcedPaintBox;
 
-      RAIIActorPaintBox (ClutterEffectClass *effect_class) :
-        effect_class (effect_class)
-      {
-        effect_class->get_paint_volume = endless_shell_fx_wobbly_lie_about_paint_volume;
-      }
+static EnforcedPaintBox
+enforce_no_effects_paint_box (ClutterEffectClass *effect_class)
+{
+  effect_class->get_paint_volume = endless_shell_fx_wobbly_lie_about_paint_volume;
 
-      ~RAIIActorPaintBox ()
-      {
-        effect_class->get_paint_volume = endless_shell_fx_wobbly_get_paint_volume;
-      }
-
-    private:
-
-      ClutterEffectClass *effect_class;
-  };
+  EnforcedPaintBox box = { effect_class };
+  return box;
 }
+
+static void
+enforce_no_effects_paint_box_cleanup (EnforcedPaintBox *box)
+{
+  box->effect_class->get_paint_volume = endless_shell_fx_wobbly_get_paint_volume;
+}
+
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (EnforcedPaintBox, enforce_no_effects_paint_box_cleanup)
 
 /* ClutterOffscreenEffect calls clutter_actor_get_paint_box in order to
  * determine the size of the buffer to redirect into. However, we can't
@@ -153,26 +150,29 @@ endless_shell_fx_wobbly_pre_paint (ClutterEffect *effect)
   EndlessShellFXWobblyClass *klass = ENDLESS_SHELL_FX_WOBBLY_GET_CLASS (wobbly_effect);
   ClutterEffectClass *effect_class = CLUTTER_EFFECT_CLASS (klass);
 
-  RAIIActorPaintBox forced_client_paint_box (effect_class);
+  g_auto(EnforcedPaintBox) forced_client_paint_box = enforce_no_effects_paint_box (effect_class);
 
   return CLUTTER_EFFECT_CLASS (endless_shell_fx_wobbly_parent_class)->pre_paint (effect);
 }
 
 static void
 endless_shell_fx_wobbly_deform_vertex (ClutterDeformEffect *effect,
-                                       gfloat                     ,
-                                       gfloat                     ,
+                                       gfloat                    x G_GNUC_UNUSED,
+                                       gfloat                    y G_GNUC_UNUSED,
                                        CoglTextureVertex   *vertex)
 {
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (effect);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
-  wobbly::Point deformed =
-    priv->model->DeformTexcoords (wobbly::Point (vertex->ty,
-                                  vertex->tx));
-  vertex->x = bg::get <0> (deformed);
-  vertex->y = bg::get <1> (deformed);
+  /* The reversal of ty and tx here is intentional */
+  WobblyVector uv = { vertex->ty, vertex->tx };
+  WobblyVector deformed;
+  wobbly_model_deform_texcoords (priv->model,
+                                 uv,
+                                 &deformed);
+  vertex->x = deformed.x;
+  vertex->y = deformed.y;
 }
 
 static void
@@ -180,9 +180,8 @@ remove_anchor_if_pending (EndlessShellFXWobblyPrivate *priv)
 {
   if (priv->ungrab_pending)
     {
-      delete priv->anchor;
-      priv->anchor = nullptr;
-      priv->ungrab_pending = false;
+      g_clear_object (&priv->anchor);
+      priv->ungrab_pending = FALSE;
     }
 }
 
@@ -194,7 +193,7 @@ endless_shell_fx_wobbly_new_frame (gpointer user_data)
 {
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (user_data);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
   gint64 msecs = g_get_monotonic_time ();
 
   static const unsigned int ms_to_us = 1000;
@@ -214,7 +213,7 @@ endless_shell_fx_wobbly_new_frame (gpointer user_data)
    * models in a way that makes sense, so don't do it */
   if (msecs_delta)
     {
-      if (priv->model->Step (msecs_delta / priv->slowdown_factor))
+      if (wobbly_model_step (priv->model, msecs_delta / priv->slowdown_factor))
         {
           clutter_actor_meta_set_enabled (CLUTTER_ACTOR_META (wobbly_effect), TRUE);
           clutter_deform_effect_invalidate (CLUTTER_DEFORM_EFFECT (wobbly_effect));
@@ -240,7 +239,7 @@ static void
 endless_shell_fx_wobbly_ensure_timeline (EndlessShellFXWobbly *wobbly_effect)
 {
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
   if (!priv->timeout_id)
     {
@@ -258,7 +257,7 @@ endless_shell_fx_wobbly_grab (EndlessShellFXWobbly *effect,
 {
   ClutterActor *actor = clutter_actor_meta_get_actor (CLUTTER_ACTOR_META (effect));
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (effect));
+    endless_shell_fx_wobbly_get_instance_private (effect);
 
   g_assert (!priv->anchor || priv->ungrab_pending);
 
@@ -269,15 +268,17 @@ endless_shell_fx_wobbly_grab (EndlessShellFXWobbly *effect,
     {
       /* Make sure to move the model to the actor's current position first
        * as it may have changed in the meantime */
-      priv->model->MoveModelTo (wobbly::Point (0, 0));
+      WobblyVector position = { 0, 0 };
+      wobbly_model_move_to (priv->model, position);
 
       endless_shell_fx_wobbly_ensure_timeline (effect);
 
       float actor_x, actor_y;
       clutter_actor_get_position (actor, &actor_x, &actor_y);
 
-      priv->anchor = new wobbly::Anchor (priv->model->GrabAnchor (wobbly::Point (x - actor_x,
-                                                                                 y - actor_y)));
+      WobblyVector anchor_position = { x - actor_x, y - actor_y };
+
+      priv->anchor = wobbly_model_grab_anchor (priv->model, anchor_position);
     }
 }
 
@@ -285,7 +286,7 @@ void
 endless_shell_fx_wobbly_ungrab (EndlessShellFXWobbly *effect)
 {
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (effect));
+    endless_shell_fx_wobbly_get_instance_private (effect);
 
   g_assert (priv->anchor && !priv->ungrab_pending);
 
@@ -293,14 +294,9 @@ endless_shell_fx_wobbly_ungrab (EndlessShellFXWobbly *effect)
    * clever here and make the ungrab pending on the completion
    * of the animation */
   if (priv->timeout_id)
-    {
-      priv->ungrab_pending = true;
-    }
+    priv->ungrab_pending = TRUE;
   else
-    {
-      delete priv->anchor;
-      priv->anchor = nullptr;
-    }
+    g_clear_object (&priv->anchor);
 }
 
 void
@@ -309,21 +305,22 @@ endless_shell_fx_wobbly_move_by (EndlessShellFXWobbly *effect,
                                  double               dy)
 {
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (effect));
+    endless_shell_fx_wobbly_get_instance_private (effect);
 
   if (priv->anchor)
     {
-      wobbly::Vector delta (dx, dy);
+      WobblyVector delta = { dx, dy };
 
       endless_shell_fx_wobbly_ensure_timeline (effect);
-      priv->anchor->MoveBy (delta);
+      wobbly_anchor_move_by (priv->anchor, delta);
 
-      wobbly::Vector reverse_delta (delta);
-      bg::multiply_value (reverse_delta, -1);
+      WobblyVector reverse_delta = delta;
+      reverse_delta.x *= -1;
+      reverse_delta.y *= -1;
 
       /* Now move the entire model back - this ensures that
        * we stay in sync with the actor's relative position */
-      priv->model->MoveModelBy (reverse_delta);
+      wobbly_model_move_by (priv->model, reverse_delta);
     }
 }
 
@@ -371,8 +368,8 @@ endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
    * texture. However, we only want the size of the
    * paint box when we're just considering the
    * actor alone */
-  RAIIActorPaintBox forced_client_paint_box (effect_class);
-  ClutterActorBox   rect;
+  g_auto(EnforcedPaintBox) forced_client_paint_box = enforce_no_effects_paint_box (effect_class);
+  ClutterActorBox          rect;
 
   /* If endless_shell_fx_get_untransformed_paint_box fails
    * we should fall back to the actor size at this point */
@@ -384,13 +381,13 @@ endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
 
 static void
 endless_shell_fx_wobbly_size_changed (GObject    *object,
-                                      GParamSpec *,
+                                      GParamSpec *spec G_GNUC_UNUSED,
                                       gpointer   user_data)
 {
   ClutterActor    *actor = CLUTTER_ACTOR (object);
   EndlessShellFXWobbly *effect = ENDLESS_SHELL_FX_WOBBLY (user_data);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (effect));
+    endless_shell_fx_wobbly_get_instance_private (effect);
 
   /* We don't ensure a timeline here because we only want to redistribute
    * non-anchor points if we're already grabbed, which the wobbly effect will
@@ -409,8 +406,11 @@ endless_shell_fx_wobbly_size_changed (GObject    *object,
        * the cursor) */
       remove_anchor_if_pending (priv);
 
-      priv->model->ResizeModel (actor_width, actor_height);
-      priv->model->MoveModelTo (wobbly::Point (0, 0));
+      WobblyVector actor_size = { actor_width, actor_height };
+      WobblyVector actor_position = { 0.0, 0.0 };
+
+      wobbly_model_resize (priv->model, actor_size);
+      wobbly_model_move_to (priv->model, actor_position);
     }
 }
 
@@ -424,22 +424,12 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
 
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (actor_meta);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
-  /* If we're grabbed, we have to immediately get rid of the grab
-   * as the grab depends on objects inside the model */
-  if (priv->anchor)
-    {
-      delete priv->anchor;
-      priv->anchor = nullptr;
-      priv->ungrab_pending = false;
-    }
+  g_clear_object (&priv->anchor);
+  g_clear_object (&priv->model);
 
-  if (priv->model)
-    {
-      delete priv->model;
-      priv->model = nullptr;
-    }
+  priv->ungrab_pending = FALSE;
 
   if (priv->timeout_id)
     {
@@ -464,23 +454,27 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
                                                       &actor_width,
                                                       &actor_height);
 
-      priv->model = new wobbly::Model (wobbly::Point (0, 0),
-                                       actor_width,
-                                       actor_height,
-                                       priv->model_settings);
+      WobblyVector actor_position = { 0, 0 };
+      WobblyVector actor_size = { actor_width, actor_height };
+
+      priv->model = wobbly_model_new (actor_position,
+                                      actor_size,
+                                      priv->spring_constant,
+                                      priv->friction,
+                                      priv->movement_range);
 
       priv->width_changed_signal =
         g_signal_connect_object (actor,
                                  "notify::width",
                                  G_CALLBACK (endless_shell_fx_wobbly_size_changed),
                                  wobbly_effect,
-                                 static_cast <GConnectFlags> (G_CONNECT_AFTER));
+                                 G_CONNECT_AFTER);
       priv->height_changed_signal =
         g_signal_connect_object (actor,
                                  "notify::height",
                                  G_CALLBACK (endless_shell_fx_wobbly_size_changed),
                                  wobbly_effect,
-                                 static_cast <GConnectFlags> (G_CONNECT_AFTER));
+                                 G_CONNECT_AFTER);
     }
 
   /* Whatever the actor, ensure that the effect is disabled at this point */
@@ -493,24 +487,32 @@ endless_shell_fx_wobbly_set_property (GObject      *object,
                                       const GValue *value,
                                       GParamSpec   *pspec)
 {
-  EndlessShellFXWobbly *wobbly_effect =
-    reinterpret_cast <EndlessShellFXWobbly *> (object);
+  EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (object);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
   switch (prop_id)
     {
     case PROP_SPRING_K:
-      priv->model_settings.springConstant = g_value_get_double (value);
+      priv->spring_constant = g_value_get_double (value);
+
+      if (priv->model != NULL)
+        wobbly_model_set_spring_k (priv->model, priv->spring_constant);
       break;
     case PROP_FRICTION:
-      priv->model_settings.friction = g_value_get_double (value);
+      priv->friction = g_value_get_double (value);
+
+      if (priv->model != NULL)
+        wobbly_model_set_friction (priv->model, priv->friction);
       break;
     case PROP_SLOWDOWN_FACTOR:
       priv->slowdown_factor = g_value_get_double (value);
       break;
     case PROP_OBJECT_MOVEMENT_RANGE:
-      priv->model_settings.maximumRange = g_value_get_double (value);
+      priv->movement_range = g_value_get_double (value);
+
+      if (priv->model != NULL)
+        wobbly_model_set_maximum_range (priv->model, priv->movement_range);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -521,13 +523,11 @@ endless_shell_fx_wobbly_set_property (GObject      *object,
 static void
 endless_shell_fx_wobbly_finalize (GObject *object)
 {
-  EndlessShellFXWobbly *wobbly_effect =
-    reinterpret_cast <EndlessShellFXWobbly *> (object);
+  EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (object);
   EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (wobbly_effect));
+    endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
-  if (priv->model)
-    delete priv->model;
+  g_clear_object (&priv->model);
 
   if (priv->timeout_id)
     {
@@ -541,11 +541,6 @@ endless_shell_fx_wobbly_finalize (GObject *object)
 static void
 endless_shell_fx_wobbly_init (EndlessShellFXWobbly *effect)
 {
-  EndlessShellFXWobblyPrivate *priv =
-    reinterpret_cast <EndlessShellFXWobblyPrivate *> (endless_shell_fx_wobbly_get_instance_private (effect));
-
-  /* Everything else is zero-initialised. */
-  priv->model_settings = wobbly::Model::DefaultSettings;
 }
 
 static void
@@ -597,6 +592,5 @@ endless_shell_fx_wobbly_class_init (EndlessShellFXWobblyClass *klass)
 ClutterEffect *
 endless_shell_fx_wobbly_new ()
 {
-  return reinterpret_cast <ClutterEffect *> (g_object_new (ENDLESS_SHELL_FX_TYPE_WOBBLY,
-                                                           nullptr));
+  return g_object_new (ENDLESS_SHELL_FX_TYPE_WOBBLY, NULL);
 }
