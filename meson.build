@@ -102,6 +102,10 @@ if enable_recorder
   recorder_deps += [gst_dep, gst_base_dep, gtk_dep, x11_dep]
 endif
 
+cc = meson.get_compiler('c')
+
+m_dep = cc.find_library('m', required: false)
+
 # Endless-specific: Metrics
 eosmetrics_dep = dependency('eosmetrics-0')
 
@@ -167,10 +171,6 @@ endif
 mutter_typelibdir = mutter_dep.get_pkgconfig_variable('typelibdir')
 python = find_program('python3')
 sassc = find_program('sassc', required: true)
-
-cc = meson.get_compiler('c')
-
-m_dep = cc.find_library('m', required: false)
 
 cdata = configuration_data()
 cdata.set_quoted('GETTEXT_PACKAGE', meson.project_name())
