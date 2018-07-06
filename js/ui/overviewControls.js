@@ -249,11 +249,11 @@ var ThumbnailsSlider = new Lang.Class({
         this.actor.request_mode = Clutter.RequestMode.WIDTH_FOR_HEIGHT;
         this.actor.reactive = true;
         this.actor.track_hover = true;
-        this.actor.add_actor(this._thumbnailsBox.actor);
+        this.actor.add_actor(this._thumbnailsBox);
 
         Main.layoutManager.connect('monitors-changed', Lang.bind(this, this._updateSlide));
         this.actor.connect('notify::hover', Lang.bind(this, this._updateSlide));
-        this._thumbnailsBox.actor.bind_property('visible', this.actor, 'visible', GObject.BindingFlags.SYNC_CREATE);
+        this._thumbnailsBox.bind_property('visible', this.actor, 'visible', GObject.BindingFlags.SYNC_CREATE);
     },
 
     _getAlwaysZoomOut: function() {
