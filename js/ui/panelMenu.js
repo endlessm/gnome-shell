@@ -15,56 +15,66 @@ const PopupMenu = imports.ui.popupMenu;
 
 var ButtonBox = new Lang.Class({
     Name: 'ButtonBox',
+    Extends: St.Widget,
 
     _init: function(params) {
         params = Params.parse(params, { style_class: 'panel-button' }, true);
-        this.actor = new Shell.GenericContainer(params);
-        this.actor._delegate = this;
+
+        this.parent(params);
+
+        this.actor = this;
+        this._delegate = this;
 
         this.container = new St.Bin({ y_fill: true,
                                       x_fill: true,
                                       child: this.actor });
 
-        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
-        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
-        this.actor.connect('allocate', Lang.bind(this, this._allocate));
-
-        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
         this._minHPadding = this._natHPadding = 0.0;
     },
 
-    _onStyleChanged: function(actor) {
-        let themeNode = actor.get_theme_node();
+    vfunc_style_changed() {
+        this.parent();
+
+        let themeNode = this.get_theme_node();
 
         this._minHPadding = themeNode.get_length('-minimum-hpadding');
         this._natHPadding = themeNode.get_length('-natural-hpadding');
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
-        let child = actor.get_first_child();
+    vfunc_get_preferred_width(forHeight) {
+        let themeNode = this.get_theme_node();
 
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
-        } else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
+        forHeight = themeNode.adjust_for_height(forHeight);
+        let child = this.get_first_child();
+        let minimumSize, naturalSize;
 
-        alloc.min_size += 2 * this._minHPadding;
-        alloc.natural_size += 2 * this._natHPadding;
+        if (child)
+            [minimumSize, naturalSize] = child.get_preferred_width(-1);
+        else
+            minimumSize = naturalSize = 0;
+
+        minimumSize += 2 * this._minHPadding;
+        naturalSize += 2 * this._natHPadding;
+
+        return themeNode.adjust_preferred_width(minimumSize, naturalSize);
     },
 
-    _getPreferredHeight: function(actor, forWidth, alloc) {
-        let child = actor.get_first_child();
+    vfunc_get_preferred_height(forWidth) {
+        let themeNode = this.get_theme_node();
 
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
-        } else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
+        forWidth = themeNode.adjust_for_width(forWidth);
+        let child = this.get_first_child();
+
+        if (child)
+            return child.get_preferred_height(-1);
+
+        return themeNode.adjust_preferred_height(0, 0);
     },
 
-    _allocate: function(actor, box, flags) {
-        let child = actor.get_first_child();
+    vfunc_allocate(box, flags) {
+        this.set_allocation(box, flags);
+
+        let child = this.get_first_child();
         if (!child)
             return;
 
@@ -92,6 +102,7 @@ var ButtonBox = new Lang.Class({
 var Button = new Lang.Class({
     Name: 'PanelMenuButton',
     Extends: ButtonBox,
+    Signals: {'menu-set': {} },
 
     _init: function(menuAlignment, nameText, dontCreateMenu) {
         this.parent({ reactive: true,
@@ -100,8 +111,9 @@ var Button = new Lang.Class({
                       accessible_name: nameText ? nameText : "",
                       accessible_role: Atk.Role.MENU });
 
-        this.actor.connect('event', Lang.bind(this, this._onEvent));
-        this.actor.connect('notify::visible', Lang.bind(this, this._onVisibilityChanged));
+        this.connect('event', this._onEvent.bind(this));
+        this.connect('notify::visible', this._onVisibilityChanged.bind(this));
+        this.connect('destroy', this._onDestroy.bind(this));
 
         if (dontCreateMenu)
             this.menu = new PopupMenu.PopupDummyMenu(this.actor);
@@ -109,10 +121,10 @@ var Button = new Lang.Class({
             this.setMenu(new PopupMenu.PopupMenu(this.actor, menuAlignment, St.Side.BOTTOM, 0));
     },
 
-    setSensitive: function(sensitive) {
-        this.actor.reactive = sensitive;
-        this.actor.can_focus = sensitive;
-        this.actor.track_hover = sensitive;
+    setSensitive(sensitive) {
+        this.reactive = sensitive;
+        this.can_focus = sensitive;
+        this.track_hover = sensitive;
     },
 
     setMenu: function(menu) {
@@ -191,17 +203,11 @@ var Button = new Lang.Class({
         this.menu.actor.style = ('max-height: %spx;').format(maxHeight);
     },
 
-    destroy: function() {
-        this.actor._delegate = null;
-
+    _onDestroy() {
         if (this.menu)
             this.menu.destroy();
-        this.actor.destroy();
-
-        this.emit('destroy');
     }
 });
-Signals.addSignalMethods(Button.prototype);
 
 /* SystemIndicator:
  *
