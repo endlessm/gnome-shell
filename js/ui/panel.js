@@ -89,6 +89,7 @@ function _unpremultiply(color) {
 var AppMenuButton = new Lang.Class({
     Name: 'AppMenuButton',
     Extends: PanelMenu.Button,
+    Signals: {'changed': {}},
 
     _init: function(panel) {
         this.parent(0.0, null, true);
@@ -130,7 +131,7 @@ var AppMenuButton = new Lang.Class({
         this._visible = this._gtkSettings.gtk_shell_shows_app_menu &&
                         !Main.overview.visible;
         if (!this._visible)
-            this.actor.hide();
+            this.hide();
         this._overviewHidingId = Main.overview.connect('hiding', Lang.bind(this, this._sync));
         this._overviewShowingId = Main.overview.connect('showing', Lang.bind(this, this._sync));
         this._showsAppMenuId = this._gtkSettings.connect('notify::gtk-shell-shows-app-menu',
@@ -158,7 +159,7 @@ var AppMenuButton = new Lang.Class({
 
         this._visible = true;
         this.actor.reactive = true;
-        this.actor.show();
+        this.show();
         Tweener.removeTweens(this.actor);
         Tweener.addTween(this.actor,
                          { opacity: 255,
@@ -178,7 +179,7 @@ var AppMenuButton = new Lang.Class({
                            time: Overview.ANIMATION_TIME,
                            transition: 'easeOutQuad',
                            onComplete: function() {
-                               this.actor.hide();
+                               this.hide();
                            },
                            onCompleteScope: this });
     },
@@ -368,7 +369,7 @@ var AppMenuButton = new Lang.Class({
             this._menuManager.addMenu(menu);
     },
 
-    destroy: function() {
+    _onDestroy() {
         if (this._appStateChangedSignalId > 0) {
             let appSys = Shell.AppSystem.get_default();
             appSys.disconnect(this._appStateChangedSignalId);
@@ -399,8 +400,6 @@ var AppMenuButton = new Lang.Class({
         this.parent();
     }
 });
-
-Signals.addSignalMethods(AppMenuButton.prototype);
 
 var ActivitiesButton = new Lang.Class({
     Name: 'ActivitiesButton',
