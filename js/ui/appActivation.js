@@ -303,7 +303,7 @@ const SpeedwagonIface = '<node> \
 </node>';
 const SpeedwagonProxy = Gio.DBusProxy.makeProxyWrapper(SpeedwagonIface);
 
-const SpeedwagonSplash = new Lang.Class({
+var SpeedwagonSplash = new Lang.Class({
     Name: 'SpeedwagonSplash',
 
     _init: function(app) {
