@@ -220,13 +220,16 @@ var WindowTrackingButton = new Lang.Class({
                                                       this._updatePosition.bind(this));
         this._sizeChangedId = this.window.connect('size-changed',
                                                   this._updatePosition.bind(this));
-
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._showIfWindowVisible.bind(this));
         this._overviewHidingId = Main.overview.connect('hiding',
                                                        this._showIfWindowVisible.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
                                                         this._hide.bind(this));
+        this._screenShieldActiveChangedId = Main.screenShield.actor.connect('notify::visible',
+                                                                            this._showIfWindowVisible.bind(this));
+        this._screenShieldActorDestroyedId = Main.screenShield.actor.connect('destroy',
+                                                                             this._removeScreenShieldSignals.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
                                                                 this._hide.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
@@ -261,6 +264,8 @@ var WindowTrackingButton = new Lang.Class({
             Main.overview.disconnect(this._overviewHidingId);
             this._overviewHidingId = 0;
         }
+
+        this._removeScreenShieldSignals();
 
         if (this._windowMinimizedId) {
             global.window_manager.disconnect(this._windowMinimizedId);
@@ -337,13 +342,29 @@ var WindowTrackingButton = new Lang.Class({
         if (!focusedWindow)
             return;
 
+        // Don't show if the screen shield is visible
+        let screenShieldVisible = Main.screenShield.actor.visible;
+
         // Show only if either this window or the builder window
         // is in focus
-        if (focusedWindow === this.window ||
-            focusedWindow === this.builder_window)
+        if ((focusedWindow === this.window ||
+             focusedWindow === this.builder_window) &&
+            !screenShieldVisible)
             this._show();
         else
             this._hide();
+    },
+
+    _removeScreenShieldSignals: function() {
+        if (this._screenShieldActiveChangedId != -1) {
+            Main.overview.disconnect(this._screenShieldActiveChangedId);
+            this._screenShieldActiveChangedId = 0;
+        }
+
+        if (this._screenShieldActorDestroyedId != -1) {
+            Main.overview.disconnect(this._screenShieldActorDestroyedId);
+            this._screenShieldActorDestroyedId = 0;
+        }
     },
 
     _show: function() {
