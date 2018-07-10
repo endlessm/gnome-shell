@@ -91,6 +91,11 @@ function _synchronizeMetaWindowActorGeometries(src, dst) {
                           dst.meta_window.maximized_vertically);
     let maximizationStateChanged = srcIsMaximized != dstIsMaximized;
 
+    // If we're going to change the maximization state, skip
+    // effects on the destination window, since we're synchronizing it
+    if (maximizationStateChanged)
+        Main.wm.skipNextEffect(dst);
+
     if (!srcIsMaximized && dstIsMaximized)
         dst.meta_window.unmaximize(Meta.MaximizeFlags.BOTH);
 
