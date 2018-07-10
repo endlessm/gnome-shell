@@ -976,6 +976,7 @@ var CodeViewManager = new Lang.Class({
 
         this._sessions.push(new CodingSession({
             app: actor,
+            builder: null,
             button: new WindowTrackingButton({ window: actor.meta_window })
         }));
         return true;
