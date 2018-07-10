@@ -225,13 +225,14 @@ var WindowTrackingButton = new Lang.Class({
                                                       this._updatePosition.bind(this));
         this._sizeChangedId = this.window.connect('size-changed',
                                                   this._updatePosition.bind(this));
-
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._showIfWindowVisible.bind(this));
         this._overviewHidingId = Main.overview.connect('hiding',
                                                        this._showIfWindowVisible.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
                                                         this._hide.bind(this));
+        this._sessionModeChangedId = Main.sessionMode.connect('updated',
+                                                              this._showIfWindowVisible.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
                                                                 this._hide.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
@@ -265,6 +266,11 @@ var WindowTrackingButton = new Lang.Class({
         if (this._overviewHidingId) {
             Main.overview.disconnect(this._overviewHidingId);
             this._overviewHidingId = 0;
+        }
+
+        if (this._sessionModeChangedId) {
+            Main.sessionMode.disconnect(this._sessionModeChangedId);
+            this._sessionModeChangedId = 0;
         }
 
         if (this._windowMinimizedId) {
@@ -342,10 +348,14 @@ var WindowTrackingButton = new Lang.Class({
         if (!focusedWindow)
             return;
 
+        // Don't show if the screen is locked
+        let locked = Main.sessionMode.isLocked;
+
         // Show only if either this window or the builder window
         // is in focus
-        if (focusedWindow === this.window ||
-            focusedWindow === this.builder_window)
+        if ((focusedWindow === this.window ||
+             focusedWindow === this.builder_window) &&
+            !locked)
             this._show();
         else
             this._hide();
