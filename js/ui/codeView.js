@@ -370,6 +370,11 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
+function _constructLoadFlatpakValue(app, appManifest) {
+    // add an app_id_override to the manifest to load
+    return appManifest.get_path() + '+' + app.meta_window.get_flatpak_id() + '.Coding';
+}
+
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
     Extends: GObject.Object,
@@ -396,6 +401,7 @@ var CodingSession = new Lang.Class({
     _init: function(params) {
         this.parent(params);
 
+        this._appManifest = null;
         this._state = STATE_APP;
 
         this.button.connect('clicked', this._switchWindows.bind(this));
@@ -645,16 +651,11 @@ var CodingSession = new Lang.Class({
     // if a flip animation should be played. That is the responsibility of
     // the caller.
     _switchToBuilder: function() {
-        function constructLoadFlatpakValue(app, appManifest) {
-            // add an app_id_override to the manifest to load
-            return appManifest.get_path() + '+' + app.meta_window.get_flatpak_id() + '.Coding';
-        }
-
         if (!this.builder) {
             // get the manifest of the application
             // return early before we setup anything
-            let appManifest = _getAppManifest(this.app.meta_window.get_flatpak_id());
-            if (!appManifest) {
+            this._appManifest = _getAppManifest(this.app.meta_window.get_flatpak_id());
+            if (!this._appManifest) {
                 log('Error, coding: No manifest could be found for the app: ' + this.app.meta_window.get_flatpak_id());
                 return;
             }
@@ -673,8 +674,8 @@ var CodingSession = new Lang.Class({
             this.splash = new AppActivation.SpeedwagonSplash(builderShellApp);
             this.splash.show();
 
-            this._startBuilderForFlatpak(constructLoadFlatpakValue(this.app,
-                                                                   appManifest));
+            this._startBuilderForFlatpak(_constructLoadFlatpakValue(this.app,
+                                                                    this._appManifest));
         } else {
             this.builder.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
@@ -943,6 +944,12 @@ var CodingSession = new Lang.Class({
         actor.rotation_angle_y = 0;
         actor.set_cull_back_face(false);
         this._rotatingInActor = null;
+
+        // If we just finished rotating in the speedwagon
+        // for builder, launch builder now
+        if (_isBuilderSpeedwagon(actor.meta_window))
+           this._startBuilderForFlatpak(_constructLoadFlatpakValue(this.app,
+                                                                   this._appManifest));
     },
 
     _rotateOutCompleted: function() {
