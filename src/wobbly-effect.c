@@ -64,6 +64,12 @@ G_DEFINE_TYPE_WITH_PRIVATE (EndlessShellFXWobbly,
                             endless_shell_fx_wobbly,
                             CLUTTER_TYPE_DEFORM_EFFECT)
 
+/* Forward declaration so that we can set the function pointer
+ * in enforce_no_effects_paint_box_cleanup below */
+static gboolean
+endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
+                                          ClutterPaintVolume *volume);
+
 static gboolean
 endless_shell_fx_wobbly_lie_about_paint_volume (ClutterEffect    *effect,
                                                 ClutterPaintVolume *volume)
