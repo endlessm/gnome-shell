@@ -167,6 +167,7 @@ static gboolean
 endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
                                           ClutterPaintVolume *volume)
 {
+  ClutterActor *actor = clutter_actor_meta_get_actor (CLUTTER_ACTOR_META (effect));
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (effect);
   EndlessShellFXWobblyPrivate *priv =
     endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
@@ -177,6 +178,17 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
 
   if (priv->model)
     {
+      float actor_x, actor_y;
+      float actor_paint_box_x, actor_paint_box_y;
+      endless_shell_fx_get_actor_only_paint_box_rect (wobbly_effect,
+                                                      actor,
+                                                      &actor_paint_box_x,
+                                                      &actor_paint_box_y,
+                                                      NULL,
+                                                      NULL);
+      clutter_actor_get_position (actor, &actor_x, &actor_y);
+
+      WobblyVector offset = { actor_paint_box_x - actor_x, actor_paint_box_y - actor_y };
       WobblyVector extremes[4];
 
       wobbly_model_query_extremes (priv->model,
@@ -192,10 +204,10 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
 
       ClutterActorBox const extremesBox =
         {
-          floor (x1),
-          floor (y1),
-          ceil (x2),
-          ceil (y2)
+          floor (x1 + offset.x),
+          floor (y1 + offset.y),
+          ceil (x2 + offset.x),
+          ceil (y2 + offset.x)
         };
 
       clutter_paint_volume_union_box (volume, &extremesBox);
