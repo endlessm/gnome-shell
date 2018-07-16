@@ -78,6 +78,83 @@ endless_shell_fx_wobbly_lie_about_paint_volume (ClutterEffect    *effect,
                                                                                         volume);
 }
 
+typedef struct
+{
+  ClutterEffectClass *effect_class;
+} EnforcedPaintBox;
+
+static EnforcedPaintBox
+enforce_no_effects_paint_box (ClutterEffectClass *effect_class)
+{
+  effect_class->get_paint_volume = endless_shell_fx_wobbly_lie_about_paint_volume;
+
+  EnforcedPaintBox box = { effect_class };
+  return box;
+}
+
+static void
+enforce_no_effects_paint_box_cleanup (EnforcedPaintBox *box)
+{
+  box->effect_class->get_paint_volume = endless_shell_fx_wobbly_get_paint_volume;
+}
+
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (EnforcedPaintBox, enforce_no_effects_paint_box_cleanup)
+
+/* This constant is used to deal with rounding error in computing
+ * paint boxes. See also https://gitlab.gnome.org/GNOME/mutter/blob/master/clutter/clutter/clutter-paint-volume.c#L1212 */
+#define PAINT_BOX_OFFSET 1
+
+static gboolean
+endless_shell_fx_get_untransformed_paint_box (ClutterActor    *actor,
+                                              ClutterActorBox *box)
+{
+  /* Get the actor's paint volume, bypassing affine
+   * transformations which would usually be applied
+   * if we just queried the paint box. */
+  const ClutterPaintVolume *volume = clutter_actor_get_paint_volume (actor);
+  ClutterVertex origin;
+
+  if (volume == NULL)
+    return FALSE;
+
+  /* We don't have access to the stage projection matrix
+   * so the best we can do is hope here that the volume is
+   * two dimensional and orthogonal. */
+  clutter_paint_volume_get_origin (volume, &origin);
+
+  box->x1 = floor (origin.x + clutter_actor_get_x (actor)) - PAINT_BOX_OFFSET;
+  box->y1 = floor (origin.y + clutter_actor_get_y (actor)) - PAINT_BOX_OFFSET;
+  box->x2 = box->x1 + ceil (clutter_paint_volume_get_width (volume)) + PAINT_BOX_OFFSET * 2;
+  box->y2 = box->y1 + ceil (clutter_paint_volume_get_height (volume)) + PAINT_BOX_OFFSET * 2;
+
+  return TRUE;
+}
+
+static void
+endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
+                                                ClutterActor         *actor,
+                                                gfloat               *width,
+                                                gfloat               *height)
+{
+  EndlessShellFXWobblyClass *klass = ENDLESS_SHELL_FX_WOBBLY_GET_CLASS (effect);
+  ClutterEffectClass *effect_class = CLUTTER_EFFECT_CLASS (klass);
+
+  /* We want the size of the paint box and not the actor
+   * size, because that's going to be the size of the
+   * texture. However, we only want the size of the
+   * paint box when we're just considering the
+   * actor alone */
+  g_auto(EnforcedPaintBox) forced_client_paint_box = enforce_no_effects_paint_box (effect_class);
+  ClutterActorBox          rect;
+
+  /* If endless_shell_fx_get_untransformed_paint_box fails
+   * we should fall back to the actor size at this point */
+  if (endless_shell_fx_get_untransformed_paint_box (actor, &rect))
+    clutter_actor_box_get_size (&rect, width, height);
+  else
+    clutter_actor_get_size (actor, width, height);
+}
+
 static gboolean
 endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
                                           ClutterPaintVolume *volume)
@@ -118,28 +195,6 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
 
   return TRUE;
 }
-
-typedef struct
-{
-  ClutterEffectClass *effect_class;
-} EnforcedPaintBox;
-
-static EnforcedPaintBox
-enforce_no_effects_paint_box (ClutterEffectClass *effect_class)
-{
-  effect_class->get_paint_volume = endless_shell_fx_wobbly_lie_about_paint_volume;
-
-  EnforcedPaintBox box = { effect_class };
-  return box;
-}
-
-static void
-enforce_no_effects_paint_box_cleanup (EnforcedPaintBox *box)
-{
-  box->effect_class->get_paint_volume = endless_shell_fx_wobbly_get_paint_volume;
-}
-
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (EnforcedPaintBox, enforce_no_effects_paint_box_cleanup)
 
 /* ClutterOffscreenEffect calls clutter_actor_get_paint_box in order to
  * determine the size of the buffer to redirect into. However, we can't
@@ -328,61 +383,6 @@ endless_shell_fx_wobbly_move_by (EndlessShellFXWobbly *effect,
        * we stay in sync with the actor's relative position */
       wobbly_model_move_by (priv->model, reverse_delta);
     }
-}
-
-/* This constant is used to deal with rounding error in computing
- * paint boxes. See also https://gitlab.gnome.org/GNOME/mutter/blob/master/clutter/clutter/clutter-paint-volume.c#L1212 */
-#define PAINT_BOX_OFFSET 1
-
-static gboolean
-endless_shell_fx_get_untransformed_paint_box (ClutterActor    *actor,
-                                              ClutterActorBox *box)
-{
-  /* Get the actor's paint volume, bypassing affine
-   * transformations which would usually be applied
-   * if we just queried the paint box. */
-  const ClutterPaintVolume *volume = clutter_actor_get_paint_volume (actor);
-  ClutterVertex origin;
-
-  if (volume == NULL)
-    return FALSE;
-
-  /* We don't have access to the stage projection matrix
-   * so the best we can do is hope here that the volume is
-   * two dimensional and orthogonal. */
-  clutter_paint_volume_get_origin (volume, &origin);
-
-  box->x1 = floor (origin.x + clutter_actor_get_x (actor)) - PAINT_BOX_OFFSET;
-  box->y1 = floor (origin.y + clutter_actor_get_y (actor)) - PAINT_BOX_OFFSET;
-  box->x2 = box->x1 + ceil (clutter_paint_volume_get_width (volume)) + PAINT_BOX_OFFSET * 2;
-  box->y2 = box->y1 + ceil (clutter_paint_volume_get_height (volume)) + PAINT_BOX_OFFSET * 2;
-
-  return TRUE;
-}
-
-static void
-endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
-                                                ClutterActor         *actor,
-                                                gfloat               *width,
-                                                gfloat               *height)
-{
-  EndlessShellFXWobblyClass *klass = ENDLESS_SHELL_FX_WOBBLY_GET_CLASS (effect);
-  ClutterEffectClass *effect_class = CLUTTER_EFFECT_CLASS (klass);
-
-  /* We want the size of the paint box and not the actor
-   * size, because that's going to be the size of the
-   * texture. However, we only want the size of the
-   * paint box when we're just considering the
-   * actor alone */
-  g_auto(EnforcedPaintBox) forced_client_paint_box = enforce_no_effects_paint_box (effect_class);
-  ClutterActorBox          rect;
-
-  /* If endless_shell_fx_get_untransformed_paint_box fails
-   * we should fall back to the actor size at this point */
-  if (endless_shell_fx_get_untransformed_paint_box (actor, &rect))
-    clutter_actor_box_get_size (&rect, width, height);
-  else
-    clutter_actor_get_size (actor, width, height);
 }
 
 static void
