@@ -55,7 +55,7 @@ gnome_shell_deps = [
   gcr_dep,
   systemd_dep,
   eosmetrics_dep,
-  libwobbly_dep,
+  libwobbly_glib_dep,
   xkbcommon_dep
 ]
 
@@ -190,7 +190,7 @@ if enable_recorder
 endif
 
 libeos_shell_fx_sources = [
-  'wobbly-effect.cpp',
+  'wobbly-effect.c',
   'wobbly-effect.h'
 ]
 
@@ -198,7 +198,6 @@ libeos_shell_fx = library('eos-shell-fx',
   sources: libeos_shell_fx_sources,
   dependencies: libeos_shell_fx_deps,
   include_directories: conf_inc,
-  cpp_args: ['-std=c++11'],
   build_rpath: mutter_typelibdir,
   install_rpath: mutter_typelibdir,
   install_dir: pkglibdir,
