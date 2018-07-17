@@ -167,7 +167,8 @@ static gboolean
 endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
                                           ClutterPaintVolume *volume)
 {
-  ClutterActor *actor = clutter_actor_meta_get_actor (CLUTTER_ACTOR_META (effect));
+  ClutterActorMeta *meta = CLUTTER_ACTOR_META (effect);
+  ClutterActor *actor = clutter_actor_meta_get_actor (meta);
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (effect);
   EndlessShellFXWobblyPrivate *priv =
     endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
@@ -176,7 +177,7 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
    * TRUE here. */
   CLUTTER_EFFECT_CLASS (endless_shell_fx_wobbly_parent_class)->get_paint_volume (effect, volume);
 
-  if (priv->model)
+  if (priv->model && clutter_actor_meta_get_enabled (meta))
     {
       float actor_x, actor_y;
       float actor_paint_box_x, actor_paint_box_y;
@@ -227,11 +228,17 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
 static gboolean
 endless_shell_fx_wobbly_pre_paint (ClutterEffect *effect)
 {
+  ClutterActorMeta *meta = CLUTTER_ACTOR_META (effect);
   EndlessShellFXWobbly *wobbly_effect = ENDLESS_SHELL_FX_WOBBLY (effect);
   EndlessShellFXWobblyClass *klass = ENDLESS_SHELL_FX_WOBBLY_GET_CLASS (wobbly_effect);
   ClutterEffectClass *effect_class = CLUTTER_EFFECT_CLASS (klass);
 
-  g_auto(EnforcedPaintBox) forced_client_paint_box = enforce_no_effects_paint_box (effect_class);
+  if (clutter_actor_meta_get_enabled (meta))
+    {
+      g_auto(EnforcedPaintBox) forced_client_paint_box = enforce_no_effects_paint_box (effect_class);
+
+      return CLUTTER_EFFECT_CLASS (endless_shell_fx_wobbly_parent_class)->pre_paint (effect);
+    }
 
   return CLUTTER_EFFECT_CLASS (endless_shell_fx_wobbly_parent_class)->pre_paint (effect);
 }
