@@ -131,10 +131,12 @@ endless_shell_fx_get_untransformed_paint_box (ClutterActor    *actor,
 }
 
 static void
-endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
+endless_shell_fx_get_actor_only_paint_box_rect (EndlessShellFXWobbly *effect,
                                                 ClutterActor         *actor,
-                                                gfloat               *width,
-                                                gfloat               *height)
+                                                gfloat               *paint_box_x,
+                                                gfloat               *paint_box_y,
+                                                gfloat               *paint_box_width,
+                                                gfloat               *paint_box_height)
 {
   EndlessShellFXWobblyClass *klass = ENDLESS_SHELL_FX_WOBBLY_GET_CLASS (effect);
   ClutterEffectClass *effect_class = CLUTTER_EFFECT_CLASS (klass);
@@ -150,9 +152,15 @@ endless_shell_fx_get_actor_only_paint_box_size (EndlessShellFXWobbly *effect,
   /* If endless_shell_fx_get_untransformed_paint_box fails
    * we should fall back to the actor size at this point */
   if (endless_shell_fx_get_untransformed_paint_box (actor, &rect))
-    clutter_actor_box_get_size (&rect, width, height);
+    {
+      clutter_actor_box_get_origin (&rect, paint_box_x, paint_box_y);
+      clutter_actor_box_get_size (&rect, paint_box_width, paint_box_height);
+    }
   else
-    clutter_actor_get_size (actor, width, height);
+    {
+      clutter_actor_get_size (actor, paint_box_width, paint_box_height);
+      clutter_actor_get_position (actor, paint_box_x, paint_box_y);
+    }
 }
 
 static gboolean
@@ -400,11 +408,13 @@ endless_shell_fx_wobbly_size_changed (GObject    *object,
    * do internally anyways */
   if (priv->model)
     {
-      float actor_width, actor_height;
-      endless_shell_fx_get_actor_only_paint_box_size (effect,
+      float actor_paint_box_width, actor_paint_box_height;
+      endless_shell_fx_get_actor_only_paint_box_rect (effect,
                                                       actor,
-                                                      &actor_width,
-                                                      &actor_height);
+                                                      NULL,
+                                                      NULL,
+                                                      &actor_paint_box_width,
+                                                      &actor_paint_box_height);
 
       /* If we have any pending anchors, we should release them now -
        * the model move and resize code explicitly does not move
@@ -412,7 +422,7 @@ endless_shell_fx_wobbly_size_changed (GObject    *object,
        * the cursor) */
       remove_anchor_if_pending (priv);
 
-      WobblyVector actor_size = { actor_width, actor_height };
+      WobblyVector actor_size = { actor_paint_box_width, actor_paint_box_height };
       WobblyVector actor_position = { 0.0, 0.0 };
 
       wobbly_model_resize (priv->model, actor_size);
@@ -454,14 +464,16 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
 
   if (actor)
     {
-      float actor_width, actor_height;
-      endless_shell_fx_get_actor_only_paint_box_size (wobbly_effect,
+      float actor_paint_box_width, actor_paint_box_height;
+      endless_shell_fx_get_actor_only_paint_box_rect (wobbly_effect,
                                                       actor,
-                                                      &actor_width,
-                                                      &actor_height);
+                                                      NULL,
+                                                      NULL,
+                                                      &actor_paint_box_width,
+                                                      &actor_paint_box_height);
 
       WobblyVector actor_position = { 0, 0 };
-      WobblyVector actor_size = { actor_width, actor_height };
+      WobblyVector actor_size = { actor_paint_box_width, actor_paint_box_height };
 
       priv->model = wobbly_model_new (actor_position,
                                       actor_size,
