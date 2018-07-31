@@ -600,28 +600,28 @@ endless_shell_fx_wobbly_class_init (EndlessShellFXWobblyClass *klass)
                          "Spring Constant",
                          "How springy the model is",
                          2.0f, 10.0f, 8.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   object_properties[PROP_FRICTION] =
     g_param_spec_double ("friction",
                          "Friction Constant",
                          "How much friction force should be applied to moving objects",
                          2.0f, 10.0f, 3.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   object_properties[PROP_SLOWDOWN_FACTOR] =
     g_param_spec_double ("slowdown-factor",
                          "Slowdown Factor",
                          "How much to slow the model's timesteps down",
                          1.0f, 5.0f, 1.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   object_properties[PROP_OBJECT_MOVEMENT_RANGE] =
     g_param_spec_double ("object-movement-range",
                          "Object Movement Range",
                          "How much objects are allowed to move around",
                          10.0f, 500.0f, 100.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   g_object_class_install_properties (object_class, PROP_LAST, object_properties);
 }
