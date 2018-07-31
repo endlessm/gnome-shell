@@ -1,10 +1,12 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
+const AnimationsDbus = imports.gi.AnimationsDbus;
 const Cairo = imports.cairo;
 const Clutter = imports.gi.Clutter;
 const EndlessShellFX = imports.gi.EndlessShellFX;
 const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Gio = imports.gi.Gio;
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
@@ -985,6 +987,81 @@ var DesktopOverlay = new Lang.Class({
     }
 });
 
+const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
+    move: ['wobbly']
+};
+
+// ShellWindowManagerAnimatableSurface
+//
+// An implementation of AnimationsDbus.ServerSurfaceBridge used to
+// communicate from the animations-dbus library to the shell. The
+// implementation has an attach_effect method which returns
+// an implementation of an AnimationsDbus.ServerSurfaceAttachedEffect
+// if a given AnimationsDbus.ServerEffectBridge can be attached
+// to the actor.
+const ShellWindowManagerAnimatableSurface = new Lang.Class({
+    Name: 'ShellWindowManagerAnimatableSurface',
+    Extends: GObject.Object,
+    Implements: [ AnimationsDbus.ServerSurfaceBridge ],
+
+    _init: function(actor) {
+        this.parent();
+        this.actor = actor;
+    },
+
+    vfunc_attach_effect: function(event, effect) {
+        if ((_ALLOWED_ANIMATIONS_FOR_EVENTS[event] || []).indexOf(effect.name) == -1) {
+            throw new Error(`Effect ${effect.name} can't be used on event ${event}`);
+        }
+
+        return effect.bridge.createActorPrivate(this.actor);
+    },
+
+    vfunc_detach_effect: function(event, attached_effect) {
+        attached_effect.remove();
+    },
+
+    vfunc_get_title: function() {
+        return this.actor.meta_window.title;
+    },
+
+    vfunc_get_geometry: function() {
+        return new GLib.Variant("(iiii)", [
+            this.actor.x,
+            this.actor.y,
+            this.actor.width,
+            this.actor.height
+        ]);
+    }
+});
+
+// ShellWindowManagerAnimationsFactory
+//
+// An implementation of AnimationsDbus.ServerEffectFactory
+// which implements the create_effect() method. When a
+// caller tries to create an animation, the name is looked up
+// here and a corresponding AnimationsDbus.ServerEffectBridge
+// implementation is returned if one is available for that
+// effect name, which represents the metaclass for that
+// effect as it exists on the shell side.
+const ShellWindowManagerAnimationsFactory = new Lang.Class({
+    Name: 'ShellWindowManagerAnimationsFactory',
+    Implements: [ AnimationsDbus.ServerEffectFactory ],
+    Extends: GObject.Object,
+
+    vfunc_create_effect: function(name, settings) {
+        throw new Error(`No such effect ${name}`);
+    }
+});
+
+function getAnimatableWindowActors() {
+    return global.get_window_actors().filter(w => ([
+        Meta.WindowType.NORMAL,
+        Meta.WindowType.DIALOG,
+        Meta.WindowType.MODAL_DIALOG
+    ].indexOf(w.meta_window.get_window_type()) !== -1));
+}
+
 var WindowManager = new Lang.Class({
     Name: 'WindowManager',
 
@@ -1018,6 +1095,21 @@ var WindowManager = new Lang.Class({
         });
 
         this._codeViewManager = new CodeView.CodeViewManager();
+        this._animationsServer = null;
+
+        AnimationsDbus.Server.new_async(new ShellWindowManagerAnimationsFactory(), null, Lang.bind(this, function(initable, result) {
+            this._animationsServer = AnimationsDbus.Server.new_finish(initable, result);
+
+            // Go through all the available windows and create an
+            // AnimationsDbusServerSurface for it.
+            getAnimatableWindowActors().forEach(actor => {
+                let surface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
+                actor._animatableSurface = surface;
+            });
+
+            // Create a server-side animation manager
+            this._animationsManager = this._animationsServer.create_animation_manager();
+        }));
 
         this._isWorkspacePrepended = false;
 
@@ -2006,6 +2098,10 @@ var WindowManager = new Lang.Class({
             return;
         }
 
+        // Endless libanimation extension
+        if (this._animationsServer)
+            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
+
         if (SideComponent.isSideComponentWindow(actor.meta_window)) {
             this._mapping.push(actor);
 
@@ -2236,6 +2332,12 @@ var WindowManager = new Lang.Class({
              * finished closing now */
             if (SideComponent.isDiscoveryFeedWindow(actor.meta_window))
                 Main.discoveryFeed.notifyHideAnimationCompleted();
+
+            // Endless libanimation extension
+            if (actor._animatableSurface) {
+                this._animationsServer.unregister_surface(actor._animatableSurface);
+                actor._animatableSurface = null;
+            }
 
             shellwm.completed_destroy(actor);
         }
