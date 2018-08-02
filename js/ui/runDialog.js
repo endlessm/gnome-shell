@@ -63,7 +63,11 @@ var RunDialog = new Lang.Class({
                                    'rt': Lang.bind(this, function() {
                                        Main.reloadThemeResource();
                                        Main.loadTheme();
-                                   })
+                                   }),
+
+                                   'check_cloexec_fds': Lang.bind(this, function() {
+                                       Shell.util_check_cloexec_fds();
+                                   }),
                                  };
 
 
