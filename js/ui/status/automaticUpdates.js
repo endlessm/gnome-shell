@@ -135,7 +135,7 @@ var Indicator = new Lang.Class({
 
         // Start retrieving the Mogwai proxy
         this._proxy = new SchedulerProxy(Gio.DBus.system,
-                                         'com.endlessm.MogwaiScheduler1',
+                                         'com.endlessm.MogwaiSchedule1',
                                          '/com/endlessm/DownloadManager1',
                                           (proxy, error) => {
                                               if (error) {
