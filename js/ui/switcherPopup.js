@@ -39,23 +39,22 @@ function primaryModifier(mask) {
 
 var SwitcherPopup = new Lang.Class({
     Name: 'SwitcherPopup',
+    Extends: St.Widget,
     Abstract: true,
 
     _init: function(items) {
+        this.parent({ style_class: 'switcher-popup',
+                      reactive: true,
+                      visible: false });
+
         this._switcherList = null;
 
         this._items = items || [];
         this._selectedIndex = 0;
 
-        this.actor = new Shell.GenericContainer({ style_class: 'switcher-popup',
-                                                  reactive: true,
-                                                  visible: false });
-        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
-        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
-        this.actor.connect('allocate', Lang.bind(this, this._allocate));
-        this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
 
-        Main.uiGroup.add_actor(this.actor);
+        Main.uiGroup.add_actor(this);
 
         this._haveModal = false;
         this._modifierMask = 0;
@@ -69,26 +68,24 @@ var SwitcherPopup = new Lang.Class({
         this._disableHover();
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
+    vfunc_get_preferred_width: function(forHeight) {
         let primary = Main.layoutManager.primaryMonitor;
-
-        alloc.min_size = primary.width;
-        alloc.natural_size = primary.width;
+        return [primary.width, primary.width];
     },
 
-    _getPreferredHeight: function(actor, forWidth, alloc) {
+    vfunc_get_preferred_height: function(forWidth) {
         let primary = Main.layoutManager.primaryMonitor;
-
-        alloc.min_size = primary.height;
-        alloc.natural_size = primary.height;
+        return [primary.height, primary.height];
     },
 
-    _allocate: function(actor, box, flags) {
+    vfunc_allocate: function(box, flags) {
+        this.set_allocation(box, flags);
+
         let childBox = new Clutter.ActorBox();
         let primary = Main.layoutManager.primaryMonitor;
 
-        let leftPadding = this.actor.get_theme_node().get_padding(St.Side.LEFT);
-        let rightPadding = this.actor.get_theme_node().get_padding(St.Side.RIGHT);
+        let leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
+        let rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
         let hPadding = leftPadding + rightPadding;
 
         // Allocate the switcherList
@@ -115,30 +112,29 @@ var SwitcherPopup = new Lang.Class({
         if (this._items.length == 0)
             return false;
 
-        if (!Main.pushModal(this.actor)) {
+        if (!Main.pushModal(this)) {
             // Probably someone else has a pointer grab, try again with keyboard only
-            if (!Main.pushModal(this.actor, { options: Meta.ModalOptions.POINTER_ALREADY_GRABBED })) {
+            if (!Main.pushModal(this, { options: Meta.ModalOptions.POINTER_ALREADY_GRABBED }))
                 return false;
-            }
         }
         this._haveModal = true;
         this._modifierMask = primaryModifier(mask);
 
-        this.actor.connect('key-press-event', Lang.bind(this, this._keyPressEvent));
-        this.actor.connect('key-release-event', Lang.bind(this, this._keyReleaseEvent));
+        this.connect('key-press-event', Lang.bind(this, this._keyPressEvent));
+        this.connect('key-release-event', Lang.bind(this, this._keyReleaseEvent));
 
-        this.actor.connect('button-press-event', Lang.bind(this, this._clickedOutside));
-        this.actor.connect('scroll-event', Lang.bind(this, this._scrollEvent));
+        this.connect('button-press-event', Lang.bind(this, this._clickedOutside));
+        this.connect('scroll-event', Lang.bind(this, this._scrollEvent));
 
-        this.actor.add_actor(this._switcherList.actor);
+        this.add_actor(this._switcherList.actor);
         this._switcherList.connect('item-activated', Lang.bind(this, this._itemActivated));
         this._switcherList.connect('item-entered', Lang.bind(this, this._itemEntered));
 
         // Need to force an allocation so we can figure out whether we
         // need to scroll when selecting
-        this.actor.opacity = 0;
-        this.actor.show();
-        this.actor.get_allocation_box();
+        this.opacity = 0;
+        this.visible = true;
+        this.get_allocation_box();
 
         this._initialSelection(backward, binding);
 
@@ -162,7 +158,7 @@ var SwitcherPopup = new Lang.Class({
         this._initialDelayTimeoutId = Mainloop.timeout_add(POPUP_DELAY_TIMEOUT,
                                                            Lang.bind(this, function () {
                                                                Main.osdWindowManager.hideAll();
-                                                               this.actor.opacity = 255;
+                                                               this.opacity = 255;
                                                                this._initialDelayTimeoutId = 0;
                                                                return GLib.SOURCE_REMOVE;
                                                            }));
@@ -279,25 +275,26 @@ var SwitcherPopup = new Lang.Class({
 
     _popModal: function() {
         if (this._haveModal) {
-            Main.popModal(this.actor);
+            Main.popModal(this);
             this._haveModal = false;
         }
     },
 
     fadeAndDestroy: function() {
         this._popModal();
-        if (this.actor.visible) {
-            Tweener.addTween(this.actor,
+        if (this.visible) {
+            Tweener.addTween(this,
                              { opacity: 0,
                                time: POPUP_FADE_OUT_TIME,
                                transition: 'easeOutQuad',
                                onComplete: Lang.bind(this,
                                    function() {
-                                       this.actor.destroy();
+                                       this.destroy();
                                    })
                              });
-        } else
-            this.actor.destroy();
+        } else {
+            this.destroy();
+        }
     },
 
     _finish: function(timestamp) {
