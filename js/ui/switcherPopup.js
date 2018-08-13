@@ -194,7 +194,7 @@ var SwitcherPopup = new Lang.Class({
         // Note: pressing one of the below keys will destroy the popup only if
         // that key is not used by the active popup's keyboard shortcut
         if (keysym == Clutter.Escape || keysym == Clutter.Tab)
-            this.destroy();
+            this.fadeAndDestroy();
 
         return Clutter.EVENT_STOP;
     },
@@ -214,7 +214,7 @@ var SwitcherPopup = new Lang.Class({
     },
 
     _clickedOutside: function(actor, event) {
-        this.destroy();
+        this.fadeAndDestroy();
         return Clutter.EVENT_PROPAGATE;
     },
 
@@ -284,7 +284,7 @@ var SwitcherPopup = new Lang.Class({
         }
     },
 
-    destroy: function() {
+    fadeAndDestroy: function() {
         this._popModal();
         if (this.actor.visible) {
             Tweener.addTween(this.actor,
@@ -301,7 +301,7 @@ var SwitcherPopup = new Lang.Class({
     },
 
     _finish: function(timestamp) {
-        this.destroy();
+        this.fadeAndDestroy();
     },
 
     _onDestroy: function() {
