@@ -238,7 +238,7 @@ var AppSwitcherPopup = new Lang.Class({
     _windowActivated : function(thumbnailList, n) {
         let appIcon = this._items[this._selectedIndex];
         Main.activateWindow(appIcon.cachedWindows[n]);
-        this.destroy();
+        this.fadeAndDestroy();
     },
 
     _windowEntered : function(thumbnailList, n) {
