@@ -44,6 +44,7 @@ var BoxPointer = new Lang.Class({
                                   y_fill: true });
         this._container = new Shell.GenericContainer();
         this.actor.set_child(this._container);
+        this.actor.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
         this._container.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
         this._container.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
         this._container.connect('allocate', Lang.bind(this, this._allocate));
