@@ -30,12 +30,12 @@ const _CODING_APPS = [
     'org.gnome.Weather'
 ];
 
-function _isCodingApp(flatpakID) {
-    return _CODING_APPS.indexOf(flatpakID) != -1;
+function _isCodingApp(actor) {
+    return !!actor._animatableSurface;
 }
 
 function _isBuilder(flatpakID) {
-    return flatpakID === 'org.gnome.Builder';
+    return flatpakID === 'com.endlessm.CodingAnimationsTweak';
 }
 
 function _isBuilderSpeedwagon(window) {
@@ -52,26 +52,6 @@ function _createIcon() {
     let icon = new St.Icon({ style_class: 'view-source-icon',
                              gicon: gicon });
     return icon;
-}
-
-function _getAppManifestAt(location, flatpakID) {
-    let manifestFile = Gio.File.new_for_path(GLib.build_filenamev([location, 'app', flatpakID, 'current',
-                                                                   'active', 'files', 'manifest.json']));
-    if (!manifestFile.query_exists(null))
-        return null;
-    return manifestFile;
-}
-
-function _getAppManifest(flatpakID) {
-    let manifestFile = _getAppManifestAt(Flatpak.Installation.new_user(null).get_path().get_path(), flatpakID);
-    if (manifestFile)
-        return manifestFile;
-
-    manifestFile = _getAppManifestAt(Flatpak.Installation.new_system(null).get_path().get_path(), flatpakID);
-    if (manifestFile)
-        return manifestFile;
-
-    return null;
 }
 
 // _synchronizeMetaWindowActorGeometries
@@ -370,11 +350,6 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
-function _constructLoadFlatpakValue(app, appManifest) {
-    // add an app_id_override to the manifest to load
-    return appManifest.get_path() + '+' + app.meta_window.get_flatpak_id() + '.Coding';
-}
-
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
     Extends: GObject.Object,
@@ -401,7 +376,6 @@ var CodingSession = new Lang.Class({
     _init: function(params) {
         this.parent(params);
 
-        this._appManifest = null;
         this._state = STATE_APP;
 
         this.button.connect('clicked', this._switchWindows.bind(this));
@@ -615,10 +589,10 @@ var CodingSession = new Lang.Class({
             this._switchToApp();
     },
 
-    _startBuilderForFlatpak: function(loadFlatpakValue) {
-        let params = new GLib.Variant('(sava{sv})', ['load-flatpak', [new GLib.Variant('s', loadFlatpakValue)], {}]);
-        Gio.DBus.session.call('org.gnome.Builder',
-                              '/org/gnome/Builder',
+    _startForSurfacePath: function(surfacePath) {
+        let params = new GLib.Variant('(sava{sv})', ['show-for-surface-path', [new GLib.Variant('s', surfacePath)], {}]);
+        Gio.DBus.session.call('com.endlessm.CodingAnimationsTweak',
+                              '/com/endlessm/CodingAnimationsTweak',
                               'org.gtk.Actions',
                               'Activate',
                               params,
@@ -652,14 +626,6 @@ var CodingSession = new Lang.Class({
     // the caller.
     _switchToBuilder: function() {
         if (!this.builder) {
-            // get the manifest of the application
-            // return early before we setup anything
-            this._appManifest = _getAppManifest(this.app.meta_window.get_flatpak_id());
-            if (!this._appManifest) {
-                log('Error, coding: No manifest could be found for the app: ' + this.app.meta_window.get_flatpak_id());
-                return;
-            }
-
             let tracker = Shell.WindowTracker.get_default();
             tracker.track_coding_app_window(this.app.meta_window);
             this._watchdogId = Mainloop.timeout_add(WATCHDOG_TIME, this._stopWatchingForBuilderWindowToComeOnline.bind(this));
@@ -674,8 +640,7 @@ var CodingSession = new Lang.Class({
             this.splash = new AppActivation.SpeedwagonSplash(builderShellApp);
             this.splash.show();
 
-            this._startBuilderForFlatpak(_constructLoadFlatpakValue(this.app,
-                                                                    this._appManifest));
+            this._startForSurfacePath(this.app._animatableSurface.get_object_path());
         } else {
             this.builder.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
@@ -948,8 +913,7 @@ var CodingSession = new Lang.Class({
         // If we just finished rotating in the speedwagon
         // for builder, launch builder now
         if (_isBuilderSpeedwagon(actor.meta_window))
-           this._startBuilderForFlatpak(_constructLoadFlatpakValue(this.app,
-                                                                   this._appManifest));
+           this._startForSurfacePath(this.app._animatableSurface.get_object_path());
     },
 
     _rotateOutCompleted: function() {
@@ -993,7 +957,7 @@ var CodeViewManager = new Lang.Class({
             return false;
 
         let window = actor.meta_window;
-        if (!_isCodingApp(window.get_flatpak_id()))
+        if (!_isCodingApp(actor))
             return false;
 
         this._sessions.push(new CodingSession({
@@ -1026,7 +990,7 @@ var CodeViewManager = new Lang.Class({
 
     removeAppWindow: function(actor) {
         let window = actor.meta_window;
-        if (!_isCodingApp(window.get_flatpak_id()))
+        if (!_isCodingApp(actor))
             return false;
 
         let session = this._getSession(actor);
