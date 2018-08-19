@@ -1104,8 +1104,29 @@ var DesktopOverlay = new Lang.Class({
 });
 
 const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
-    move: ['wobbly', 'gsettings-wobbly']
+    move: ['wobbly', 'gsettings-wobbly'],
+    minimize: ['zoom'],
+    unminimize: ['zoom']
+    open: ['zoom', 'bounce', 'glide'],
+    close: ['zoom', 'bounce', 'glide']
 };
+
+function filterForAllowedEvents(actor) {
+    let allowedEvents = [];
+
+    if (actor.meta_window) {
+        allowedEvents = allowedEvents.concat(['move', 'open', 'close']);
+        let iconGeometry = getTaskbarIconGeometryForWindow(actor.meta_window);
+
+        if (iconGeometry !== null)
+            allowedEvents = allowedEvents.concat(['minimize', 'unminimize']);
+    }
+
+    return allowedEvents.reduce((acc, event) => {
+        acc[event] = _ALLOWED_ANIMATIONS_FOR_EVENTS[event];
+        return acc;
+    }, {});
+}
 
 // ShellWindowManagerAnimatableSurface
 //
@@ -1126,7 +1147,7 @@ const ShellWindowManagerAnimatableSurface = new Lang.Class({
     },
 
     vfunc_attach_effect: function(event, effect) {
-        let effects = _ALLOWED_ANIMATIONS_FOR_EVENTS[event] || [];
+        let effects = filterForAllowedEvents(this.actor)[event] || [];
 
         if (effects.length === 0) {
             throw new GLib.Error(AnimationsDbus.error_quark(),
