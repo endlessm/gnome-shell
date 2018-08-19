@@ -12,6 +12,12 @@
     <value nick="bottom-center" value="2"/>
     <value nick="bottom-right" value="3"/>
   </enum>
+  <enum id="org.gnome.shell.animations.MinimizeEffect">
+    <value nick="default" value="0"/>
+  </enum>
+  <enum id="org.gnome.shell.animations.UnminimizeEffect">
+    <value nick="default" value="0"/>
+  </enum>
 
   <!-- End of Endless-specific enumerations -->
 
@@ -284,6 +290,24 @@
       <description>
         How much objects are allowed to move in the mesh. A higher range
         allows for a more pronounced effect.
+      </description>
+    </key>
+    <key name="minimize-effect" enum="org.gnome.shell.animations.MinimizeEffect">
+      <default>'default'</default>
+      <summary>
+        Minimize Window Effect
+      </summary>
+      <description>
+        Animation to use when minimize a window.
+      </description>
+    </key>
+    <key name="unminimize-effect" enum="org.gnome.shell.animations.UnminimizeEffect">
+      <default>'default'</default>
+      <summary>
+        Unminimize Window Effect
+      </summary>
+      <description>
+        Animation to use when unminimize a window.
       </description>
     </key>
     <key name="discovery-feed-languages" type="as">

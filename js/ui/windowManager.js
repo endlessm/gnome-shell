@@ -1226,7 +1226,12 @@ function getAnimatableWindowActors() {
 }
 
 function getTaskbarIconGeometryForWindow(window) {
-    let actor = Shell.WindowTracker.get_default().get_window_app(window).taskbarIconActor;
+    let app = Shell.WindowTracker.get_default().get_window_app(window);
+
+    if (!app)
+        return null;
+
+    let actor = app.taskbarIconActor;
 
     if (!actor)
         return null;
@@ -1859,9 +1864,17 @@ var WindowManager = new Lang.Class({
             return;
         }
 
-        actor.set_scale(1.0, 1.0);
+        if (activateAttachedEffectOnAnimatableSurface(actor, 'minimize', {
+            // Guaranteed to work, since the minimize effect is
+            // only available if this window has an icon
+            icon: getTaskbarIconGeometryForWindow(actor.meta_window),
+            complete: () => shellwm.completed_minimize(actor)
+        }))
+            return;
 
         this._minimizing.push(actor);
+
+        actor.set_scale(1.0, 1.0);
 
         if (actor.meta_window.is_monitor_sized()) {
             Tweener.addTween(actor,
@@ -1919,6 +1932,14 @@ var WindowManager = new Lang.Class({
             shellwm.completed_unminimize(actor);
             return;
         }
+
+        if (activateAttachedEffectOnAnimatableSurface(actor, 'unminimize', {
+            // Guaranteed to work, since the minimize effect is
+            // only available if this window has an icon
+            icon: getTaskbarIconGeometryForWindow(actor.meta_window),
+            complete: () => shellwm.completed_unminimize(actor)
+        }))
+            return;
 
         this._unminimizing.push(actor);
         Main.layoutManager.prepareToLeaveOverview();
