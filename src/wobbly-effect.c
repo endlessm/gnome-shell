@@ -314,7 +314,7 @@ endless_shell_fx_wobbly_new_frame (gpointer user_data)
           clutter_actor_meta_set_enabled (CLUTTER_ACTOR_META (wobbly_effect), FALSE);
 
           /* Finally, return false so that we don't keep animating */
-          priv->timeout_id = 0;
+          priv->timeout_id = -1;
           return FALSE;
         }
     }
@@ -329,7 +329,7 @@ endless_shell_fx_wobbly_ensure_timeline (EndlessShellFXWobbly *wobbly_effect)
   EndlessShellFXWobblyPrivate *priv =
     endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
-  if (!priv->timeout_id)
+  if (priv->timeout_id == -1)
     {
       static const unsigned int frame_length_ms = 16; // 60 / 1000;
 
@@ -393,7 +393,7 @@ endless_shell_fx_wobbly_ungrab (EndlessShellFXWobbly *effect)
   /* Don't immediately ungrab. We can be a little bit more
    * clever here and make the ungrab pending on the completion
    * of the animation */
-  if (priv->timeout_id)
+  if (priv->timeout_id != -1)
     priv->ungrab_pending = TRUE;
   else
     g_clear_object (&priv->anchor);
@@ -478,10 +478,10 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
 
   priv->ungrab_pending = FALSE;
 
-  if (priv->timeout_id)
+  if (priv->timeout_id != -1)
     {
       g_source_remove (priv->timeout_id);
-      priv->timeout_id = 0;
+      priv->timeout_id = -1;
     }
 
   if (prev_actor)
@@ -578,10 +578,10 @@ endless_shell_fx_wobbly_finalize (GObject *object)
 
   g_clear_object (&priv->model);
 
-  if (priv->timeout_id)
+  if (priv->timeout_id != -1)
     {
       g_source_remove (priv->timeout_id);
-      priv->timeout_id = 0;
+      priv->timeout_id = -1;
     }
 
   G_OBJECT_CLASS (endless_shell_fx_wobbly_parent_class)->finalize (object);
@@ -590,6 +590,10 @@ endless_shell_fx_wobbly_finalize (GObject *object)
 static void
 endless_shell_fx_wobbly_init (EndlessShellFXWobbly *effect)
 {
+  EndlessShellFXWobblyPrivate *priv =
+    endless_shell_fx_wobbly_get_instance_private (effect);
+
+  priv->timeout_id = -1;
 }
 
 static void
