@@ -1204,6 +1204,21 @@ function getAnimatableWindowActors() {
     ].indexOf(w.meta_window.get_window_type()) !== -1));
 }
 
+function getTaskbarIconGeometryForWindow(window) {
+    let actor = Shell.WindowTracker.get_default().get_window_app(window).taskbarIconActor;
+
+    if (!actor)
+        return null;
+
+    let [x, y] = actor.get_transformed_position();
+    return {
+        x1: x,
+        y1: y,
+        x2: x + actor.width,
+        y2: y + actor.height
+    }
+}
+
 var WindowManager = new Lang.Class({
     Name: 'WindowManager',
 
