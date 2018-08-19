@@ -812,11 +812,13 @@ const ScrolledIconList = new Lang.Class({
             favorites.removeFavorite(app.get_id());
             if (app.state == Shell.AppState.STOPPED) {
                 newActor.destroy();
+                app.taskbarIconActor = null;
                 this._taskbarApps.delete(app);
                 this._updatePage();
             }
         });
         this._taskbarApps.set(app, newChild);
+        app.taskbarIconActor = newActor;
 
         this._container.add_actor(newActor);
     },
@@ -841,6 +843,7 @@ const ScrolledIconList = new Lang.Class({
             let oldChild = this._taskbarApps.get(app);
             if (oldChild) {
                 let oldButton = this._taskbarApps.get(app);
+                app.taskbarIconActor = null;
                 this._container.remove_actor(oldButton.actor);
                 this._taskbarApps.delete(app);
             }
