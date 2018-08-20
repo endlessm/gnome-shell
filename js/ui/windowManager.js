@@ -2361,6 +2361,12 @@ var WindowManager = new Lang.Class({
             return;
         }
 
+        if (activateAttachedEffectOnAnimatableSurface(actor, 'open', {
+            pointer: global.get_pointer(),
+            complete: () => shellwm.completed_map(actor)
+        }))
+            return;
+
         switch (actor._windowType) {
         case Meta.WindowType.NORMAL:
             // Speedwagon windows slide from the bottom, while regular
@@ -2506,6 +2512,12 @@ var WindowManager = new Lang.Class({
 
             return;
         }
+
+        if (activateAttachedEffectOnAnimatableSurface(actor, 'close', {
+            pointer: global.get_pointer(),
+            complete: () => shellwm.completed_destroy(actor)
+        }))
+            return;
 
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
