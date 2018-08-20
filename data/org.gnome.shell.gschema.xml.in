@@ -12,6 +12,12 @@
     <value nick="bottom-center" value="2"/>
     <value nick="bottom-right" value="3"/>
   </enum>
+  <enum id="org.gnome.shell.animations.OpenEffect">
+    <value nick="default" value="0"/>
+  </enum>
+  <enum id="org.gnome.shell.animations.CloseEffect">
+    <value nick="default" value="0"/>
+  </enum>
   <enum id="org.gnome.shell.animations.MinimizeEffect">
     <value nick="default" value="0"/>
   </enum>
@@ -290,6 +296,24 @@
       <description>
         How much objects are allowed to move in the mesh. A higher range
         allows for a more pronounced effect.
+      </description>
+    </key>
+    <key name="open-effect" enum="org.gnome.shell.animations.OpenEffect">
+      <default>'default'</default>
+      <summary>
+        Open Window Effect
+      </summary>
+      <description>
+        Animation to use when opening a window.
+      </description>
+    </key>
+    <key name="close-effect" enum="org.gnome.shell.animations.CloseEffect">
+      <default>'default'</default>
+      <summary>
+        Close Window Effect
+      </summary>
+      <description>
+        Animation to use when closing a window.
       </description>
     </key>
     <key name="minimize-effect" enum="org.gnome.shell.animations.MinimizeEffect">
