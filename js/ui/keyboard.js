@@ -48,17 +48,17 @@ var Key = new Lang.Class({
                                                            y_fill: true,
                                                            x_align: St.Align.START });
             // Adds style to existing keyboard style to avoid repetition
-            this._boxPointer.actor.add_style_class_name('keyboard-subkeys');
+            this._boxPointer.add_style_class_name('keyboard-subkeys');
             this._getExtendedKeys();
             this.actor._extended_keys = this._extended_keyboard;
-            this._boxPointer.actor.hide();
-            Main.layoutManager.addChrome(this._boxPointer.actor);
+            this._boxPointer.hide();
+            Main.layoutManager.addChrome(this._boxPointer);
         }
     },
 
     _onDestroy: function() {
         if (this._boxPointer) {
-            this._boxPointer.actor.destroy();
+            this._boxPointer.destroy();
             this._boxPointer = null;
         }
     },
@@ -141,7 +141,7 @@ var Key = new Lang.Class({
 
     _onShowSubkeysChanged: function () {
         if (this._key.show_subkeys) {
-            this._boxPointer.actor.raise_top();
+            this._boxPointer.raise_top();
             this._boxPointer.setPosition(this.actor, 0.5);
             this.emit('show-subkeys');
             this.actor.fake_release();
