@@ -16,11 +16,13 @@
     <value nick="default" value="0"/>
     <value nick="zoom" value="1"/>
     <value nick="bounce" value="2"/>
+    <value nick="glide" value="3"/>
   </enum>
   <enum id="org.gnome.shell.animations.CloseEffect">
     <value nick="default" value="0"/>
     <value nick="zoom" value="1"/>
     <value nick="bounce" value="2"/>
+    <value nick="glide" value="3"/>
   </enum>
   <enum id="org.gnome.shell.animations.MinimizeEffect">
     <value nick="default" value="0"/>
@@ -352,6 +354,66 @@
       </summary>
       <description>
         How many times the window oscillates from its original position
+      </description>
+    </key>
+    <key name="glide-length" type="i">
+      <range min="0" max="5000"/>
+      <default>200</default>
+      <summary>
+        Glide animation length
+      </summary>
+      <description>
+        How long the glide animation lasts
+      </description>
+    </key>
+    <key name="glide-initial-distance" type="d">
+      <range min="-1.0" max="1.0"/>
+      <default>-0.3</default>
+      <summary>
+        Initial distance
+      </summary>
+      <description>
+        Initial distance away from the camera
+      </description>
+    </key>
+    <key name="glide-x-rotation-angle-degrees" type="d">
+      <range min="-360.0" max="360.0"/>
+      <default>-20.0</default>
+      <summary>
+        X Rotation Angle
+      </summary>
+      <description>
+        Angle to rotate around the x-axis
+      </description>
+    </key>
+    <key name="glide-y-rotation-angle-degrees" type="d">
+      <range min="-360.0" max="360.0"/>
+      <default>0.0</default>
+      <summary>
+        Y Rotation Angle
+      </summary>
+      <description>
+        Angle to rotate around the y-axis
+      </description>
+    </key>
+    <key name="glide-x-axis-location-unit" type="d">
+      <range min="0.0" max="1.0"/>
+      <default>0.2</default>
+      <summary>
+        X Axis Location
+      </summary>
+      <description>
+        Unit co-ordinates for X axis location
+      </description>
+    </key>
+    <key name="glide-y-axis-location-unit" type="d">
+      <range min="0.0" max="1.0"/>
+      <default>0.5</default>
+      <summary>
+        Y Axis Location
+      </summary>
+      <description>
+        Unit co-ordinates for Y axis location
       </description>
     </key>
     <key name="open-effect" enum="org.gnome.shell.animations.OpenEffect">

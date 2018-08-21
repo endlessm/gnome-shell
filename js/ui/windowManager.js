@@ -633,6 +633,188 @@ const AttachedBounceAnimation = new Lang.Class({
     }
 });
 
+// ControllableGlideAnimation
+//
+// A "metaclass" for a glide animation.
+const ControllableGlideAnimation = new Lang.Class({
+    Name: 'ControllableGlideAnimation',
+    Implements: [ AnimationsDbus.ServerEffectBridge ],
+    Extends: GObject.Object,
+    Properties: {
+        length: GObject.ParamSpec.uint('length',
+                                       'Length',
+                                       'How long the animation lasts',
+                                       GObject.ParamFlags.READWRITE |
+                                       GObject.ParamFlags.CONSTRUCT,
+                                       1,
+                                       5000,
+                                       200),
+        initial_distance: GObject.ParamSpec.double('initial-distance',
+                                                   'Initial Distnace',
+                                                   'Number of degrees on the X axis to rotate',
+                                                   GObject.ParamFlags.READWRITE |
+                                                   GObject.ParamFlags.CONSTRUCT,
+                                                   -1.0,
+                                                   1.0,
+                                                   -0.3),
+        x_rotation_angle_degrees: GObject.ParamSpec.double('x-rotation-angle-degrees',
+                                                           'X Rotation Angle Degrees',
+                                                           'Number of degrees on the X axis to rotate',
+                                                           GObject.ParamFlags.READWRITE |
+                                                           GObject.ParamFlags.CONSTRUCT,
+                                                           -360.0,
+                                                           360.0,
+                                                           -20.0),
+        y_rotation_angle_degrees: GObject.ParamSpec.double('y-rotation-angle-degrees',
+                                                           'Y Rotation Angle Degrees',
+                                                           'Number of degrees on the y axis to rotate',
+                                                           GObject.ParamFlags.READWRITE |
+                                                           GObject.ParamFlags.CONSTRUCT,
+                                                           -360.0,
+                                                           360.0,
+                                                           0.0),
+        x_axis_location_unit: GObject.ParamSpec.double('x-axis-location-unit',
+                                                       'X Axis Location Unit',
+                                                       'Unit-coordinates of where the X axis is on the surface',
+                                                       GObject.ParamFlags.READWRITE |
+                                                       GObject.ParamFlags.CONSTRUCT,
+                                                       0.0,
+                                                       1.0,
+                                                       0.2),
+        y_axis_location_unit: GObject.ParamSpec.double('y-axis-location-unit',
+                                                       'Y Axis Location Unit',
+                                                       'Unit-coordinates of where the Y axis is on the surface',
+                                                       GObject.ParamFlags.READWRITE |
+                                                       GObject.ParamFlags.CONSTRUCT,
+                                                       0.0,
+                                                       1.0,
+                                                       0.5)
+    },
+
+    vfunc_get_name: function() {
+        return 'glide';
+    },
+
+    createActorPrivate: function(actor) {
+        let effect = new AttachedGlideAnimation({ bridge: this, enabled: false });
+        actor.add_effect_with_name('endless-animation-glide', effect);
+        return effect;
+    }
+});
+
+// GSettingsGlideAnimation
+//
+// A subclass of ControllableGlideAnimation that gets
+// its configuration from GSettings as opposed to an external
+// caller.
+const GSettingsGlideAnimation = new Lang.Class({
+    Name: 'GSettingsGlideAnimation',
+    Extends: ControllableGlideAnimation,
+
+    vfunc_get_name: function() {
+        return 'gsettings-glide';
+    },
+
+    _init: function(params) {
+        this.parent(params);
+
+         let binder = ((key, prop) => {
+             global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+         });
+
+         // Bind GSettings to effect properties
+         binder('glide-length', 'length');
+         binder('glide-initial-distance', 'initial-distance');
+         binder('glide-x-rotation-angle-degrees', 'x-rotation-angle-degrees');
+         binder('glide-y-rotation-angle-degrees', 'y-rotation-angle-degrees');
+         binder('glide-x-axis-location-unit', 'x-axis-location-unit');
+         binder('glide-y-axis-location-unit', 'y-axis-location-unit');
+    }
+});
+
+// AttachedGlideAnimation
+//
+// A boune animation as attached to an actor.
+const AttachedGlideAnimation = new Lang.Class({
+    Name: 'AttachedGlideAnimation',
+    Extends: EndlessShellFX.Affine,
+    Implements: [ AnimationsDbus.ServerSurfaceAttachedEffect ],
+    Properties: {
+        'bridge': GObject.ParamSpec.object('bridge',
+                                           'Glide Animation Bridge',
+                                           'The bridge to the settings',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           ControllableGlideAnimation)
+    },
+
+    _init: function(params) {
+        this.parent(params);
+        this._enabledId = 0;
+    },
+
+    _startAnimation: function(animation, done) {
+        this.transform_animation = animation;
+        this.set_enabled(true);
+
+        this._enabledId = this.connect('notify::enabled', () => {
+            if (!this.enabled) {
+                done();
+                this.disconnect(this._enabledId);
+                this._enabledId = 0;
+            }
+        });
+    },
+
+    activate: function(event, detail) {
+        let [x, y] = this.actor.get_position();
+        let [width, height] = this.actor.get_size();
+
+        switch (event) {
+            case 'open':
+                this._startAnimation(new Animation.GlideAnimation({
+                    x_rotation_angle_degrees: this.bridge.x_rotation_angle_degrees,
+                    y_rotation_angle_degrees: this.bridge.y_rotation_angle_degrees,
+                    x_axis_location_unit: this.bridge.x_axis_location_unit,
+                    y_axis_location_unit: this.bridge.y_axis_location_unit,
+                    screen_width: global.get_stage().width,
+                    target: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                }), detail.complete);
+                return true;
+            case 'close':
+                this._startAnimation(new Animation.GlideAnimation({
+                    x_rotation_angle_degrees: this.bridge.x_rotation_angle_degrees,
+                    y_rotation_angle_degrees: this.bridge.y_rotation_angle_degrees,
+                    x_axis_location_unit: this.bridge.x_axis_location_unit,
+                    y_axis_location_unit: this.bridge.y_axis_location_unit,
+                    screen_width: global.get_stage().width,
+                    target: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    stepper: new Animation.ReverseStepper({
+                        base_stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                    })
+                }), detail.complete);
+                return true;
+            default:
+                return false;
+        }
+    },
+
+    remove: function() {
+        if (this.actor) {
+            this.actor.remove_effect(this);
+        }
+
+        this.set_enabled(false);
+    }
+});
+
 
 var WindowDimmer = new Lang.Class({
     Name: 'WindowDimmer',
@@ -1431,8 +1613,8 @@ const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
     move: ['wobbly', 'gsettings-wobbly'],
     minimize: ['zoom', 'gsettings-zoom'],
     unminimize: ['zoom', 'gsettings-zoom'],
-    open: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce'],
-    close: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce']
+    open: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce', 'glide', 'gsettings-glide'],
+    close: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce', 'glide', 'gsettings-glide']
 };
 
 function filterForAllowedEvents(actor) {
@@ -1541,6 +1723,10 @@ const ShellWindowManagerAnimationsFactory = new Lang.Class({
                 return new ControllableBounceAnimation();
             case 'gsettings-bounce':
                 return new GSettingsBounceAnimation();
+            case 'glide':
+                return new ControllableGlideAnimation();
+            case 'gsettings-glide':
+                return new GSettingsGlideAnimation();
             default:
                 throw new GLib.Error(AnimationsDbus.error_quark(),
                                      AnimationsDbus.Error.NO_SUCH_EFFECT,
