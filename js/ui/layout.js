@@ -3,6 +3,7 @@
 const Clutter = imports.gi.Clutter;
 const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
@@ -57,8 +58,17 @@ const defaultParams = {
 
 var LayoutManager = new Lang.Class({
     Name: 'LayoutManager',
+    Extends: GObject.Object,
+    Signals: { 'background-clicked': {},
+               'hot-corners-changed': {},
+               'startup-complete': {},
+               'startup-prepared': {},
+               'monitors-changed': {},
+               'keyboard-visible-changed': { param_types: [GObject.TYPE_BOOLEAN] } },
 
-    _init: function () {
+    _init() {
+        this.parent();
+
         this._rtl = (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL);
         this.monitors = [];
         this.primaryMonitor = null;
@@ -1027,7 +1037,6 @@ var LayoutManager = new Lang.Class({
         return this._startingUp;
     }
 });
-Signals.addSignalMethods(LayoutManager.prototype);
 
 
 // HotCorner:
