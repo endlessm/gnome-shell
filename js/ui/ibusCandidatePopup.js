@@ -276,7 +276,7 @@ var CandidatePopup = new Lang.Class({
                              }));
         panelService.connect('focus-out',
                              Lang.bind(this, function(ps) {
-                                 this._boxPointer.hide(BoxPointer.PopupAnimation.NONE);
+                                 this._boxPointer.close(BoxPointer.PopupAnimation.NONE);
                              }));
     },
 
@@ -293,10 +293,10 @@ var CandidatePopup = new Lang.Class({
 
         if (isVisible) {
             this._boxPointer.setPosition(Main.layoutManager.dummyCursor, 0);
-            this._boxPointer.show(BoxPointer.PopupAnimation.NONE);
+            this._boxPointer.open(BoxPointer.PopupAnimation.NONE);
             this._boxPointer.actor.raise_top();
         } else {
-            this._boxPointer.hide(BoxPointer.PopupAnimation.NONE);
+            this._boxPointer.close(BoxPointer.PopupAnimation.NONE);
         }
     },
 

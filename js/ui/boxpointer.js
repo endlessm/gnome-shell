@@ -80,7 +80,7 @@ var BoxPointer = new Lang.Class({
         }
     },
 
-    show: function(animate, onComplete) {
+    open(animate, onComplete) {
         let themeNode = this.actor.get_theme_node();
         let rise = themeNode.get_length('-arrow-rise');
         let animationTime = (animate & PopupAnimation.FULL) ? POPUP_ANIMATION_TIME : 0;
@@ -121,7 +121,7 @@ var BoxPointer = new Lang.Class({
                                  time: animationTime });
     },
 
-    hide: function(animate, onComplete) {
+    close(animate, onComplete) {
         if (!this.actor.visible)
             return;
 
