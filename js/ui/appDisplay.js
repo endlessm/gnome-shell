@@ -162,7 +162,7 @@ var BaseAppView = new Lang.Class({
         else
             this._grid = new IconGrid.IconGrid(gridParams);
 
-        this._grid.connect('key-focus-in', Lang.bind(this, function(grid, actor) {
+        this._grid.connect('child-focused', Lang.bind(this, function(grid, actor) {
             this._keyFocusIn(actor);
         }));
         // Standard hack for ClutterBinLayout
@@ -172,7 +172,7 @@ var BaseAppView = new Lang.Class({
         this._allItems = [];
     },
 
-    _keyFocusIn: function(actor) {
+    _childFocused(actor) {
         // Nothing by default
     },
 
@@ -1030,6 +1030,11 @@ var AllView = new Lang.Class({
             return false;
 
         return true;
+    },
+
+    _childFocused(icon) {
+        let itemPage = this._grid.getItemPage(icon);
+        this.goToPage(itemPage);
     },
 
     _resetNudgeState: function() {
