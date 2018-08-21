@@ -331,8 +331,8 @@ var IconGrid = new Lang.Class({
         this._grid.connect('actor-removed', Lang.bind(this, this._childRemoved));
     },
 
-    _keyFocusIn: function(actor) {
-        this.emit('key-focus-in', actor);
+    _keyFocusIn(actor) {
+        this.emit('child-focused', actor);
     },
 
     _childAdded: function(grid, child) {
