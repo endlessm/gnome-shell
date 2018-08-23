@@ -816,6 +816,188 @@ const AttachedGlideAnimation = new Lang.Class({
     }
 });
 
+// ControllableMagicLampAnimation
+//
+// A "metaclass" for a glide animation.
+const ControllableMagicLampAnimation = new Lang.Class({
+    Name: 'ControllableMagicLampAnimation',
+    Implements: [ AnimationsDbus.ServerEffectBridge ],
+    Extends: GObject.Object,
+    Properties: {
+        length: GObject.ParamSpec.uint('length',
+                                       'Length',
+                                       'How long the animation lasts',
+                                       GObject.ParamFlags.READWRITE |
+                                       GObject.ParamFlags.CONSTRUCT,
+                                       1,
+                                       5000,
+                                       200),
+        bend_factor: GObject.ParamSpec.double('bend-factor',
+                                              'Bend Factor',
+                                              'How much to bend the window during the animation',
+                                              GObject.ParamFlags.READWRITE |
+                                              GObject.ParamFlags.CONSTRUCT,
+                                              1.0,
+                                              20.0,
+                                              10.0),
+        offset_factor: GObject.ParamSpec.double('offset-factor',
+                                                'Offset Factor',
+                                                'How much the waves curve during the animation',
+                                                GObject.ParamFlags.READWRITE |
+                                                GObject.ParamFlags.CONSTRUCT,
+                                                0.1,
+                                                1.0,
+                                                0.5),
+        stretch_factor: GObject.ParamSpec.double('stretch-factor',
+                                                 'Stretch Factor',
+                                                 'How much to stretch the window during the animation',
+                                                 GObject.ParamFlags.READWRITE |
+                                                 GObject.ParamFlags.CONSTRUCT,
+                                                 0.2,
+                                                 1.0,
+                                                 0.45),
+        deform_speed_factor: GObject.ParamSpec.double('deform-speed-factor',
+                                                      'Deform Speed Factor',
+                                                      'How quickly to deform the window',
+                                                      GObject.ParamFlags.READWRITE |
+                                                      GObject.ParamFlags.CONSTRUCT,
+                                                      0.2,
+                                                      3.0,
+                                                      2.3)
+    },
+
+    vfunc_get_name: function() {
+        return 'magiclamp';
+    },
+
+    createActorPrivate: function(actor) {
+        let effect = new AttachedMagicLampAnimation({ bridge: this, enabled: false });
+        actor.add_effect_with_name('endless-animation-magiclamp', effect);
+        return effect;
+    }
+});
+
+// GSettingsMagicLampAnimation
+//
+// A subclass of ControllableMagicLampAnimation that gets
+// its configuration from GSettings as opposed to an external
+// caller.
+const GSettingsMagicLampAnimation = new Lang.Class({
+    Name: 'GSettingsMagicLampAnimation',
+    Extends: ControllableMagicLampAnimation,
+
+    vfunc_get_name: function() {
+        return 'gsettings-magiclamp';
+    },
+
+    _init: function(params) {
+        this.parent(params);
+
+         let binder = ((key, prop) => {
+             global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+         });
+
+         // Bind GSettings to effect properties
+         binder('magiclamp-length', 'length');
+         binder('magiclamp-bend-factor', 'bend-factor');
+         binder('magiclamp-offset-factor', 'offset-factor');
+         binder('magiclamp-stretch-factor', 'stretch-factor');
+         binder('magiclamp-deform-speed-factor', 'deform-speed-factor');
+    }
+});
+
+// AttachedMagicLampAnimation
+//
+// A boune animation as attached to an actor.
+const AttachedMagicLampAnimation = new Lang.Class({
+    Name: 'AttachedMagicLampAnimation',
+    Extends: EndlessShellFX.Grid,
+    Implements: [ AnimationsDbus.ServerSurfaceAttachedEffect ],
+    Properties: {
+        'bridge': GObject.ParamSpec.object('bridge',
+                                           'MagicLamp Animation Bridge',
+                                           'The bridge to the settings',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           ControllableMagicLampAnimation)
+    },
+
+    _init: function(params) {
+        this.parent(params);
+        this._enabledId = 0;
+    },
+
+    _startAnimation: function(animation, done) {
+        this.grid_animation = animation;
+        this.x_tiles = 2;
+        this.y_tiles = 100;
+        this.set_enabled(true);
+
+        this._enabledId = this.connect('notify::enabled', () => {
+            if (!this.enabled) {
+                done();
+                this.disconnect(this._enabledId);
+                this._enabledId = 0;
+            }
+        });
+    },
+
+    activate: function(event, detail) {
+        let box = EndlessShellFX.get_best_known_paint_extents_box (this.actor);
+
+        switch (event) {
+            case 'minimize':
+                this._startAnimation(new Animation.MagicLampAnimation({
+                    source: new Animation.Box({
+                        top_left: new Animation.Vector({ x: detail.icon.x1, y: detail.icon.y1 }),
+                        bottom_right: new Animation.Vector({ x: detail.icon.x2, y: detail.icon.y2 })
+                    }),
+                    target: new Animation.Box({
+                        top_left: new Animation.Vector({ x: box.x1, y: box.y1 }),
+                        bottom_right: new Animation.Vector({ x: box.x2, y: box.y2 })
+                    }),
+                    resolution: new Animation.Vector({ x: 2, y: 100 }),
+                    bend_factor: this.bridge.bend_factor,
+                    offset_factor: this.bridge.offset_factor,
+                    stretch_factor: this.bridge.stretch_factor,
+                    deform_speed_factor: this.bridge.deform_speed_factor,
+                    stepper: new Animation.ReverseStepper({
+                        base_stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                    })
+                }), detail.complete);
+                return true;
+            case 'unminimize':
+                this._startAnimation(new Animation.MagicLampAnimation({
+                    source: new Animation.Box({
+                        top_left: new Animation.Vector({ x: detail.icon.x1, y: detail.icon.y1 }),
+                        bottom_right: new Animation.Vector({ x: detail.icon.x2, y: detail.icon.y2 })
+                    }),
+                    target: new Animation.Box({
+                        top_left: new Animation.Vector({ x: box.x1, y: box.y1 }),
+                        bottom_right: new Animation.Vector({ x: box.x2, y: box.y2 })
+                    }),
+                    resolution: new Animation.Vector({ x: 2, y: 100 }),
+                    bend_factor: this.bridge.bend_factor,
+                    offset_factor: this.bridge.offset_factor,
+                    stretch_factor: this.bridge.stretch_factor,
+                    deform_speed_factor: this.bridge.deform_speed_factor,
+                    stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                }), detail.complete);
+                return true;
+            default:
+                return false;
+        }
+    },
+
+    remove: function() {
+        if (this.actor) {
+            this.actor.remove_effect(this);
+        }
+
+        this.set_enabled(false);
+    }
+});
+
 
 var WindowDimmer = new Lang.Class({
     Name: 'WindowDimmer',
@@ -1612,8 +1794,8 @@ var DesktopOverlay = new Lang.Class({
 
 const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
     move: ['wobbly', 'gsettings-wobbly'],
-    minimize: ['zoom', 'gsettings-zoom'],
-    unminimize: ['zoom', 'gsettings-zoom'],
+    minimize: ['zoom', 'gsettings-zoom', 'magiclamp', 'gsettings-magiclamp'],
+    unminimize: ['zoom', 'gsettings-zoom', 'magiclamp', 'gsettings-magiclamp'],
     open: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce', 'glide', 'gsettings-glide'],
     close: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce', 'glide', 'gsettings-glide']
 };
@@ -1728,6 +1910,10 @@ const ShellWindowManagerAnimationsFactory = new Lang.Class({
                 return new ControllableGlideAnimation();
             case 'gsettings-glide':
                 return new GSettingsGlideAnimation();
+            case 'magiclamp':
+                return new ControllableMagicLampAnimation();
+            case 'gsettings-magiclamp':
+                return new GSettingsMagicLampAnimation();
             default:
                 throw new GLib.Error(AnimationsDbus.error_quark(),
                                      AnimationsDbus.Error.NO_SUCH_EFFECT,
