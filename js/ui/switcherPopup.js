@@ -10,6 +10,7 @@ const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 const St = imports.gi.St;
 
+const Monitor = imports.ui.monitor;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 
@@ -63,19 +64,11 @@ var SwitcherPopup = new Lang.Class({
         this._initialDelayTimeoutId = 0;
         this._noModsTimeoutId = 0;
 
+        this.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
+
         // Initially disable hover so we ignore the enter-event if
         // the switcher appears underneath the current pointer location
         this._disableHover();
-    },
-
-    vfunc_get_preferred_width: function(forHeight) {
-        let primary = Main.layoutManager.primaryMonitor;
-        return [primary.width, primary.width];
-    },
-
-    vfunc_get_preferred_height: function(forWidth) {
-        let primary = Main.layoutManager.primaryMonitor;
-        return [primary.height, primary.height];
     },
 
     vfunc_allocate: function(box, flags) {
