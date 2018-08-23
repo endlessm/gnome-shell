@@ -192,6 +192,8 @@ endif
 libeos_shell_fx_sources = [
   'affine-effect.c',
   'affine-effect.h',
+  'grid-effect.c',
+  'grid-effect.h',
   'shell-fx-common.c',
   'shell-fx-common.h',
   'wobbly-effect.c',
