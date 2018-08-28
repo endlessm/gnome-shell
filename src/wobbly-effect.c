@@ -354,9 +354,21 @@ endless_shell_fx_wobbly_grab (EndlessShellFXWobbly *effect,
 
   if (priv->model)
     {
-      /* Make sure to move the model to the actor's current position first
-       * as it may have changed in the meantime */
+      /* Make sure to update the model geometry and move
+       * to the right position, it may have changed
+       * in the meantime */
+      float actor_paint_box_width, actor_paint_box_height;
+      endless_shell_fx_get_actor_only_paint_box_rect (effect,
+                                                      actor,
+                                                      NULL,
+                                                      NULL,
+                                                      &actor_paint_box_width,
+                                                      &actor_paint_box_height);
+
       WobblyVector position = { 0, 0 };
+      WobblyVector size = { actor_paint_box_width, actor_paint_box_height };
+
+      wobbly_model_resize (priv->model, size);
       wobbly_model_move_to (priv->model, position);
 
       endless_shell_fx_wobbly_ensure_timeline (effect);
