@@ -55,7 +55,7 @@ gnome_shell_deps = [
   gcr_dep,
   systemd_dep,
   eosmetrics_dep,
-  libwobbly_glib_dep,
+  libanimation_glib_dep,
   xkbcommon_dep
 ]
 

@@ -25,25 +25,25 @@
 #include <gio/gio.h>
 #include <clutter/clutter.h>
 
-#include <wobbly-glib/anchor.h>
-#include <wobbly-glib/model.h>
-#include <wobbly-glib/vector.h>
+#include <animation-glib/vector.h>
+#include <animation-glib/wobbly/anchor.h>
+#include <animation-glib/wobbly/model.h>
 
 #include "wobbly-effect.h"
 
 typedef struct _EndlessShellFXWobblyPrivate
 {
-  float         slowdown_factor;
-  double        spring_constant;
-  double        friction;
-  double        movement_range;
-  WobblyModel  *model;
-  WobblyAnchor *anchor;
-  gint64        last_msecs;
-  guint         timeout_id;
-  guint         width_changed_signal;
-  guint         height_changed_signal;
-  gboolean      ungrab_pending;
+  float                  slowdown_factor;
+  double                 spring_constant;
+  double                 friction;
+  double                 movement_range;
+  AnimationWobblyModel  *model;
+  AnimationWobblyAnchor *anchor;
+  gint64                 last_msecs;
+  guint                  timeout_id;
+  guint                  width_changed_signal;
+  guint                  height_changed_signal;
+  gboolean               ungrab_pending;
 } EndlessShellFXWobblyPrivate;
 
 enum
@@ -189,10 +189,10 @@ endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
                                                       NULL);
       clutter_actor_get_position (actor, &actor_x, &actor_y);
 
-      WobblyVector offset = { actor_paint_box_x - actor_x, actor_paint_box_y - actor_y };
-      WobblyVector extremes[4];
+      AnimationVector offset = { actor_paint_box_x - actor_x, actor_paint_box_y - actor_y };
+      AnimationVector extremes[4];
 
-      wobbly_model_query_extremes (priv->model,
+      animation_wobbly_model_query_extremes (priv->model,
                                    &extremes[0],
                                    &extremes[1],
                                    &extremes[2],
@@ -254,9 +254,9 @@ endless_shell_fx_wobbly_deform_vertex (ClutterDeformEffect *effect,
     endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
   /* The reversal of ty and tx here is intentional */
-  WobblyVector uv = { vertex->ty, vertex->tx };
-  WobblyVector deformed;
-  wobbly_model_deform_texcoords (priv->model,
+  AnimationVector uv = { vertex->ty, vertex->tx };
+  AnimationVector deformed;
+  animation_wobbly_model_deform_texcoords (priv->model,
                                  uv,
                                  &deformed);
   vertex->x = deformed.x;
@@ -301,7 +301,7 @@ endless_shell_fx_wobbly_new_frame (gpointer user_data)
    * models in a way that makes sense, so don't do it */
   if (msecs_delta)
     {
-      if (wobbly_model_step (priv->model, msecs_delta / priv->slowdown_factor))
+      if (animation_wobbly_model_step (priv->model, msecs_delta / priv->slowdown_factor))
         {
           clutter_actor_meta_set_enabled (CLUTTER_ACTOR_META (wobbly_effect), TRUE);
           clutter_deform_effect_invalidate (CLUTTER_DEFORM_EFFECT (wobbly_effect));
@@ -365,20 +365,20 @@ endless_shell_fx_wobbly_grab (EndlessShellFXWobbly *effect,
                                                       &actor_paint_box_width,
                                                       &actor_paint_box_height);
 
-      WobblyVector position = { 0, 0 };
-      WobblyVector size = { actor_paint_box_width, actor_paint_box_height };
+      AnimationVector position = { 0, 0 };
+      AnimationVector size = { actor_paint_box_width, actor_paint_box_height };
 
-      wobbly_model_resize (priv->model, size);
-      wobbly_model_move_to (priv->model, position);
+      animation_wobbly_model_resize (priv->model, size);
+      animation_wobbly_model_move_to (priv->model, position);
 
       endless_shell_fx_wobbly_ensure_timeline (effect);
 
       float actor_x, actor_y;
       clutter_actor_get_position (actor, &actor_x, &actor_y);
 
-      WobblyVector anchor_position = { x - actor_x, y - actor_y };
+      AnimationVector anchor_position = { x - actor_x, y - actor_y };
 
-      priv->anchor = wobbly_model_grab_anchor (priv->model, anchor_position);
+      priv->anchor = animation_wobbly_model_grab_anchor (priv->model, anchor_position);
     }
 }
 
@@ -409,18 +409,18 @@ endless_shell_fx_wobbly_move_by (EndlessShellFXWobbly *effect,
 
   if (priv->anchor)
     {
-      WobblyVector delta = { dx, dy };
+      AnimationVector delta = { dx, dy };
 
       endless_shell_fx_wobbly_ensure_timeline (effect);
-      wobbly_anchor_move_by (priv->anchor, delta);
+      animation_wobbly_anchor_move_by (priv->anchor, delta);
 
-      WobblyVector reverse_delta = delta;
+      AnimationVector reverse_delta = delta;
       reverse_delta.x *= -1;
       reverse_delta.y *= -1;
 
       /* Now move the entire model back - this ensures that
        * we stay in sync with the actor's relative position */
-      wobbly_model_move_by (priv->model, reverse_delta);
+      animation_wobbly_model_move_by (priv->model, reverse_delta);
     }
 }
 
@@ -453,11 +453,11 @@ endless_shell_fx_wobbly_size_changed (GObject    *object,
        * the cursor) */
       remove_anchor_if_pending (priv);
 
-      WobblyVector actor_size = { actor_paint_box_width, actor_paint_box_height };
-      WobblyVector actor_position = { 0.0, 0.0 };
+      AnimationVector actor_size = { actor_paint_box_width, actor_paint_box_height };
+      AnimationVector actor_position = { 0.0, 0.0 };
 
-      wobbly_model_resize (priv->model, actor_size);
-      wobbly_model_move_to (priv->model, actor_position);
+      animation_wobbly_model_resize (priv->model, actor_size);
+      animation_wobbly_model_move_to (priv->model, actor_position);
     }
 }
 
@@ -503,10 +503,10 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
                                                       &actor_paint_box_width,
                                                       &actor_paint_box_height);
 
-      WobblyVector actor_position = { 0, 0 };
-      WobblyVector actor_size = { actor_paint_box_width, actor_paint_box_height };
+      AnimationVector actor_position = { 0, 0 };
+      AnimationVector actor_size = { actor_paint_box_width, actor_paint_box_height };
 
-      priv->model = wobbly_model_new (actor_position,
+      priv->model = animation_wobbly_model_new (actor_position,
                                       actor_size,
                                       priv->spring_constant,
                                       priv->friction,
@@ -546,13 +546,13 @@ endless_shell_fx_wobbly_set_property (GObject      *object,
       priv->spring_constant = g_value_get_double (value);
 
       if (priv->model != NULL)
-        wobbly_model_set_spring_k (priv->model, priv->spring_constant);
+        animation_wobbly_model_set_spring_k (priv->model, priv->spring_constant);
       break;
     case PROP_FRICTION:
       priv->friction = g_value_get_double (value);
 
       if (priv->model != NULL)
-        wobbly_model_set_friction (priv->model, priv->friction);
+        animation_wobbly_model_set_friction (priv->model, priv->friction);
       break;
     case PROP_SLOWDOWN_FACTOR:
       priv->slowdown_factor = g_value_get_double (value);
@@ -561,7 +561,7 @@ endless_shell_fx_wobbly_set_property (GObject      *object,
       priv->movement_range = g_value_get_double (value);
 
       if (priv->model != NULL)
-        wobbly_model_set_maximum_range (priv->model, priv->movement_range);
+        animation_wobbly_model_set_maximum_range (priv->model, priv->movement_range);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
