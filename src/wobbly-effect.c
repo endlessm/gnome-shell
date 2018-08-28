@@ -314,7 +314,7 @@ endless_shell_fx_wobbly_new_frame (gpointer user_data)
           clutter_actor_meta_set_enabled (CLUTTER_ACTOR_META (wobbly_effect), FALSE);
 
           /* Finally, return false so that we don't keep animating */
-          priv->timeout_id = 0;
+          priv->timeout_id = -1;
           return FALSE;
         }
     }
@@ -329,7 +329,7 @@ endless_shell_fx_wobbly_ensure_timeline (EndlessShellFXWobbly *wobbly_effect)
   EndlessShellFXWobblyPrivate *priv =
     endless_shell_fx_wobbly_get_instance_private (wobbly_effect);
 
-  if (!priv->timeout_id)
+  if (priv->timeout_id == -1)
     {
       static const unsigned int frame_length_ms = 16; // 60 / 1000;
 
@@ -354,9 +354,21 @@ endless_shell_fx_wobbly_grab (EndlessShellFXWobbly *effect,
 
   if (priv->model)
     {
-      /* Make sure to move the model to the actor's current position first
-       * as it may have changed in the meantime */
+      /* Make sure to update the model geometry and move
+       * to the right position, it may have changed
+       * in the meantime */
+      float actor_paint_box_width, actor_paint_box_height;
+      endless_shell_fx_get_actor_only_paint_box_rect (effect,
+                                                      actor,
+                                                      NULL,
+                                                      NULL,
+                                                      &actor_paint_box_width,
+                                                      &actor_paint_box_height);
+
       WobblyVector position = { 0, 0 };
+      WobblyVector size = { actor_paint_box_width, actor_paint_box_height };
+
+      wobbly_model_resize (priv->model, size);
       wobbly_model_move_to (priv->model, position);
 
       endless_shell_fx_wobbly_ensure_timeline (effect);
@@ -381,7 +393,7 @@ endless_shell_fx_wobbly_ungrab (EndlessShellFXWobbly *effect)
   /* Don't immediately ungrab. We can be a little bit more
    * clever here and make the ungrab pending on the completion
    * of the animation */
-  if (priv->timeout_id)
+  if (priv->timeout_id != -1)
     priv->ungrab_pending = TRUE;
   else
     g_clear_object (&priv->anchor);
@@ -466,10 +478,10 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
 
   priv->ungrab_pending = FALSE;
 
-  if (priv->timeout_id)
+  if (priv->timeout_id != -1)
     {
       g_source_remove (priv->timeout_id);
-      priv->timeout_id = 0;
+      priv->timeout_id = -1;
     }
 
   if (prev_actor)
@@ -566,10 +578,10 @@ endless_shell_fx_wobbly_finalize (GObject *object)
 
   g_clear_object (&priv->model);
 
-  if (priv->timeout_id)
+  if (priv->timeout_id != -1)
     {
       g_source_remove (priv->timeout_id);
-      priv->timeout_id = 0;
+      priv->timeout_id = -1;
     }
 
   G_OBJECT_CLASS (endless_shell_fx_wobbly_parent_class)->finalize (object);
@@ -578,6 +590,10 @@ endless_shell_fx_wobbly_finalize (GObject *object)
 static void
 endless_shell_fx_wobbly_init (EndlessShellFXWobbly *effect)
 {
+  EndlessShellFXWobblyPrivate *priv =
+    endless_shell_fx_wobbly_get_instance_private (effect);
+
+  priv->timeout_id = -1;
 }
 
 static void
@@ -600,28 +616,28 @@ endless_shell_fx_wobbly_class_init (EndlessShellFXWobblyClass *klass)
                          "Spring Constant",
                          "How springy the model is",
                          2.0f, 10.0f, 8.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   object_properties[PROP_FRICTION] =
     g_param_spec_double ("friction",
                          "Friction Constant",
                          "How much friction force should be applied to moving objects",
                          2.0f, 10.0f, 3.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   object_properties[PROP_SLOWDOWN_FACTOR] =
     g_param_spec_double ("slowdown-factor",
                          "Slowdown Factor",
                          "How much to slow the model's timesteps down",
                          1.0f, 5.0f, 1.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   object_properties[PROP_OBJECT_MOVEMENT_RANGE] =
     g_param_spec_double ("object-movement-range",
                          "Object Movement Range",
                          "How much objects are allowed to move around",
                          10.0f, 500.0f, 100.0f,
-                         G_PARAM_WRITABLE);
+                         G_PARAM_WRITABLE | G_PARAM_CONSTRUCT);
 
   g_object_class_install_properties (object_class, PROP_LAST, object_properties);
 }
