@@ -1212,7 +1212,6 @@ var Panel = new Lang.Class({
         let destroyId = indicator.connect('destroy', Lang.bind(this, function(emitter) {
             delete this.statusArea[role];
             emitter.disconnect(destroyId);
-            container.destroy();
         }));
         indicator.connect('menu-set', Lang.bind(this, this._onMenuSet));
         this._onMenuSet(indicator);

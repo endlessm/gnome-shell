@@ -29,6 +29,8 @@ var ButtonBox = new Lang.Class({
                                       x_fill: true,
                                       child: this.actor });
 
+        this.connect('destroy', this._onDestroy.bind(this));
+
         this._minHPadding = this._natHPadding = 0.0;
     },
 
@@ -97,6 +99,11 @@ var ButtonBox = new Lang.Class({
 
         child.allocate(childBox, flags);
     },
+
+    _onDestroy() {
+        this.container.child = null;
+        this.container.destroy();
+    },
 });
 
 var Button = new Lang.Class({
@@ -113,7 +120,6 @@ var Button = new Lang.Class({
 
         this.connect('event', this._onEvent.bind(this));
         this.connect('notify::visible', this._onVisibilityChanged.bind(this));
-        this.connect('destroy', this._onDestroy.bind(this));
 
         if (dontCreateMenu)
             this.menu = new PopupMenu.PopupDummyMenu(this.actor);
@@ -204,6 +210,8 @@ var Button = new Lang.Class({
     },
 
     _onDestroy() {
+        this.parent();
+
         if (this.menu)
             this.menu.destroy();
     }
