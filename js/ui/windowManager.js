@@ -142,28 +142,144 @@ var DisplayChangeDialog = new Lang.Class({
     },
 });
 
+// ControllableShellWobblyEffect
+//
+// "Metaclass" that exists to store settings for an effect
+// to be attached to a surface. It has a few properties
+// which are modified by the AnimationsDbus.ServerEffect that
+// owns it when ChangeSetting is called on its owner object. It
+// also has a createActorPrivate() method which creates an
+// EOSShellWobbly, representing private data for an attached
+// effect to an actor.
+const ControllableShellWobblyEffect = new Lang.Class({
+    Name: 'ControllableShellWobblyEffect',
+    Implements: [ AnimationsDbus.ServerEffectBridge ],
+    Extends: GObject.Object,
+    Properties: {
+        spring_k: GObject.ParamSpec.double('spring-k',
+                                           'Spring K',
+                                           'The Spring Constant to use',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT,
+                                           2.0,
+                                           10.0,
+                                           8.0),
+        friction: GObject.ParamSpec.double('friction',
+                                           'Friction',
+                                           'The Friction Constant to use',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT,
+                                           3.0,
+                                           10.0,
+                                           5.0),
+        slowdown_factor: GObject.ParamSpec.double('slowdown-factor',
+                                                  'Slowdown Factor',
+                                                  'How much to slow animations down',
+                                                  GObject.ParamFlags.READWRITE |
+                                                  GObject.ParamFlags.CONSTRUCT,
+                                                  1.0,
+                                                  5.0,
+                                                  1.0),
+        object_movement_range: GObject.ParamSpec.double('object-movement-range',
+                                                        'Object Movement Range',
+                                                        'How far apart control points can be from each other',
+                                                        GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT,
+                                                        10.0,
+                                                        500.0,
+                                                        100.0)
+    },
+
+    vfunc_get_name: function() {
+        return 'wobbly';
+    },
+
+    createActorPrivate: function(actor) {
+        let effect = new EOSShellWobbly({ bridge: this });
+        actor.add_effect_with_name('endless-animation-wobbly', effect);
+        return effect;
+    }
+});
+
+// GSettingsShellWobblyEffect
+//
+// A subclass of ControllableShellWobblyEffect that gets
+// its configuration from GSettings as opposed to an external
+// caller.
+const GSettingsShellWobblyEffect = new Lang.Class({
+    Name: 'GSettingsShellWobblyEffect',
+    Extends: ControllableShellWobblyEffect,
+
+    vfunc_get_name: function() {
+        return 'gsettings-wobbly';
+    },
+
+    _init: function(params) {
+        this.parent(params);
+
+         let binder = ((key, prop) => {
+             global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+         });
+
+         // Bind GSettings to effect properties
+         binder('wobbly-spring-k', 'spring-k');
+         binder('wobbly-spring-friction', 'friction');
+         binder('wobbly-slowdown-factor', 'slowdown-factor');
+         binder('wobbly-object-movement-range', 'object-movement-range');
+    }
+});
+
+// EOSShellWobbly
+//
+// Private data that exists for the attached ControllableShellWobblyEffect
+// on an AnimationsDbus.ServerSurfaceBridge (eg, a ClutterActor). It is
+// a subclass of EndlessShellFX.Wobbly (eg, a ClutterEffect) and binds to
+// the properties of the passed ControllableShellWobblyEffect.
 var EOSShellWobbly = new Lang.Class({
     Name: 'EOSShellWobbly',
     Extends: EndlessShellFX.Wobbly,
+    Implements: [ AnimationsDbus.ServerSurfaceAttachedEffect ],
+    Properties: {
+        'bridge': GObject.ParamSpec.object('bridge',
+                                           '',
+                                           '',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           ControllableShellWobblyEffect)
+    },
 
     _init: function(params) {
         this.parent(params);
 
         let binder = ((key, prop) => {
-            global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+            this.bridge.bind_property(key, this, prop, GObject.BindingFlags.DEFAULT);
         });
 
         // Bind to effect properties
-        binder('wobbly-spring-k', 'spring-k');
-        binder('wobbly-spring-friction', 'friction');
-        binder('wobbly-slowdown-factor', 'slowdown-factor');
-        binder('wobbly-object-movement-range', 'object-movement-range');
+        binder('spring-k', 'spring-k');
+        binder('friction', 'friction');
+        binder('slowdown-factor', 'slowdown-factor');
+        binder('object-movement-range', 'object-movement-range');
     },
 
-    grabbedByMouse: function() {
-        if (!global.settings.get_boolean('wobbly-effect'))
-            return;
+    activate: function(event, detail) {
+        switch (event) {
+            case 'move':
+                detail.grabbed ? this._grabbedByMouse() : this._ungrabbedByMouse();
+                return true;
+                break;
+            default:
+                return false;
+        }
+    },
 
+    remove: function() {
+        if (this.actor) {
+            this.actor.remove_effect(this);
+            this.actor = null;
+        }
+    },
+
+    _grabbedByMouse: function() {
         let position = global.get_pointer();
         let actor = this.get_actor();
         this.grab(position[0], position[1]);
@@ -180,7 +296,7 @@ var EOSShellWobbly = new Lang.Class({
             });
     },
 
-    ungrabbedByMouse: function() {
+    _ungrabbedByMouse: function() {
         // Only continue if we have an active grab and change notification
         // on movement
         if (!this._positionChangedId)
@@ -988,7 +1104,7 @@ var DesktopOverlay = new Lang.Class({
 });
 
 const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
-    move: ['wobbly']
+    move: ['wobbly', 'gsettings-wobbly']
 };
 
 // ShellWindowManagerAnimatableSurface
@@ -1010,8 +1126,18 @@ const ShellWindowManagerAnimatableSurface = new Lang.Class({
     },
 
     vfunc_attach_effect: function(event, effect) {
-        if ((_ALLOWED_ANIMATIONS_FOR_EVENTS[event] || []).indexOf(effect.name) == -1) {
-            throw new Error(`Effect ${effect.name} can't be used on event ${event}`);
+        let effects = _ALLOWED_ANIMATIONS_FOR_EVENTS[event] || [];
+
+        if (effects.length === 0) {
+            throw new GLib.Error(AnimationsDbus.error_quark(),
+                                 AnimationsDbus.Error.UNSUPPORTED_EVENT_FOR_ANIMATION_SURFACE,
+                                 `Surface does not support event ${event}`);
+        }
+
+        if (effects.indexOf(effect.name) == -1) {
+            throw new GLib.Error(AnimationsDbus.error_quark(),
+                                 AnimationsDbus.Error.UNSUPPORTED_EVENT_FOR_ANIMATION_EFFECT,
+                                 `Effect ${effect.name} can't be used on event ${event}`);
         }
 
         return effect.bridge.createActorPrivate(this.actor);
@@ -1032,6 +1158,13 @@ const ShellWindowManagerAnimatableSurface = new Lang.Class({
             this.actor.width,
             this.actor.height
         ]);
+    },
+
+    vfunc_get_available_effects: function() {
+        return new GLib.Variant("a{sv}", Object.keys(_ALLOWED_ANIMATIONS_FOR_EVENTS).reduce(function(acc, key) {
+            acc[key] = new GLib.Variant("as", _ALLOWED_ANIMATIONS_FOR_EVENTS[key]);
+            return acc
+        }, {}));
     }
 });
 
@@ -1050,7 +1183,16 @@ const ShellWindowManagerAnimationsFactory = new Lang.Class({
     Extends: GObject.Object,
 
     vfunc_create_effect: function(name, settings) {
-        throw new Error(`No such effect ${name}`);
+        switch (name) {
+            case 'wobbly':
+                return new ControllableShellWobblyEffect();
+            case 'gsettings-wobbly':
+                return new GSettingsShellWobblyEffect();
+            default:
+                throw new GLib.Error(AnimationsDbus.error_quark(),
+                                     AnimationsDbus.Error.NO_SUCH_EFFECT,
+                                     `No such effect ${name}`);
+        }
     }
 });
 
@@ -1097,6 +1239,9 @@ var WindowManager = new Lang.Class({
         this._codeViewManager = new CodeView.CodeViewManager();
         this._animationsServer = null;
 
+        // Globally configured animations
+        this._wobblyEffect = null;
+
         AnimationsDbus.Server.new_async(new ShellWindowManagerAnimationsFactory(), null, Lang.bind(this, function(initable, result) {
             this._animationsServer = AnimationsDbus.Server.new_finish(initable, result);
 
@@ -1109,6 +1254,27 @@ var WindowManager = new Lang.Class({
 
             // Create a server-side animation manager
             this._animationsManager = this._animationsServer.create_animation_manager();
+
+            // Watch for the GSetting for the wobbly to change and add
+            // the effect to all windows
+            let actionWobblyEffectSetting = Lang.bind(this, function(settings, key) {
+                if (settings.get_boolean(key)) {
+                    this._wobblyEffect = this._animationsManager.create_effect('Wobbly Effect',
+                                                                               'gsettings-wobbly',
+                                                                               new GLib.Variant('a{sv}', {}));
+
+                    getAnimatableWindowActors().forEach(Lang.bind(this, function(actor) {
+                        actor._animatableSurface.attach_animation_effect_with_server_priority('move',
+                                                                                              this._wobblyEffect);
+                    }));
+                } else if (this._wobblyEffect) {
+                    this._wobblyEffect.destroy();
+                    this._wobblyEffect = null;
+                }
+            });
+
+            global.settings.connect('changed::wobbly-effect', actionWobblyEffectSetting);
+            actionWobblyEffectSetting(global.settings, 'wobbly-effect');
         }));
 
         this._isWorkspacePrepended = false;
@@ -2102,6 +2268,12 @@ var WindowManager = new Lang.Class({
         if (this._animationsServer)
             actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
 
+        // Add the wobbly effect if it is enabled
+        if (this._wobblyEffect) {
+            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
+                                                                                  this._wobblyEffect);
+        }
+
         if (SideComponent.isSideComponentWindow(actor.meta_window)) {
             this._mapping.push(actor);
 
@@ -2722,13 +2894,15 @@ var WindowManager = new Lang.Class({
 
         let actor = window.get_compositor_private();
 
-        let effect = actor.get_effect('endless-wobbly');
-        if (!effect) {
-            effect = new EOSShellWobbly();
-            actor.add_effect_with_name('endless-wobbly', effect);
-        }
+        if (!actor._animatableSurface)
+            return;
 
-        effect.grabbedByMouse();
+        // This is an event that may cause an animation
+        // on the window.
+        let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
+
+        if (attachedEffect)
+            attachedEffect.activate('move', { grabbed: true });
     },
 
     _windowUngrabbed: function(display, op, window) {
@@ -2738,12 +2912,14 @@ var WindowManager = new Lang.Class({
             return;
 
         let actor = window.get_compositor_private();
-        let effect = actor.get_effect('endless-wobbly');
 
-        // Lots of different grab ops can end here, so we just let
-        // EOSShellWobbly.ungrabbedByMouse figure out what to do based on its
-        // own state
-        if (effect)
-            effect.ungrabbedByMouse();
+        if (!actor._animatableSurface)
+            return;
+
+        // This is an event that may cause an animation on the window
+        let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
+
+        if (attachedEffect)
+            attachedEffect.activate('move', { grabbed: false });
     },
 });
