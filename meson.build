@@ -109,9 +109,9 @@ m_dep = cc.find_library('m', required: false)
 # Endless-specific: Metrics
 eosmetrics_dep = dependency('eosmetrics-0')
 
-# Endless-specific: Wobbly windows
-libwobbly_glib_dep = dependency('libwindowfx_wobbly_glib-0.3')
-libeos_shell_fx_deps = [mutter_dep, gdk_pixbuf_dep, libwobbly_glib_dep, m_dep]
+# Endless-specific: Custom animations
+libanimation_glib_dep = dependency('libanimation-glib-0')
+libeos_shell_fx_deps = [mutter_dep, gdk_pixbuf_dep, libanimation_glib_dep, m_dep]
 
 # Endless-specific: Required for keyboard layout switcher in password entries
 xkbcommon_dep = dependency('xkbcommon')
