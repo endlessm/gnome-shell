@@ -18,7 +18,7 @@ var ClubhouseIndicator = new Lang.Class({
 
     _init: function() {
         this.parent(_("Clubhouse"), Clutter.ActorAlign.CENTER, Clutter.ActorAlign.CENTER);
-        this.setIcon(Gio.icon_new_for_string('media-view-subtitles-symbolic'), 24);
+        this.setIcon(Gio.icon_new_for_string('face-monkey-symbolic'), 24);
     },
 
     // overrides default implementation from PanelMenu.Button
@@ -31,9 +31,9 @@ var ClubhouseIndicator = new Lang.Class({
 
             // pressing the button when the overview is being shown always displays the side bar
             if (Main.overview.visible)
-                Main.codingManager.show(event.get_time());
+                Main.clubhouse.show(event.get_time());
             else
-                Main.codingManager.toggle(event.get_time());
+                Main.clubhouse.toggle(event.get_time());
         }
 
         return Clutter.EVENT_PROPAGATE;

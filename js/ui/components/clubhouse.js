@@ -1,3 +1,4 @@
+
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
 const Lang = imports.lang;
@@ -5,8 +6,8 @@ const Lang = imports.lang;
 const Main = imports.ui.main;
 const SideComponent = imports.ui.sideComponent;
 
-const CodingManagerIface = '<node> \
-<interface name="com.endlessm.Coding.Manager"> \
+const ClubhouseIface = '<node> \
+<interface name="com.endlessm.Clubhouse"> \
 <method name="show"> \
   <arg type="u" direction="in" name="timestamp"/> \
 </method> \
@@ -17,35 +18,33 @@ const CodingManagerIface = '<node> \
 </interface> \
 </node>';
 
-const CODING_MANAGER_NAME = 'com.endlessm.Coding.Manager';
-const CODING_MANAGER_PATH = '/com/endlessm/Coding/Manager';
+const CLUBHOUSE_NAME = 'com.endlessm.Clubhouse';
+const CLUBHOUSE_PATH = '/com/endlessm/Clubhouse';
 
-var CodingManager = new Lang.Class({
-    Name: 'CodingManager',
+var Clubhouse = new Lang.Class({
+    Name: 'Clubhouse',
     Extends: SideComponent.SideComponent,
 
     _init: function() {
-        this.parent(CodingManagerIface, CODING_MANAGER_NAME, CODING_MANAGER_PATH);
+        this.parent(ClubhouseIface, CLUBHOUSE_NAME, CLUBHOUSE_PATH);
     },
 
     enable: function() {
         this.parent();
-        Main.codingManager = this;
+        Main.clubhouse = this;
     },
 
     disable: function() {
         this.parent();
-        Main.codingManager = null;
+        Main.clubhouse = null;
     },
 
     callShow: function(timestamp) {
-        log('>>>>>>>>>>>>>>>>>>>>>>>>>>>> SHOW!!!!!!!!!!!');
         this.proxy.showRemote(timestamp);
     },
 
     callHide: function(timestamp) {
-        log('>>>>>>>>>>>>>>>>>>>>>>>>>>>> HIDE');
         this.proxy.hideRemote(timestamp);
     }
 });
-const Component = CodingManager;
+const Component = Clubhouse;

@@ -144,22 +144,53 @@ const _modes = {
         components: Config.HAVE_NETWORKMANAGER ?
                     ['networkAgent', 'polkitAgent',
                      'keyring', 'autorunManager', 'automountManager',
-                     'codingGameService',
-                     'codingManager',
+                     'clubhouse',
                      'discoveryFeed',
                      'trayArea'] :
                     ['polkitAgent',
                      'keyring', 'autorunManager', 'automountManager',
-                     'codingGameService',
-                     'codingManager',
+                     'clubhouse',
                      'discoveryFeed',
                      'trayArea'],
         panel: {
             left: ['endlessButton', 'appIcons'],
             center: [],
             right: ['a11y', 'keyboard', 'aggregateMenu', 'userMenu',
-                    'codingGame',
+                    'codingGame', 'clubhouse',
                     'dateMenu', 'hotCorner']
+        }
+    },
+
+    'user-hacking': {
+        hasOverview: true,
+        showCalendarEvents: true,
+        allowSettings: true,
+        allowExtensions: true,
+        allowScreencast: true,
+        hasRunDialog: true,
+        hasWorkspaces: true,
+        hasWindows: true,
+        hasWmMenus: true,
+        hasNotifications: true,
+        isLocked: false,
+        isPrimary: true,
+        unlockDialog: imports.ui.unlockDialog.UnlockDialog,
+        components: Config.HAVE_NETWORKMANAGER ?
+                    ['networkAgent', 'polkitAgent',
+                     'keyring', 'autorunManager', 'automountManager',
+                     'clubhouse',
+                     'discoveryFeed',
+                     'trayArea'] :
+                    ['polkitAgent',
+                     'keyring', 'autorunManager', 'automountManager',
+                     'clubhouse',
+                     'discoveryFeed',
+                     'trayArea'],
+        panel: {
+            left: ['endlessButton', 'appIcons'],
+            center: [],
+            right: ['a11y', 'keyboard', 'aggregateMenu', 'userMenu',
+                    'clubhouse', 'dateMenu', 'hotCorner']
         }
     }
 };
@@ -216,9 +247,12 @@ var SessionMode = new Lang.Class({
                          _modes[global.session_mode].isPrimary);
         let mode = isPrimary ? global.session_mode : 'user';
 
-        if (mode == 'user' &&
-            global.settings.get_boolean('enable-coding-game'))
-            mode = 'user-coding';
+        if (mode == 'user') {
+            if (global.settings.get_boolean('enable-coding-game'))
+                mode = 'user-coding';
+            else if (global.settings.get_boolean('enable-hacking-mode'))
+                mode = 'user-hacking';
+        }
 
         this._modeStack = [mode];
         this._sync();
