@@ -190,6 +190,8 @@ if enable_recorder
 endif
 
 libeos_shell_fx_sources = [
+  'shell-fx-common.c',
+  'shell-fx-common.h',
   'wobbly-effect.c',
   'wobbly-effect.h'
 ]
