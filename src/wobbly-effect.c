@@ -29,6 +29,7 @@
 #include <animation-glib/wobbly/anchor.h>
 #include <animation-glib/wobbly/model.h>
 
+#include "shell-fx-common.h"
 #include "wobbly-effect.h"
 
 typedef struct _EndlessShellFXWobblyPrivate
@@ -63,76 +64,6 @@ static GParamSpec *object_properties[PROP_LAST];
 G_DEFINE_TYPE_WITH_PRIVATE (EndlessShellFXWobbly,
                             endless_shell_fx_wobbly,
                             CLUTTER_TYPE_DEFORM_EFFECT)
-
-/* This constant is used to deal with rounding error in computing
- * paint boxes. See also https://gitlab.gnome.org/GNOME/mutter/blob/master/clutter/clutter/clutter-paint-volume.c#L1212 */
-#define PAINT_BOX_OFFSET 1
-
-static void
-endless_shell_fx_get_untransformed_paint_box_from_existing_volume (ClutterActor             *actor,
-                                                                   const ClutterPaintVolume *volume,
-                                                                   ClutterActorBox          *box)
-{
-  ClutterVertex origin;
-
-  /* We don't have access to the stage projection matrix
-   * so the best we can do is hope here that the volume is
-   * two dimensional and orthogonal. */
-  clutter_paint_volume_get_origin (volume, &origin);
-
-  box->x1 = floor (origin.x + clutter_actor_get_x (actor)) - PAINT_BOX_OFFSET;
-  box->y1 = floor (origin.y + clutter_actor_get_y (actor)) - PAINT_BOX_OFFSET;
-  box->x2 = box->x1 + ceil (clutter_paint_volume_get_width (volume)) + PAINT_BOX_OFFSET * 2;
-  box->y2 = box->y1 + ceil (clutter_paint_volume_get_height (volume)) + PAINT_BOX_OFFSET * 2;
-}
-
-static gboolean
-endless_shell_fx_get_untransformed_paint_box (ClutterActor    *actor,
-                                              ClutterActorBox *box)
-{
-  /* Get the actor's paint volume, bypassing affine
-   * transformations which would usually be applied
-   * if we just queried the paint box. */
-  const ClutterPaintVolume *volume = clutter_actor_get_paint_volume (actor);
-
-  if (volume == NULL)
-    return FALSE;
-
-  endless_shell_fx_get_untransformed_paint_box_from_existing_volume (actor,
-                                                                     volume,
-                                                                     box);
-
-  return TRUE;
-}
-
-static void
-endless_shell_fx_get_actor_only_paint_box_rect (EndlessShellFXWobbly *effect,
-                                                ClutterActor         *actor,
-                                                gfloat               *paint_box_x,
-                                                gfloat               *paint_box_y,
-                                                gfloat               *paint_box_width,
-                                                gfloat               *paint_box_height)
-{
-  /* We want the size of the paint box and not the actor
-   * size, because that's going to be the size of the
-   * texture. However, we only want the size of the
-   * paint box when we're just considering the
-   * actor alone */
-  ClutterActorBox          rect;
-
-  /* If endless_shell_fx_get_untransformed_paint_box fails
-   * we should fall back to the actor size at this point */
-  if (endless_shell_fx_get_untransformed_paint_box (actor, &rect))
-    {
-      clutter_actor_box_get_origin (&rect, paint_box_x, paint_box_y);
-      clutter_actor_box_get_size (&rect, paint_box_width, paint_box_height);
-    }
-  else
-    {
-      clutter_actor_get_size (actor, paint_box_width, paint_box_height);
-      clutter_actor_get_position (actor, paint_box_x, paint_box_y);
-    }
-}
 
 static gboolean
 endless_shell_fx_wobbly_get_paint_volume (ClutterEffect    *effect,
@@ -298,13 +229,12 @@ endless_shell_fx_wobbly_grab (EndlessShellFXWobbly *effect,
       /* Make sure to update the model geometry and move
        * to the right position, it may have changed
        * in the meantime */
+      ClutterActorBox box;
       float actor_paint_box_width, actor_paint_box_height;
-      endless_shell_fx_get_actor_only_paint_box_rect (effect,
-                                                      actor,
-                                                      NULL,
-                                                      NULL,
-                                                      &actor_paint_box_width,
-                                                      &actor_paint_box_height);
+      endless_shell_fx_get_best_known_paint_extents_box (actor, &box);
+
+      actor_paint_box_width = box.x2 - box.x1;
+      actor_paint_box_height = box.y2 - box.y1;
 
       AnimationVector position = { 0, 0 };
       AnimationVector size = { actor_paint_box_width, actor_paint_box_height };
@@ -380,13 +310,12 @@ endless_shell_fx_wobbly_size_changed (GObject    *object,
    * do internally anyways */
   if (priv->model)
     {
+      ClutterActorBox box;
       float actor_paint_box_width, actor_paint_box_height;
-      endless_shell_fx_get_actor_only_paint_box_rect (effect,
-                                                      actor,
-                                                      NULL,
-                                                      NULL,
-                                                      &actor_paint_box_width,
-                                                      &actor_paint_box_height);
+      endless_shell_fx_get_best_known_paint_extents_box (actor, &box);
+
+      actor_paint_box_width = box.x2 - box.x1;
+      actor_paint_box_height = box.y2 - box.y1;
 
       /* If we have any pending anchors, we should release them now -
        * the model move and resize code explicitly does not move
@@ -436,13 +365,12 @@ endless_shell_fx_wobbly_set_actor (ClutterActorMeta *actor_meta,
 
   if (actor)
     {
+      ClutterActorBox box;
       float actor_paint_box_width, actor_paint_box_height;
-      endless_shell_fx_get_actor_only_paint_box_rect (wobbly_effect,
-                                                      actor,
-                                                      NULL,
-                                                      NULL,
-                                                      &actor_paint_box_width,
-                                                      &actor_paint_box_height);
+      endless_shell_fx_get_best_known_paint_extents_box (actor, &box);
+
+      actor_paint_box_width = box.x2 - box.x1;
+      actor_paint_box_height = box.y2 - box.y1;
 
       AnimationVector actor_position = { 0, 0 };
       AnimationVector actor_size = { actor_paint_box_width, actor_paint_box_height };
