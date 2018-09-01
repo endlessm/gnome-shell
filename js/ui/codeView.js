@@ -23,28 +23,7 @@ const BUTTON_OFFSET_X = 33;
 const BUTTON_OFFSET_Y = 40;
 
 const STATE_APP = 0;
-const STATE_BUILDER = 1;
-
-const _CODING_APPS = [
-    'com.endlessm.Helloworld',
-    'org.gnome.Weather'
-];
-
-function _isCodingApp(flatpakID) {
-    return _CODING_APPS.indexOf(flatpakID) != -1;
-}
-
-function _isBuilder(flatpakID) {
-    return flatpakID === 'org.gnome.Builder';
-}
-
-function _isBuilderSpeedwagon(window) {
-    let tracker = Shell.WindowTracker.get_default();
-    let correspondingApp = tracker.get_window_app(window);
-    return (Shell.WindowTracker.is_speedwagon_window(window) &&
-            correspondingApp &&
-            correspondingApp.get_id() === 'org.gnome.Builder.desktop');
-}
+const STATE_TOOLBOX = 1;
 
 function _createIcon() {
     let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/rotate.svg');
@@ -195,7 +174,7 @@ var WindowTrackingButton = new Lang.Class({
                                          GObject.ParamFlags.READWRITE |
                                          GObject.ParamFlags.CONSTRUCT_ONLY,
                                          Meta.Window),
-        builder_window: GObject.ParamSpec.object('builder-window',
+        toolbox_window: GObject.ParamSpec.object('toolbox-window',
                                                  '',
                                                  '',
                                                  GObject.ParamFlags.READWRITE,
@@ -220,7 +199,7 @@ var WindowTrackingButton = new Lang.Class({
         // hide, and show the button. Note that WindowTrackingButton is
         // constructed with the primary app window and we listen for signals
         // on that. This is because of the assumption that both the app
-        // window and builder window are completely synchronized.
+        // window and toolbox window are completely synchronized.
         this._positionChangedId = this.window.connect('position-changed',
                                                       this._updatePosition.bind(this));
         this._sizeChangedId = this.window.connect('size-changed',
@@ -337,6 +316,17 @@ var WindowTrackingButton = new Lang.Class({
         });
     },
 
+    // It should be possible to set the property directly
+    // and use the notify::toolbox-window signal, but that
+    // doesn't work, so just have this function for now.
+    setToolboxWindow: function(window) {
+        // Its possible that the toolbox window got focused before
+        // the toolbox window was set, so do the check again
+        // here, too.
+        this.toolbox_window = window;
+        this._showIfWindowVisible();
+    },
+
     _updatePosition: function() {
         let rect = this.window.get_frame_rect();
         _synchronizeViewSourceButtonToRectCorner(this._button, rect);
@@ -351,10 +341,10 @@ var WindowTrackingButton = new Lang.Class({
         // Don't show if the screen is locked
         let locked = Main.sessionMode.isLocked;
 
-        // Show only if either this window or the builder window
+        // Show only if either this window or the toolbox window
         // is in focus
         if ((focusedWindow === this.window ||
-             focusedWindow === this.builder_window) &&
+             focusedWindow === this.toolbox_window) &&
             !locked)
             this._show();
         else
@@ -370,10 +360,29 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
-function _constructLoadFlatpakValue(app, appManifest) {
-    // add an app_id_override to the manifest to load
-    return appManifest.get_path() + '+' + app.meta_window.get_flatpak_id() + '.Coding';
-}
+function launchToolboxForGlobalBusNameAndObjectPath(targetBusName, targetObjectPath) {
+    Gio.DBus.session.call('com.endlessm.HackToolbox',
+                          '/com/endlessm/HackToolbox',
+                          'org.gtk.Actions',
+                          'Activate',
+                          new GLib.Variant('(sava{sv})', [
+                              'show-for-dbus-object',
+                              [new GLib.Variant('(ss)', [targetBusName, targetObjectPath])],
+                              {}
+                          ]),
+                          null,
+                          Gio.DBusCallFlags.NONE,
+                          GLib.MAXINT32,
+                          null,
+                          (conn, result) => {
+                              try {
+                                  conn.call_finish(result);
+                              } catch (e) {
+                                  // Failed.
+                                  logError(e, 'Failed to start com.endlessm.HackToolbox');
+                              }
+                          });
+};
 
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
@@ -385,7 +394,7 @@ var CodingSession = new Lang.Class({
                                         GObject.ParamFlags.READWRITE |
                                         GObject.ParamFlags.CONSTRUCT_ONLY,
                                         Meta.WindowActor),
-        'builder': GObject.ParamSpec.object('builder',
+        'toolbox': GObject.ParamSpec.object('toolbox',
                                             '',
                                             '',
                                             GObject.ParamFlags.READWRITE,
@@ -421,54 +430,41 @@ var CodingSession = new Lang.Class({
         this._watchdogId = 0;
     },
 
+    _toolboxWindowIsReady: function() {
+        this._animate(this.app,
+                      this.toolbox,
+                      Gtk.DirectionType.LEFT);
+        this.button.switchAnimation(Gtk.DirectionType.LEFT);
+    },
+
     // Maybe admit this actor if it is the kind of actor that we want
-    admitBuilderWindowActor: function(actor) {
-        // If there is a currently bound window and it is not a speedwagon,
-        // then we can't admit this window. Return false.
-        if (this.builder &&
-            !Shell.WindowTracker.is_speedwagon_window(this.builder.meta_window))
+    admitToolboxWindowActor: function(actor) {
+        // If there is a currently bound window then we
+        // can't admit this window. Return false.
+        if (this.toolbox)
             return false;
 
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
-        this.builder = actor;
-        this.button.builder_window = actor.meta_window;
+        this.toolbox = actor;
+        this.button.setToolboxWindow(actor.meta_window);
 
         // The assumption here is that if we connect a new window, we
-        // are connecting a builder window (potentially 'on top') of the
+        // are connecting a toolbox window (potentially 'on top') of the
         // speedwagon window, so there is no need to disconnect
         // signals
-        this._positionChangedIdBuilder = this.builder.meta_window.connect('position-changed',
+        this._positionChangedIdToolbox = this.toolbox.meta_window.connect('position-changed',
                                                                           this._synchronizeWindows.bind(this));
-        this._sizeChangedIdBuilder = this.builder.meta_window.connect('size-changed',
+        this._sizeChangedIdToolbox = this.toolbox.meta_window.connect('size-changed',
                                                                       this._synchronizeWindows.bind(this));
-        _synchronizeMetaWindowActorGeometries(this.app, this.builder);
+        _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
 
-        if (Shell.WindowTracker.is_speedwagon_window(actor.meta_window)) {
-            // If we are animating to a speedwagon window, we'll want to
-            // remove the 'above' attribute - we don't want the splash to
-            // appear over everything else.
-            actor.meta_window.unmake_above();
-        } else {
-            // Connect the real builder window to the geometry-allocate
-            // signal
-            this._constrainGeometryBuilderId = this.builder.meta_window.connect('geometry-allocate',
-                                                                                this._constrainGeometry.bind(this));
+        this._constrainGeometryToolboxId = this.toolbox.meta_window.connect('geometry-allocate',
+                                                                            this._constrainGeometry.bind(this));
 
-            // We only want to untrack the coding app window at this
-            // point and not at the point we show the speedwagon. This
-            // will ensure that the shell window tracker is still
-            // watching for the builder window to appear.
-            this._stopWatchingForBuilderWindowToComeOnline();
-
-            // We also only want to hide the speedwagon window at this
-            // point, since the other window has arrived.
-            this.splash.rampOut();
-        }
-
-        // Now, if we're not already on the builder window, we want to start
+        // Now, if we're not already on the toolbox window, we want to start
         // animating to it here. This is different from just calling
-        // _switchToBuilder - we already have the window and we want to
+        // _switchToToolbox - we already have the window and we want to
         // rotate to it as soon as its first frame appears
         if (this._state === STATE_APP) {
             // We wait until the first frame of the window has been drawn
@@ -476,57 +472,60 @@ var CodingSession = new Lang.Class({
             //
             // This way we don't get ugly artifacts when rotating if
             // a window is slow to draw.
-            let firstFrameConnection = this.builder.connect('first-frame', () => {
-                this._animate(this.app,
-                              this.builder,
-                              Gtk.DirectionType.LEFT);
+            if (this.toolbox._drawnFirstFrame) {
+                let firstFrameConnection = this.toolbox.connect('first-frame', Lang.bind(this, function() {
+                    this._toolboxWindowIsReady();
+                    this.toolbox.disconnect(firstFrameConnection);
+                }));
+            } else {
+                GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
+                    this._toolboxWindowIsReady();
+                    return false;
+                }));
+            }
 
-                this.builder.disconnect(firstFrameConnection);
-                this.button.switchAnimation(Gtk.DirectionType.LEFT);
-
-                return false;
-            });
             this._prepareAnimate(this.app,
-                                 this.builder,
+                                 this.toolbox,
                                  Gtk.DirectionType.LEFT);
-            this._state = STATE_BUILDER;
+            this._state = STATE_TOOLBOX;
         }
 
         return true;
     },
 
-    // Remove the builder window from this session. Disconnect
-    // any signals that we have connected to the builder window
+    // Remove the toolbox window from this session. Disconnect
+    // any signals that we have connected to the toolbox window
     // and show the app window
-    removeBuilderWindow: function() {
-        if (this._positionChangedIdBuilder) {
-            this.builder.meta_window.disconnect(this._positionChangedIdBuilder);
-            this._positionChangedIdBuilder = 0;
+    removeToolboxWindow: function() {
+        if (this._positionChangedIdToolbox) {
+            this.toolbox.meta_window.disconnect(this._positionChangedIdToolbox);
+            this._positionChangedIdToolbox = 0;
         }
 
-        if (this._sizeChangedIdBuilder) {
-            this.builder.meta_window.disconnect(this._sizeChangedIdBuilder);
-            this._sizeChangedIdBuilder = 0;
+        if (this._sizeChangedIdToolbox) {
+            this.toolbox.meta_window.disconnect(this._sizeChangedIdToolbox);
+            this._sizeChangedIdToolbox = 0;
         }
 
-        if (this._constrainGeometryBuilderId) {
-            this.builder.meta_window.disconnect(this._constrainGeometryBuilderId);
-            this._constrainGeometryBuilderId = 0;
+        if (this._constrainGeometryToolboxId) {
+            this.toolbox.meta_window.disconnect(this._constrainGeometryToolboxId);
+            this._constrainGeometryToolboxId = 0;
         }
 
-        // Remove the builder_window reference from the button. There's no
+        // Remove the toolbox_window reference from the button. There's no
         // need to disconnect any signals here since the button doesn't
-        // care about signals on builder.
-        this.button.builder_window = null;
-        this.builder = null;
+        // care about signals on the toolbox.
+        this.button.setToolboxWindow(null);
+        this.toolbox = null;
         this._state = STATE_APP;
 
+        log('Activating toolbox');
         this.app.meta_window.activate(global.get_current_time());
         this.app.show();
     },
 
     // Eject out of this session and remove all pairings.
-    // Remove all connected signals and show the builder window if we have
+    // Remove all connected signals and show the the toolbox window if we have
     // one.
     //
     // The assumption here is that the session will be removed immediately
@@ -558,32 +557,32 @@ var CodingSession = new Lang.Class({
             this._constrainGeometryAppId = 0;
         }
 
-        if (this._constrainGeometryBuilderId) {
-            this.builder.meta_window.disconnect(this._constrainGeometryBuilderId);
-            this._constrainGeometryBuilderId = 0;
-        }
-
         // Destroy the button too
         this.button.destroy();
 
-        // If we have a builder window, disconnect any signals,
+        // If we have a toolbox window, disconnect any signals,
         // show it and activate it now
         //
-        // For whatever reason, this.builder.meta_window seems to be
+        // For whatever reason, this.toolbox.meta_window seems to be
         // undefined on speedwagon windows, so handle that case here.
-        if (this.builder && this.builder.meta_window) {
-            if (this._positionChangedIdBuilder) {
-                this.builder.meta_window.disconnect(this._positionChangedIdBuilder);
-                this._positionChangedIdBuilder = 0;
+        if (this.toolbox && this.toolbox.meta_window) {
+            if (this._positionChangedIdToolbox) {
+                this.toolbox.meta_window.disconnect(this._positionChangedIdToolbox);
+                this._positionChangedIdToolbox = 0;
             }
 
-            if (this._sizeChangedIdBuilder) {
-                this.builder.meta_window.disconnect(this._sizeChangedIdBuilder);
-                this._sizeChangedIdBuilder = 0;
+            if (this._sizeChangedIdToolbox) {
+                this.toolbox.meta_window.disconnect(this._sizeChangedIdToolbox);
+                this._sizeChangedIdToolbox = 0;
             }
 
-            this.builder.meta_window.activate(global.get_current_time());
-            this.builder.show();
+            if (this._constrainGeometryToolboxId) {
+                this.toolbox.meta_window.disconnect(this._constrainGeometryToolboxId);
+                this._constrainGeometryToolboxId = 0;
+            }
+
+            // Destroy the toolbox window now
+            this.toolbox.meta_window.delete(global.get_current_time());
 
             // Note that we do not set this._state to STATE_APP here. Any
             // further usage of this session is undefined and it should
@@ -592,109 +591,64 @@ var CodingSession = new Lang.Class({
     },
 
     _constrainGeometry: function(window) {
-        if (!this.builder)
+        if (!this.toolbox)
             return;
 
-        // Get the minimum size of both the app and the builder window
+        // Get the minimum size of both the app and the toolbox window
         // and then determine the maximum of the two. We won't permit
         // either window to get any smaller.
         let [minAppWidth, minAppHeight] = this.app.meta_window.get_minimum_size_hints();
-        let [minBuilderWidth, minBuilderHeight] = this.builder.meta_window.get_minimum_size_hints();
+        let [minToolboxWidth, minToolboxHeight] = this.toolbox.meta_window.get_minimum_size_hints();
 
-        let minWidth = Math.max(minAppWidth, minBuilderWidth);
-        let minHeight = Math.max(minAppHeight, minBuilderHeight);
+        let minWidth = Math.max(minAppWidth, minToolboxWidth);
+        let minHeight = Math.max(minAppHeight, minToolboxHeight);
 
         window.expand_allocated_geometry(minWidth, minHeight);
     },
 
     _switchWindows: function(actor, event) {
-        // Switch to builder if the app is active. Otherwise switch to the app.
+        // Switch to toolbox if the app is active. Otherwise switch to the app.
         if (this._state === STATE_APP)
-            this._switchToBuilder();
+            this._switchToToolbox();
         else
             this._switchToApp();
     },
 
-    _startBuilderForFlatpak: function(loadFlatpakValue) {
-        let params = new GLib.Variant('(sava{sv})', ['load-flatpak', [new GLib.Variant('s', loadFlatpakValue)], {}]);
-        Gio.DBus.session.call('org.gnome.Builder',
-                              '/org/gnome/Builder',
-                              'org.gtk.Actions',
-                              'Activate',
-                              params,
-                              null,
-                              Gio.DBusCallFlags.NONE,
-                              GLib.MAXINT32,
-                              null,
-                              (conn, result) => {
-                                  try {
-                                      conn.call_finish(result);
-                                  } catch (e) {
-                                      // Failed. Mark the session as cancelled
-                                      // and wait for the flip animation
-                                      // to complete, where we will
-                                      // remove the builder window.
-                                      this.cancelled = true;
-                                      logError(e, 'Failed to start gnome-builder');
-                                  }
-                              });
-    },
-
-    // Switch to a builder window, launching it if we haven't yet launched it.
+    // Switch to a toolbox window, launching it if we haven't yet launched it.
     //
     // Note that this is not the same as just rotating to the window - we
-    // need to either launch the builder window if we don't have a reference
+    // need to either launch the toolbox window if we don't have a reference
     // to it (and show a speedwagon) or we just need to switch to an existing
-    // builder window.
+    // toolbox window.
     //
     // This function and the one below do not check this._state to determine
     // if a flip animation should be played. That is the responsibility of
     // the caller.
-    _switchToBuilder: function() {
-        if (!this.builder) {
+    _switchToToolbox: function() {
+        if (!this.toolbox) {
             // get the manifest of the application
             // return early before we setup anything
-            this._appManifest = _getAppManifest(this.app.meta_window.get_flatpak_id());
-            if (!this._appManifest) {
-                log('Error, coding: No manifest could be found for the app: ' + this.app.meta_window.get_flatpak_id());
-                return;
-            }
-
-            let tracker = Shell.WindowTracker.get_default();
-            tracker.track_coding_app_window(this.app.meta_window);
-            this._watchdogId = Mainloop.timeout_add(WATCHDOG_TIME, this._stopWatchingForBuilderWindowToComeOnline.bind(this));
-
-            // We always show a splash screen, even if builder is running. We
-            // know when the window comes online so we can hide it accordingly.
-            let builderShellApp = Shell.AppSystem.get_default().lookup_app('org.gnome.Builder.desktop');
-            // Right now we don't connect the close button - clicking on
-            // it will just do nothing. We expect the user to just click on
-            // the CodeView button in order to get back to the main
-            // window.
-            this.splash = new AppActivation.SpeedwagonSplash(builderShellApp);
-            this.splash.show();
-
-            this._startBuilderForFlatpak(_constructLoadFlatpakValue(this.app,
-                                                                    this._appManifest));
+            launchToolboxForGlobalBusNameAndObjectPath(this.app.meta_window.gtk_application_id,
+                                                       this.app.meta_window.gtk_window_object_path);
         } else {
-            this.builder.meta_window.activate(global.get_current_time());
+            this.toolbox.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
-                                 this.builder,
+                                 this.toolbox,
                                  Gtk.DirectionType.LEFT);
             this._animate(this.app,
-                          this.builder,
+                          this.toolbox,
                           Gtk.DirectionType.LEFT);
             this.button.switchAnimation(Gtk.DirectionType.LEFT);
-            this._state = STATE_BUILDER;
+            this._state = STATE_TOOLBOX;
         }
     },
 
     _switchToApp: function() {
         this.app.meta_window.activate(global.get_current_time());
-        this._prepareAnimate(this.builder,
+        this._prepareAnimate(this.toolbox,
                              this.app,
                              Gtk.DirectionType.RIGHT);
-        this._animate(this.builder,
+        this._animate(this.toolbox,
                       this.app,
                       Gtk.DirectionType.RIGHT);
         this.button.switchAnimation(Gtk.DirectionType.RIGHT);
@@ -707,13 +661,13 @@ var CodingSession = new Lang.Class({
     // or left the overview. This will cause the state to instantly change
     // and prevent things from being flipped later in _windowRestacked
     _switchToWindowWithoutFlipping: function(actor) {
-        // Neither the app window nor the builder, return
-        if (actor !== this.app && actor !== this.builder)
+        // Neither the app window nor the toolbox, return
+        if (actor !== this.app && actor !== this.toolbox)
             return;
 
         // We need to do a few housekeeping things here:
         // 1. Change the _state variable to indicate whether we are now
-        //    on the app, or the builder window.
+        //    on the app, or the toolbox window.
         // 2. Depending on that state, hide and show windows. We might have
         //    hidden windows during the flip animation, so we need to show
         //    any relevant windows and hide any irrelevant ones
@@ -723,41 +677,41 @@ var CodingSession = new Lang.Class({
         //    which then breaks the user's expectations (it should unminimize
         //    but not activate). Re-activating ensures that we present
         //    the right story to the user.
-        this._state = (actor === this.app ? STATE_APP : STATE_BUILDER);
+        this._state = (actor === this.app ? STATE_APP : STATE_TOOLBOX);
         if (this._state === STATE_APP) {
-            this.builder.hide();
+            this.toolbox.hide();
             this.app.show();
         } else {
             this.app.hide();
-            this.builder.show();
+            this.toolbox.show();
         }
 
         actor.meta_window.activate(global.get_current_time());
     },
 
-    // Assuming that we are only listening to some signal on app and builder,
+    // Assuming that we are only listening to some signal on app and toolbox,
     // given some window, determine which MetaWindowActor instance is the
     // source and which is the destination, such that the source is where
     // the signal occurred and the destination is where changes should be
     // applied.
     _srcAndDstPairFromWindow: function(window) {
-        let src = (window === this.app.meta_window ? this.app : this.builder);
-        let dst = (window === this.app.meta_window ? this.builder : this.app);
+        let src = (window === this.app.meta_window ? this.app : this.toolbox);
+        let dst = (window === this.app.meta_window ? this.toolbox : this.app);
 
         return [src, dst];
     },
 
     _isActorFromSession: function(actor) {
-        if (actor === this.app && this.builder)
-            return this.builder;
-        else if (actor === this.builder && this.app)
+        if (actor === this.app && this.toolbox)
+            return this.toolbox;
+        else if (actor === this.toolbox && this.app)
             return this.app;
         return null;
     },
 
     _synchronizeWindows: function(window) {
-        // No synchronization if builder has not been set here
-        if (!this.builder)
+        // No synchronization if toolbox has not been set here
+        if (!this.toolbox)
             return;
 
         let [src, dst] = this._srcAndDstPairFromWindow(window);
@@ -768,15 +722,15 @@ var CodingSession = new Lang.Class({
         if (!maximizationStateChanged)
             return;
 
-        if (this._state === STATE_BUILDER)
+        if (this._state === STATE_TOOLBOX)
             this.app.hide();
         else
-            this.builder.hide();
+            this.toolbox.hide();
     },
 
     _applyWindowMinimizationState: function(shellwm, actor) {
-        // No synchronization if builder has not been set here
-        if (!this.builder)
+        // No synchronization if toolbox has not been set here
+        if (!this.toolbox)
             return;
 
         let toMini = this._isActorFromSession(actor);
@@ -787,8 +741,8 @@ var CodingSession = new Lang.Class({
     },
 
     _applyWindowUnminimizationState: function(shellwm, actor) {
-        // No synchronization if builder has not been set here
-        if (!this.builder)
+        // No synchronization if toolbox has not been set here
+        if (!this.toolbox)
             return;
 
         let toUnMini = this._isActorFromSession(actor);
@@ -811,19 +765,19 @@ var CodingSession = new Lang.Class({
         if (!focusedWindow)
             return;
 
-        if (!this.builder)
+        if (!this.toolbox)
             return;
 
         let appWindow = this.app.meta_window;
-        let builderWindow = this.builder.meta_window;
+        let toolboxWindow = this.toolbox.meta_window;
         let nextState = null;
 
         // Determine if we need to change the state of this session by
         // examining the focused window
-        if (appWindow === focusedWindow && this._state === STATE_BUILDER)
+        if (appWindow === focusedWindow && this._state === STATE_TOOLBOX)
             nextState = STATE_APP;
-        else if (builderWindow === focusedWindow && this._state === STATE_APP)
-            nextState = STATE_BUILDER;
+        else if (toolboxWindow === focusedWindow && this._state === STATE_APP)
+            nextState = STATE_TOOLBOX;
 
         // No changes to be made, so return directly
         if (nextState === null)
@@ -834,7 +788,7 @@ var CodingSession = new Lang.Class({
         // make no sense, immediately change the state and show the
         // recently activated window.
         if (Main.overview.visible || Main.overview.animationInProgress) {
-            let actor = (nextState === STATE_APP ? this.app : this.builder);
+            let actor = (nextState === STATE_APP ? this.app : this.toolbox);
             this._switchToWindowWithoutFlipping(actor);
             return;
         }
@@ -848,7 +802,7 @@ var CodingSession = new Lang.Class({
         if (nextState === STATE_APP)
             this._switchToApp();
         else
-            this._switchToBuilder();
+            this._switchToToolbox();
     },
 
     _prepareAnimate: function(src, dst, direction) {
@@ -908,13 +862,10 @@ var CodingSession = new Lang.Class({
             onComplete: () => {
                 this._rotateInCompleted(dst);
 
-                // Failed. Stop watching for coding
-                // app windows and cancel any splash
-                // screens.
+                // Failed. Remove the toolbox window
+                // and rotate back
                 if (this.cancelled) {
-                    this.splash.rampOut();
-                    this._stopWatchingForBuilderWindowToComeOnline();
-                    this.removeBuilderWindow();
+                    this.removeToolboxWindow();
                 }
             }
         });
@@ -944,12 +895,6 @@ var CodingSession = new Lang.Class({
         actor.rotation_angle_y = 0;
         actor.set_cull_back_face(false);
         this._rotatingInActor = null;
-
-        // If we just finished rotating in the speedwagon
-        // for builder, launch builder now
-        if (_isBuilderSpeedwagon(actor.meta_window))
-           this._startBuilderForFlatpak(_constructLoadFlatpakValue(this.app,
-                                                                   this._appManifest));
     },
 
     _rotateOutCompleted: function() {
@@ -964,17 +909,6 @@ var CodingSession = new Lang.Class({
         this._rotatingOutActor = null;
     },
 
-    _stopWatchingForBuilderWindowToComeOnline: function() {
-        let tracker = Shell.WindowTracker.get_default();
-        tracker.untrack_coding_app_window();
-        if (this._watchdogId !== 0) {
-            Mainloop.source_remove(this._watchdogId);
-            this._watchdogId = 0;
-        }
-
-        return false;
-    },
-
     killEffects: function() {
         this._rotateInCompleted();
         this._rotateOutCompleted();
@@ -986,50 +920,41 @@ var CodeViewManager = new Lang.Class({
 
     _init: function() {
         this._sessions = [];
+
+        global.display.connect('window-created', Lang.bind(this, function(display, window) {
+            window._drawnFirstFrame = false;
+            window.get_compositor_private().connect('first-frame', Lang.bind(this, function() {
+                window._drawnFirstFrame = true;
+            }));
+        }));
     },
 
     addAppWindow: function(actor) {
-        if (!global.settings.get_boolean('enable-code-view'))
-            return false;
-
         let window = actor.meta_window;
-        if (!_isCodingApp(window.get_flatpak_id()))
-            return false;
 
         this._sessions.push(new CodingSession({
             app: actor,
-            builder: null,
+            toolbox: null,
             button: new WindowTrackingButton({ window: actor.meta_window })
         }));
         return true;
     },
 
-    addBuilderWindow: function(actor) {
-        if (!global.settings.get_boolean('enable-code-view'))
-            return false;
-
-        let window = actor.meta_window;
-        let isSpeedwagonForBuilder = _isBuilderSpeedwagon(window);
-
-        if (!_isBuilder(window.get_flatpak_id()) &&
-            !isSpeedwagonForBuilder)
-            return false;
-
-        // Get the last session in the list - we assume that we are
-        // adding a builder to this window
-        let session = this._sessions[this._sessions.length - 1];
-        if (!session)
-            return false;
-
-        return session.admitBuilderWindowActor(actor);
+    addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
+        for (let session of this._sessions) {
+            if (session.toolbox === null &&
+                session.app.meta_window.gtk_application_id == targetBusName &&
+                session.app.meta_window.gtk_window_object_path == targetObjectPath) {
+                session.admitToolboxWindowActor(actor);
+                break;
+            }
+        }
     },
 
     removeAppWindow: function(actor) {
         let window = actor.meta_window;
-        if (!_isCodingApp(window.get_flatpak_id()))
-            return false;
 
-        let session = this._getSession(actor);
+        let session = this._getSessionForAppWindow(actor);
         if (!session)
             return false;
 
@@ -1044,21 +969,16 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    removeBuilderWindow: function(actor) {
+    removeToolboxWindow: function(actor) {
         let window = actor.meta_window;
-        let isSpeedwagonForBuilder = _isBuilderSpeedwagon(window);
-
-        if (!_isBuilder(window.get_flatpak_id()) &&
-            !isSpeedwagonForBuilder)
-            return false;
-
-        let session = this._getSession(actor);
+        let session = this._getSessionForToolboxWindow(actor);
+        log(`Remove toolbox, getting session ${session}`);
         if (!session)
             return false;
 
-        // We can remove either a speedwagon window or a normal builder window.
+        // We can remove the normal toolbox window.
         // That window will be registered in the session at this point.
-        session.removeBuilderWindow();
+        session.removeToolboxWindow();
         return true;
     },
 
@@ -1068,10 +988,36 @@ var CodeViewManager = new Lang.Class({
             session.killEffects();
     },
 
-    _getSession: function(actor) {
+    _getSessionForAppWindow: function(actor) {
+        log(`Sessions: ${this._sessions.length}`);
         for (let i = 0; i < this._sessions.length; i++) {
             let session = this._sessions[i];
-            if (session.app === actor || session.builder === actor)
+            log(`Compare ${session.app} ${actor}`);
+            if (session.app === actor)
+                return session;
+        }
+
+        return null;
+    },
+
+    _getSessionForToolboxWindow: function(actor) {
+        log(`Sessions: ${this._sessions.length}`);
+        for (let i = 0; i < this._sessions.length; i++) {
+            let session = this._sessions[i];
+            log(`Compare ${session.toolbox} ${actor}`);
+            if (session.toolbox === actor)
+                return session;
+        }
+
+        return null;
+    },
+
+    _getSession: function(actor) {
+        log(`Sessions: ${this._sessions.length}`);
+        for (let i = 0; i < this._sessions.length; i++) {
+            let session = this._sessions[i];
+            log(`Compare ${session.app} ${session.toolbox} ${actor}`);
+            if (session.app === actor || session.toolbox === actor)
                 return session;
         }
 
