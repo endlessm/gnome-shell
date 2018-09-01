@@ -66,6 +66,14 @@ const GsdWacomIface = '<node name="/org/gnome/SettingsDaemon/Wacom"> \
 
 const GsdWacomProxy = Gio.DBusProxy.makeProxyWrapper(GsdWacomIface);
 
+const HackToolboxIface = '<node name="/com/endlessm/HackToolbox/Toolbox"> \
+<interface name="com.endlessm.HackToolbox.Toolbox"> \
+    <property name="Target" type="(ss)" access="read" /> \
+</interface> \
+</node>';
+
+const HackToolboxProxy = Gio.DBusProxy.makeProxyWrapper(HackToolboxIface);
+
 var DisplayChangeDialog = new Lang.Class({
     Name: 'DisplayChangeDialog',
     Extends: ModalDialog.ModalDialog,
@@ -2228,12 +2236,54 @@ var WindowManager = new Lang.Class({
                     this._checkDimming(parent);
         }));
 
-        if (this._codeViewManager.addBuilderWindow(actor)) {
-            shellwm.completed_map(actor);
-            return;
-        }
-        this._codeViewManager.addAppWindow(actor);
+        // Endless libanimation extension
+        if (this._animationsServer)
+            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
 
+        // Add the wobbly effect if it is enabled
+        if (this._wobblyEffect) {
+            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
+                                                                                  this._wobblyEffect);
+        }
+
+        // Endless Change: Check if the window is a GtkApplicationWindow. If it is
+        //                 then it might be either a "hack" toolbox window or target
+        //                 window and we'll need to check on the session bus and
+        //                 make associations as appropriate
+        if (actor.meta_window.gtk_application_object_path &&
+            actor.meta_window.window_type == Meta.WindowType.NORMAL) {
+            // It might be a "HackToolbox". Check its object path to see
+            // if it is, then add it to the window group for the window.
+            let proxy = new HackToolboxProxy(Gio.DBus.session,
+                                             actor.meta_window.gtk_application_id,
+                                             actor.meta_window.gtk_window_object_path,
+                                             Lang.bind(this, function(initable, error) {
+                                                 // If there was no proxy, or the Target property was
+                                                 // not set on proxy, then this means that the object
+                                                 // didn't export the interface.
+                                                 if (!proxy || !proxy.Target) {
+                                                     log(`Treating GtkApplicationWindow '${actor.meta_window.title}' as an app`);
+                                                     this._codeViewManager.addAppWindow(actor);
+                                                     GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
+                                                         this._animateMappedWindow(shellwm, actor);
+                                                     }));
+                                                     return;
+                                                 }
+
+                                                 let [targetBusName, targetObjectPath] = proxy.Target;
+
+                                                 log(`Treating GtkApplicationWindow '${actor.meta_window.title}' as a toolbox targeting ${targetBusName}:${targetObjectPath}`);
+                                                 this._codeViewManager.addToolboxWindow(actor, targetBusName, targetObjectPath);
+                                                 shellwm.completed_map(actor);
+                                             }));
+        } else {
+            GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
+                this._animateMappedWindow(shellwm, actor);
+            }));
+        }
+    },
+
+    _animateMappedWindow: function(shellwm, actor) {
         let metaWindow = actor.meta_window;
         let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
 
@@ -2262,16 +2312,6 @@ var WindowManager = new Lang.Class({
 
             shellwm.completed_map(actor);
             return;
-        }
-
-        // Endless libanimation extension
-        if (this._animationsServer)
-            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
-
-        // Add the wobbly effect if it is enabled
-        if (this._wobblyEffect) {
-            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
-                                                                                  this._wobblyEffect);
         }
 
         if (SideComponent.isSideComponentWindow(actor.meta_window)) {
@@ -2390,7 +2430,7 @@ var WindowManager = new Lang.Class({
         let window = actor.meta_window;
 
         this._codeViewManager.removeAppWindow(actor);
-        this._codeViewManager.removeBuilderWindow(actor);
+        this._codeViewManager.removeToolboxWindow(actor);
 
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
