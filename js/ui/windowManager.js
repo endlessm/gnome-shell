@@ -267,7 +267,6 @@ var EOSShellWobbly = new Lang.Class({
             case 'move':
                 detail.grabbed ? this._grabbedByMouse() : this._ungrabbedByMouse();
                 return true;
-                break;
             default:
                 return false;
         }
