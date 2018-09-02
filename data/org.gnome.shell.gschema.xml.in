@@ -14,15 +14,19 @@
   </enum>
   <enum id="org.gnome.shell.animations.OpenEffect">
     <value nick="default" value="0"/>
+    <value nick="zoom" value="1"/>
   </enum>
   <enum id="org.gnome.shell.animations.CloseEffect">
     <value nick="default" value="0"/>
+    <value nick="zoom" value="1"/>
   </enum>
   <enum id="org.gnome.shell.animations.MinimizeEffect">
     <value nick="default" value="0"/>
+    <value nick="zoom" value="1"/>
   </enum>
   <enum id="org.gnome.shell.animations.UnminimizeEffect">
     <value nick="default" value="0"/>
+    <value nick="zoom" value="1"/>
   </enum>
 
   <!-- End of Endless-specific enumerations -->
@@ -296,6 +300,16 @@
       <description>
         How much objects are allowed to move in the mesh. A higher range
         allows for a more pronounced effect.
+      </description>
+    </key>
+    <key name="zoom-length" type="i">
+      <range min="0" max="5000"/>
+      <default>200</default>
+      <summary>
+        Zoom animation length
+      </summary>
+      <description>
+        How long the zoom animation lasts
       </description>
     </key>
     <key name="open-effect" enum="org.gnome.shell.animations.OpenEffect">
