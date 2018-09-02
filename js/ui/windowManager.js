@@ -1297,6 +1297,13 @@ var WindowManager = new Lang.Class({
         // Globally configured animations
         this._wobblyEffect = null;
 
+        this._globalEffects = {
+            'close': null,
+            'open': null,
+            'minimize': null,
+            'unminimize': null
+        };
+
         AnimationsDbus.Server.new_async(new ShellWindowManagerAnimationsFactory(), null, Lang.bind(this, function(initable, result) {
             this._animationsServer = AnimationsDbus.Server.new_finish(initable, result);
 
@@ -1330,6 +1337,35 @@ var WindowManager = new Lang.Class({
 
             global.settings.connect('changed::wobbly-effect', actionWobblyEffectSetting);
             actionWobblyEffectSetting(global.settings, 'wobbly-effect');
+
+            // Watch for the GSetting for the each effect event and
+            // attach effects as needed.
+            Object.keys(this._globalEffects).forEach(Lang.bind(this, function(event) {
+                let actionSettingChanged = Lang.bind(this, function(settings, key) {
+                    let chosenEffectName = settings.get_string(key);
+
+                    // Need to destroy and detach the old effects if there are any,
+                    // easily done by just destroying the effect.
+                    if (this._globalEffects[event]) {
+                        this._globalEffects[event].destroy();
+                        this._globalEffects[event] = null;
+                    }
+
+                    // Now create the effect and attach it to all eligible actors
+                    if (chosenEffectName !== 'default') {
+                        this._globalEffects[event] = this._animationsManager.create_effect(`Global Effect ${chosenEffectName}`,
+                                                                                           `gsettings-${chosenEffectName}`,
+                                                                                           new GLib.Variant('a{sv}', {}));
+                        getAnimatableWindowActors().forEach(Lang.bind(this, function(actor) {
+                            actor._animatableSurface.attach_animation_effect_with_server_priority(event,
+                                                                                                  this._globalEffects[event]);
+                        }));
+                    }
+                });
+
+                global.settings.connect(`changed::${event}-effect`, actionSettingChanged);
+                actionSettingChanged(global.settings, `${event}-effect`);
+            }));
         }));
 
         this._isWorkspacePrepended = false;
@@ -2344,6 +2380,13 @@ var WindowManager = new Lang.Class({
             actor._animatableSurface.attach_animation_effect_with_server_priority('move',
                                                                                   this._wobblyEffect);
         }
+
+        // Attach other animations if active
+        Object.keys(this._globalEffects).forEach(Lang.bind(this, function(event) {
+            if (this._globalEffects[event] !== null)
+                actor._animatableSurface.attach_animation_effect_with_server_priority(event,
+                                                                                      this._globalEffects[event]);
+        }));
 
         if (SideComponent.isSideComponentWindow(actor.meta_window)) {
             this._mapping.push(actor);
