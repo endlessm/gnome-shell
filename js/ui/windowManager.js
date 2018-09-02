@@ -1105,10 +1105,10 @@ var DesktopOverlay = new Lang.Class({
 
 const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
     move: ['wobbly', 'gsettings-wobbly'],
-    minimize: ['zoom'],
-    unminimize: ['zoom']
-    open: ['zoom', 'bounce', 'glide'],
-    close: ['zoom', 'bounce', 'glide']
+    minimize: [],
+    unminimize: [],
+    open: [],
+    close: []
 };
 
 function filterForAllowedEvents(actor) {
