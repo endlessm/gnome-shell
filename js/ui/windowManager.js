@@ -474,6 +474,167 @@ const AttachedZoomAnimation = new Lang.Class({
     }
 });
 
+// ControllableBounceAnimation
+//
+// A "metaclass" for a bounce animation.
+const ControllableBounceAnimation = new Lang.Class({
+    Name: 'ControllableBounceAnimation',
+    Implements: [ AnimationsDbus.ServerEffectBridge ],
+    Extends: GObject.Object,
+    Properties: {
+        length: GObject.ParamSpec.uint('length',
+                                       'Length',
+                                       'How long the animation lasts',
+                                       GObject.ParamFlags.READWRITE |
+                                       GObject.ParamFlags.CONSTRUCT,
+                                       1,
+                                       5000,
+                                       200),
+        initial_scale: GObject.ParamSpec.double('initial-scale',
+                                                'Initial Scale',
+                                                'Scale factor that the surface will initially have',
+                                                GObject.ParamFlags.READWRITE |
+                                                GObject.ParamFlags.CONSTRUCT,
+                                                0.1,
+                                                1.0,
+                                                1.0),
+        maximum_scale: GObject.ParamSpec.double('maximum-scale',
+                                                'Maximum Scale',
+                                                'Scale factor that the surface will have at its peak',
+                                                GObject.ParamFlags.READWRITE |
+                                                GObject.ParamFlags.CONSTRUCT,
+                                                1.0,
+                                                2.0,
+                                                1.0),
+        n_bounce: GObject.ParamSpec.uint('n-bounce',
+                                         'Number of bouces',
+                                         'Number of bounces',
+                                         GObject.ParamFlags.READWRITE |
+                                         GObject.ParamFlags.CONSTRUCT,
+                                         1,
+                                         10,
+                                         2),
+    },
+
+    vfunc_get_name: function() {
+        return 'bounce';
+    },
+
+    createActorPrivate: function(actor) {
+        let effect = new AttachedBounceAnimation({ bridge: this, enabled: false });
+        actor.add_effect_with_name('endless-animation-bounce', effect);
+        return effect;
+    }
+});
+
+// GSettingsBounceAnimation
+//
+// A subclass of ControllableBounceAnimation that gets
+// its configuration from GSettings as opposed to an external
+// caller.
+const GSettingsBounceAnimation = new Lang.Class({
+    Name: 'GSettingsBounceAnimation',
+    Extends: ControllableBounceAnimation,
+
+    vfunc_get_name: function() {
+        return 'gsettings-bounce';
+    },
+
+    _init: function(params) {
+        this.parent(params);
+
+         let binder = ((key, prop) => {
+             global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+         });
+
+         // Bind GSettings to effect properties
+         binder('bounce-length', 'length');
+         binder('bounce-initial-scale', 'initial-scale');
+         binder('bounce-maximum-scale', 'maximum-scale');
+         binder('bounce-n-bounce', 'n-bounce');
+    }
+});
+
+// AttachedBounceAnimation
+//
+// A boune animation as attached to an actor.
+const AttachedBounceAnimation = new Lang.Class({
+    Name: 'AttachedBounceAnimation',
+    Extends: EndlessShellFX.Affine,
+    Implements: [ AnimationsDbus.ServerSurfaceAttachedEffect ],
+    Properties: {
+        'bridge': GObject.ParamSpec.object('bridge',
+                                           'Bounce Animation Bridge',
+                                           'The bridge to the settings',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           ControllableBounceAnimation)
+    },
+
+    _init: function(params) {
+        this.parent(params);
+        this._enabledId = 0;
+    },
+
+    _startAnimation: function(animation, done) {
+        this.transform_animation = animation;
+        this.set_enabled(true);
+
+        this._enabledId = this.connect('notify::enabled', () => {
+            if (!this.enabled) {
+                done();
+                this.disconnect(this._enabledId);
+                this._enabledId = 0;
+            }
+        });
+    },
+
+    activate: function(event, detail) {
+        let [x, y] = this.actor.get_position();
+        let [width, height] = this.actor.get_size();
+
+        switch (event) {
+            case 'open':
+                this._startAnimation(new Animation.BounceAnimation({
+                    initial_scale: this.bridge.initial_scale,
+                    maximum_scale: this.bridge.maximum_scale,
+                    n_bounce: this.bridge.n_bounce,
+                    target: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                }), detail.complete);
+                return true;
+            case 'close':
+                this._startAnimation(new Animation.BounceAnimation({
+                    initial_scale: this.bridge.initial_scale,
+                    maximum_scale: this.bridge.maximum_scale,
+                    n_bounce: this.bridge.n_bounce,
+                    target: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    stepper: new Animation.ReverseStepper({
+                        base_stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                    })
+                }), detail.complete);
+                return true;
+            default:
+                return false;
+        }
+    },
+
+    remove: function() {
+        if (this.actor) {
+            this.actor.remove_effect(this);
+        }
+
+        this.set_enabled(false);
+    }
+});
+
+
 var WindowDimmer = new Lang.Class({
     Name: 'WindowDimmer',
 
@@ -1271,8 +1432,8 @@ const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
     move: ['wobbly', 'gsettings-wobbly'],
     minimize: ['zoom', 'gsettings-zoom'],
     unminimize: ['zoom', 'gsettings-zoom'],
-    open: ['zoom', 'gsettings-zoom'],
-    close: ['zoom', 'gsettings-zoom']
+    open: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce'],
+    close: ['zoom', 'gsettings-zoom', 'bounce', 'gsettings-bounce']
 };
 
 function filterForAllowedEvents(actor) {
@@ -1377,6 +1538,10 @@ const ShellWindowManagerAnimationsFactory = new Lang.Class({
                 return new ControllableZoomAnimation();
             case 'gsettings-zoom':
                 return new GSettingsZoomAnimation();
+            case 'bounce':
+                return new ControllableBounceAnimation();
+            case 'gsettings-bounce':
+                return new GSettingsBounceAnimation();
             default:
                 throw new GLib.Error(AnimationsDbus.error_quark(),
                                      AnimationsDbus.Error.NO_SUCH_EFFECT,

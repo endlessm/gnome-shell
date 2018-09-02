@@ -15,10 +15,12 @@
   <enum id="org.gnome.shell.animations.OpenEffect">
     <value nick="default" value="0"/>
     <value nick="zoom" value="1"/>
+    <value nick="bounce" value="2"/>
   </enum>
   <enum id="org.gnome.shell.animations.CloseEffect">
     <value nick="default" value="0"/>
     <value nick="zoom" value="1"/>
+    <value nick="bounce" value="2"/>
   </enum>
   <enum id="org.gnome.shell.animations.MinimizeEffect">
     <value nick="default" value="0"/>
@@ -310,6 +312,46 @@
       </summary>
       <description>
         How long the zoom animation lasts
+      </description>
+    </key>
+    <key name="bounce-length" type="i">
+      <range min="0" max="5000"/>
+      <default>200</default>
+      <summary>
+        Bounce animation length
+      </summary>
+      <description>
+        How long the bounce animation lasts
+      </description>
+    </key>
+    <key name="bounce-initial-scale" type="d">
+      <range min="0.1" max="1.0"/>
+      <default>0.7</default>
+      <summary>
+        Initial scale
+      </summary>
+      <description>
+        Initial scale of the surface being bounced
+      </description>
+    </key>
+    <key name="bounce-maximum-scale" type="d">
+      <range min="1.0" max="2.0"/>
+      <default>1.3</default>
+      <summary>
+        Maximum scale
+      </summary>
+      <description>
+        Maximum scale of the surface being bounced
+      </description>
+    </key>
+    <key name="bounce-n-bounce" type="i">
+      <range min="1" max="10"/>
+      <default>2</default>
+      <summary>
+        Number of Bounces
+      </summary>
+      <description>
+        How many times the window oscillates from its original position
       </description>
     </key>
     <key name="open-effect" enum="org.gnome.shell.animations.OpenEffect">
