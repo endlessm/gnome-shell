@@ -1239,6 +1239,21 @@ function getTaskbarIconGeometryForWindow(window) {
     }
 }
 
+function activateAttachedEffectOnAnimatableSurface(actor, event, detail) {
+    if (actor._animatableSurface) {
+        // This is an event that may cause an animation
+        // on the window.
+        let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event(event);
+
+        if (attachedEffect) {
+            attachedEffect.activate(event, detail);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 var WindowManager = new Lang.Class({
     Name: 'WindowManager',
 
