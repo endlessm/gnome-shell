@@ -1,5 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
+const Animation = imports.gi.Animation;
 const AnimationsDbus = imports.gi.AnimationsDbus;
 const Cairo = imports.cairo;
 const Clutter = imports.gi.Clutter;
@@ -306,6 +307,169 @@ var EOSShellWobbly = new Lang.Class({
 
         actor.disconnect(this._positionChangedId);
         this._positionChangedId = null;
+    }
+});
+
+// ControllableZoomAnimation
+//
+// A "metaclass" for a zoom animation.
+const ControllableZoomAnimation = new Lang.Class({
+    Name: 'ControllableZoomAnimation',
+    Implements: [ AnimationsDbus.ServerEffectBridge ],
+    Extends: GObject.Object,
+    Properties: {
+        length: GObject.ParamSpec.uint('length',
+                                       'Length',
+                                       'How long the animation lasts',
+                                       GObject.ParamFlags.READWRITE |
+                                       GObject.ParamFlags.CONSTRUCT,
+                                       1,
+                                       5000,
+                                       200)
+    },
+
+    vfunc_get_name: function() {
+        return 'zoom';
+    },
+
+    createActorPrivate: function(actor) {
+        let effect = new AttachedZoomAnimation({ bridge: this, enabled: false });
+        actor.add_effect_with_name('endless-animation-zoom', effect);
+        return effect;
+    }
+});
+
+// GSettingsZoomAnimation
+//
+// A subclass of ControllableZoomAnimation that gets
+// its configuration from GSettings as opposed to an external
+// caller.
+const GSettingsZoomAnimation = new Lang.Class({
+    Name: 'GSettingsZoomAnimation',
+    Extends: ControllableZoomAnimation,
+
+    vfunc_get_name: function() {
+        return 'gsettings-zoom';
+    },
+
+    _init: function(params) {
+        this.parent(params);
+
+         let binder = ((key, prop) => {
+             global.settings.bind(key, this, prop, Gio.SettingsBindFlags.GET);
+         });
+
+         // Bind GSettings to effect properties
+         binder('zoom-length', 'length');
+    }
+});
+
+// AttachedZoomAnimation
+//
+// A zoom animation as attached to an actor.
+const AttachedZoomAnimation = new Lang.Class({
+    Name: 'AttachedZoomAnimation',
+    Extends: EndlessShellFX.Affine,
+    Implements: [ AnimationsDbus.ServerSurfaceAttachedEffect ],
+    Properties: {
+        'bridge': GObject.ParamSpec.object('bridge',
+                                           'Zoom Animation Bridge',
+                                           'The bridge to the settings',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           ControllableZoomAnimation)
+    },
+
+    _init: function(params) {
+        this.parent(params);
+        this._enabledId = 0;
+    },
+
+    _startAnimation: function(animation, done) {
+        this.transform_animation = animation;
+        this.set_enabled(true);
+
+        this._enabledId = this.connect('notify::enabled', () => {
+            if (!this.enabled) {
+                done();
+                this.disconnect(this._enabledId);
+                this._enabledId = 0;
+            }
+        });
+    },
+
+    activate: function(event, detail) {
+        let [x, y] = this.actor.get_position();
+        let [width, height] = this.actor.get_size();
+
+        switch (event) {
+            case 'open':
+                this._startAnimation(new Animation.ZoomAnimation({
+                    to: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    from: new Animation.Box({
+                        top_left: new Animation.Vector({ x: detail.pointer[0], y: detail.pointer[1] }),
+                        bottom_right: new Animation.Vector({ x: detail.pointer[0], y: detail.pointer[1] })
+                    }),
+                    stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                }), detail.complete);
+                return true;
+            case 'close':
+                this._startAnimation(new Animation.ZoomAnimation({
+                    from: new Animation.Box({
+                        top_left: new Animation.Vector({ x: detail.pointer[0], y: detail.pointer[1] }),
+                        bottom_right: new Animation.Vector({ x: detail.pointer[0], y: detail.pointer[1] })
+                    }),
+                    to: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    stepper: new Animation.ReverseStepper({
+                        base_stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                    })
+                }), detail.complete);
+                return true;
+            case 'minimize':
+                this._startAnimation(new Animation.ZoomAnimation({
+                    from: new Animation.Box({
+                        top_left: new Animation.Vector({ x: detail.icon.x1, y: detail.icon.y1 }),
+                        bottom_right: new Animation.Vector({ x: detail.icon.x2, y: detail.icon.y2 })
+                    }),
+                    to: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    stepper: new Animation.ReverseStepper({
+                        base_stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                    })
+                }), detail.complete);
+                return true;
+            case 'unminimize':
+                this._startAnimation(new Animation.ZoomAnimation({
+                    to: new Animation.Box({
+                        top_left: new Animation.Vector({ x: x, y: y }),
+                        bottom_right: new Animation.Vector({ x: x + width, y: y + height })
+                    }),
+                    from: new Animation.Box({
+                        top_left: new Animation.Vector({ x: detail.icon.x1, y: detail.icon.y1 }),
+                        bottom_right: new Animation.Vector({ x: detail.icon.x2, y: detail.icon.y2 })
+                    }),
+                    stepper: new Animation.LinearStepper({ length: this.bridge.length })
+                }), detail.complete);
+                return true;
+            default:
+                return false;
+        }
+    },
+
+    remove: function() {
+        if (this.actor) {
+            this.actor.remove_effect(this);
+        }
+
+        this.set_enabled(false);
     }
 });
 
@@ -1104,10 +1268,10 @@ var DesktopOverlay = new Lang.Class({
 
 const _ALLOWED_ANIMATIONS_FOR_EVENTS = {
     move: ['wobbly', 'gsettings-wobbly'],
-    minimize: [],
-    unminimize: [],
-    open: [],
-    close: []
+    minimize: ['zoom', 'gsettings-zoom'],
+    unminimize: ['zoom', 'gsettings-zoom'],
+    open: ['zoom', 'gsettings-zoom'],
+    close: ['zoom', 'gsettings-zoom']
 };
 
 function filterForAllowedEvents(actor) {
@@ -1208,6 +1372,10 @@ const ShellWindowManagerAnimationsFactory = new Lang.Class({
                 return new ControllableShellWobblyEffect();
             case 'gsettings-wobbly':
                 return new GSettingsShellWobblyEffect();
+            case 'zoom':
+                return new ControllableZoomAnimation();
+            case 'gsettings-zoom':
+                return new GSettingsZoomAnimation();
             default:
                 throw new GLib.Error(AnimationsDbus.error_quark(),
                                      AnimationsDbus.Error.NO_SUCH_EFFECT,
