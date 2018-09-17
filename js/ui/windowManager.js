@@ -2228,7 +2228,7 @@ var WindowManager = new Lang.Class({
                     this._checkDimming(parent);
         }));
 
-        if (this._codeViewManager.addBuilderWindow(actor)) {
+        if (this._codeViewManager.addToolboxWindow(actor)) {
             shellwm.completed_map(actor);
             return;
         }
@@ -2390,7 +2390,7 @@ var WindowManager = new Lang.Class({
         let window = actor.meta_window;
 
         this._codeViewManager.removeAppWindow(actor);
-        this._codeViewManager.removeBuilderWindow(actor);
+        this._codeViewManager.removeToolboxWindow(actor);
 
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
