@@ -492,21 +492,24 @@ var CodingSession = new Lang.Class({
         // _switchToToolbox - we already have the window and we want to
         // rotate to it as soon as its first frame appears
         if (this._state === STATE_APP) {
+            this._prepareAnimate(this.app,
+                                 this.toolbox,
+                                 Gtk.DirectionType.LEFT);
+            this._state = STATE_TOOLBOX;
+
             // We wait until the first frame of the window has been drawn
             // and damage updated in the compositor before we start rotating.
             //
             // This way we don't get ugly artifacts when rotating if
             // a window is slow to draw.
-            let firstFrameConnection = this.toolbox.connect('first-frame', () => {
-                this.toolbox.disconnect(firstFrameConnection);
+            if (!this.toolbox._drawnFirstFrame) {
+                let firstFrameConnection = this.toolbox.connect('first-frame', () => {
+                    this.toolbox.disconnect(firstFrameConnection);
+                    this._toolboxWindowIsReady();
+                });
+            } else {
                 this._toolboxWindowIsReady();
-
-                return false;
-            });
-            this._prepareAnimate(this.app,
-                                 this.toolbox,
-                                 Gtk.DirectionType.LEFT);
-            this._state = STATE_TOOLBOX;
+            }
         }
 
         return true;
@@ -1008,6 +1011,14 @@ var CodeViewManager = new Lang.Class({
 
     _init: function() {
         this._sessions = [];
+
+        global.display.connect('window-created', (display, window) => {
+            let windowActor = window.get_compositor_private();
+            windowActor._drawnFirstFrame = false;
+            windowActor.connect('first-frame', () => {
+                windowActor._drawnFirstFrame = true;
+            });
+        });
     },
 
     addAppWindow: function(actor) {
