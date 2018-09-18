@@ -189,17 +189,17 @@ var WindowTrackingButton = new Lang.Class({
     Name: 'WindowTrackingButton',
     Extends: GObject.Object,
     Properties: {
-        window: GObject.ParamSpec.object('window',
-                                         '',
-                                         '',
-                                         GObject.ParamFlags.READWRITE |
-                                         GObject.ParamFlags.CONSTRUCT_ONLY,
-                                         Meta.Window),
-        toolbox_window: GObject.ParamSpec.object('toolbox-window',
-                                                 '',
-                                                 '',
-                                                 GObject.ParamFlags.READWRITE,
-                                                 Meta.Window)
+        'window': GObject.ParamSpec.object('window',
+                                           '',
+                                           '',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           Meta.Window),
+        'toolbox_window': GObject.ParamSpec.object('toolbox-window',
+                                                   '',
+                                                   '',
+                                                   GObject.ParamFlags.READWRITE,
+                                                   Meta.Window)
     },
     Signals: {
         'clicked': {}
@@ -335,6 +335,14 @@ var WindowTrackingButton = new Lang.Class({
                 animationButton.destroy();
             }
         });
+    },
+
+    set toolbox_window(window) {
+        // It's possible that the toolbox window got focused before
+        // the toolbox window was set, so do the check again
+        // here, too.
+        this.toolbox_window = window;
+        this._showIfWindowVisible();
     },
 
     _updatePosition: function() {
