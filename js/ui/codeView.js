@@ -34,10 +34,6 @@ function _isCodingApp(flatpakID) {
     return _CODING_APPS.indexOf(flatpakID) != -1;
 }
 
-function _isToolbox(flatpakID) {
-    return flatpakID === 'org.gnome.Builder';
-}
-
 function _isToolboxSpeedwagon(window) {
     let tracker = Shell.WindowTracker.get_default();
     let correspondingApp = tracker.get_window_app(window);
@@ -1021,7 +1017,7 @@ var CodeViewManager = new Lang.Class({
         });
     },
 
-    addAppWindow: function(actor) {
+    _addAppWindow: function(actor) {
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
@@ -1037,27 +1033,28 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    addToolboxWindow: function(actor) {
+    _addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
         let window = actor.meta_window;
         let isSpeedwagonForToolbox = _isToolboxSpeedwagon(window);
 
-        if (!_isToolbox(window.get_flatpak_id()) &&
-            !isSpeedwagonForToolbox)
+        if (!isSpeedwagonForToolbox)
             return false;
 
-        // Get the last session in the list - we assume that we are
-        // adding a toolbox to this window
-        let session = this._sessions[this._sessions.length - 1];
-        if (!session)
-            return false;
+        for (let session of this._sessions) {
+            if (session.toolbox === null &&
+                session.app.meta_window.gtk_application_id == targetBusName &&
+                session.app.meta_window.gtk_window_object_path == targetObjectPath) {
+                return session.admitToolboxWindowActor(actor);
+            }
+        }
 
-        return session.admitToolboxWindowActor(actor);
+        return false;
     },
 
-    removeAppWindow: function(actor) {
+    _removeAppWindow: function(actor) {
         let window = actor.meta_window;
         if (!_isCodingApp(window.get_flatpak_id()))
             return false;
@@ -1077,12 +1074,11 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    removeToolboxWindow: function(actor) {
+    _removeToolboxWindow: function(actor) {
         let window = actor.meta_window;
         let isSpeedwagonForToolbox = _isToolboxSpeedwagon(window);
 
-        if (!_isToolbox(window.get_flatpak_id()) &&
-            !isSpeedwagonForToolbox)
+        if (!isSpeedwagonForToolbox)
             return false;
 
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
@@ -1092,6 +1088,33 @@ var CodeViewManager = new Lang.Class({
         // We can remove either a speedwagon window or a normal toolbox window.
         // That window will be registered in the session at this point.
         session.removeToolboxWindow();
+        return true;
+    },
+
+    handleDestroyWindow: function(actor) {
+        this._removeAppWindow(actor);
+        this._removeToolboxWindow(actor);
+    },
+
+    handleMapWindow: function(actor) {
+        // Check if the window is a GtkApplicationWindow. If it is
+        // then it might be either a "hack" toolbox window or target
+        // window and we'll need to check on the session bus and
+        // make associations as appropriate
+        if (!actor.meta_window.gtk_application_object_path)
+            return false;
+
+        // It might be a "HackToolbox". Check that, and if so,
+        // add it to the window group for the window.
+        let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(actor.meta_window);
+        if (!proxy) {
+            this._addAppWindow(actor);
+            return false;
+        }
+
+        let variant = proxy.get_cached_property('Target');
+        let [targetBusName, targetObjectPath] = variant.deep_unpack();
+        this._addToolboxWindow(actor, targetBusName, targetObjectPath);
         return true;
     },
 
