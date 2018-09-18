@@ -9,6 +9,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
+#include <gio/gio.h>
 #include <meta/display.h>
 #include <meta/group.h>
 #include <meta/util.h>
@@ -360,6 +361,81 @@ get_app_from_window_pid (ShellWindowTracker  *tracker,
   return result;
 }
 
+static ShellApp *
+maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
+                                   MetaWindow          *window)
+{
+  g_autoptr(GError) local_error = NULL;
+  g_autoptr(GDBusProxy) proxy = NULL;
+  g_autoptr(GVariant) target_property_variant = NULL;
+  const gchar *window_app_id = NULL;
+  const gchar *window_object_path = NULL;
+  const gchar *target_bus_name = NULL;
+  const gchar *target_object_path = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  /* Check if there is a set application id and object path
+   * on this window. If not, then it can't be a toolbox. */
+  window_app_id = meta_window_get_gtk_application_id (window);
+  window_object_path = meta_window_get_gtk_window_object_path (window);
+
+  if (window_app_id == NULL ||
+      window_object_path == NULL)
+    return NULL;
+
+  /* Not a bus name, no way that this could be a toolbox */
+  if (!g_dbus_is_name (window_app_id))
+    return NULL;
+
+  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                         G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
+                                         G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                         NULL,
+                                         window_app_id,
+                                         window_object_path,
+                                         "com.endlessm.HackToolbox.Toolbox",
+                                         NULL,
+                                         &local_error);
+
+  if (proxy == NULL)
+    {
+      if (!g_error_matches (local_error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_INTERFACE))
+        g_warning ("Error in finding candidate app for potential Hack Toolbox: %s",
+                   local_error->message);
+      return NULL;
+    }
+
+  target_property_variant = g_dbus_proxy_get_cached_property (proxy, "Target");
+  if (target_property_variant == NULL)
+    return NULL;
+
+  g_variant_get (target_property_variant, "(&s&s)",
+                 &target_bus_name,
+                 &target_object_path);
+
+  /* Now that we have the target bus name and object path, we need to look
+   * up the corresponding app for the bus name by enumerating all the
+   * windows on the window tracker */
+  g_hash_table_iter_init (&iter, tracker->window_to_app);
+
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      MetaWindow *window = key;
+      ShellApp *app = value;
+      const char *candidate_app_id = meta_window_get_gtk_application_id (window);
+      const char *candidate_object_path = meta_window_get_gtk_window_object_path (window);
+
+      if (candidate_app_id != NULL &&
+          candidate_object_path != NULL &&
+          g_strcmp0 (candidate_app_id, target_bus_name) == 0 &&
+          g_strcmp0 (candidate_object_path, target_object_path) == 0)
+        return app;
+    }
+
+  return NULL;
+}
+
 /**
  * get_app_for_window:
  *
@@ -380,6 +456,15 @@ get_app_for_window (ShellWindowTracker    *tracker,
   /* Side components don't have an associated app */
   if (g_strcmp0 (meta_window_get_role (window), SIDE_COMPONENT_ROLE) == 0)
     return NULL;
+
+  /* Check if the window is a HackToolbox and if so
+   * associate it with the corresponding target application.
+   * It is definitely not ideal that this has to happen
+   * synchronously for each window that gets opened, but
+   * that's just the way that this function happens to work. */
+  result = maybe_find_target_app_for_toolbox (tracker, window);
+  if (result != NULL)
+    return g_object_ref (result);
 
   transient_for = meta_window_get_transient_for (window);
   if (transient_for != NULL)
