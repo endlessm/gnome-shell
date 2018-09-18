@@ -365,10 +365,31 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
-function _constructLoadFlatpakValue(app, appManifest) {
-    // add an app_id_override to the manifest to load
-    return appManifest.get_path() + '+' + app.meta_window.get_flatpak_id() + '.Coding';
-}
+function launchToolboxForTarget(targetBusName, targetObjectPath) {
+    // FIXME: this should be extended to make it possible to launch
+    // arbitrary toolboxes in the future, depending on the application
+    Gio.DBus.session.call('com.endlessm.HackToolbox',
+                          '/com/endlessm/HackToolbox',
+                          'org.gtk.Actions',
+                          'Activate',
+                          new GLib.Variant('(sava{sv})', [
+                              'show-for-dbus-object',
+                              [new GLib.Variant('(ss)', [targetBusName, targetObjectPath])],
+                              {}
+                          ]),
+                          null,
+                          Gio.DBusCallFlags.NONE,
+                          GLib.MAXINT32,
+                          null,
+                          (conn, result) => {
+                              try {
+                                  conn.call_finish(result);
+                              } catch (e) {
+                                  // Failed.
+                                  logError(e, 'Failed to start com.endlessm.HackToolbox');
+                              }
+                          });
+};
 
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
@@ -396,7 +417,6 @@ var CodingSession = new Lang.Class({
     _init: function(params) {
         this.parent(params);
 
-        this._appManifest = null;
         this._state = STATE_APP;
 
         this.button.connect('clicked', this._switchWindows.bind(this));
@@ -582,31 +602,6 @@ var CodingSession = new Lang.Class({
             this._switchToApp();
     },
 
-    _startToolboxForFlatpak: function(loadFlatpakValue) {
-        let params = new GLib.Variant('(sava{sv})', ['load-flatpak', [new GLib.Variant('s', loadFlatpakValue)], {}]);
-        Gio.DBus.session.call('org.gnome.Builder',
-                              '/org/gnome/Builder',
-                              'org.gtk.Actions',
-                              'Activate',
-                              params,
-                              null,
-                              Gio.DBusCallFlags.NONE,
-                              GLib.MAXINT32,
-                              null,
-                              (conn, result) => {
-                                  try {
-                                      conn.call_finish(result);
-                                  } catch (e) {
-                                      // Failed. Mark the session as cancelled
-                                      // and wait for the flip animation
-                                      // to complete, where we will
-                                      // remove the toolbox window.
-                                      this.cancelled = true;
-                                      logError(e, 'Failed to start gnome-builder');
-                                  }
-                              });
-    },
-
     // Switch to a toolbox window, launching it if we haven't yet launched it.
     //
     // Note that this is not the same as just rotating to the window - we
@@ -619,19 +614,8 @@ var CodingSession = new Lang.Class({
     // the caller.
     _switchToToolbox: function() {
         if (!this.toolbox) {
-            // get the manifest of the application
-            // return early before we setup anything
-            this._appManifest = _getAppManifest(this.app.meta_window.get_flatpak_id());
-            if (!this._appManifest) {
-                log('Error, coding: No manifest could be found for the app: ' + this.app.meta_window.get_flatpak_id());
-                return;
-            }
-
-            let tracker = Shell.WindowTracker.get_default();
-            tracker.track_coding_app_window(this.app.meta_window);
-
-            this._startToolboxForFlatpak(_constructLoadFlatpakValue(this.app,
-                                                                    this._appManifest));
+            launchToolboxForTarget(this.app.meta_window.gtk_application_id,
+                                   this.app.meta_window.gtk_window_object_path);
         } else {
             this.toolbox.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
