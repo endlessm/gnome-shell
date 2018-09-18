@@ -29,10 +29,6 @@ gboolean shell_window_tracker_is_window_interesting (MetaWindow *window);
 
 gboolean shell_window_tracker_is_speedwagon_window (MetaWindow *window);
 
-void shell_window_tracker_track_coding_app_window (ShellWindowTracker *tracker, MetaWindow *app_window);
-
-void shell_window_tracker_untrack_coding_app_window (ShellWindowTracker *tracker);
-
 GDBusProxy * shell_window_tracker_get_hack_toolbox_proxy (MetaWindow *window);
 
 /* Hidden typedef for SnStartupSequence */
