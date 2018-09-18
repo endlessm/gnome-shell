@@ -476,10 +476,7 @@ var CodingSession = new Lang.Class({
         return true;
     },
 
-    // Remove the toolbox window from this session. Disconnect
-    // any signals that we have connected to the toolbox window
-    // and show the app window
-    removeToolboxWindow: function() {
+    _cleanupToolboxWindow: function() {
         if (this._positionChangedIdToolbox) {
             this.toolbox.meta_window.disconnect(this._positionChangedIdToolbox);
             this._positionChangedIdToolbox = 0;
@@ -494,6 +491,13 @@ var CodingSession = new Lang.Class({
             this.toolbox.meta_window.disconnect(this._constrainGeometryToolboxId);
             this._constrainGeometryToolboxId = 0;
         }
+    },
+
+    // Remove the toolbox window from this session. Disconnect
+    // any signals that we have connected to the toolbox window
+    // and show the app window
+    removeToolboxWindow: function() {
+        this._cleanupToolboxWindow();
 
         // Remove the toolbox_window reference from the button. There's no
         // need to disconnect any signals here since the button doesn't
@@ -507,8 +511,7 @@ var CodingSession = new Lang.Class({
     },
 
     // Eject out of this session and remove all pairings.
-    // Remove all connected signals and show the toolbox window if we have
-    // one.
+    // Remove all connected signals and close the toolbox as well, if we have one.
     //
     // The assumption here is that the session will be removed immediately
     // after destruction.
@@ -539,29 +542,15 @@ var CodingSession = new Lang.Class({
             this._constrainGeometryAppId = 0;
         }
 
-        if (this._constrainGeometryToolboxId) {
-            this.toolbox.meta_window.disconnect(this._constrainGeometryToolboxId);
-            this._constrainGeometryToolboxId = 0;
-        }
-
         // Destroy the button too
         this.button.destroy();
 
-        // If we have a toolbox window, disconnect any signals,
-        // show it and activate it now
+        // If we have a toolbox window, disconnect any signals and destroy it.
         if (this.toolbox) {
-            if (this._positionChangedIdToolbox) {
-                this.toolbox.meta_window.disconnect(this._positionChangedIdToolbox);
-                this._positionChangedIdToolbox = 0;
-            }
+            this._cleanupToolboxWindow();
 
-            if (this._sizeChangedIdToolbox) {
-                this.toolbox.meta_window.disconnect(this._sizeChangedIdToolbox);
-                this._sizeChangedIdToolbox = 0;
-            }
-
-            this.toolbox.meta_window.activate(global.get_current_time());
-            this.toolbox.show();
+            // Destroy the toolbox window now
+            this.toolbox.meta_window.delete(global.get_current_time());
 
             // Note that we do not set this._state to STATE_APP here. Any
             // further usage of this session is undefined and it should
