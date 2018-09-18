@@ -34,10 +34,6 @@ function _isCodingApp(flatpakID) {
     return _CODING_APPS.indexOf(flatpakID) != -1;
 }
 
-function _isToolbox(flatpakID) {
-    return flatpakID === 'org.gnome.Builder';
-}
-
 function _isToolboxSpeedwagon(window) {
     let tracker = Shell.WindowTracker.get_default();
     let correspondingApp = tracker.get_window_app(window);
@@ -1033,24 +1029,25 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    addToolboxWindow: function(actor) {
+    addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
         let window = actor.meta_window;
         let isSpeedwagonForToolbox = _isToolboxSpeedwagon(window);
 
-        if (!_isToolbox(window.get_flatpak_id()) &&
-            !isSpeedwagonForToolbox)
+        if (!isSpeedwagonForToolbox)
             return false;
 
-        // Get the last session in the list - we assume that we are
-        // adding a toolbox to this window
-        let session = this._sessions[this._sessions.length - 1];
-        if (!session)
-            return false;
+        for (let session of this._sessions) {
+            if (session.toolbox === null &&
+                session.app.meta_window.gtk_application_id == targetBusName &&
+                session.app.meta_window.gtk_window_object_path == targetObjectPath) {
+                return session.admitToolboxWindowActor(actor);
+            }
+        }
 
-        return session.admitToolboxWindowActor(actor);
+        return false;
     },
 
     removeAppWindow: function(actor) {
@@ -1077,8 +1074,7 @@ var CodeViewManager = new Lang.Class({
         let window = actor.meta_window;
         let isSpeedwagonForToolbox = _isToolboxSpeedwagon(window);
 
-        if (!_isToolbox(window.get_flatpak_id()) &&
-            !isSpeedwagonForToolbox)
+        if (!isSpeedwagonForToolbox)
             return false;
 
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
