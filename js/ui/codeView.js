@@ -998,6 +998,11 @@ var CodingSession = new Lang.Class({
     }
 });
 
+const SessionLookupFlags = {
+    SESSION_LOOKUP_APP: 1 << 0,
+    SESSION_LOOKUP_TOOLBOX: 1 << 1,
+};
+
 var CodeViewManager = new Lang.Class({
     Name: 'CodeViewManager',
 
@@ -1046,7 +1051,7 @@ var CodeViewManager = new Lang.Class({
         if (!_isCodingApp(window.get_flatpak_id()))
             return false;
 
-        let session = this._getSession(actor);
+        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
         if (!session)
             return false;
 
@@ -1069,7 +1074,7 @@ var CodeViewManager = new Lang.Class({
             !isSpeedwagonForToolbox)
             return false;
 
-        let session = this._getSession(actor);
+        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (!session)
             return false;
 
@@ -1080,15 +1085,18 @@ var CodeViewManager = new Lang.Class({
     },
 
     killEffectsOnActor: function(actor) {
-        let session = this._getSession(actor);
+        let session = this._getSession(actor,
+                                       SessionLookupFlags.SESSION_LOOKUP_APP |
+                                       SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (session)
             session.killEffects();
     },
 
-    _getSession: function(actor) {
+    _getSession: function(actor, flags) {
         for (let i = 0; i < this._sessions.length; i++) {
             let session = this._sessions[i];
-            if (session.app === actor || session.toolbox === actor)
+            if (((session.app === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_APP)) ||
+                ((session.toolbox === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)))
                 return session;
         }
 
