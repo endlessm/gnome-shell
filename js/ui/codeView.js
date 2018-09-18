@@ -189,23 +189,25 @@ var WindowTrackingButton = new Lang.Class({
     Name: 'WindowTrackingButton',
     Extends: GObject.Object,
     Properties: {
-        window: GObject.ParamSpec.object('window',
-                                         '',
-                                         '',
-                                         GObject.ParamFlags.READWRITE |
-                                         GObject.ParamFlags.CONSTRUCT_ONLY,
-                                         Meta.Window),
-        toolbox_window: GObject.ParamSpec.object('toolbox-window',
-                                                 '',
-                                                 '',
-                                                 GObject.ParamFlags.READWRITE,
-                                                 Meta.Window)
+        'window': GObject.ParamSpec.object('window',
+                                           '',
+                                           '',
+                                           GObject.ParamFlags.READWRITE |
+                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           Meta.Window),
+        'toolbox_window': GObject.ParamSpec.object('toolbox-window',
+                                                   '',
+                                                   '',
+                                                   GObject.ParamFlags.READWRITE,
+                                                   Meta.Window)
     },
     Signals: {
         'clicked': {}
     },
 
     _init: function(params) {
+        this._toolbox_window = null;
+
         this.parent(params);
 
         // The button will be auto-added to the manager. Note that in order to
@@ -335,6 +337,18 @@ var WindowTrackingButton = new Lang.Class({
                 animationButton.destroy();
             }
         });
+    },
+
+    set toolbox_window(value) {
+        // It's possible that the toolbox window got focused before
+        // the toolbox window was set, so do the check again
+        // here, too.
+        this._toolbox_window = value;
+        this._showIfWindowVisible();
+    },
+
+    get toolbox_window() {
+        return this._toolbox_window;
     },
 
     _updatePosition: function() {
