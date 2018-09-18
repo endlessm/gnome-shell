@@ -25,8 +25,8 @@ const STATE_APP = 0;
 const STATE_TOOLBOX = 1;
 
 const _CODING_APPS = [
-    'com.endlessm.Helloworld',
-    'org.gnome.Weather'
+    // FIXME: this should be extended with a more complex lookup
+    'com.endlessm.dinosaurs.en'
 ];
 
 function _isCodingApp(flatpakID) {
