@@ -2242,7 +2242,10 @@ var WindowManager = new Lang.Class({
             return;
         }
         this._codeViewManager.addAppWindow(actor);
+        this.animateMappedWindow(shellwm, actor);
+    },
 
+    _animateMappedWindow: function(shellwm, actor) {
         let metaWindow = actor.meta_window;
         let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
 
