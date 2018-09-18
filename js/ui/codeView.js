@@ -17,7 +17,6 @@ const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 
 const WINDOW_ANIMATION_TIME = 0.25;
-const WATCHDOG_TIME = 30000; // ms
 
 const BUTTON_OFFSET_X = 33;
 const BUTTON_OFFSET_Y = 40;
@@ -32,14 +31,6 @@ const _CODING_APPS = [
 
 function _isCodingApp(flatpakID) {
     return _CODING_APPS.indexOf(flatpakID) != -1;
-}
-
-function _isToolboxSpeedwagon(window) {
-    let tracker = Shell.WindowTracker.get_default();
-    let correspondingApp = tracker.get_window_app(window);
-    return (Shell.WindowTracker.is_speedwagon_window(window) &&
-            correspondingApp &&
-            correspondingApp.get_id() === 'org.gnome.Builder.desktop');
 }
 
 function _createIcon() {
@@ -427,8 +418,6 @@ var CodingSession = new Lang.Class({
                                                                   this._applyWindowUnminimizationState.bind(this));
         this._constrainGeometryAppId = this.app.meta_window.connect('geometry-allocate',
                                                                     this._constrainGeometry.bind(this));
-
-        this._watchdogId = 0;
     },
 
     _toolboxWindowIsReady: function() {
@@ -440,10 +429,8 @@ var CodingSession = new Lang.Class({
 
     // Maybe admit this actor if it is the kind of actor that we want
     admitToolboxWindowActor: function(actor) {
-        // If there is a currently bound window and it is not a speedwagon,
-        // then we can't admit this window. Return false.
-        if (this.toolbox &&
-            !Shell.WindowTracker.is_speedwagon_window(this.toolbox.meta_window))
+        // If there is a currently bound window then we can't admit this window.
+        if (this.toolbox)
             return false;
 
         // We can admit this window. Wire up signals and synchronize
@@ -461,27 +448,8 @@ var CodingSession = new Lang.Class({
                                                                       this._synchronizeWindows.bind(this));
         _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
 
-        if (Shell.WindowTracker.is_speedwagon_window(actor.meta_window)) {
-            // If we are animating to a speedwagon window, we'll want to
-            // remove the 'above' attribute - we don't want the splash to
-            // appear over everything else.
-            actor.meta_window.unmake_above();
-        } else {
-            // Connect the real toolbox window to the geometry-allocate
-            // signal
-            this._constrainGeometryToolboxId = this.toolbox.meta_window.connect('geometry-allocate',
-                                                                                this._constrainGeometry.bind(this));
-
-            // We only want to untrack the coding app window at this
-            // point and not at the point we show the speedwagon. This
-            // will ensure that the shell window tracker is still
-            // watching for the toolbox window to appear.
-            this._stopWatchingForToolboxWindowToComeOnline();
-
-            // We also only want to hide the speedwagon window at this
-            // point, since the other window has arrived.
-            this.splash.rampOut();
-        }
+        this._constrainGeometryToolboxId = this.toolbox.meta_window.connect('geometry-allocate',
+                                                                            this._constrainGeometry.bind(this));
 
         // Now, if we're not already on the toolbox window, we want to start
         // animating to it here. This is different from just calling
@@ -584,10 +552,7 @@ var CodingSession = new Lang.Class({
 
         // If we have a toolbox window, disconnect any signals,
         // show it and activate it now
-        //
-        // For whatever reason, this.toolbox.meta_window seems to be
-        // undefined on speedwagon windows, so handle that case here.
-        if (this.toolbox && this.toolbox.meta_window) {
+        if (this.toolbox) {
             if (this._positionChangedIdToolbox) {
                 this.toolbox.meta_window.disconnect(this._positionChangedIdToolbox);
                 this._positionChangedIdToolbox = 0;
@@ -660,8 +625,7 @@ var CodingSession = new Lang.Class({
     //
     // Note that this is not the same as just rotating to the window - we
     // need to either launch the toolbox window if we don't have a reference
-    // to it (and show a speedwagon) or we just need to switch to an existing
-    // toolbox window.
+    // to it,  or we just need to switch to an existing toolbox window.
     //
     // This function and the one below do not check this._state to determine
     // if a flip animation should be played. That is the responsibility of
@@ -678,17 +642,6 @@ var CodingSession = new Lang.Class({
 
             let tracker = Shell.WindowTracker.get_default();
             tracker.track_coding_app_window(this.app.meta_window);
-            this._watchdogId = Mainloop.timeout_add(WATCHDOG_TIME, this._stopWatchingForToolboxWindowToComeOnline.bind(this));
-
-            // We always show a splash screen, even if toolbox is running. We
-            // know when the window comes online so we can hide it accordingly.
-            let toolboxShellApp = Shell.AppSystem.get_default().lookup_app('org.gnome.Builder.desktop');
-            // Right now we don't connect the close button - clicking on
-            // it will just do nothing. We expect the user to just click on
-            // the CodeView button in order to get back to the main
-            // window.
-            this.splash = new AppActivation.SpeedwagonSplash(toolboxShellApp);
-            this.splash.show();
 
             this._startToolboxForFlatpak(_constructLoadFlatpakValue(this.app,
                                                                     this._appManifest));
@@ -924,14 +877,9 @@ var CodingSession = new Lang.Class({
             onComplete: () => {
                 this._rotateInCompleted(dst);
 
-                // Failed. Stop watching for coding
-                // app windows and cancel any splash
-                // screens.
-                if (this.cancelled) {
-                    this.splash.rampOut();
-                    this._stopWatchingForToolboxWindowToComeOnline();
+                // Failed. Remove the toolbox window and rotate back
+                if (this.cancelled)
                     this.removeToolboxWindow();
-                }
             }
         });
 
@@ -960,12 +908,6 @@ var CodingSession = new Lang.Class({
         actor.rotation_angle_y = 0;
         actor.set_cull_back_face(false);
         this._rotatingInActor = null;
-
-        // If we just finished rotating in the speedwagon
-        // for toolbox, launch toolbox now
-        if (_isToolboxSpeedwagon(actor.meta_window))
-           this._startToolboxForFlatpak(_constructLoadFlatpakValue(this.app,
-                                                                   this._appManifest));
     },
 
     _rotateOutCompleted: function() {
@@ -978,17 +920,6 @@ var CodingSession = new Lang.Class({
         actor.rotation_angle_y = 0;
         actor.set_cull_back_face(false);
         this._rotatingOutActor = null;
-    },
-
-    _stopWatchingForToolboxWindowToComeOnline: function() {
-        let tracker = Shell.WindowTracker.get_default();
-        tracker.untrack_coding_app_window();
-        if (this._watchdogId !== 0) {
-            Mainloop.source_remove(this._watchdogId);
-            this._watchdogId = 0;
-        }
-
-        return false;
     },
 
     killEffects: function() {
@@ -1037,12 +968,6 @@ var CodeViewManager = new Lang.Class({
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
-        let window = actor.meta_window;
-        let isSpeedwagonForToolbox = _isToolboxSpeedwagon(window);
-
-        if (!isSpeedwagonForToolbox)
-            return false;
-
         for (let session of this._sessions) {
             if (session.toolbox === null &&
                 session.app.meta_window.gtk_application_id == targetBusName &&
@@ -1075,17 +1000,11 @@ var CodeViewManager = new Lang.Class({
     },
 
     _removeToolboxWindow: function(actor) {
-        let window = actor.meta_window;
-        let isSpeedwagonForToolbox = _isToolboxSpeedwagon(window);
-
-        if (!isSpeedwagonForToolbox)
-            return false;
-
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (!session)
             return false;
 
-        // We can remove either a speedwagon window or a normal toolbox window.
+        // We can remove the normal toolbox window.
         // That window will be registered in the session at this point.
         session.removeToolboxWindow();
         return true;
