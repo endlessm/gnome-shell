@@ -959,7 +959,7 @@ var CodeViewManager = new Lang.Class({
         this._sessions.push(new CodingSession({
             app: actor,
             toolbox: null,
-            button: new WindowTrackingButton({ window: actor.meta_window })
+            button: new WindowTrackingButton({ window: window })
         }));
         return true;
     },
