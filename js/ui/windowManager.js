@@ -2261,7 +2261,10 @@ var WindowManager = new Lang.Class({
             actor.meta_window.gtk_application_id,
             actor.meta_window.gtk_window_object_path,
             Lang.bind(this, function(proxy, error) {
-                if (error) {
+                // FIXME: there does not seem to be a good way to check
+                // whether the interface is implemented by the other end,
+                // so we just check whether the property exists.
+                if (error || !proxy.Target) {
                     this._codeViewManager.addAppWindow(actor);
                     this._animateMappedWindow(shellwm, actor);
                     return;
