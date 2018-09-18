@@ -2237,11 +2237,10 @@ var WindowManager = new Lang.Class({
             actor._animatableSurface.attach_animation_effect_with_server_priority('move',
                                                                                   this._wobblyEffect);
 
-        if (this._codeViewManager.addToolboxWindow(actor)) {
+        if (this._codeViewManager.handleMapWindow(actor)) {
             shellwm.completed_map(actor);
             return;
         }
-        this._codeViewManager.addAppWindow(actor);
 
         let metaWindow = actor.meta_window;
         let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
@@ -2388,8 +2387,7 @@ var WindowManager = new Lang.Class({
     _destroyWindow : function(shellwm, actor) {
         let window = actor.meta_window;
 
-        this._codeViewManager.removeAppWindow(actor);
-        this._codeViewManager.removeToolboxWindow(actor);
+        this._codeViewManager.handleDestroyWindow(actor);
 
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
