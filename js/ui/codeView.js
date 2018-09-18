@@ -435,6 +435,13 @@ var CodingSession = new Lang.Class({
         this._watchdogId = 0;
     },
 
+    _toolboxWindowIsReady: function() {
+        this._animate(this.app,
+                      this.toolbox,
+                      Gtk.DirectionType.LEFT);
+        this.button.switchAnimation(Gtk.DirectionType.LEFT);
+    },
+
     // Maybe admit this actor if it is the kind of actor that we want
     admitToolboxWindowActor: function(actor) {
         // If there is a currently bound window and it is not a speedwagon,
@@ -491,12 +498,8 @@ var CodingSession = new Lang.Class({
             // This way we don't get ugly artifacts when rotating if
             // a window is slow to draw.
             let firstFrameConnection = this.toolbox.connect('first-frame', () => {
-                this._animate(this.app,
-                              this.toolbox,
-                              Gtk.DirectionType.LEFT);
-
                 this.toolbox.disconnect(firstFrameConnection);
-                this.button.switchAnimation(Gtk.DirectionType.LEFT);
+                this._toolboxWindowIsReady();
 
                 return false;
             });
