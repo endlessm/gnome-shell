@@ -491,12 +491,18 @@ var CodingSession = new Lang.Class({
             //
             // This way we don't get ugly artifacts when rotating if
             // a window is slow to draw.
-            let firstFrameConnection = this.toolbox.connect('first-frame', () => {
-                this.toolbox.disconnect(firstFrameConnection);
-                this._toolboxWindowIsReady();
+            if (!this.toolbox._drawnFirstFrame) {
+                let firstFrameConnection = this.toolbox.connect('first-frame', Lang.bind(this, function() {
+                    this.toolbox.disconnect(firstFrameConnection);
+                    this._toolboxWindowIsReady();
+                }));
+            } else {
+                GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
+                    this._toolboxWindowIsReady();
+                    return false;
+                }));
+            }
 
-                return false;
-            });
             this._prepareAnimate(this.app,
                                  this.toolbox,
                                  Gtk.DirectionType.LEFT);
@@ -1002,6 +1008,13 @@ var CodeViewManager = new Lang.Class({
 
     _init: function() {
         this._sessions = [];
+
+        global.display.connect('window-created', Lang.bind(this, function(display, window) {
+            window._drawnFirstFrame = false;
+            window.get_compositor_private().connect('first-frame', Lang.bind(this, function() {
+                window._drawnFirstFrame = true;
+            }));
+        }));
     },
 
     addAppWindow: function(actor) {
