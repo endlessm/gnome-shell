@@ -2228,6 +2228,15 @@ var WindowManager = new Lang.Class({
                     this._checkDimming(parent);
         }));
 
+        // Endless libanimation extension
+        if (this._animationsServer)
+            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
+
+        // Add the wobbly effect if it is enabled
+        if (this._wobblyEffect)
+            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
+                                                                                  this._wobblyEffect);
+
         if (this._codeViewManager.addToolboxWindow(actor)) {
             shellwm.completed_map(actor);
             return;
@@ -2262,16 +2271,6 @@ var WindowManager = new Lang.Class({
 
             shellwm.completed_map(actor);
             return;
-        }
-
-        // Endless libanimation extension
-        if (this._animationsServer)
-            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
-
-        // Add the wobbly effect if it is enabled
-        if (this._wobblyEffect) {
-            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
-                                                                                  this._wobblyEffect);
         }
 
         if (SideComponent.isSideComponentWindow(actor.meta_window)) {
