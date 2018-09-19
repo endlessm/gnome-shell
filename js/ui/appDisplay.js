@@ -2665,11 +2665,23 @@ class AppCenterIcon extends AppIcon {
         // and return an empty icon to satisfy the caller
         this._setStyleClass(this.iconState);
 
-        if (this.iconState != ViewIconState.NORMAL)
-            return new St.Icon({ icon_size: iconSize });
-
         // In normal state we chain up to the parent to get the default icon.
-        return super._createIcon	(iconSize);
+        if (this.iconState == ViewIconState.NORMAL)
+            return super._createIcon(iconSize)
+
+        // Otherwise, retrieve the trash icon from the resources
+        let iconUri;
+
+        if (this.iconState == AppCenterIconState.EMPTY_TRASH)
+            iconUri = 'resource:///org/gnome/shell/theme/trash-icon-empty.png';
+        else if (this.iconState == AppCenterIconState.FULL_TRASH)
+            iconUri = 'resource:///org/gnome/shell/theme/trash-icon-full.png';
+
+        let iconFile = Gio.File.new_for_uri(iconUri);
+        let gicon = new Gio.FileIcon({ file: iconFile });
+
+        return new St.Icon({ gicon: gicon,
+                             icon_size: iconSize });
     }
 
     getId() {
