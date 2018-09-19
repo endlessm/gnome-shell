@@ -250,6 +250,10 @@ const AppIconMenu = new Lang.Class({
  */
 const AppIconButton = new Lang.Class({
     Name: 'AppIconButton',
+    Extends: St.Button,
+    Signals: { 'app-icon-pressed': {},
+               'app-icon-pinned': {},
+               'app-icon-unpinned': {} },
 
     _init: function(app, iconSize, menuManager, allowsPinning) {
         this._app = app;
@@ -259,28 +263,30 @@ const AppIconButton = new Lang.Class({
 
         this._menuManager = menuManager;
 
-        this.actor = new St.Button({ style_class: 'app-icon-button',
-                                     child: icon,
-                                     button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
-                                     reactive: true });
+        this.parent({ style_class: 'app-icon-button',
+                      child: icon,
+                      button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+                      reactive: true });
+
+        this.actor = this;
 
         this._label = new St.Label({ text: this._app.get_name(),
                                      style_class: 'app-icon-hover-label' });
         this._label.connect('style-changed', this._updateStyle.bind(this));
 
         // Handle the menu-on-press case for multiple windows
-        this.actor.connect('button-press-event', this._handleButtonPressEvent.bind(this));
-        this.actor.connect('clicked', this._handleClickEvent.bind(this));
+        this.connect('button-press-event', this._handleButtonPressEvent.bind(this));
+        this.connect('clicked', this._handleClickEvent.bind(this));
 
         Main.layoutManager.connect('startup-complete', this._updateIconGeometry.bind(this));
-        this.actor.connect('notify::allocation', this._updateIconGeometry.bind(this));
-        this.actor.connect('destroy', this._onDestroy.bind(this));
-        this.actor.connect('enter-event', this._showHoverState.bind(this));
-        this.actor.connect('leave-event', this._hideHoverState.bind(this));
+        this.connect('notify::allocation', this._updateIconGeometry.bind(this));
+        this.connect('destroy', this._onDestroy.bind(this));
+        this.connect('enter-event', this._showHoverState.bind(this));
+        this.connect('leave-event', this._hideHoverState.bind(this));
 
         this._rightClickMenuManager = new PopupMenu.PopupMenuManager(this);
 
-        this._rightClickMenu = new PopupMenu.PopupMenu(this.actor, 0.0, St.Side.TOP, 0);
+        this._rightClickMenu = new PopupMenu.PopupMenu(this, 0.0, St.Side.TOP, 0);
         this._rightClickMenu.blockSourceEvents = true;
 
         if (allowsPinning) {
@@ -311,7 +317,7 @@ const AppIconButton = new Lang.Class({
         this._rightClickMenu.actor.hide();
         Main.uiGroup.add_actor(this._rightClickMenu.actor);
 
-        this._menu = new AppIconMenu(this._app, this.actor);
+        this._menu = new AppIconMenu(this._app, this);
         this._menuManager.addMenu(this._menu);
         this._menu.actor.hide();
         Main.uiGroup.add_actor(this._menu.actor);
@@ -385,7 +391,7 @@ const AppIconButton = new Lang.Class({
                 this._closeOtherMenus(animation);
                 this._animateBounce();
 
-                this.actor.fake_release();
+                this.fake_release();
                 this._menu.toggle(animation);
                 this._menuManager.ignoreRelease();
 
@@ -394,7 +400,7 @@ const AppIconButton = new Lang.Class({
             }
         }
 
-        this.actor.sync_hover();
+        this.sync_hover();
         return false;
     },
 
@@ -450,14 +456,14 @@ const AppIconButton = new Lang.Class({
     },
 
     _hideHoverState: function() {
-        this.actor.fake_release();
+        this.fake_release();
         if (this._label.get_parent() != null)
             Main.uiGroup.remove_actor(this._label);
     },
 
     _showHoverState: function() {
         // Show label only if it's not already visible
-        this.actor.fake_release();
+        this.fake_release();
         if (this._label.get_parent())
             return;
 
@@ -466,10 +472,11 @@ const AppIconButton = new Lang.Class({
 
         // Calculate location of the label only if we're not tweening as the
         // values will be inaccurate
-        if (!Tweener.isTweening(this.actor)) {
-            let iconMidpoint = this.actor.get_transformed_position()[0] + this.actor.width / 2;
+        if (!Tweener.isTweening(this)) {
+            let transformedPosition = this.get_transformed_position();
+            let iconMidpoint = transformedPosition[0] + this.width / 2;
             this._label.translation_x = Math.floor(iconMidpoint - this._label.width / 2);
-            this._label.translation_y = Math.floor(this.actor.get_transformed_position()[1] - this._labelOffsetY);
+            this._label.translation_y = Math.floor(transformedPosition[1] - this._labelOffsetY);
 
             // Clip left edge to be the left edge of the screen
             this._label.translation_x = Math.max(this._label.translation_x, 0);
@@ -477,16 +484,16 @@ const AppIconButton = new Lang.Class({
     },
 
     _animateBounce: function() {
-        if (!Tweener.isTweening(this.actor)) {
-            Tweener.addTween(this.actor, {
+        if (!Tweener.isTweening(this)) {
+            Tweener.addTween(this, {
                 scale_y: 1 - ICON_BOUNCE_MAX_SCALE,
                 scale_x: 1 + ICON_BOUNCE_MAX_SCALE,
-                translation_y: this.actor.height * ICON_BOUNCE_MAX_SCALE,
-                translation_x: -this.actor.width * ICON_BOUNCE_MAX_SCALE / 2,
+                translation_y: this.height * ICON_BOUNCE_MAX_SCALE,
+                translation_x: -this.width * ICON_BOUNCE_MAX_SCALE / 2,
                 time: ICON_BOUNCE_ANIMATION_TIME * 0.25,
                 transition: ICON_BOUNCE_ANIMATION_TYPE_1
             });
-            Tweener.addTween(this.actor, {
+            Tweener.addTween(this, {
                 scale_y: 1,
                 scale_x: 1,
                 translation_y: 0,
@@ -502,7 +509,7 @@ const AppIconButton = new Lang.Class({
         let icon = this._app.create_icon_texture(iconSize);
         this._iconSize = iconSize;
 
-        this.actor.set_child(icon);
+        this.set_child(icon);
     },
 
     _onDestroy: function() {
@@ -527,12 +534,12 @@ const AppIconButton = new Lang.Class({
     },
 
     _updateIconGeometry: function() {
-        if (!this.actor.mapped)
+        if (!this.mapped)
             return;
 
         let rect = new Meta.Rectangle();
-        [rect.x, rect.y] = this.actor.get_transformed_position();
-        [rect.width, rect.height] = this.actor.get_transformed_size();
+        [rect.x, rect.y] = this.get_transformed_position();
+        [rect.width, rect.height] = this.get_transformed_size();
 
         this._setIconRectForAllWindows(rect);
     },
@@ -545,7 +552,6 @@ const AppIconButton = new Lang.Class({
         return AppFavorites.getAppFavorites().isFavorite(this._app.get_id());
     }
 });
-Signals.addSignalMethods(AppIconButton.prototype);
 
 /** AppIconBarNavButton:
  *
@@ -641,9 +647,9 @@ const ScrolledIconList = new Lang.Class({
     setActiveApp: function(app) {
         this._taskbarApps.forEach((appButton, taskbarApp) => {
             if (app == taskbarApp)
-                appButton.actor.add_style_pseudo_class('highlighted');
+                appButton.add_style_pseudo_class('highlighted');
             else
-                appButton.actor.remove_style_pseudo_class('highlighted');
+                appButton.remove_style_pseudo_class('highlighted');
         });
     },
 
@@ -775,7 +781,7 @@ const ScrolledIconList = new Lang.Class({
 
     _getIconButtonForActor: function(actor) {
         for (let appIconButton of this._taskbarApps.values()) {
-            if (appIconButton != null && appIconButton.actor == actor)
+            if (appIconButton != null && appIconButton == actor)
                 return appIconButton;
         }
         return null;
@@ -800,7 +806,6 @@ const ScrolledIconList = new Lang.Class({
 
         let favorites = AppFavorites.getAppFavorites();
         let newChild = new AppIconButton(app, this._iconSize, this._menuManager, true);
-        let newActor = newChild.actor;
 
         newChild.connect('app-icon-pressed', () => {
             this.emit('app-icon-pressed');
@@ -811,14 +816,14 @@ const ScrolledIconList = new Lang.Class({
         newChild.connect('app-icon-unpinned', () => {
             favorites.removeFavorite(app.get_id());
             if (app.state == Shell.AppState.STOPPED) {
-                newActor.destroy();
+                newChild.destroy();
                 this._taskbarApps.delete(app);
                 this._updatePage();
             }
         });
         this._taskbarApps.set(app, newChild);
 
-        this._container.add_actor(newActor);
+        this._container.add_actor(newChild);
     },
 
     _addButton: function(app) {
@@ -841,7 +846,7 @@ const ScrolledIconList = new Lang.Class({
             let oldChild = this._taskbarApps.get(app);
             if (oldChild) {
                 let oldButton = this._taskbarApps.get(app);
-                this._container.remove_actor(oldButton.actor);
+                this._container.remove_actor(oldButton);
                 this._taskbarApps.delete(app);
             }
 
@@ -865,6 +870,139 @@ const ScrolledIconList = new Lang.Class({
 });
 Signals.addSignalMethods(ScrolledIconList.prototype);
 
+var AppIconBarContainer = new Lang.Class({
+    Name: 'AppIconBarContainer',
+    Extends: St.Widget,
+
+    _init(backButton, forwardButton, scrolledIconList) {
+        this.parent({ name: 'appIconBarContainer' });
+
+        this._spacing = 0;
+
+        this._backButton = backButton;
+        this.add_actor(backButton);
+
+        this._forwardButton = forwardButton;
+        this.add_actor(forwardButton);
+
+        this._scrolledIconList = scrolledIconList;
+        this.add_actor(scrolledIconList.actor);
+    },
+
+    vfunc_get_preferred_width(forHeight) {
+        let themeNode = this.get_theme_node();
+
+        forHeight = themeNode.adjust_for_height(forHeight);
+        let [minBackWidth, natBackWidth] = this._backButton.get_preferred_width(forHeight);
+        let [minForwardWidth, natForwardWidth] = this._forwardButton.get_preferred_width(forHeight);
+
+        // The scrolled icon list actor is a scrolled view with
+        // hscrollbar-policy=NONE, so it will take the same width requisition as
+        // its child. While we can use the natural one to measure the content,
+        // we need a special method to measure the minimum width
+        let minContentWidth = this._scrolledIconList.getMinContentWidth(forHeight);
+        let [, natContentWidth] = this._scrolledIconList.actor.get_preferred_width(forHeight);
+
+        let minWidth = minBackWidth + minForwardWidth + 2 * this._spacing + minContentWidth;
+        let natWidth = natBackWidth + natForwardWidth + 2 * this._spacing + natContentWidth;
+
+        return themeNode.adjust_preferred_width(minWidth, natWidth);
+    },
+
+    vfunc_get_preferred_height(forWidth) {
+        let themeNode = this.get_theme_node();
+
+        forWidth = themeNode.adjust_for_width(forWidth);
+        let [minListHeight, natListHeight] = this._scrolledIconList.actor.get_preferred_height(forWidth);
+        let [minBackHeight, natBackHeight] = this._backButton.get_preferred_height(forWidth);
+        let [minForwardHeight, natForwardHeight] = this._forwardButton.get_preferred_height(forWidth);
+
+        let minButtonHeight = Math.max(minBackHeight, minForwardHeight);
+        let natButtonHeight = Math.max(natBackHeight, natForwardHeight);
+
+        let minHeight = Math.max(minButtonHeight, minListHeight);
+        let natHeight = Math.max(natButtonHeight, natListHeight);
+
+        return themeNode.adjust_preferred_height(minHeight, natHeight);
+    },
+
+    vfunc_allocate(box, flags) {
+        this.set_allocation(box, flags);
+
+        box = this.get_theme_node().get_content_box(box);
+
+        let allocWidth = box.x2 - box.x1;
+        let allocHeight = box.y2 - box.y1;
+
+        let minBackWidth = this._backButton.get_preferred_width(allocHeight)[0];
+        let minForwardWidth = this._forwardButton.get_preferred_width(allocHeight)[0];
+        let maxIconSpace = Math.max(allocWidth - minBackWidth - minForwardWidth - 2 * this._spacing, 0);
+
+        let childBox = new Clutter.ActorBox();
+        childBox.y1 = 0;
+        childBox.y2 = allocHeight;
+
+        if (this.get_text_direction() == Clutter.TextDirection.RTL) {
+            childBox.x1 = allocWidth;
+            childBox.x2 = allocWidth;
+
+            if (this._scrolledIconList.isBackAllowed()) {
+                childBox.x1 = childBox.x2 - minBackWidth;
+                this._backButton.allocate(childBox, flags);
+
+                childBox.x1 -= this._spacing;
+            }
+
+            childBox.x2 = childBox.x1;
+            childBox.x1 = childBox.x2 - this._scrolledIconList.calculateNaturalSize(maxIconSpace) - 2 * this._spacing;
+            this._scrolledIconList.actor.allocate(childBox, flags);
+
+            childBox.x2 = childBox.x1;
+            childBox.x1 = childBox.x2 - minForwardWidth;
+            this._forwardButton.allocate(childBox, flags);
+        } else {
+            childBox.x1 = 0;
+            childBox.x2 = 0;
+
+            if (this._scrolledIconList.isBackAllowed()) {
+                childBox.x2 = childBox.x1 + minBackWidth;
+                this._backButton.allocate(childBox, flags);
+
+                childBox.x2 += this._spacing;
+            }
+
+            childBox.x1 = childBox.x2;
+            childBox.x2 = childBox.x1 + this._scrolledIconList.calculateNaturalSize(maxIconSpace) + 2 * this._spacing;
+            this._scrolledIconList.actor.allocate(childBox, flags);
+
+            childBox.x1 = childBox.x2;
+            childBox.x2 = childBox.x1 + minForwardWidth;
+            this._forwardButton.allocate(childBox, flags);
+        }
+
+        this._updateNavButtonState();
+    },
+
+    vfunc_style_changed() {
+        this.parent();
+
+        this._spacing = this.get_theme_node().get_length('spacing');
+    },
+
+    _updateNavButtonState: function() {
+        let backButtonOpacity = MAX_OPACITY;
+        if (!this._scrolledIconList.isBackAllowed())
+            backButtonOpacity = 0;
+
+        let forwardButtonOpacity = MAX_OPACITY;
+        if (!this._scrolledIconList.isForwardAllowed())
+            forwardButtonOpacity = 0;
+
+        this._backButton.opacity = backButtonOpacity;
+        this._forwardButton.opacity = forwardButtonOpacity;
+    },
+});
+
 /** AppIconBar:
  *
  * This class handles positioning all the application icons and listening
@@ -879,7 +1017,6 @@ var AppIconBar = new Lang.Class({
         this.actor.add_style_class_name('app-icon-bar');
 
         this._panel = panel;
-        this._spacing = 0;
 
         this._menuManager = new PopupMenu.PopupMenuManager(this);
 
@@ -887,24 +1024,18 @@ var AppIconBar = new Lang.Class({
                                x_fill: true });
         this.actor.add_actor(bin);
 
-        this._container = new Shell.GenericContainer({ name: 'appIconBarContainer' });
-        this._container.connect('style-changed', this._updateStyleConstants.bind(this));
-
-        bin.set_child(this._container);
-        this._container.connect('get-preferred-width', this._getContentPreferredWidth.bind(this));
-        this._container.connect('get-preferred-height', this._getContentPreferredHeight.bind(this));
-        this._container.connect('allocate', this._contentAllocate.bind(this));
-
         this._backButton = new AppIconBarNavButton('go-previous-symbolic');
         this._backButton.connect('clicked', this._previousPageSelected.bind(this));
-        this._container.add_actor(this._backButton);
 
         this._scrolledIconList = new ScrolledIconList(this._menuManager);
-        this._container.add_actor(this._scrolledIconList.actor);
 
         this._forwardButton = new AppIconBarNavButton('go-next-symbolic');
         this._forwardButton.connect('clicked', this._nextPageSelected.bind(this));
-        this._container.add_actor(this._forwardButton);
+
+        this._container = new AppIconBarContainer(this._backButton,
+                                                  this._forwardButton,
+                                                  this._scrolledIconList);
+        bin.set_child(this._container);
 
         this._scrolledIconList.connect('icons-scrolled', () => {
             this._container.queue_relayout();
@@ -977,101 +1108,4 @@ var AppIconBar = new Lang.Class({
     _nextPageSelected: function() {
         this._scrolledIconList.pageForward();
     },
-
-    _updateNavButtonState: function() {
-        let backButtonOpacity = MAX_OPACITY;
-        if (!this._scrolledIconList.isBackAllowed())
-            backButtonOpacity = 0;
-
-        let forwardButtonOpacity = MAX_OPACITY;
-        if (!this._scrolledIconList.isForwardAllowed())
-            forwardButtonOpacity = 0;
-
-        this._backButton.opacity = backButtonOpacity;
-        this._forwardButton.opacity = forwardButtonOpacity;
-    },
-
-    _getContentPreferredWidth: function(actor, forHeight, alloc) {
-        let [minBackWidth, natBackWidth] = this._backButton.get_preferred_width(forHeight);
-        let [minForwardWidth, natForwardWidth] = this._forwardButton.get_preferred_width(forHeight);
-
-        // The scrolled icon list actor is a scrolled view with
-        // hscrollbar-policy=NONE, so it will take the same width requisition as
-        // its child. While we can use the natural one to measure the content,
-        // we need a special method to measure the minimum width
-        let minContentWidth = this._scrolledIconList.getMinContentWidth(forHeight);
-        let [, natContentWidth] = this._scrolledIconList.actor.get_preferred_width(forHeight);
-
-        alloc.min_size = minBackWidth + minForwardWidth + 2 * this._spacing + minContentWidth;
-        alloc.natural_size = natBackWidth + natForwardWidth + 2 * this._spacing + natContentWidth;
-    },
-
-    _getContentPreferredHeight: function(actor, forWidth, alloc) {
-        let [minListHeight, natListHeight] = this._scrolledIconList.actor.get_preferred_height(forWidth);
-        let [minBackHeight, natBackHeight] = this._backButton.get_preferred_height(forWidth);
-        let [minForwardHeight, natForwardHeight] = this._forwardButton.get_preferred_height(forWidth);
-
-        let minButtonHeight = Math.max(minBackHeight, minForwardHeight);
-        let natButtonHeight = Math.max(natBackHeight, natForwardHeight);
-
-        alloc.min_size = Math.max(minButtonHeight, minListHeight);
-        alloc.natural_size = Math.max(natButtonHeight, natListHeight);
-    },
-
-    _updateStyleConstants: function() {
-        this._spacing = this._container.get_theme_node().get_length('spacing');
-    },
-
-    _contentAllocate: function(actor, box, flags) {
-        let allocWidth = box.x2 - box.x1;
-        let allocHeight = box.y2 - box.y1;
-
-        let minBackWidth = this._backButton.get_preferred_width(allocHeight)[0];
-        let minForwardWidth = this._forwardButton.get_preferred_width(allocHeight)[0];
-        let maxIconSpace = Math.max(allocWidth - minBackWidth - minForwardWidth - 2 * this._spacing, 0);
-
-        let childBox = new Clutter.ActorBox();
-        childBox.y1 = 0;
-        childBox.y2 = allocHeight;
-
-        if (actor.get_text_direction() == Clutter.TextDirection.RTL) {
-            childBox.x1 = allocWidth;
-            childBox.x2 = allocWidth;
-
-            if (this._scrolledIconList.isBackAllowed()) {
-                childBox.x1 = childBox.x2 - minBackWidth;
-                this._backButton.allocate(childBox, flags);
-
-                childBox.x1 -= this._spacing;
-            }
-
-            childBox.x2 = childBox.x1;
-            childBox.x1 = childBox.x2 - this._scrolledIconList.calculateNaturalSize(maxIconSpace) - 2 * this._spacing;
-            this._scrolledIconList.actor.allocate(childBox, flags);
-
-            childBox.x2 = childBox.x1;
-            childBox.x1 = childBox.x2 - minForwardWidth;
-            this._forwardButton.allocate(childBox, flags);
-        } else {
-            childBox.x1 = 0;
-            childBox.x2 = 0;
-
-            if (this._scrolledIconList.isBackAllowed()) {
-                childBox.x2 = childBox.x1 + minBackWidth;
-                this._backButton.allocate(childBox, flags);
-
-                childBox.x2 += this._spacing;
-            }
-
-            childBox.x1 = childBox.x2;
-            childBox.x2 = childBox.x1 + this._scrolledIconList.calculateNaturalSize(maxIconSpace) + 2 * this._spacing;
-            this._scrolledIconList.actor.allocate(childBox, flags);
-
-            childBox.x1 = childBox.x2;
-            childBox.x2 = childBox.x1 + minForwardWidth;
-            this._forwardButton.allocate(childBox, flags);
-        }
-
-        this._updateNavButtonState();
-    }
 });
