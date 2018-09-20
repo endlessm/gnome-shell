@@ -328,7 +328,7 @@ var WindowTrackingButton = new Lang.Class({
         // It's possible that the toolbox window got focused before
         // the toolbox window was set, so do the check again
         // here, too.
-        this.toolbox_window = window;
+        this._toolbox_window = window;
         this._showIfWindowVisible();
     },
 
@@ -349,7 +349,7 @@ var WindowTrackingButton = new Lang.Class({
         // Show only if either this window or the toolbox window
         // is in focus
         if ((focusedWindow === this.window ||
-             focusedWindow === this.toolbox_window) &&
+             focusedWindow === this._toolbox_window) &&
             !locked)
             this._show();
         else
