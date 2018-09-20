@@ -373,7 +373,7 @@ function launchToolboxForTarget(targetBusName, targetObjectPath) {
                           'org.gtk.Actions',
                           'Activate',
                           new GLib.Variant('(sava{sv})', [
-                              'show-for-dbus-object',
+                              'flip',
                               [new GLib.Variant('(ss)', [targetBusName, targetObjectPath])],
                               {}
                           ]),
