@@ -368,12 +368,17 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
   g_autoptr(GError) local_error = NULL;
   g_autoptr(GDBusProxy) proxy = NULL;
   g_autoptr(GVariant) target_property_variant = NULL;
+  GSettings *settings = shell_global_get_settings (shell_global_get ());
   const gchar *window_app_id = NULL;
   const gchar *window_object_path = NULL;
   const gchar *target_bus_name = NULL;
   const gchar *target_object_path = NULL;
   GHashTableIter iter;
   gpointer key, value;
+
+  /* If code view is disabled globally, do nothing here */
+  if (!g_settings_get_boolean (settings, "enable-code-view"))
+    return NULL;
 
   /* Check if there is a set application id and object path
    * on this window. If not, then it can't be a toolbox. */
