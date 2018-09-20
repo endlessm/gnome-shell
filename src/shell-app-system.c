@@ -106,6 +106,21 @@ static void shell_app_system_class_init(ShellAppSystemClass *klass)
                   SHELL_TYPE_APP);
 }
 
+static void
+add_aliases (ShellAppSystem  *self,
+             const char      *id,
+             GDesktopAppInfo *info)
+{
+  ShellAppSystemPrivate *priv = self->priv;
+  const char *alias;
+
+  alias = g_desktop_app_info_get_string (info, X_ENDLESS_ALIAS_KEY);
+  if (alias != NULL)
+    {
+      char *desktop_alias = g_strconcat (alias, ".desktop", NULL);
+      g_hash_table_insert (priv->alias_to_id, desktop_alias, g_strdup (id));
+    }
+}
 
 static void
 scan_alias_to_id (ShellAppSystem *self)
@@ -119,16 +134,9 @@ scan_alias_to_id (ShellAppSystem *self)
   for (l = apps; l != NULL; l = l->next)
     {
       GAppInfo *info = l->data;
-      const char *alias, *id;
-      g_autofree char *desktop_alias = NULL;
+      const char *id = g_app_info_get_id (info);
 
-      id = g_app_info_get_id (info);
-      alias = g_desktop_app_info_get_string (G_DESKTOP_APP_INFO (info), X_ENDLESS_ALIAS_KEY);
-      if (alias == NULL)
-        continue;
-
-      desktop_alias = g_strconcat (alias, ".desktop", NULL);
-      g_hash_table_insert (priv->alias_to_id, g_strdup (desktop_alias), g_strdup (id));
+      add_aliases (self, id, G_DESKTOP_APP_INFO (info));
     }
 
   g_list_free_full (apps, g_object_unref);
@@ -365,7 +373,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 {
   ShellAppSystemPrivate *priv = self->priv;
   ShellApp *app;
-  GDesktopAppInfo *info;
+  g_autoptr(GDesktopAppInfo) info = NULL;
   g_autofree char *alias = NULL;
 
   app = g_hash_table_lookup (priv->id_to_app, id);
@@ -378,14 +386,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 
   app = _shell_app_new (info);
   g_hash_table_insert (priv->id_to_app, (char *) shell_app_get_id (app), app);
-  g_object_unref (info);
-
-  alias = g_desktop_app_info_get_string (info, X_ENDLESS_ALIAS_KEY);
-  if (alias != NULL && g_hash_table_lookup (priv->alias_to_id, alias) == NULL)
-    {
-      g_autofree char *desktop_alias = g_strconcat (alias, ".desktop", NULL);
-      g_hash_table_insert (priv->alias_to_id, g_strdup (desktop_alias), g_strdup (id));
-    }
+  add_aliases (self, id, info);
 
   return app;
 }
