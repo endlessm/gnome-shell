@@ -402,13 +402,6 @@ var CodingSession = new Lang.Class({
                                                                     this._constrainGeometry.bind(this));
     },
 
-    _toolboxWindowIsReady: function() {
-        this._animate(this.app,
-                      this.toolbox,
-                      Gtk.DirectionType.LEFT);
-        this.button.switchAnimation(Gtk.DirectionType.LEFT);
-    },
-
     // Maybe admit this actor if it is the kind of actor that we want
     admitToolboxWindowActor: function(actor) {
         // If there is a currently bound window then we can't admit this window.
@@ -451,10 +444,14 @@ var CodingSession = new Lang.Class({
             if (!this.toolbox._drawnFirstFrame) {
                 let firstFrameConnection = this.toolbox.connect('first-frame', () => {
                     this.toolbox.disconnect(firstFrameConnection);
-                    this._toolboxWindowIsReady();
-                });
+                    this._completeAnimate(this.app,
+                                          this.toolbox,
+                                          Gtk.DirectionType.LEFT);
+                }));
             } else {
-                this._toolboxWindowIsReady();
+                this._completeAnimate(this.app,
+                                      this.toolbox,
+                                      Gtk.DirectionType.LEFT);
             }
         }
 
@@ -587,10 +584,9 @@ var CodingSession = new Lang.Class({
             this._prepareAnimate(this.app,
                                  this.toolbox,
                                  Gtk.DirectionType.LEFT);
-            this._animate(this.app,
-                          this.toolbox,
-                          Gtk.DirectionType.LEFT);
-            this.button.switchAnimation(Gtk.DirectionType.LEFT);
+            this._completeAnimate(this.app,
+                                  this.toolbox,
+                                  Gtk.DirectionType.LEFT);
             this._state = STATE_TOOLBOX;
         }
     },
@@ -600,10 +596,9 @@ var CodingSession = new Lang.Class({
         this._prepareAnimate(this.toolbox,
                              this.app,
                              Gtk.DirectionType.RIGHT);
-        this._animate(this.toolbox,
-                      this.app,
-                      Gtk.DirectionType.RIGHT);
-        this.button.switchAnimation(Gtk.DirectionType.RIGHT);
+        this._completeAnimate(this.toolbox,
+                              this.app,
+                              Gtk.DirectionType.RIGHT);
         this._state = STATE_APP;
     },
 
@@ -795,6 +790,13 @@ var CodingSession = new Lang.Class({
         src.rotation_angle_y = 0;
         dst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
         src.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
+    },
+
+    _completeAnimate: function(src, dst, direction) {
+        this._animate(src,
+                      dst,
+                      direction);
+        this.button.switchAnimation(direction);
     },
 
     _animate: function(src, dst, direction) {
