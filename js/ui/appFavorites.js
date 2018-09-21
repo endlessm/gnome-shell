@@ -42,7 +42,29 @@ class AppFavorites extends Signals.EventEmitter {
     }
 
     reload() {
-        const ids = global.settings.get_strv(this.FAVORITE_APPS_KEY);
+        let ids = global.settings.get_strv(this.FAVORITE_APPS_KEY);
+        let appSys = Shell.AppSystem.get_default();
+
+        // Map old desktop file names to the current ones
+        let updated = false;
+        ids = ids.map(id => {
+            let newId = RENAMED_DESKTOP_IDS[id];
+            if (newId !== undefined &&
+                appSys.lookup_app(newId) != null) {
+                updated = true;
+                return newId;
+            }
+            let newApp = appSys.lookup_alias(id);
+            if (newApp && newApp.get_id() !== id) {
+                updated = true;
+                return newApp.get_id();
+            }
+            return id;
+        });
+        // ... and write back the updated desktop file names
+        if (updated)
+            global.settings.set_strv(this.FAVORITE_APPS_KEY, ids);
+
         const apps = ids.map(id => this._appSystem.lookup_app(id))
                       .filter(app => app !== null && this._parentalControlsManager.shouldShowApp(app.app_info));
         this._favorites = {};
