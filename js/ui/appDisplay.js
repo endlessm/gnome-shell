@@ -1599,15 +1599,10 @@ var AppSearchProvider = new Lang.Class({
 
         // resort to keep results on the desktop grid before the others
         results = results.sort(function(a, b) {
-            let hasA = IconGridLayout.layout.hasIcon(a);
-            let hasB = IconGridLayout.layout.hasIcon(b);
+            let hasA = a === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(a);
+            let hasB = b === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(b);
 
-            if (hasA)
-                return -1;
-            if (hasB)
-                return 1;
-
-            return 0;
+            return hasB - hasA;
         });
 
         // perform replacements by removing replaceable apps
