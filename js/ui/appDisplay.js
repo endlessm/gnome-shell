@@ -1602,9 +1602,9 @@ var AppSearchProvider = new Lang.Class({
             let hasA = a === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(a);
             let hasB = b === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(b);
 
-            if (hasA)
+            if (hasA && !hasB)
                 return -1;
-            if (hasB)
+            if (hasB && !hasA)
                 return 1;
 
             return 0;
