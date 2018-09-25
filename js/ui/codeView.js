@@ -645,14 +645,21 @@ var CodingSession = new Lang.Class({
     },
 
     _switchToApp: function() {
-        this.app.meta_window.activate(global.get_current_time());
-        this._prepareAnimate(this.toolbox,
-                             this.app,
-                             Gtk.DirectionType.RIGHT);
-        this._completeAnimate(this.toolbox,
-                              this.app,
-                              Gtk.DirectionType.RIGHT);
-        this._state = STATE_APP;
+        if (this._toolboxActionGroup.has_action('flip-back')) {
+            this._toolboxActionGroup.activate_action(
+                'flip-back',
+                new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
+                                          this.app.meta_window.gtk_window_object_path]));
+        } else {
+            this.app.meta_window.activate(global.get_current_time());
+            this._prepareAnimate(this.toolbox,
+                                 this.app,
+                                 Gtk.DirectionType.RIGHT);
+            this._completeAnimate(this.toolbox,
+                                  this.app,
+                                  Gtk.DirectionType.RIGHT);
+            this._state = STATE_APP;
+        }
     },
 
     // Given some recently-focused actor, switch to it without
