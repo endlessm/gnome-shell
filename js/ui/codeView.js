@@ -393,30 +393,6 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
-function launchToolboxAction(actionName, parameter) {
-    // FIXME: this should be extended to make it possible to launch
-    // arbitrary toolboxes in the future, depending on the application
-    Gio.DBus.session.call('com.endlessm.HackToolbox',
-                          '/com/endlessm/HackToolbox',
-                          'org.gtk.Actions',
-                          'Activate',
-                          new GLib.Variant('(sava{sv})', [
-                              actionName, parameter, {}
-                          ]),
-                          null,
-                          Gio.DBusCallFlags.NONE,
-                          GLib.MAXINT32,
-                          null,
-                          (conn, result) => {
-                              try {
-                                  conn.call_finish(result);
-                              } catch (e) {
-                                  // Failed.
-                                  logError(e, 'Failed to start com.endlessm.HackToolbox');
-                              }
-                          });
-};
-
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
     Extends: GObject.Object,
@@ -445,6 +421,14 @@ var CodingSession = new Lang.Class({
 
         this._state = STATE_APP;
         this.toolboxProxy = null;
+
+        // FIXME: this should be extended to make it possible to launch
+        // arbitrary toolboxes in the future, depending on the application
+        this._toolboxActionGroup =
+            Gio.DBusActionGroup.get(Gio.DBus.session,
+                                    'com.endlessm.HackToolbox',
+                                    '/com/endlessm/HackToolbox');
+        this._toolboxActionGroup.list_actions();
 
         this.button.connect('clicked', this._switchWindows.bind(this));
         this._positionChangedIdApp = this.app.meta_window.connect('position-changed',
@@ -644,10 +628,10 @@ var CodingSession = new Lang.Class({
     // the caller.
     _switchToToolbox: function() {
         if (!this.toolbox) {
-            launchToolboxAction(
+            this._toolboxActionGroup.activate_action(
                 'flip',
-                [new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
-                                           this.app.meta_window.gtk_window_object_path])]);
+                new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
+                                          this.app.meta_window.gtk_window_object_path]));
         } else {
             this.toolbox.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
