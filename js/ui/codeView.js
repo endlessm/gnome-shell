@@ -69,6 +69,26 @@ function _getAppManifest(flatpakID) {
     return null;
 }
 
+function _getToolboxProxy(metaWindow) {
+    let proxy;
+    try {
+        proxy = new HackToolboxProxy(Gio.DBus.session,
+                                     metaWindow.gtk_application_id,
+                                     metaWindow.gtk_window_object_path);
+
+    } catch (error) {
+        // nothing to do
+    }
+
+    // FIXME: there does not seem to be a good way to check
+    // whether the interface is implemented by the other end,
+    // so we just check whether the property exists.
+    if (proxy.Target)
+        return proxy;
+
+    return null;
+}
+
 // _synchronizeMetaWindowActorGeometries
 //
 // Synchronize geometry of MetaWindowActor src to dst by
@@ -426,6 +446,7 @@ var CodingSession = new Lang.Class({
         this.parent(params);
 
         this._state = STATE_APP;
+        this.toolboxProxy = null;
 
         this.button.connect('clicked', this._switchWindows.bind(this));
         this._positionChangedIdApp = this.app.meta_window.connect('position-changed',
@@ -442,8 +463,13 @@ var CodingSession = new Lang.Class({
                                                                     this._constrainGeometry.bind(this));
     },
 
+    admitAppWindowActor: function(actor) {
+        // TODO: handle the flip-back window being mapped here
+        return false;
+    },
+
     // Maybe admit this actor if it is the kind of actor that we want
-    admitToolboxWindowActor: function(actor) {
+    admitToolboxWindowActor: function(actor, proxy) {
         // If there is a currently bound window then we can't admit this window.
         if (this.toolbox)
             return false;
@@ -452,6 +478,7 @@ var CodingSession = new Lang.Class({
         // geometries now.
         this.toolbox = actor;
         this.button.toolbox_window = actor.meta_window;
+        this.toolboxProxy = proxy;
 
         // The assumption here is that if we connect a new window, we
         // are connecting a toolbox window (potentially 'on top') of the
@@ -944,21 +971,6 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    _addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
-        if (!global.settings.get_boolean('enable-code-view'))
-            return false;
-
-        for (let session of this._sessions) {
-            if (session.toolbox === null &&
-                session.app.meta_window.gtk_application_id == targetBusName &&
-                session.app.meta_window.gtk_window_object_path == targetObjectPath) {
-                return session.admitToolboxWindowActor(actor);
-            }
-        }
-
-        return false;
-    },
-
     _removeAppWindow: function(actor) {
         let window = actor.meta_window;
         if (!_isCodingApp(window.get_flatpak_id()))
@@ -1003,33 +1015,27 @@ var CodeViewManager = new Lang.Class({
         if (!actor.meta_window.gtk_application_object_path)
             return false;
 
-        // It might be a "HackToolbox". Check that, and if so,
-        // add it to the window group for the window.
-        let proxy;
-        let isToolbox = false;
-        try {
-            proxy = new HackToolboxProxy(Gio.DBus.session,
-                                         actor.meta_window.gtk_application_id,
-                                         actor.meta_window.gtk_window_object_path);
+        let proxy = _getToolboxProxy(actor.meta_window);
 
-        } catch (error) {
-            // nothing to do
+        // This is a new proxy window, make it join the session
+        if (proxy) {
+            let [targetBusName, targetObjectPath] = proxy.Target;
+            let session = this._getSessionForTargetApp(
+                actor, targetBusName, targetObjectPath);
+            return session.admitToolboxWindowActor(actor, proxy);
         }
 
-        // FIXME: there does not seem to be a good way to check
-        // whether the interface is implemented by the other end,
-        // so we just check whether the property exists.
-        if (proxy.Target)
-            isToolbox = true;
+        // See if this is a new app window for an existing toolbox session
+        let session = this._getSessionForToolboxTarget(
+            actor,
+            actor.meta_window.gtk_application_id,
+            actor.meta_window.gtk_window_object_path);
+        if (session)
+            return session.admitAppWindowActor(actor);
 
-        if (!isToolbox) {
-            this._addAppWindow(actor);
-            return false;
-        }
-
-        let [targetBusName, targetObjectPath] = proxy.Target;
-        this._addToolboxWindow(actor, targetBusName, targetObjectPath);
-        return true;
+        // This is simply a new application window
+        this._addAppWindow(actor);
+        return false;
     },
 
     killEffectsOnActor: function(actor) {
@@ -1045,6 +1051,33 @@ var CodeViewManager = new Lang.Class({
             let session = this._sessions[i];
             if (((session.app === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_APP)) ||
                 ((session.toolbox === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)))
+                return session;
+        }
+
+        return null;
+    },
+
+    _getSessionForTargetApp: function(actor, targetBusName, targetObjectPath) {
+        for (let i = 0; i < this._sessions.length; i++) {
+            let session = this._sessions[i];
+            if ((session.app &&
+                 (session.app.meta_window.gtk_application_id == targetBusName &&
+                  session.app.meta_window.gtk_window_object_path == targetObjectPath)))
+                return session;
+        }
+
+        return null;
+    },
+
+    _getSessionForToolboxTarget: function(actor, appBusName, appObjectPath) {
+        for (let i = 0; i < this._sessions.length; i++) {
+            let session = this._sessions[i];
+            if (!session.toolboxProxy)
+                continue;
+
+            let [targetBusName, targetObjectPath] = session.toolboxProxy.Target;
+            if (targetBusName == appBusName &&
+                targetObjectPath == appObjectPath)
                 return session;
         }
 
