@@ -83,7 +83,7 @@ var AppFavorites = new Lang.Class({
                 return newId;
             }
             let newApp = appSys.lookup_alias(id);
-            if (newApp) {
+            if (newApp && newApp.get_id() !== id) {
                 updated = true;
                 return newApp.get_id();
             }
