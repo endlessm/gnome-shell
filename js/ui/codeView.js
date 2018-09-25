@@ -393,7 +393,7 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
-function launchToolboxForTarget(targetBusName, targetObjectPath) {
+function launchToolboxAction(actionName, parameter) {
     // FIXME: this should be extended to make it possible to launch
     // arbitrary toolboxes in the future, depending on the application
     Gio.DBus.session.call('com.endlessm.HackToolbox',
@@ -401,9 +401,7 @@ function launchToolboxForTarget(targetBusName, targetObjectPath) {
                           'org.gtk.Actions',
                           'Activate',
                           new GLib.Variant('(sava{sv})', [
-                              'flip',
-                              [new GLib.Variant('(ss)', [targetBusName, targetObjectPath])],
-                              {}
+                              actionName, parameter, {}
                           ]),
                           null,
                           Gio.DBusCallFlags.NONE,
@@ -646,8 +644,10 @@ var CodingSession = new Lang.Class({
     // the caller.
     _switchToToolbox: function() {
         if (!this.toolbox) {
-            launchToolboxForTarget(this.app.meta_window.gtk_application_id,
-                                   this.app.meta_window.gtk_window_object_path);
+            launchToolboxAction(
+                'flip',
+                [new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
+                                           this.app.meta_window.gtk_window_object_path])]);
         } else {
             this.toolbox.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
