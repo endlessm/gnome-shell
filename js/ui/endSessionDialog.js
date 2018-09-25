@@ -799,7 +799,7 @@ var EndSessionDialog = new Lang.Class({
         let updatePrepared = this._pkOfflineProxy ? this._pkOfflineProxy.UpdatePrepared : false;
         let updatesAllowed = this._updatesPermission && this._updatesPermission.allowed;
 
-        _setCheckBoxLabel(this._checkBox, dialogContent.checkBoxText);
+        _setCheckBoxLabel(this._checkBox, dialogContent.checkBoxText || '');
         this._checkBox.actor.visible = (dialogContent.checkBoxText && updatePrepared && updatesAllowed);
         this._checkBox.actor.checked = (updatePrepared && updateTriggered);
 
