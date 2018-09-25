@@ -413,7 +413,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 {
   ShellAppSystemPrivate *priv = self->priv;
   ShellApp *app;
-  GDesktopAppInfo *info;
+  g_autoptr(GDesktopAppInfo) info = NULL;
   g_autofree char *alias = NULL;
 
   app = g_hash_table_lookup (priv->id_to_app, id);
@@ -426,9 +426,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 
   app = _shell_app_new (info);
   g_hash_table_insert (priv->id_to_app, (char *) shell_app_get_id (app), app);
-  g_object_unref (info);
-
-  add_aliases (self, id, app);
+  add_aliases (self, id, info);
 
   return app;
 }
