@@ -402,6 +402,11 @@ var CodingSession = new Lang.Class({
                                                                     this._constrainGeometry.bind(this));
     },
 
+    admitAppWindowActor: function(actor) {
+        // TODO: handle the flip-back window being mapped here
+        return false;
+    },
+
     // Maybe admit this actor if it is the kind of actor that we want
     admitToolboxWindowActor: function(actor) {
         // If there is a currently bound window then we can't admit this window.
@@ -903,21 +908,6 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    _addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
-        if (!global.settings.get_boolean('enable-code-view'))
-            return false;
-
-        for (let session of this._sessions) {
-            if (session.toolbox === null &&
-                session.app.meta_window.gtk_application_id == targetBusName &&
-                session.app.meta_window.gtk_window_object_path == targetObjectPath) {
-                return session.admitToolboxWindowActor(actor);
-            }
-        }
-
-        return false;
-    },
-
     _removeAppWindow: function(actor) {
         let window = actor.meta_window;
         if (!_isCodingApp(window.get_flatpak_id()))
@@ -965,15 +955,27 @@ var CodeViewManager = new Lang.Class({
         // It might be a "HackToolbox". Check that, and if so,
         // add it to the window group for the window.
         let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(actor.meta_window);
-        if (!proxy) {
-            this._addAppWindow(actor);
-            return false;
+
+        // This is a new proxy window, make it join the session
+        if (proxy) {
+            let variant = proxy.get_cached_property('Target');
+            let [targetBusName, targetObjectPath] = variant.deep_unpack();
+            let session = this._getSessionForTargetApp(
+                targetBusName, targetObjectPath);
+            if (session)
+                return session.admitToolboxWindowActor(actor);
         }
 
-        let variant = proxy.get_cached_property('Target');
-        let [targetBusName, targetObjectPath] = variant.deep_unpack();
-        this._addToolboxWindow(actor, targetBusName, targetObjectPath);
-        return true;
+        // See if this is a new app window for an existing toolbox session
+        let session = this._getSessionForToolboxTarget(
+            actor.meta_window.gtk_application_id,
+            actor.meta_window.gtk_window_object_path);
+        if (session)
+            return session.admitAppWindowActor(actor);
+
+        // This is simply a new application window
+        this._addAppWindow(actor);
+        return false;
     },
 
     killEffectsOnActor: function(actor) {
@@ -989,6 +991,33 @@ var CodeViewManager = new Lang.Class({
             let session = this._sessions[i];
             if (((session.app === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_APP)) ||
                 ((session.toolbox === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)))
+                return session;
+        }
+
+        return null;
+    },
+
+    _getSessionForTargetApp: function(targetBusName, targetObjectPath) {
+        for (let session of this._sessions) {
+            if ((session.app &&
+                 (session.app.meta_window.gtk_application_id == targetBusName &&
+                  session.app.meta_window.gtk_window_object_path == targetObjectPath)))
+                return session;
+        }
+
+        return null;
+    },
+
+    _getSessionForToolboxTarget: function(appBusName, appObjectPath) {
+        for (let session of this._sessions) {
+            if (!session.toolbox)
+                continue;
+
+            let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(session.toolbox.meta_window);
+            let variant = proxy.get_cached_property('Target');
+            let [targetBusName, targetObjectPath] = variant.deep_unpack();
+            if (targetBusName == appBusName &&
+                targetObjectPath == appObjectPath)
                 return session;
         }
 
