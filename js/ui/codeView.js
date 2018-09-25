@@ -24,6 +24,14 @@ const BUTTON_OFFSET_Y = 40;
 const STATE_APP = 0;
 const STATE_TOOLBOX = 1;
 
+const HackToolboxIface = '<node name="/com/endlessm/HackToolbox/Toolbox"> \
+<interface name="com.endlessm.HackToolbox.Toolbox"> \
+    <property name="Target" type="(ss)" access="read" /> \
+</interface> \
+</node>';
+
+const HackToolboxProxy = Gio.DBusProxy.makeProxyWrapper(HackToolboxIface);
+
 const _CODING_APPS = [
     //FIXME: this should be extended with a more complex lookup
     'com.endlessm.dinosaurs.en'
@@ -920,7 +928,7 @@ var CodeViewManager = new Lang.Class({
         }));
     },
 
-    addAppWindow: function(actor) {
+    _addAppWindow: function(actor) {
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
@@ -936,7 +944,7 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
+    _addToolboxWindow: function(actor, targetBusName, targetObjectPath) {
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
@@ -951,7 +959,7 @@ var CodeViewManager = new Lang.Class({
         return false;
     },
 
-    removeAppWindow: function(actor) {
+    _removeAppWindow: function(actor) {
         let window = actor.meta_window;
         if (!_isCodingApp(window.get_flatpak_id()))
             return false;
@@ -971,7 +979,7 @@ var CodeViewManager = new Lang.Class({
         return true;
     },
 
-    removeToolboxWindow: function(actor) {
+    _removeToolboxWindow: function(actor) {
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (!session)
             return false;
@@ -979,6 +987,48 @@ var CodeViewManager = new Lang.Class({
         // We can remove the normal toolbox window.
         // That window will be registered in the session at this point.
         session.removeToolboxWindow();
+        return true;
+    },
+
+    handleDestroyWindow: function(actor) {
+        this._removeAppWindow(actor);
+        this._removeToolboxWindow(actor);
+    },
+
+    handleMapWindow: function(actor) {
+        // Check if the window is a GtkApplicationWindow. If it is
+        // then it might be either a "hack" toolbox window or target
+        // window and we'll need to check on the session bus and
+        // make associations as appropriate
+        if (!actor.meta_window.gtk_application_object_path)
+            return false;
+
+        // It might be a "HackToolbox". Check that, and if so,
+        // add it to the window group for the window.
+        let proxy;
+        let isToolbox = false;
+        try {
+            proxy = new HackToolboxProxy(Gio.DBus.session,
+                                         actor.meta_window.gtk_application_id,
+                                         actor.meta_window.gtk_window_object_path);
+
+        } catch (error) {
+            // nothing to do
+        }
+
+        // FIXME: there does not seem to be a good way to check
+        // whether the interface is implemented by the other end,
+        // so we just check whether the property exists.
+        if (proxy.Target)
+            isToolbox = true;
+
+        if (!isToolbox) {
+            this._addAppWindow(actor);
+            return false;
+        }
+
+        let [targetBusName, targetObjectPath] = proxy.Target;
+        this._addToolboxWindow(actor, targetBusName, targetObjectPath);
         return true;
     },
 

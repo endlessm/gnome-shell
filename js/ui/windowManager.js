@@ -66,14 +66,6 @@ const GsdWacomIface = '<node name="/org/gnome/SettingsDaemon/Wacom"> \
 
 const GsdWacomProxy = Gio.DBusProxy.makeProxyWrapper(GsdWacomIface);
 
-const HackToolboxIface = '<node name="/com/endlessm/HackToolbox/Toolbox"> \
-<interface name="com.endlessm.HackToolbox.Toolbox"> \
-    <property name="Target" type="(ss)" access="read" /> \
-</interface> \
-</node>';
-
-const HackToolboxProxy = Gio.DBusProxy.makeProxyWrapper(HackToolboxIface);
-
 var DisplayChangeDialog = new Lang.Class({
     Name: 'DisplayChangeDialog',
     Extends: ModalDialog.ModalDialog,
@@ -2245,35 +2237,10 @@ var WindowManager = new Lang.Class({
             actor._animatableSurface.attach_animation_effect_with_server_priority('move',
                                                                                   this._wobblyEffect);
 
-        // Check if the window is a GtkApplicationWindow. If it is
-        // then it might be either a "hack" toolbox window or target
-        // window and we'll need to check on the session bus and
-        // make associations as appropriate
-        if (!actor.meta_window.gtk_application_object_path) {
+        if (this._codeViewManager.handleMapWindow(actor))
+            shellwm.completed_map(actor);
+        else
             this._animateMappedWindow(shellwm, actor);
-            return;
-        }
-
-        // It might be a "HackToolbox". Check if that interface exists, and
-        // if it does, then add it to the window group for the window.
-        let proxy = new HackToolboxProxy(
-            Gio.DBus.session,
-            actor.meta_window.gtk_application_id,
-            actor.meta_window.gtk_window_object_path,
-            Lang.bind(this, function(proxy, error) {
-                // FIXME: there does not seem to be a good way to check
-                // whether the interface is implemented by the other end,
-                // so we just check whether the property exists.
-                if (error || !proxy.Target) {
-                    this._codeViewManager.addAppWindow(actor);
-                    this._animateMappedWindow(shellwm, actor);
-                    return;
-                }
-
-                let [targetBusName, targetObjectPath] = proxy.Target;
-                this._codeViewManager.addToolboxWindow(actor, targetBusName, targetObjectPath);
-                shellwm.completed_map(actor);
-            }));
     },
 
     _animateMappedWindow: function(shellwm, actor) {
@@ -2422,8 +2389,7 @@ var WindowManager = new Lang.Class({
     _destroyWindow : function(shellwm, actor) {
         let window = actor.meta_window;
 
-        this._codeViewManager.removeAppWindow(actor);
-        this._codeViewManager.removeToolboxWindow(actor);
+        this._codeViewManager.handleDestroyWindow(actor);
 
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
