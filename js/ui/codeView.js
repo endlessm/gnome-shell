@@ -394,6 +394,7 @@ var CodingSession = new Lang.Class({
     _init: function(params) {
         this._app = null;
         this._toolbox = null;
+        this.appRemovedByFlipBack = false;
 
         this._positionChangedIdApp = 0;
         this._positionChangedIdToolbox = 0;
@@ -453,9 +454,7 @@ var CodingSession = new Lang.Class({
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
         this.app = actor;
-
-        //FIXME: take care of updating the button...
-        //this.button.toolbox_window = actor.meta_window;
+        this.button.window = actor.meta_window;
 
         _synchronizeMetaWindowActorGeometries(this.toolbox, this.app);
 
@@ -608,6 +607,17 @@ var CodingSession = new Lang.Class({
         }
     },
 
+    removeAppWindow: function() {
+        this.appRemovedByFlipBack = false;
+        this.app = null;
+
+        this.button.window = null;
+        this._state = STATE_TOOLBOX;
+
+        this.toolbox.meta_window.activate(global.get_current_time());
+        this.toolbox.show();
+    },
+
     // Eject out of this session and remove all pairings.
     // Remove all connected signals and close the toolbox as well, if we have one.
     //
@@ -700,6 +710,7 @@ var CodingSession = new Lang.Class({
     _switchToApp: function() {
         if (this._toolboxActionGroup.has_action('flip-back')) {
             this._toolboxActionGroup.activate_action('flip-back', null);
+            this.appRemovedByFlipBack = true;
         } else {
             this.app.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.toolbox,
@@ -1022,14 +1033,19 @@ var CodeViewManager = new Lang.Class({
         if (!session)
             return false;
 
-        // Destroy the session here and remove it from the list
-        session.destroy();
+        if (session.appRemovedByFlipBack) {
+            session.removeAppWindow();
+        } else {
+            // Destroy the session here and remove it from the list
+            session.destroy();
 
-        let idx = this._sessions.indexOf(session);
-        if (idx === -1)
-            return false;
+            let idx = this._sessions.indexOf(session);
+            if (idx === -1)
+                return false;
 
-        this._sessions.splice(idx, 1);
+            this._sessions.splice(idx, 1);
+        }
+
         return true;
     },
 
