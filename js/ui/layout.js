@@ -3,6 +3,7 @@
 const Clutter = imports.gi.Clutter;
 const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
@@ -57,8 +58,17 @@ const defaultParams = {
 
 var LayoutManager = new Lang.Class({
     Name: 'LayoutManager',
+    Extends: GObject.Object,
+    Signals: { 'background-clicked': {},
+               'hot-corners-changed': {},
+               'startup-complete': {},
+               'startup-prepared': {},
+               'monitors-changed': {},
+               'keyboard-visible-changed': { param_types: [GObject.TYPE_BOOLEAN] } },
 
-    _init: function () {
+    _init() {
+        this.parent();
+
         this._rtl = (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL);
         this.monitors = [];
         this.primaryMonitor = null;
@@ -84,23 +94,11 @@ var LayoutManager = new Lang.Class({
         global.stage.no_clear_hint = true;
 
         // Set up stage hierarchy to group all UI actors under one container.
-        this.uiGroup = new Shell.GenericContainer({ name: 'uiGroup' });
-        this.uiGroup.connect('allocate',
-                        function (actor, box, flags) {
-                            let children = actor.get_children();
-                            for (let i = 0; i < children.length; i++)
-                                children[i].allocate_preferred_size(flags);
-                        });
-        this.uiGroup.connect('get-preferred-width',
-                        function(actor, forHeight, alloc) {
-                            let width = global.stage.width;
-                            [alloc.min_size, alloc.natural_size] = [width, width];
-                        });
-        this.uiGroup.connect('get-preferred-height',
-                        function(actor, forWidth, alloc) {
-                            let height = global.stage.height;
-                            [alloc.min_size, alloc.natural_size] = [height, height];
-                        });
+        this.uiGroup = new St.Widget({ name: 'uiGroup' });
+        this.uiGroup.add_constraint(new Clutter.BindConstraint({
+            source: global.stage,
+            coordinate: Clutter.BindCoordinate.ALL,
+        }));
 
         global.stage.remove_actor(global.window_group);
         this.uiGroup.add_actor(global.window_group);
@@ -1039,7 +1037,6 @@ var LayoutManager = new Lang.Class({
         return this._startingUp;
     }
 });
-Signals.addSignalMethods(LayoutManager.prototype);
 
 
 // HotCorner:

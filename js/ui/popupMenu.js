@@ -773,7 +773,7 @@ var PopupMenu = new Lang.Class({
                                                      { x_fill: true,
                                                        y_fill: true,
                                                        x_align: St.Align.START });
-        this.actor = this._boxPointer.actor;
+        this.actor = this._boxPointer;
         this.actor._delegate = this;
         this.actor.style_class = 'popup-menu-boxpointer';
 
@@ -864,7 +864,7 @@ var PopupMenu = new Lang.Class({
         this.isOpen = true;
 
         this._boxPointer.setPosition(this.sourceActor, this._arrowAlignment);
-        this._boxPointer.show(animate);
+        this._boxPointer.open(animate);
 
         this.actor.raise_top();
 
@@ -876,9 +876,9 @@ var PopupMenu = new Lang.Class({
             this._activeMenuItem.setActive(false);
 
         if (this._boxPointer.actor.visible) {
-            this._boxPointer.hide(animate, Lang.bind(this, function() {
+            this._boxPointer.close(animate, () => {
                 this.emit('menu-closed');
-            }));
+            });
         }
 
         if (!this.isOpen)
