@@ -29,3 +29,6 @@ GSList         *shell_app_system_get_running               (ShellAppSystem  *sel
 char         ***shell_app_system_search                    (const char *search_string);
 
 GList          *shell_app_system_get_installed             (ShellAppSystem  *self);
+
+gboolean        shell_app_system_app_info_equal            (GDesktopAppInfo *one,
+                                                            GDesktopAppInfo *two);
