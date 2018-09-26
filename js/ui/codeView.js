@@ -1022,10 +1022,6 @@ var CodeViewManager = new Lang.Class({
     },
 
     _removeAppWindow: function(actor) {
-        let window = actor.meta_window;
-        if (!_isCodingApp(window.get_flatpak_id()))
-            return false;
-
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
         if (!session)
             return false;
