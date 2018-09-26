@@ -159,8 +159,7 @@ var WindowTrackingButton = new Lang.Class({
         'window': GObject.ParamSpec.object('window',
                                            '',
                                            '',
-                                           GObject.ParamFlags.READWRITE |
-                                           GObject.ParamFlags.CONSTRUCT_ONLY,
+                                           GObject.ParamFlags.READWRITE,
                                            Meta.Window),
         'toolbox_window': GObject.ParamSpec.object('toolbox-window',
                                                    '',
@@ -174,6 +173,7 @@ var WindowTrackingButton = new Lang.Class({
 
     _init: function(params) {
         this._toolbox_window = null;
+        this._window = null;
 
         this.parent(params);
 
@@ -190,10 +190,6 @@ var WindowTrackingButton = new Lang.Class({
         // constructed with the primary app window and we listen for signals
         // on that. This is because of the assumption that both the app
         // window and toolbox window are completely synchronized.
-        this._positionChangedId = this.window.connect('position-changed',
-                                                      this._updatePosition.bind(this));
-        this._sizeChangedId = this.window.connect('size-changed',
-                                                  this._updatePosition.bind(this));
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._showIfWindowVisible.bind(this));
         this._overviewHidingId = Main.overview.connect('hiding',
@@ -208,10 +204,14 @@ var WindowTrackingButton = new Lang.Class({
                                                                   this._show.bind(this));
     },
 
-    // Users MUST call destroy before unreferencing this button - this will
-    // cause it to disconnect all signals and remove its button from any
-    // layout managers.
-    destroy: function() {
+    _setupWindow: function() {
+        this._positionChangedId = this.window.connect('position-changed',
+                                                      this._updatePosition.bind(this));
+        this._sizeChangedId = this.window.connect('size-changed',
+                                                  this._updatePosition.bind(this));
+    },
+
+    _cleanupWindow: function() {
         if (this._positionChangedId) {
             this.window.disconnect(this._positionChangedId);
             this._positionChangedId = 0;
@@ -221,7 +221,12 @@ var WindowTrackingButton = new Lang.Class({
             this.window.disconnect(this._sizeChangedId);
             this._sizeChangedId = 0;
         }
+    },
 
+    // Users MUST call destroy before unreferencing this button - this will
+    // cause it to disconnect all signals and remove its button from any
+    // layout managers.
+    destroy: function() {
         if (this._windowsRestackedId) {
             Main.overview.disconnect(this._windowsRestackedId);
             this._windowsRestackedId = 0;
@@ -251,6 +256,8 @@ var WindowTrackingButton = new Lang.Class({
             global.window_manager.disconnect(this._windowUnminimizedId);
             this._windowUnminimizedId = 0;
         }
+
+        this.window = null;
 
         Main.layoutManager.removeChrome(this._button);
         this._button.destroy();
@@ -316,6 +323,17 @@ var WindowTrackingButton = new Lang.Class({
 
     get toolbox_window() {
         return this._toolbox_window;
+    },
+
+    set window(value) {
+        this._cleanupWindow();
+        this._window = value;
+        if (this._window)
+            this._setupWindow();
+    },
+
+    get window() {
+        return this._window;
     },
 
     _updatePosition: function() {
