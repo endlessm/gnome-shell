@@ -34,7 +34,8 @@ const HackToolboxProxy = Gio.DBusProxy.makeProxyWrapper(HackToolboxIface);
 
 const _CODING_APPS = [
     //FIXME: this should be extended with a more complex lookup
-    'com.endlessm.dinosaurs.en'
+    'com.endlessm.dinosaurs.en',
+    'com.endlessm.hackybird'
 ];
 
 function _isCodingApp(flatpakID) {
