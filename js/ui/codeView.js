@@ -623,6 +623,12 @@ var CodingSession = new Lang.Class({
         this._constrainGeometryAppId =
             this.app.meta_window.connect('geometry-allocate',
                                          this._constrainGeometry.bind(this));
+
+        this._appActionProxy =
+            Gio.DBusActionGroup.get(Gio.DBus.session,
+                                    this.app.meta_window.gtk_application_id,
+                                    this.app.meta_window.gtk_application_object_path);
+        this._appActionProxy.list_actions();
     },
 
     _cleanupAppWindow: function() {
@@ -743,6 +749,10 @@ var CodingSession = new Lang.Class({
                                   Gtk.DirectionType.LEFT);
             this._state = STATE_TOOLBOX;
         }
+
+        // Support a 'flip' action in the app too, if it exposes it
+        if (this._appActionProxy.has_action('flip'))
+            this._appActionProxy.activate_action('flip', new GLib.Variant('b', true));
     },
 
     _switchToApp: function() {
@@ -766,6 +776,10 @@ var CodingSession = new Lang.Class({
                                   Gtk.DirectionType.RIGHT);
             this._state = STATE_APP;
         }
+
+        // Support a 'flip' action in the app too, if it exposes it
+        if (this._appActionProxy.has_action('flip'))
+            this._appActionProxy.activate_action('flip', new GLib.Variant('b', false));
     },
 
     // Given some recently-focused actor, switch to it without
