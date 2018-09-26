@@ -682,7 +682,7 @@ var CodingSession = new Lang.Class({
             this.toolbox.hide();
             this.app.show();
         } else {
-            this.app.hide();
+            this.app.show();
             this.toolbox.show();
         }
 
@@ -722,10 +722,10 @@ var CodingSession = new Lang.Class({
         if (!maximizationStateChanged)
             return;
 
-        if (this._state === STATE_TOOLBOX)
-            this.app.hide();
-        else
-            this.toolbox.hide();
+        if (this._state === STATE_TOOLBOX) {
+            this.app.show();
+            this.toolbox.show();
+        }
     },
 
     _applyWindowMinimizationState: function(shellwm, actor) {
@@ -903,7 +903,7 @@ var CodingSession = new Lang.Class({
             return;
 
         Tweener.removeTweens(actor);
-        actor.hide();
+        actor.show();
         actor.rotation_angle_y = 0;
         actor.set_cull_back_face(false);
         this._rotatingOutActor = null;
