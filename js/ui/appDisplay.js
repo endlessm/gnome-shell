@@ -1577,11 +1577,6 @@ var AppSearchProvider = new Lang.Class({
         let groups = Shell.AppSystem.search(query);
         let usage = Shell.AppUsage.get_default();
         let results = [];
-        let codingEnabled = global.settings.get_boolean('enable-coding-game');
-        let codingApps = [
-            'com.endlessm.Coding.Chatbox.desktop',
-            'eos-shell-extension-prefs.desktop'
-        ];
         let replacementMap = {};
 
         groups.forEach(function(group) {
@@ -1592,10 +1587,6 @@ var AppSearchProvider = new Lang.Class({
 
                 // exclude links that are not part of the desktop grid
                 if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
-                    return false;
-
-                // exclude coding related apps if coding game is not enabled
-                if (!codingEnabled && codingApps.indexOf(appID) > -1)
                     return false;
 
                 if (app && app.should_show()) {
