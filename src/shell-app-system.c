@@ -240,7 +240,6 @@ static gboolean
 app_is_stale (ShellApp *app)
 {
   GDesktopAppInfo *info, *old;
-  GAppInfo *old_info, *new_info;
   gboolean is_unchanged;
 
   if (shell_app_is_window_backed (app))
@@ -252,25 +251,8 @@ app_is_stale (ShellApp *app)
     return TRUE;
 
   old = shell_app_get_app_info (app);
-  old_info = G_APP_INFO (old);
-  new_info = G_APP_INFO (info);
 
-  is_unchanged =
-    g_app_info_should_show (old_info) == g_app_info_should_show (new_info) &&
-    strcmp (g_desktop_app_info_get_filename (old),
-            g_desktop_app_info_get_filename (info)) == 0 &&
-    g_strcmp0 (g_app_info_get_executable (old_info),
-               g_app_info_get_executable (new_info)) == 0 &&
-    g_strcmp0 (g_app_info_get_commandline (old_info),
-               g_app_info_get_commandline (new_info)) == 0 &&
-    strcmp (g_app_info_get_name (old_info),
-            g_app_info_get_name (new_info)) == 0 &&
-    g_strcmp0 (g_app_info_get_description (old_info),
-               g_app_info_get_description (new_info)) == 0 &&
-    strcmp (g_app_info_get_display_name (old_info),
-            g_app_info_get_display_name (new_info)) == 0 &&
-    g_icon_equal (g_app_info_get_icon (old_info),
-                  g_app_info_get_icon (new_info));
+  is_unchanged = shell_app_system_app_info_equal (old, info);
 
   return !is_unchanged;
 }
