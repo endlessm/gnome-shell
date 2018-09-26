@@ -375,6 +375,16 @@ var CodingSession = new Lang.Class({
     },
 
     _init: function(params) {
+        this._app = null;
+        this._toolbox = null;
+
+        this._positionChangedIdApp = 0;
+        this._positionChangedIdToolbox = 0;
+        this._sizeChangedIdApp = 0;
+        this._sizeChangedIdToolbox = 0;
+        this._constrainGeometryAppId = 0;
+        this._constrainGeometryToolboxId = 0;
+
         this.parent(params);
 
         this._state = STATE_APP;
@@ -394,8 +404,28 @@ var CodingSession = new Lang.Class({
                                                                 this._applyWindowMinimizationState.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
                                                                   this._applyWindowUnminimizationState.bind(this));
+    },
 
-        this._setupAppWindow();
+    set app(value) {
+        this._cleanupAppWindow();
+        this._app = value;
+        if (this._app)
+            this._setupAppWindow();
+    },
+
+    get app() {
+        return this._app;
+    },
+
+    set toolbox(value) {
+        this._cleanupToolboxWindow();
+        this._toolbox = value;
+        if (this._toolbox)
+            this._setupToolboxWindow();
+    },
+
+    get toolbox() {
+        return this._toolbox;
     },
 
     admitAppWindowActor: function(actor) {
@@ -414,11 +444,6 @@ var CodingSession = new Lang.Class({
         this.toolbox = actor;
         this.button.toolbox_window = actor.meta_window;
 
-        // The assumption here is that if we connect a new window, we
-        // are connecting a toolbox window (potentially 'on top') of the
-        // speedwagon window, so there is no need to disconnect
-        // signals
-        this._setupToolboxWindow();
         _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
 
         // Now, if we're not already on the toolbox window, we want to start
@@ -486,13 +511,12 @@ var CodingSession = new Lang.Class({
     // any signals that we have connected to the toolbox window
     // and show the app window
     removeToolboxWindow: function() {
-        this._cleanupToolboxWindow();
+        this.toolbox = null;
 
         // Remove the toolbox_window reference from the button. There's no
         // need to disconnect any signals here since the button doesn't
         // care about signals on the toolbox.
         this.button.toolbox_window = null;
-        this.toolbox = null;
         this._state = STATE_APP;
 
         this.app.meta_window.activate(global.get_current_time());
@@ -514,11 +538,11 @@ var CodingSession = new Lang.Class({
     _cleanupAppWindow: function() {
         if (this._positionChangedIdApp !== 0) {
             this.app.meta_window.disconnect(this._positionChangedIdApp);
-            this.positionChangedIdApp = 0;
+            this._positionChangedIdApp = 0;
         }
         if (this._sizeChangedIdApp !== 0) {
             this.app.meta_window.disconnect(this._sizeChangedIdApp);
-            this.sizeChangedIdApp = 0;
+            this._sizeChangedIdApp = 0;
         }
         if (this._constrainGeometryAppId) {
             this.app.meta_window.disconnect(this._constrainGeometryAppId);
@@ -545,17 +569,18 @@ var CodingSession = new Lang.Class({
             this._windowUnminimizedId = 0;
         }
 
-        this._cleanupAppWindow();
+        this.app = null;
 
         // Destroy the button too
         this.button.destroy();
 
         // If we have a toolbox window, disconnect any signals and destroy it.
         if (this.toolbox) {
-            this._cleanupToolboxWindow();
+            let toolboxWindow = this.toolbox.meta_window;
+            this.toolbox = null;
 
             // Destroy the toolbox window now
-            this.toolbox.meta_window.delete(global.get_current_time());
+            toolboxWindow.delete(global.get_current_time());
 
             // Note that we do not set this._state to STATE_APP here. Any
             // further usage of this session is undefined and it should
