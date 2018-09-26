@@ -25,7 +25,6 @@ const IconGrid = imports.ui.iconGrid;
 const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const NotificationDaemon = imports.ui.notificationDaemon;
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
 const PopupMenu = imports.ui.popupMenu;
@@ -2628,7 +2627,6 @@ var AppIcon = new Lang.Class({
         this.app = app;
         this.id = app.get_id();
         this.name = app.get_name();
-        this._sourceAddedId = 0;
 
         let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
         iconParams = Params.parse(iconParams, { createIcon: this._createIcon.bind(this),
@@ -2659,10 +2657,6 @@ var AppIcon = new Lang.Class({
                 this._updateRunningStyle();
             }));
         this._updateRunningStyle();
-
-        if (app.get_id() === 'com.endlessm.Coding.Chatbox.desktop')
-            this._sourceAddedId = Main.messageTray.connect('source-added',
-                                                           this._sourceAdded.bind(this));
     },
 
     getId: function() {
@@ -2681,11 +2675,6 @@ var AppIcon = new Lang.Class({
         if (this._stateChangedId > 0)
             this.app.disconnect(this._stateChangedId);
         this._stateChangedId = 0;
-
-        if (this._sourceAddedId > 0) {
-            Main.messageTray.disconnect(this._sourceAddedId);
-            this._sourceAddedId = 0;
-        }
     },
 
     _createIcon: function(iconSize) {
@@ -2698,24 +2687,6 @@ var AppIcon = new Lang.Class({
 
         let sourceActor = new AppIconSourceActor(this._notificationSource, iconSize);
         return [sourceActor.actor];
-    },
-
-    _sourceAdded: function(tray, source) {
-        // we are only interested in ChatBox notifications for now, early return
-        // if not the type we are looking for
-        if (!(source instanceof NotificationDaemon.GtkNotificationDaemonAppSource))
-            return;
-
-        if (source.app != this.app)
-            return;
-
-        this._notificationSource = source;
-        this._notificationSource.connect('destroy', () => {
-            this._notificationSource = null;
-            this.icon.reloadIcon();
-        });
-
-        this.icon.reloadIcon();
     },
 
     _updateRunningStyle: function() {
