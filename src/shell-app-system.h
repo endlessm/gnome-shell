@@ -31,4 +31,7 @@ char         ***shell_app_system_search                    (const char *search_s
 
 GList          *shell_app_system_get_installed             (ShellAppSystem  *self);
 
+gboolean        shell_app_system_app_info_equal            (GDesktopAppInfo *one,
+                                                            GDesktopAppInfo *two);
+
 #endif /* __SHELL_APP_SYSTEM_H__ */
