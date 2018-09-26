@@ -1428,8 +1428,7 @@ var ScreenShield = new Lang.Class({
         // We need to add some extra checks for PAYG becasue we don't want to
         // end up loging the screen for not regular sessions (e.g. initial-setup).
         let shouldLockForPayg = Main.paygManager.isLocked &&
-            (Main.sessionMode.currentMode == 'user' ||
-             Main.sessionMode.currentMode == 'user-coding');
+            (Main.sessionMode.currentMode == 'user');
 
         if (!this._settings.get_boolean(LOCK_ENABLED_KEY) && !shouldLockForPayg)
             return;
