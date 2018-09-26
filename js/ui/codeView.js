@@ -1015,8 +1015,8 @@ var CodingSession = new Lang.Class({
 });
 
 const SessionLookupFlags = {
-    SESSION_LOOKUP_APP: 0,
-    SESSION_LOOKUP_TOOLBOX: 1,
+    SESSION_LOOKUP_APP: 1,
+    SESSION_LOOKUP_TOOLBOX: 2,
 };
 
 var CodeViewManager = new Lang.Class({
