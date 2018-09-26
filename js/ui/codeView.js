@@ -388,18 +388,14 @@ var CodingSession = new Lang.Class({
         this._toolboxActionGroup.list_actions();
 
         this.button.connect('clicked', this._switchWindows.bind(this));
-        this._positionChangedIdApp = this.app.meta_window.connect('position-changed',
-                                                                  this._synchronizeWindows.bind(this));
-        this._sizeChangedIdApp = this.app.meta_window.connect('size-changed',
-                                                              this._synchronizeWindows.bind(this));
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._windowsRestacked.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
                                                                 this._applyWindowMinimizationState.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
                                                                   this._applyWindowUnminimizationState.bind(this));
-        this._constrainGeometryAppId = this.app.meta_window.connect('geometry-allocate',
-                                                                    this._constrainGeometry.bind(this));
+
+        this._setupAppWindow();
     },
 
     admitAppWindowActor: function(actor) {
@@ -422,14 +418,8 @@ var CodingSession = new Lang.Class({
         // are connecting a toolbox window (potentially 'on top') of the
         // speedwagon window, so there is no need to disconnect
         // signals
-        this._positionChangedIdToolbox = this.toolbox.meta_window.connect('position-changed',
-                                                                          this._synchronizeWindows.bind(this));
-        this._sizeChangedIdToolbox = this.toolbox.meta_window.connect('size-changed',
-                                                                      this._synchronizeWindows.bind(this));
+        this._setupToolboxWindow();
         _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
-
-        this._constrainGeometryToolboxId = this.toolbox.meta_window.connect('geometry-allocate',
-                                                                            this._constrainGeometry.bind(this));
 
         // Now, if we're not already on the toolbox window, we want to start
         // animating to it here. This is different from just calling
@@ -461,6 +451,18 @@ var CodingSession = new Lang.Class({
         }
 
         return true;
+    },
+
+    _setupToolboxWindow: function() {
+        this._positionChangedIdToolbox =
+            this.toolbox.meta_window.connect('position-changed',
+                                             this._synchronizeWindows.bind(this));
+        this._sizeChangedIdToolbox =
+            this.toolbox.meta_window.connect('size-changed',
+                                             this._synchronizeWindows.bind(this));
+        this._constrainGeometryToolboxId =
+            this.toolbox.meta_window.connect('geometry-allocate',
+                                             this._constrainGeometry.bind(this));
     },
 
     _cleanupToolboxWindow: function() {
@@ -497,12 +499,19 @@ var CodingSession = new Lang.Class({
         this.app.show();
     },
 
-    // Eject out of this session and remove all pairings.
-    // Remove all connected signals and close the toolbox as well, if we have one.
-    //
-    // The assumption here is that the session will be removed immediately
-    // after destruction.
-    destroy: function() {
+    _setupAppWindow: function() {
+        this._positionChangedIdApp =
+            this.app.meta_window.connect('position-changed',
+                                         this._synchronizeWindows.bind(this));
+        this._sizeChangedIdApp =
+            this.app.meta_window.connect('size-changed',
+                                         this._synchronizeWindows.bind(this));
+        this._constrainGeometryAppId =
+            this.app.meta_window.connect('geometry-allocate',
+                                         this._constrainGeometry.bind(this));
+    },
+
+    _cleanupAppWindow: function() {
         if (this._positionChangedIdApp !== 0) {
             this.app.meta_window.disconnect(this._positionChangedIdApp);
             this.positionChangedIdApp = 0;
@@ -511,6 +520,18 @@ var CodingSession = new Lang.Class({
             this.app.meta_window.disconnect(this._sizeChangedIdApp);
             this.sizeChangedIdApp = 0;
         }
+        if (this._constrainGeometryAppId) {
+            this.app.meta_window.disconnect(this._constrainGeometryAppId);
+            this._constrainGeometryAppId = 0;
+        }
+    },
+
+    // Eject out of this session and remove all pairings.
+    // Remove all connected signals and close the toolbox as well, if we have one.
+    //
+    // The assumption here is that the session will be removed immediately
+    // after destruction.
+    destroy: function() {
         if (this._windowsRestackedId !== 0) {
             Main.overview.disconnect(this._windowsRestackedId);
             this._windowsRestackedId = 0;
@@ -524,10 +545,7 @@ var CodingSession = new Lang.Class({
             this._windowUnminimizedId = 0;
         }
 
-        if (this._constrainGeometryAppId) {
-            this.app.meta_window.disconnect(this._constrainGeometryAppId);
-            this._constrainGeometryAppId = 0;
-        }
+        this._cleanupAppWindow();
 
         // Destroy the button too
         this.button.destroy();
