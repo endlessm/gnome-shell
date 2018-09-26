@@ -833,11 +833,8 @@ var CodingSession = new Lang.Class({
         if (!focusedWindow)
             return;
 
-        if (!this.toolbox)
-            return;
-
-        let appWindow = this.app.meta_window;
-        let toolboxWindow = this.toolbox.meta_window;
+        let appWindow = this.app ? this.app.meta_window : null;
+        let toolboxWindow = this.toolbox ? this.toolbox.meta_window : null;
         let nextState = null;
 
         // Determine if we need to change the state of this session by
