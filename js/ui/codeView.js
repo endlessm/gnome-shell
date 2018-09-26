@@ -49,26 +49,6 @@ function _createIcon() {
     return icon;
 }
 
-function _getAppManifestAt(location, flatpakID) {
-    let manifestFile = Gio.File.new_for_path(GLib.build_filenamev([location, 'app', flatpakID, 'current',
-                                                                   'active', 'files', 'manifest.json']));
-    if (!manifestFile.query_exists(null))
-        return null;
-    return manifestFile;
-}
-
-function _getAppManifest(flatpakID) {
-    let manifestFile = _getAppManifestAt(Flatpak.Installation.new_user(null).get_path().get_path(), flatpakID);
-    if (manifestFile)
-        return manifestFile;
-
-    manifestFile = _getAppManifestAt(Flatpak.Installation.new_system(null).get_path().get_path(), flatpakID);
-    if (manifestFile)
-        return manifestFile;
-
-    return null;
-}
-
 function _getToolboxProxy(metaWindow) {
     let proxy;
     try {
