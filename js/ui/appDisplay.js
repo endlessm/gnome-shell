@@ -265,6 +265,20 @@ class BaseAppView {
             // The icon image changed
             if (newIconInfo && !newIconInfo.equal(oldIconInfo))
                 return true;
+
+            if (item instanceof Shell.App) {
+                if (!(currentIcon instanceof AppIcon) || !currentIcon.app) {
+                    // Should not happen: the IDs are the same so if the new
+                    // item is an app, so should be the existing icon.
+                    return true;
+                }
+
+                if (!Shell.AppSystem.app_info_equal(item.get_app_info(),
+                                                    currentIcon.app.get_app_info()))
+                    return true;
+            }
+            // TODO: deep equality for folders; at present the miniature icons
+            // will not update until the folder is next opened.
         }
 
         return false;
