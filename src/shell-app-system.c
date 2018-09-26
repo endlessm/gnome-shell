@@ -213,7 +213,19 @@ scan_startup_wm_class_to_id (ShellAppSystem *self)
   g_list_free_full (apps, g_object_unref);
 }
 
-static gboolean
+/**
+ * shell_app_system_app_info_equal:
+ * @one: (transfer none): a #GDesktopAppInfo
+ * @two: (transfer none): a possibly-different #GDesktopAppInfo
+ *
+ * Returns %TRUE if @one and @two can be treated as equal. Compared to
+ * g_app_info_equal(), which just compares app IDs, this function also compares
+ * fields of interest to the shell: icon, name, description, executable, and
+ * should_show().
+ *
+ * Returns: %TRUE if @one and @two are equivalent; %FALSE otherwise
+ */
+gboolean
 shell_app_system_app_info_equal (GDesktopAppInfo *one,
                                  GDesktopAppInfo *two)
 {
