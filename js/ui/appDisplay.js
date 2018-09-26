@@ -1077,13 +1077,33 @@ var BaseAppView = GObject.registerClass({
 
     _redisplay() {
         const oldApps = this._orderedItems.slice();
-        const oldAppIds = oldApps.map(icon => icon.id);
-
         const newApps = this._loadApps().sort(this._compareItems.bind(this));
-        const newAppIds = newApps.map(icon => icon.id);
 
-        const addedApps = newApps.filter(icon => !oldAppIds.includes(icon.id));
-        const removedApps = oldApps.filter(icon => !newAppIds.includes(icon.id));
+        const compareIcons = (itemA, itemB) => {
+            if ((itemA instanceof AppIcon) !== (itemB instanceof AppIcon))
+                return false;
+
+            if (itemA.name !== itemB.name)
+                return false;
+
+            if (itemA.id !== itemB.id)
+                return false;
+
+            if ((itemA instanceof AppIcon) &&
+                (itemB instanceof AppIcon) &&
+                !Shell.AppSystem.app_info_equal(itemA.app.get_app_info(), itemB.app.get_app_info()))
+                return false;
+
+            return true;
+        };
+
+        const addedApps = newApps.filter(icon => {
+            return !oldApps.some(oldIcon => compareIcons(oldIcon, icon));
+        });
+
+        const removedApps = oldApps.filter(icon => {
+            return !newApps.some(newIcon => compareIcons(newIcon, icon));
+        });
 
         // Remove old app icons
         removedApps.forEach(icon => {
