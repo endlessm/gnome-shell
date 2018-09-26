@@ -44,6 +44,13 @@ const RENAMED_DESKTOP_IDS = {
     'totem.desktop': 'org.gnome.Totem.desktop',
 };
 
+function surround(label, f) {
+    log('--> ' + label);
+    var ret = f();
+    log('<-- ' + label);
+    return ret;
+}
+
 var AppFavorites = new Lang.Class({
     Name: 'AppFavorites',
 
@@ -65,11 +72,15 @@ var AppFavorites = new Lang.Class({
     },
 
     _onFavsChanged: function() {
+        surround('_onFavsChanged', () => {
         this.reload();
+        surround('emit ::changed', () => {
         this.emit('changed');
+        });
+        });
     },
 
-    reload: function() {
+    reload: function() { surround('reload', () => {
         let ids = global.settings.get_strv(this.FAVORITE_APPS_KEY);
         let appSys = Shell.AppSystem.get_default();
 
@@ -90,8 +101,11 @@ var AppFavorites = new Lang.Class({
             return id;
         });
         // ... and write back the updated desktop file names
-        if (updated)
+        if (updated) {
+            surround('write back updated', () => {
             global.settings.set_strv(this.FAVORITE_APPS_KEY, ids);
+            });
+        }
 
         let apps = ids.map(function (id) {
                 return appSys.lookup_app(id);
@@ -103,7 +117,7 @@ var AppFavorites = new Lang.Class({
             let app = apps[i];
             this._favorites[app.get_id()] = app;
         }
-    },
+    })},
 
     _getIds: function() {
         let ret = [];
@@ -128,6 +142,7 @@ var AppFavorites = new Lang.Class({
     },
 
     _addFavorite: function(appId, pos) {
+        surround('_addFavorite', () => {
         if (appId in this._favorites)
             return false;
 
@@ -141,9 +156,12 @@ var AppFavorites = new Lang.Class({
             ids.push(appId);
         else
             ids.splice(pos, 0, appId);
+        surround('set_strv', () => {
         global.settings.set_strv(this.FAVORITE_APPS_KEY, ids);
+        });
         this._favorites[appId] = app;
         return true;
+        });
     },
 
     addFavoriteAtPos: function(appId, pos) {
@@ -160,12 +178,16 @@ var AppFavorites = new Lang.Class({
     },
 
     _removeFavorite: function(appId) {
+        surround('_removeFavorite', () => {
         if (!appId in this._favorites)
             return false;
 
         let ids = this._getIds().filter(function (id) { return id != appId; });
+        surround('set_strv', () => {
         global.settings.set_strv(this.FAVORITE_APPS_KEY, ids);
+        });
         return true;
+        });
     },
 
     removeFavorite: function(appId) {
