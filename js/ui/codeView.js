@@ -1103,7 +1103,8 @@ var CodeViewManager = new Lang.Class({
             let [targetBusName, targetObjectPath] = proxy.Target;
             let session = this._getSessionForTargetApp(
                 actor, targetBusName, targetObjectPath);
-            return session.admitToolboxWindowActor(actor, proxy);
+            if (session)
+                return session.admitToolboxWindowActor(actor, proxy);
         }
 
         // See if this is a new app window for an existing toolbox session
