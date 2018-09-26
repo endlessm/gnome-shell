@@ -489,6 +489,11 @@ var CodingSession = new Lang.Class({
         // _switchToApp - we already have the window and we want to
         // rotate to it as soon as its first frame appears
         if (this._state === STATE_TOOLBOX) {
+            this._prepareAnimate(this.toolbox,
+                                 this.app,
+                                 Gtk.DirectionType.RIGHT);
+            this._state = STATE_APP;
+
             // We wait until the first frame of the window has been drawn
             // and damage updated in the compositor before we start rotating.
             //
@@ -502,18 +507,10 @@ var CodingSession = new Lang.Class({
                                           Gtk.DirectionType.RIGHT);
                 }));
             } else {
-                GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
-                    this._completeAnimate(this.toolbox,
-                                          this.app,
-                                          Gtk.DirectionType.RIGHT);
-                    return false;
-                }));
+                this._completeAnimate(this.toolbox,
+                                      this.app,
+                                      Gtk.DirectionType.RIGHT);
             }
-
-            this._prepareAnimate(this.toolbox,
-                                 this.app,
-                                 Gtk.DirectionType.RIGHT);
-            this._state = STATE_APP;
         }
 
         return true;
@@ -538,6 +535,11 @@ var CodingSession = new Lang.Class({
         // _switchToToolbox - we already have the window and we want to
         // rotate to it as soon as its first frame appears
         if (this._state === STATE_APP) {
+            this._prepareAnimate(this.app,
+                                 this.toolbox,
+                                 Gtk.DirectionType.LEFT);
+            this._state = STATE_TOOLBOX;
+
             // We wait until the first frame of the window has been drawn
             // and damage updated in the compositor before we start rotating.
             //
@@ -551,18 +553,10 @@ var CodingSession = new Lang.Class({
                                           Gtk.DirectionType.LEFT);
                 }));
             } else {
-                GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
-                    this._completeAnimate(this.app,
-                                          this.toolbox,
-                                          Gtk.DirectionType.LEFT);
-                    return false;
-                }));
+                this._completeAnimate(this.app,
+                                      this.toolbox,
+                                      Gtk.DirectionType.LEFT);
             }
-
-            this._prepareAnimate(this.app,
-                                 this.toolbox,
-                                 Gtk.DirectionType.LEFT);
-            this._state = STATE_TOOLBOX;
         }
 
         return true;
