@@ -232,8 +232,7 @@ var Indicator = new Lang.Class({
 
     _updateNotification: function() {
         // Only notify when in an regular session, not in GDM or initial-setup.
-        if (Main.sessionMode.currentMode != 'user' &&
-            Main.sessionMode.currentMode != 'user-coding') {
+        if (Main.sessionMode.currentMode != 'user') {
             return;
         }
 
