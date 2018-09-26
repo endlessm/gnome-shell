@@ -472,8 +472,52 @@ var CodingSession = new Lang.Class({
     },
 
     admitAppWindowActor: function(actor) {
-        // TODO: handle the flip-back window being mapped here
-        return false;
+        // If there is a currently bound window then we can't admit this window.
+        if (this.app)
+            return false;
+
+        // We can admit this window. Wire up signals and synchronize
+        // geometries now.
+        this.app = actor;
+
+        //FIXME: take care of updating the button...
+        //this.button.toolbox_window = actor.meta_window;
+
+        _synchronizeMetaWindowActorGeometries(this.toolbox, this.app);
+
+        // Now, if we're not already on the app window, we want to start
+        // animating to it here. This is different from just calling
+        // _switchToApp - we already have the window and we want to
+        // rotate to it as soon as its first frame appears
+        if (this._state === STATE_TOOLBOX) {
+            // We wait until the first frame of the window has been drawn
+            // and damage updated in the compositor before we start rotating.
+            //
+            // This way we don't get ugly artifacts when rotating if
+            // a window is slow to draw.
+            if (!this.app._drawnFirstFrame) {
+                let firstFrameConnection = this.app.connect('first-frame', Lang.bind(this, function() {
+                    this.app.disconnect(firstFrameConnection);
+                    this._completeAnimate(this.toolbox,
+                                          this.app,
+                                          Gtk.DirectionType.RIGHT);
+                }));
+            } else {
+                GLib.idle_add(GLib.PRIORITY_DEFAULT, Lang.bind(this, function() {
+                    this._completeAnimate(this.toolbox,
+                                          this.app,
+                                          Gtk.DirectionType.RIGHT);
+                    return false;
+                }));
+            }
+
+            this._prepareAnimate(this.toolbox,
+                                 this.app,
+                                 Gtk.DirectionType.RIGHT);
+            this._state = STATE_APP;
+        }
+
+        return true;
     },
 
     // Maybe admit this actor if it is the kind of actor that we want
