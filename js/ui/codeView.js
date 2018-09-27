@@ -976,7 +976,8 @@ var CodingSession = new Lang.Class({
             rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeOutQuad',
-            onComplete: this._rotateOutCompleted.bind(this)
+            onComplete: this._rotateOutCompleted.bind(this),
+            onCompleteParams: [false]
         });
     },
 
@@ -1002,21 +1003,24 @@ var CodingSession = new Lang.Class({
 
         Tweener.removeTweens(actor);
         actor.rotation_angle_y = 0;
+        actor.opacity = 255;
         this._rotatingInActor = null;
     },
 
-    _rotateOutCompleted: function() {
+    _rotateOutCompleted: function(resetRotation) {
         let actor = this._rotatingOutActor;
         if (!actor)
             return;
 
         Tweener.removeTweens(actor);
+        if (resetRotation)
+            actor.rotation_angle_y = 0;
         this._rotatingOutActor = null;
     },
 
     killEffects: function() {
         this._rotateInCompleted();
-        this._rotateOutCompleted();
+        this._rotateOutCompleted(true);
     }
 });
 
