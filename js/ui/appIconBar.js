@@ -794,6 +794,17 @@ const ScrolledIconList = new Lang.Class({
         return -1;
     },
 
+    _removeButton(app, button) {
+        if (button === undefined) {
+            button = this._taskbarApps.get(app);
+        }
+
+        if (button !== undefined) {
+            button.actor.destroy();
+            this._taskbarApps.delete(app);
+        }
+    },
+
     _addButtonAnimated: function(app) {
         if (this._taskbarApps.has(app) || !this._isAppInteresting(app))
             return;
@@ -811,8 +822,7 @@ const ScrolledIconList = new Lang.Class({
         newChild.connect('app-icon-unpinned', () => {
             favorites.removeFavorite(app.get_id());
             if (app.state == Shell.AppState.STOPPED) {
-                newActor.destroy();
-                this._taskbarApps.delete(app);
+                this._removeButton(app, newChild);
                 this._updatePage();
             }
         });
@@ -838,13 +848,7 @@ const ScrolledIconList = new Lang.Class({
             if (AppFavorites.getAppFavorites().isFavorite(app.get_id()))
                 break;
 
-            let oldChild = this._taskbarApps.get(app);
-            if (oldChild) {
-                let oldButton = this._taskbarApps.get(app);
-                this._container.remove_actor(oldButton.actor);
-                this._taskbarApps.delete(app);
-            }
-
+            this._removeButton(app);
             break;
         }
 
