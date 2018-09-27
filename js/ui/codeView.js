@@ -1002,7 +1002,6 @@ var CodingSession = new Lang.Class({
 
         Tweener.removeTweens(actor);
         actor.hide();
-        actor.rotation_angle_y = 0;
         this._rotatingOutActor = null;
     },
 
