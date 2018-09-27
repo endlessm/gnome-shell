@@ -552,6 +552,22 @@ var CodingSession = new Lang.Class({
         return true;
     },
 
+    _completeRemoveWindow: function() {
+        let actor;
+        if (this._state == STATE_APP)
+            actor = this.app;
+        else
+            actor = this.toolbox;
+
+        if (actor) {
+            actor.rotation_angle_y = 0;
+            actor.show();
+            actor.meta_window.activate(global.get_current_time());
+        } else {
+            this.destroy();
+        }
+    },
+
     _setupToolboxWindow: function() {
         this._positionChangedIdToolbox =
             this.toolbox.meta_window.connect('position-changed',
@@ -593,8 +609,7 @@ var CodingSession = new Lang.Class({
         this.button.toolbox_window = null;
         this._state = STATE_APP;
 
-        this.app.meta_window.activate(global.get_current_time());
-        this.app.show();
+        this._completeRemoveWindow();
     },
 
     _setupAppWindow: function() {
@@ -639,8 +654,7 @@ var CodingSession = new Lang.Class({
         this.button.window = null;
         this._state = STATE_TOOLBOX;
 
-        this.toolbox.meta_window.activate(global.get_current_time());
-        this.toolbox.show();
+        this._completeRemoveWindow();
     },
 
     // Eject out of this session and remove all pairings.
