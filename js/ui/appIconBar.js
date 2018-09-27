@@ -621,7 +621,9 @@ const ScrolledIconList = new Lang.Class({
                              app: app });
         }
 
-        let favorites = AppFavorites.getAppFavorites().getFavorites();
+        let appFavorites = AppFavorites.getAppFavorites();
+        appFavorites.connect('changed', this._onAppFavoritesChanged.bind(this));
+        let favorites = appFavorites.getFavorites();
         for (let i = 0; i < favorites.length; i++) {
             this._addButtonAnimated(favorites[i]);
         }
@@ -805,7 +807,7 @@ const ScrolledIconList = new Lang.Class({
         }
     },
 
-    _addButtonAnimated: function(app) {
+    _addButtonAnimated: function(app, oldActor) {
         if (this._taskbarApps.has(app) || !this._isAppInteresting(app))
             return;
 
@@ -821,18 +823,55 @@ const ScrolledIconList = new Lang.Class({
         });
         newChild.connect('app-icon-unpinned', () => {
             favorites.removeFavorite(app.get_id());
-            if (app.state == Shell.AppState.STOPPED) {
-                this._removeButton(app, newChild);
-                this._updatePage();
-            }
         });
         this._taskbarApps.set(app, newChild);
 
-        this._container.add_actor(newActor);
+        if (oldActor) {
+            this._container.replace_child(oldActor, newActor);
+            oldActor.destroy();
+        } else {
+            this._container.add_actor(newActor);
+        }
     },
 
     _addButton: function(app) {
         this._addButtonAnimated(app);
+    },
+
+    _onAppFavoritesChanged(appFavorites) {
+        let favoriteMap = appFavorites.getFavoriteMap();
+        var changed = false;
+
+        // Update existing favorites, and add new ones.
+        for (let id in favoriteMap) {
+            let app = favoriteMap[id];
+            if (!this._taskbarApps.has(app)) {
+                var actorToReplace = null;
+
+                for (let [oldApp, oldChild] of this._taskbarApps) {
+                    if (oldApp.get_id() === id) {
+                        this._taskbarApps.delete(oldApp);
+                        actorToReplace = oldChild.actor;
+                        break;
+                    }
+                }
+
+                // TODO: in the case where no existing app matches, put the new
+                // app at the right position, not the end.
+                this._addButtonAnimated(app, actorToReplace);
+                changed = true;
+            }
+        }
+
+        // Get rid of any removed favorites
+        for (let [oldApp, oldChild] of this._taskbarApps) {
+            if (!this._isAppInteresting(oldApp)) {
+                this._removeButton(oldApp, oldChild);
+            }
+        }
+
+        if (changed)
+            this._updatePage();
     },
 
     _onAppStateChanged: function(appSys, app) {
