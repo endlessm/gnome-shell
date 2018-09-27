@@ -989,13 +989,7 @@ var CodingSession = new Lang.Class({
             rotation_angle_y: 0,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeOutQuad',
-            onComplete: () => {
-                this._rotateInCompleted(dst);
-
-                // Failed. Remove the toolbox window and rotate back
-                if (this.cancelled)
-                    this.removeToolboxWindow();
-            }
+            onComplete: this._rotateInCompleted.bind(this)
         });
     },
 
