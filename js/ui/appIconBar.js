@@ -892,8 +892,7 @@ const ScrolledIconList = new Lang.Class({
 
             let oldChild = this._taskbarApps.get(app);
             if (oldChild) {
-                let oldButton = this._taskbarApps.get(app);
-                this._container.remove_actor(oldButton);
+                this._container.remove_actor(oldChild);
                 this._taskbarApps.delete(app);
             }
 
