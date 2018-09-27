@@ -887,6 +887,10 @@ var CodingSession = new Lang.Class({
     },
 
     _prepareAnimate: function(src, dst, direction) {
+        // Make sure the source window has active focus at the start of the
+        // animation. We rely on it staying on top until midpoint.
+        src.meta_window.activate(global.get_current_time());
+
         // We want to do this _first_ before setting up any animations.
         // Synchronising windows could cause kill-window-effects to
         // be emitted, which would undo some of the preparation
@@ -903,7 +907,10 @@ var CodingSession = new Lang.Class({
         // at which the second window is brought to back.
         src.show();
         dst.show();
-        dst.opacity = 0;
+
+        // Hide the destination until midpoint
+        if (direction == Gtk.DirectionType.LEFT)
+            dst.opacity = 0;
 
         // we have to set those after unmaximize/maximized otherwise they are lost
         dst.rotation_angle_y = direction == Gtk.DirectionType.RIGHT ? -180 : 180;
@@ -936,18 +943,6 @@ var CodingSession = new Lang.Class({
             onComplete: this._rotateInToMidpointCompleted.bind(this),
             onCompleteParams: [dst, direction]
         });
-
-        // Gently fade the window in, this will paper over
-        // any artifacts from shadows and the like
-        //
-        // Note: The animation time is reduced here - this
-        // is intention. It is just to prevent initial
-        // "double shadows" when rotating between windows.
-        Tweener.addTween(dst, {
-            opacity: 255,
-            time: WINDOW_ANIMATION_TIME,
-            transition: 'linear'
-        });
     },
 
     _rotateOutToMidpointCompleted: function(src, direction) {
@@ -965,8 +960,9 @@ var CodingSession = new Lang.Class({
     },
 
     _rotateInToMidpointCompleted: function(dst, direction) {
-        // Now bring to front the other side
+        // Now show the destination
         dst.meta_window.activate(global.get_current_time());
+        dst.opacity = 255;
 
         Tweener.addTween(dst, {
             rotation_angle_y: 0,
@@ -990,7 +986,6 @@ var CodingSession = new Lang.Class({
             return;
 
         Tweener.removeTweens(actor);
-        actor.opacity = 255;
         actor.rotation_angle_y = 0;
         this._rotatingInActor = null;
     },
