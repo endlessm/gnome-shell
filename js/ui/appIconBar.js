@@ -627,7 +627,9 @@ const ScrolledIconList = new Lang.Class({
                              app: app });
         }
 
-        let favorites = AppFavorites.getAppFavorites().getFavorites();
+        let appFavorites = AppFavorites.getAppFavorites();
+        appFavorites.connect('changed', this._onAppFavoritesChanged.bind(this));
+        let favorites = appFavorites.getFavorites();
         for (let i = 0; i < favorites.length; i++) {
             this._addButtonAnimated(favorites[i]);
         }
@@ -641,6 +643,7 @@ const ScrolledIconList = new Lang.Class({
             this._addButtonAnimated(app);
         }
 
+        appSys.connect('installed-changed', this._onInstalledChanged.bind(this));
         appSys.connect('app-state-changed', this._onAppStateChanged.bind(this));
     },
 
@@ -800,7 +803,7 @@ const ScrolledIconList = new Lang.Class({
         return -1;
     },
 
-    _addButtonAnimated: function(app) {
+    _addButtonAnimated: function(app, oldChild) {
         if (this._taskbarApps.has(app) || !this._isAppInteresting(app))
             return;
 
@@ -815,19 +818,63 @@ const ScrolledIconList = new Lang.Class({
         });
         newChild.connect('app-icon-unpinned', () => {
             favorites.removeFavorite(app.get_id());
-            if (app.state == Shell.AppState.STOPPED) {
-                newChild.destroy();
-                this._taskbarApps.delete(app);
-                this._updatePage();
-            }
         });
         this._taskbarApps.set(app, newChild);
 
-        this._container.add_actor(newChild);
+        if (oldChild)
+            this._container.replace_child(oldChild, newChild);
+        else
+            this._container.add_actor(newChild);
     },
 
     _addButton: function(app) {
         this._addButtonAnimated(app);
+    },
+
+    _onAppFavoritesChanged(appFavorites) {
+        let favoriteMap = appFavorites.getFavoriteMap();
+        var changed = false;
+
+        // Update existing favorites, and add new ones.
+        for (let id in favoriteMap) {
+            let app = favoriteMap[id];
+            if (!this._taskbarApps.has(app)) {
+                var childToReplace = null;
+
+                for (let [oldApp, oldChild] of this._taskbarApps) {
+                    if (oldApp.get_id() === id) {
+                        this._taskbarApps.delete(oldApp);
+                        childToReplace = oldChild;
+                        break;
+                    }
+                }
+
+                // TODO: in the case where no existing app matches, put the new
+                // app at the right position, not the end.
+                this._addButtonAnimated(app, childToReplace);
+                if (childToReplace)
+                    childToReplace.destroy();
+                changed = true;
+            }
+        }
+
+        // Get rid of any removed favorites
+        for (let [oldApp, oldChild] of this._taskbarApps) {
+            if (!this._isAppInteresting(oldApp)) {
+                oldChild.destroy();
+                this._taskbarApps.delete(oldApp);
+                changed = true;
+            }
+        }
+
+        if (changed)
+            this._updatePage();
+    },
+
+    _onInstalledChanged(appSys) {
+        let appFavorites = AppFavorites.getAppFavorites();
+        appFavorites.reload();
+        this._onAppFavoritesChanged(appFavorites);
     },
 
     _onAppStateChanged: function(appSys, app) {
@@ -845,8 +892,7 @@ const ScrolledIconList = new Lang.Class({
 
             let oldChild = this._taskbarApps.get(app);
             if (oldChild) {
-                let oldButton = this._taskbarApps.get(app);
-                this._container.remove_actor(oldButton);
+                this._container.remove_actor(oldChild);
                 this._taskbarApps.delete(app);
             }
 
