@@ -417,14 +417,15 @@ var CodingSession = new Lang.Class({
         this.parent(params);
 
         this._state = STATE_APP;
+        this._toolboxActionGroup = null;
 
         // FIXME: this should be extended to make it possible to launch
         // arbitrary toolboxes in the future, depending on the application
-        this._toolboxActionGroup =
+        this._toolboxAppActionGroup =
             Gio.DBusActionGroup.get(Gio.DBus.session,
                                     'com.endlessm.HackToolbox',
                                     '/com/endlessm/HackToolbox');
-        this._toolboxActionGroup.list_actions();
+        this._toolboxAppActionGroup.list_actions();
 
         this.button.connect('clicked', this._switchWindows.bind(this));
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
@@ -511,6 +512,11 @@ var CodingSession = new Lang.Class({
         // geometries now.
         this.toolbox = actor;
         this.button.toolbox_window = actor.meta_window;
+        this._toolboxActionGroup =
+            Gio.DBusActionGroup.get(Gio.DBus.session,
+                                    this.toolbox.meta_window.gtk_application_id,
+                                    this.toolbox.meta_window.gtk_window_object_path);
+        this._toolboxActionGroup.list_actions();
 
         _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
 
@@ -710,7 +716,7 @@ var CodingSession = new Lang.Class({
     // the caller.
     _switchToToolbox: function() {
         if (!this.toolbox) {
-            this._toolboxActionGroup.activate_action(
+            this._toolboxAppActionGroup.activate_action(
                 'flip',
                 new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
                                           this.app.meta_window.gtk_window_object_path]));
