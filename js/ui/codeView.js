@@ -957,7 +957,9 @@ var CodingSession = new Lang.Class({
         this._rotatingInActor = dst;
         this._rotatingOutActor = src;
 
-        // What we do here is rotate both windows by 180degrees.
+        // What we do here is we fake a rotation in both windows by 180degrees.
+        // In reality we want to avoid mirroring the back window, so we only ever
+        // rotate 90degrees to and from the midpoint.
         // The effect of this is that the front and back window will be at
         // opposite rotations at each point in time and so the exact point
         // at which the first window is brought to front, is the same point
@@ -970,7 +972,7 @@ var CodingSession = new Lang.Class({
             dst.opacity = 0;
 
         // we have to set those after unmaximize/maximized otherwise they are lost
-        dst.rotation_angle_y = direction == Gtk.DirectionType.RIGHT ? -180 : 180;
+        dst.rotation_angle_y = 0;
         src.rotation_angle_y = 0;
         dst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
         src.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
@@ -994,7 +996,7 @@ var CodingSession = new Lang.Class({
             onCompleteParams: [src, direction]
         });
         Tweener.addTween(dst, {
-            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
+            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeInQuad',
             onComplete: this._rotateInToMidpointCompleted.bind(this),
@@ -1008,8 +1010,13 @@ var CodingSession = new Lang.Class({
         if (this._appActionProxy.has_action('flip'))
             this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
 
+        if (direction == Gtk.DirectionType.RIGHT)
+            src.rotation_angle_y = -90;
+        else
+            src.rotation_angle_y = 90;
+
         Tweener.addTween(src, {
-            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
+            rotation_angle_y: 0,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeOutQuad',
             onComplete: this._rotateOutCompleted.bind(this)
@@ -1020,6 +1027,11 @@ var CodingSession = new Lang.Class({
         // Now show the destination
         dst.meta_window.activate(global.get_current_time());
         dst.opacity = 255;
+
+        if (direction == Gtk.DirectionType.RIGHT)
+            dst.rotation_angle_y = -90;
+        else
+            dst.rotation_angle_y = 90;
 
         Tweener.addTween(dst, {
             rotation_angle_y: 0,
