@@ -821,11 +821,10 @@ const ScrolledIconList = new Lang.Class({
         });
         this._taskbarApps.set(app, newChild);
 
-        if (oldChild) {
+        if (oldChild)
             this._container.replace_child(oldChild, newChild);
-        } else {
+        else
             this._container.add_actor(newChild);
-        }
     },
 
     _addButton: function(app) {
@@ -864,6 +863,7 @@ const ScrolledIconList = new Lang.Class({
             if (!this._isAppInteresting(oldApp)) {
                 oldChild.destroy();
                 this._taskbarApps.delete(oldApp);
+                changed = true;
             }
         }
 
