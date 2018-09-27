@@ -244,12 +244,12 @@ shell_app_system_app_info_equal (GDesktopAppInfo *one,
                g_app_info_get_executable (two_info)) == 0 &&
     g_strcmp0 (g_app_info_get_commandline (one_info),
                g_app_info_get_commandline (two_info)) == 0 &&
-    strcmp (g_app_info_get_name (one_info),
+    g_strcmp0 (g_app_info_get_name (one_info),
             g_app_info_get_name (two_info)) == 0 &&
     g_strcmp0 (g_app_info_get_description (one_info),
                g_app_info_get_description (two_info)) == 0 &&
-    strcmp (g_app_info_get_display_name (one_info),
-            g_app_info_get_display_name (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_display_name (one_info),
+               g_app_info_get_display_name (two_info)) == 0 &&
     g_icon_equal (g_app_info_get_icon (one_info),
                   g_app_info_get_icon (two_info));
 }
