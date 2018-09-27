@@ -890,31 +890,17 @@ var CodingSession = new Lang.Class({
         // We want to do this _first_ before setting up any animations.
         // Synchronising windows could cause kill-window-effects to
         // be emitted, which would undo some of the preparation
-        // that we would have done such as setting backface culling
-        // or rotation angles.
+        // that we would have done such as setting rotation angles.
         _synchronizeMetaWindowActorGeometries(src, dst);
 
         this._rotatingInActor = dst;
         this._rotatingOutActor = src;
 
-        // We set backface culling to be enabled here so that we can
-        // smootly animate between the two windows. Without expensive
-        // vector projections, there's no way to determine whether a
-        // window's front-face is completely invisible to the user
-        // (this cannot be done just by looking at the angle of the
-        // window because the same angle may show a different visible
-        // face depending on its position in the view frustum).
-        //
-        // What we do here is enable backface culling and rotate both
-        // windows by 180degrees. The effect of this is that the front
-        // and back window will be at opposite rotations at each point
-        // in time and so the exact point at which the first window
-        // becomes invisible is the same point at which the second
-        // window becomes visible. Because no back faces are drawn
-        // there are no visible artifacts in the animation */
-        src.set_cull_back_face(true);
-        dst.set_cull_back_face(true);
-
+        // What we do here is rotate both windows by 180degrees.
+        // The effect of this is that the front and back window will be at
+        // opposite rotations at each point in time and so the exact point
+        // at which the first window is brought to front, is the same point
+        // at which the second window is brought to back.
         src.show();
         dst.show();
         dst.opacity = 0;
@@ -934,9 +920,8 @@ var CodingSession = new Lang.Class({
     },
 
     _animateToMidpoint: function(src, dst, direction) {
-        // Tween both windows in a rotation animation at the same time
-        // with backface culling enabled on both. This will allow for
-        // a smooth transition.
+        // Tween both windows in a rotation animation at the same time.
+        // This will allow for a smooth transition.
         Tweener.addTween(src, {
             rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
             time: WINDOW_ANIMATION_TIME * 2,
@@ -1007,7 +992,6 @@ var CodingSession = new Lang.Class({
         Tweener.removeTweens(actor);
         actor.opacity = 255;
         actor.rotation_angle_y = 0;
-        actor.set_cull_back_face(false);
         this._rotatingInActor = null;
     },
 
@@ -1019,7 +1003,6 @@ var CodingSession = new Lang.Class({
         Tweener.removeTweens(actor);
         actor.hide();
         actor.rotation_angle_y = 0;
-        actor.set_cull_back_face(false);
         this._rotatingOutActor = null;
     },
 
