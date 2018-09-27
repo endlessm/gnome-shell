@@ -222,6 +222,8 @@ scan_startup_wm_class_to_id (ShellAppSystem *self)
  * g_app_info_equal(), which just compares app IDs, this function also compares
  * fields of interest to the shell: icon, name, description, executable, and
  * should_show().
+ *
+ * Returns: %TRUE if @one and @two are equivalent; %FALSE otherwise
  */
 gboolean
 shell_app_system_app_info_equal (GDesktopAppInfo *one,
