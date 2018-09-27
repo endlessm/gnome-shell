@@ -311,15 +311,17 @@ static void
 remove_or_update_app_from_info (ShellAppSystem *self)
 {
   GHashTableIter iter;
+  char *id;
   ShellApp *app;
 
   g_hash_table_iter_init (&iter, self->priv->id_to_app);
-  while (g_hash_table_iter_next (&iter, NULL, (gpointer) &app))
+  while (g_hash_table_iter_next (&iter, (void **) &id, (gpointer) &app))
     {
       g_autoptr(GDesktopAppInfo) app_info = NULL;
 
       if (app_is_stale (app))
         {
+          g_message ("%s: removing stale app %s", G_STRFUNC, id);
           /* App is stale, we remove it */
           g_hash_table_iter_remove (&iter);
           continue;
@@ -328,8 +330,14 @@ remove_or_update_app_from_info (ShellAppSystem *self)
       app_info = get_new_desktop_app_info_from_app (app);
       if (app_info_changed (app, app_info))
         {
+          g_message ("%s: app %s changed", G_STRFUNC, id);
+
           _shell_app_set_app_info (app, app_info);
           g_signal_emit (self, signals[APP_INFO_CHANGED], 0, app);
+        }
+      else
+        {
+          g_message ("%s: app %s unchanged", G_STRFUNC, id);
         }
     }
 }
@@ -346,6 +354,7 @@ installed_changed (GAppInfoMonitor *monitor,
 
   remove_or_update_app_from_info (self);
 
+  g_message ("%s: emit installed-changed", G_STRFUNC);
   g_signal_emit (self, signals[INSTALLED_CHANGED], 0, NULL);
 }
 
