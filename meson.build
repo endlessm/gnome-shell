@@ -61,7 +61,7 @@ servicedir = join_paths(datadir, 'dbus-1', 'services')
 plugindir = get_variable('BROWSER_PLUGIN_DIR', mozplugindir)
 
 keybindings_dep = dependency('gnome-keybindings', required: false)
-if keybindings_dep.found()
+if false and keybindings_dep.found()
   keysdir = keybindings_dep.get_pkgconfig_variable('keysdir')
 else
   keysdir = join_paths(datadir, 'gnome-control-center', 'keybindings')
