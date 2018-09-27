@@ -1044,7 +1044,6 @@ var CodingSession = new Lang.Class({
             return;
 
         Tweener.removeTweens(actor);
-        actor.hide();
         this._rotatingOutActor = null;
     },
 
