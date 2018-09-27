@@ -687,6 +687,7 @@ var CodingSession = new Lang.Class({
                 'flip',
                 new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
                                           this.app.meta_window.gtk_window_object_path]));
+            this._button.reactive = false;
         } else {
             this._setupAnimation(STATE_TOOLBOX,
                                  this.app,
@@ -699,6 +700,7 @@ var CodingSession = new Lang.Class({
         if (this._toolboxActionGroup.has_action('flip-back')) {
             this._toolboxActionGroup.activate_action('flip-back', null);
             this.appRemovedByFlipBack = true;
+            this._button.reactive = false;
         } else {
             this._setupAnimation(STATE_APP,
                                  this.toolbox,
@@ -919,6 +921,8 @@ var CodingSession = new Lang.Class({
         actor.rotation_angle_y = 0;
         actor.opacity = 255;
         this._rotatingInActor = null;
+
+        this._button.reactive = true;
     },
 
     _rotateOutCompleted: function(resetRotation) {
