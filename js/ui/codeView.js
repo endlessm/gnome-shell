@@ -420,6 +420,8 @@ var CodingSession = new Lang.Class({
         this._app = null;
         this._toolbox = null;
         this.appRemovedByFlipBack = false;
+        this._toolboxFlipPending = false;
+        this._toolboxFlipBackPending = false;
 
         this._positionChangedIdApp = 0;
         this._positionChangedIdToolbox = 0;
@@ -477,6 +479,8 @@ var CodingSession = new Lang.Class({
         if (this.app)
             return false;
 
+        this._toolboxFlipBackPending = false;
+
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
         this.app = actor;
@@ -521,6 +525,8 @@ var CodingSession = new Lang.Class({
         // If there is a currently bound window then we can't admit this window.
         if (this.toolbox)
             return false;
+
+        this._toolboxFlipPending = false;
 
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
@@ -719,10 +725,14 @@ var CodingSession = new Lang.Class({
     // the caller.
     _switchToToolbox: function() {
         if (!this.toolbox) {
+            if (this._toolboxFlipPending)
+                return;
+
             this._toolboxActionGroup.activate_action(
                 'flip',
                 new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
                                           this.app.meta_window.gtk_window_object_path]));
+            this._toolboxFlipPending = true;
         } else {
             this.toolbox.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
@@ -737,11 +747,15 @@ var CodingSession = new Lang.Class({
 
     _switchToApp: function() {
         if (this._toolboxActionGroup.has_action('flip-back')) {
+            if (this._toolboxFlipBackPending)
+                return;
+
             this._toolboxActionGroup.activate_action(
                 'flip-back',
                 new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
                                           this.app.meta_window.gtk_window_object_path]));
             this.appRemovedByFlipBack = true;
+            this._toolboxFlipBackPending = true;
         } else {
             this.app.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.toolbox,
