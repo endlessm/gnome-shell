@@ -114,6 +114,7 @@ function _flipButtonAroundRectCenter(props) {
         button,
         rect,
         startAngle,
+        midpointAngle,
         finishAngle,
         startOpacity,
         finishOpacity,
@@ -132,12 +133,19 @@ function _flipButtonAroundRectCenter(props) {
     button.rotation_angle_y = startAngle;
     button.opacity = startOpacity;
     Tweener.addTween(button, {
-        rotation_angle_y: finishAngle,
-        time: WINDOW_ANIMATION_TIME * 4,
-        transition: 'easeOutQuad',
+        rotation_angle_y: midpointAngle,
+        time: WINDOW_ANIMATION_TIME * 2,
+        transition: 'easeInQuad',
         onComplete: function() {
-            if (onRotationComplete)
-                onRotationComplete();
+            Tweener.addTween(button, {
+                rotation_angle_y: finishAngle,
+                time: WINDOW_ANIMATION_TIME * 2,
+                transition: 'easeOutQuad',
+                onComplete: function() {
+                    if (onRotationComplete)
+                        onRotationComplete();
+                }
+            });
         }
     });
     Tweener.addTween(button, {
@@ -275,6 +283,7 @@ var WindowTrackingButton = new Lang.Class({
             button: this._button,
             rect: rect,
             startAngle: 0,
+            midpointAngle: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
             finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             startOpacity: 255,
             finishOpacity: 0,
@@ -303,6 +312,7 @@ var WindowTrackingButton = new Lang.Class({
             button: animationButton,
             rect: rect,
             startAngle: direction == Gtk.DirectionType.RIGHT ? -180 : 180,
+            midpointAngle: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
             finishAngle: 0,
             startOpacity: 0,
             finishOpacity: 255,
@@ -927,33 +937,29 @@ var CodingSession = new Lang.Class({
     },
 
     _completeAnimate: function(src, dst, direction) {
-        this._animate(src,
-                      dst,
-                      direction);
+        this._animateToMidpoint(src,
+                                dst,
+                                direction);
         this.button.switchAnimation(direction);
     },
 
-    _animate: function(src, dst, direction) {
+    _animateToMidpoint: function(src, dst, direction) {
         // Tween both windows in a rotation animation at the same time
         // with backface culling enabled on both. This will allow for
         // a smooth transition.
         Tweener.addTween(src, {
-            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
-            time: WINDOW_ANIMATION_TIME * 4,
-            transition: 'easeOutQuad',
-            onComplete: this._rotateOutCompleted.bind(this)
+            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
+            time: WINDOW_ANIMATION_TIME * 2,
+            transition: 'easeInQuad',
+            onComplete: this._rotateOutToMidpointCompleted.bind(this),
+            onCompleteParams: [src, direction]
         });
         Tweener.addTween(dst, {
-            rotation_angle_y: 0,
-            time: WINDOW_ANIMATION_TIME * 4,
-            transition: 'easeOutQuad',
-            onComplete: () => {
-                this._rotateInCompleted(dst);
-
-                // Failed. Remove the toolbox window and rotate back
-                if (this.cancelled)
-                    this.removeToolboxWindow();
-            }
+            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
+            time: WINDOW_ANIMATION_TIME * 2,
+            transition: 'easeInQuad',
+            onComplete: this._rotateInToMidpointCompleted.bind(this),
+            onCompleteParams: [dst, direction]
         });
 
         // Gently fade the window in, this will paper over
@@ -966,6 +972,30 @@ var CodingSession = new Lang.Class({
             opacity: 255,
             time: WINDOW_ANIMATION_TIME,
             transition: 'linear'
+        });
+    },
+
+    _rotateOutToMidpointCompleted: function(src, direction) {
+        Tweener.addTween(src, {
+            rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
+            time: WINDOW_ANIMATION_TIME * 2,
+            transition: 'easeOutQuad',
+            onComplete: this._rotateOutCompleted.bind(this)
+        });
+    },
+
+    _rotateInToMidpointCompleted: function(dst, direction) {
+        Tweener.addTween(dst, {
+            rotation_angle_y: 0,
+            time: WINDOW_ANIMATION_TIME * 2,
+            transition: 'easeOutQuad',
+            onComplete: () => {
+                this._rotateInCompleted(dst);
+
+                // Failed. Remove the toolbox window and rotate back
+                if (this.cancelled)
+                    this.removeToolboxWindow();
+            }
         });
     },
 
