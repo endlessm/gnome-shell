@@ -643,6 +643,7 @@ const ScrolledIconList = new Lang.Class({
             this._addButtonAnimated(app);
         }
 
+        appSys.connect('installed-changed', this._onInstalledChanged.bind(this));
         appSys.connect('app-state-changed', this._onAppStateChanged.bind(this));
     },
 
@@ -868,6 +869,12 @@ const ScrolledIconList = new Lang.Class({
 
         if (changed)
             this._updatePage();
+    },
+
+    _onInstalledChanged(appSys) {
+        let appFavorites = AppFavorites.getAppFavorites();
+        appFavorites.reload();
+        this._onAppFavoritesChanged(appFavorites);
     },
 
     _onAppStateChanged: function(appSys, app) {
