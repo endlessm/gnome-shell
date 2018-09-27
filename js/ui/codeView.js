@@ -723,10 +723,6 @@ var CodingSession = new Lang.Class({
                                   Gtk.DirectionType.LEFT);
             this._state = STATE_TOOLBOX;
         }
-
-        // Support a 'flip' action in the app too, if it exposes it
-        if (this._appActionProxy.has_action('flip'))
-            this._appActionProxy.activate_action('flip', new GLib.Variant('b', true));
     },
 
     _switchToApp: function() {
@@ -743,10 +739,6 @@ var CodingSession = new Lang.Class({
                                   Gtk.DirectionType.RIGHT);
             this._state = STATE_APP;
         }
-
-        // Support a 'flip' action in the app too, if it exposes it
-        if (this._appActionProxy.has_action('flip'))
-            this._appActionProxy.activate_action('flip', new GLib.Variant('b', false));
     },
 
     // Given some recently-focused actor, switch to it without
@@ -976,6 +968,11 @@ var CodingSession = new Lang.Class({
     },
 
     _rotateOutToMidpointCompleted: function(src, direction) {
+        // Support a 'flip' action in the app too, if it exposes it
+        const flipState = (this._state == STATE_TOOLBOX);
+        if (this._appActionProxy.has_action('flip'))
+            this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
+
         Tweener.addTween(src, {
             rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             time: WINDOW_ANIMATION_TIME * 2,
