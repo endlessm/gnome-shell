@@ -750,7 +750,6 @@ var CodingSession = new Lang.Class({
                                           this.app.meta_window.gtk_window_object_path]));
             this._toolboxFlipPending = true;
         } else {
-            this.toolbox.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.app,
                                  this.toolbox,
                                  Gtk.DirectionType.LEFT);
@@ -773,7 +772,6 @@ var CodingSession = new Lang.Class({
             this.appRemovedByFlipBack = true;
             this._toolboxFlipBackPending = true;
         } else {
-            this.app.meta_window.activate(global.get_current_time());
             this._prepareAnimate(this.toolbox,
                                  this.app,
                                  Gtk.DirectionType.RIGHT);
@@ -1025,6 +1023,9 @@ var CodingSession = new Lang.Class({
     },
 
     _rotateInToMidpointCompleted: function(dst, direction) {
+        // Now bring to front the other side
+        dst.meta_window.activate(global.get_current_time());
+
         Tweener.addTween(dst, {
             rotation_angle_y: 0,
             time: WINDOW_ANIMATION_TIME * 2,
