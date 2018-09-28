@@ -529,12 +529,15 @@ var CodingSession = new Lang.Class({
         return true;
     },
 
-    _completeRemoveWindow: function() {
-        let actor;
+    _actorForCurrentState: function() {
         if (this._state == STATE_APP)
-            actor = this.app;
+            return this.app;
         else
-            actor = this.toolbox;
+            return this.toolbox;
+    },
+
+    _completeRemoveWindow: function() {
+        let actor = this._actorForCurrentState();
 
         if (actor) {
             actor.rotation_angle_y = 0;
@@ -692,7 +695,7 @@ var CodingSession = new Lang.Class({
         window.expand_allocated_geometry(minWidth, minHeight);
     },
 
-    _switchWindows: function(actor, event) {
+    _switchWindows: function() {
         // Switch to toolbox if the app is active. Otherwise switch to the app.
         if (this._state === STATE_APP)
             this._switchToToolbox();
@@ -847,26 +850,20 @@ var CodingSession = new Lang.Class({
 
         let appWindow = this.app ? this.app.meta_window : null;
         let toolboxWindow = this.toolbox ? this.toolbox.meta_window : null;
-        let nextState = null;
 
         // Determine if we need to change the state of this session by
         // examining the focused window
-        if (appWindow === focusedWindow && this._state === STATE_TOOLBOX)
-            nextState = STATE_APP;
-        else if (toolboxWindow === focusedWindow && this._state === STATE_APP)
-            nextState = STATE_TOOLBOX;
-
-        // No changes to be made, so return directly
-        if (nextState === null)
+        if (focusedWindow != appWindow && focusedWindow != toolboxWindow)
             return;
+
+        let focusedActor = focusedWindow.get_compositor_private();
 
         // If the overview is still showing or animating out, we probably
         // selected this window from the overview. In that case, flipping
         // make no sense, immediately change the state and show the
         // recently activated window.
         if (Main.overview.visible || Main.overview.animationInProgress) {
-            let actor = (nextState === STATE_APP ? this.app : this.toolbox);
-            this._switchToWindowWithoutFlipping(actor);
+            this._switchToWindowWithoutFlipping(focusedActor);
             return;
         }
 
@@ -876,10 +873,9 @@ var CodingSession = new Lang.Class({
         if (this._rotatingInActor || this._rotatingOutActor)
             return;
 
-        if (nextState === STATE_APP)
-            this._switchToApp();
-        else
-            this._switchToToolbox();
+        let actor = this._actorForCurrentState();
+        if (actor !== focusedActor)
+            this._switchWindows();
     },
 
     _prepareAnimate: function(src, oldDst, newDst, direction) {
