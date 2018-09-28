@@ -459,17 +459,13 @@ var CodingSession = new Lang.Class({
         return this._toolbox;
     },
 
-    _completeDestroyAppWindow: function() {
-        if (this._appRemovedActor) {
-            global.window_manager.completed_destroy(this._appRemovedActor);
-            this._appRemovedActor = null;
-        }
-    },
-
     admitAppWindowActor: function(actor) {
         // If there is a currently bound window then we can't admit this window.
         if (this.app)
             return false;
+
+        let appRemovedActor = this._appRemovedActor;
+        this._appRemovedActor = null;
 
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
@@ -484,6 +480,7 @@ var CodingSession = new Lang.Class({
         // rotate to it as soon as its first frame appears
         if (this._state === STATE_TOOLBOX) {
             this._prepareAnimate(this.toolbox,
+                                 appRemovedActor,
                                  this.app,
                                  Gtk.DirectionType.RIGHT);
             this._state = STATE_APP;
@@ -496,15 +493,14 @@ var CodingSession = new Lang.Class({
             if (!this.app._drawnFirstFrame) {
                 let firstFrameConnection = this.app.connect('first-frame', () => {
                     this.app.disconnect(firstFrameConnection);
-
-                    this._completeDestroyAppWindow();
                     this._completeAnimate(this.toolbox,
+                                          appRemovedActor,
                                           this.app,
                                           Gtk.DirectionType.RIGHT);
                 });
             } else {
-                this._completeDestroyAppWindow();
                 this._completeAnimate(this.toolbox,
+                                      appRemovedActor,
                                       this.app,
                                       Gtk.DirectionType.RIGHT);
             }
@@ -537,6 +533,7 @@ var CodingSession = new Lang.Class({
         // rotate to it as soon as its first frame appears
         if (this._state === STATE_APP) {
             this._prepareAnimate(this.app,
+                                 null,
                                  this.toolbox,
                                  Gtk.DirectionType.LEFT);
             this._state = STATE_TOOLBOX;
@@ -550,11 +547,13 @@ var CodingSession = new Lang.Class({
                 let firstFrameConnection = this.toolbox.connect('first-frame', () => {
                     this.toolbox.disconnect(firstFrameConnection);
                     this._completeAnimate(this.app,
+                                          null,
                                           this.toolbox,
                                           Gtk.DirectionType.LEFT);
                 }));
             } else {
                 this._completeAnimate(this.app,
+                                      null,
                                       this.toolbox,
                                       Gtk.DirectionType.LEFT);
             }
@@ -751,9 +750,11 @@ var CodingSession = new Lang.Class({
                                           this.app.meta_window.gtk_window_object_path]));
         } else {
             this._prepareAnimate(this.app,
+                                 null,
                                  this.toolbox,
                                  Gtk.DirectionType.LEFT);
             this._completeAnimate(this.app,
+                                  null,
                                   this.toolbox,
                                   Gtk.DirectionType.LEFT);
             this._state = STATE_TOOLBOX;
@@ -766,9 +767,11 @@ var CodingSession = new Lang.Class({
             this.appRemovedByFlipBack = true;
         } else {
             this._prepareAnimate(this.toolbox,
+                                 null,
                                  this.app,
                                  Gtk.DirectionType.RIGHT);
             this._completeAnimate(this.toolbox,
+                                  null,
                                   this.app,
                                   Gtk.DirectionType.RIGHT);
             this._state = STATE_APP;
@@ -922,7 +925,7 @@ var CodingSession = new Lang.Class({
             this._switchToToolbox();
     },
 
-    _prepareAnimate: function(src, dst, direction) {
+    _prepareAnimate: function(src, oldDst, newDst, direction) {
         // Make sure the source window has active focus at the start of the
         // animation. We rely on it staying on top until midpoint.
         src.meta_window.activate(global.get_current_time());
@@ -931,9 +934,9 @@ var CodingSession = new Lang.Class({
         // Synchronising windows could cause kill-window-effects to
         // be emitted, which would undo some of the preparation
         // that we would have done such as setting rotation angles.
-        _synchronizeMetaWindowActorGeometries(src, dst);
+        _synchronizeMetaWindowActorGeometries(src, newDst);
 
-        this._rotatingInActor = dst;
+        this._rotatingInActor = newDst;
         this._rotatingOutActor = src;
 
         // What we do here is rotate both windows by 180degrees.
@@ -942,27 +945,36 @@ var CodingSession = new Lang.Class({
         // at which the first window is brought to front, is the same point
         // at which the second window is brought to back.
         src.show();
-        dst.show();
+        if (oldDst)
+            newDst.opacity = 0;
+        else
+            newDst.show();
 
         // Hide the destination until midpoint
         if (direction == Gtk.DirectionType.LEFT)
-            dst.opacity = 0;
+            newDst.opacity = 0;
 
         // we have to set those after unmaximize/maximized otherwise they are lost
-        dst.rotation_angle_y = direction == Gtk.DirectionType.RIGHT ? -180 : 180;
+        newDst.rotation_angle_y = direction == Gtk.DirectionType.RIGHT ? -180 : 180;
         src.rotation_angle_y = 0;
-        dst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
+        newDst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
         src.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
+
+        if (oldDst) {
+            oldDst.rotation_angle_y = newDst.rotation_angle_y;
+            oldDst.pivot_point = newDst.pivot_point;
+        }
     },
 
-    _completeAnimate: function(src, dst, direction) {
+    _completeAnimate: function(src, oldDst, newDst, direction) {
         this._animateToMidpoint(src,
-                                dst,
+                                oldDst,
+                                newDst,
                                 direction);
         this.button.switchAnimation(direction);
     },
 
-    _animateToMidpoint: function(src, dst, direction) {
+    _animateToMidpoint: function(src, oldDst, newDst, direction) {
         // Tween both windows in a rotation animation at the same time.
         // This will allow for a smooth transition.
         Tweener.addTween(src, {
@@ -972,12 +984,14 @@ var CodingSession = new Lang.Class({
             onComplete: this._rotateOutToMidpointCompleted.bind(this),
             onCompleteParams: [src, direction]
         });
+
+        let dst = oldDst ? oldDst : newDst;
         Tweener.addTween(dst, {
             rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeInQuad',
             onComplete: this._rotateInToMidpointCompleted.bind(this),
-            onCompleteParams: [dst, direction]
+            onCompleteParams: [oldDst, newDst, direction]
         });
     },
 
@@ -996,12 +1010,17 @@ var CodingSession = new Lang.Class({
         });
     },
 
-    _rotateInToMidpointCompleted: function(dst, direction) {
-        // Now show the destination
-        dst.meta_window.activate(global.get_current_time());
-        dst.opacity = 255;
+    _rotateInToMidpointCompleted: function(oldDst, newDst, direction) {
+        if (oldDst) {
+            newDst.rotation_angle_y = oldDst.rotation_angle_y;
+            global.window_manager.completed_destroy(oldDst);
+        }
 
-        Tweener.addTween(dst, {
+        // Now show the destination
+        newDst.meta_window.activate(global.get_current_time());
+        newDst.opacity = 255;
+
+        Tweener.addTween(newDst, {
             rotation_angle_y: 0,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeOutQuad',
