@@ -2432,7 +2432,8 @@ var WindowManager = new Lang.Class({
 
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
-            this._codeViewManager.handleDestroyWindow(actor);
+            if (this._codeViewManager.handleDestroyWindow(actor))
+                return;
 
             actor.set_pivot_point(0.5, 0.5);
             this._destroying.push(actor);

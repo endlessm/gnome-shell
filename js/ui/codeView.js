@@ -405,6 +405,7 @@ var CodingSession = new Lang.Class({
     _init: function(params) {
         this._app = null;
         this._toolbox = null;
+        this._appRemovedActor = null;
         this.appRemovedByFlipBack = false;
 
         this._positionChangedIdApp = 0;
@@ -458,6 +459,13 @@ var CodingSession = new Lang.Class({
         return this._toolbox;
     },
 
+    _completeDestroyAppWindow: function() {
+        if (this._appRemovedActor) {
+            global.window_manager.completed_destroy(this._appRemovedActor);
+            this._appRemovedActor = null;
+        }
+    },
+
     admitAppWindowActor: function(actor) {
         // If there is a currently bound window then we can't admit this window.
         if (this.app)
@@ -488,11 +496,14 @@ var CodingSession = new Lang.Class({
             if (!this.app._drawnFirstFrame) {
                 let firstFrameConnection = this.app.connect('first-frame', () => {
                     this.app.disconnect(firstFrameConnection);
+
+                    this._completeDestroyAppWindow();
                     this._completeAnimate(this.toolbox,
                                           this.app,
                                           Gtk.DirectionType.RIGHT);
                 });
             } else {
+                this._completeDestroyAppWindow();
                 this._completeAnimate(this.toolbox,
                                       this.app,
                                       Gtk.DirectionType.RIGHT);
@@ -648,6 +659,10 @@ var CodingSession = new Lang.Class({
     },
 
     removeAppWindow: function() {
+        // Save the actor, so we can complete the destroy transition later
+        if (this.appRemovedByFlipBack)
+            this._appRemovedActor = this.app;
+
         this.appRemovedByFlipBack = false;
         this.app = null;
 
@@ -1062,20 +1077,23 @@ var CodeViewManager = new Lang.Class({
     _removeAppWindow: function(actor) {
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
         if (!session)
-            return;
+            return false;
 
         if (session.appRemovedByFlipBack) {
             session.removeAppWindow();
+            return true;
         } else {
             // Destroy the session here and remove it from the list
             session.destroy();
 
             let idx = this._sessions.indexOf(session);
             if (idx === -1)
-                return;
+                return false;
 
             this._sessions.splice(idx, 1);
         }
+
+        return false;
     },
 
     _removeToolboxWindow: function(actor) {
@@ -1089,8 +1107,10 @@ var CodeViewManager = new Lang.Class({
     },
 
     handleDestroyWindow: function(actor) {
-        this._removeAppWindow(actor);
+        let wasFlippedBack = this._removeAppWindow(actor);
         this._removeToolboxWindow(actor);
+
+        return wasFlippedBack;
     },
 
     handleMapWindow: function(actor) {
