@@ -2237,11 +2237,6 @@ var WindowManager = new Lang.Class({
             actor._animatableSurface.attach_animation_effect_with_server_priority('move',
                                                                                   this._wobblyEffect);
 
-        if (this._codeViewManager.handleMapWindow(actor)) {
-            shellwm.completed_map(actor);
-            return;
-        }
-
         let metaWindow = actor.meta_window;
         let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
 
@@ -2315,6 +2310,11 @@ var WindowManager = new Lang.Class({
                                    onOverwriteParams: [shellwm, actor]
                                  });
             } else {
+                if (this._codeViewManager.handleMapWindow(actor)) {
+                    shellwm.completed_map(actor);
+                    return;
+                }
+
                 actor.set_pivot_point(0.5, 1.0);
                 actor.scale_x = 0.01;
                 actor.scale_y = 0.05;
@@ -2387,8 +2387,6 @@ var WindowManager = new Lang.Class({
     _destroyWindow : function(shellwm, actor) {
         let window = actor.meta_window;
 
-        this._codeViewManager.handleDestroyWindow(actor);
-
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
             actor._notifyWindowTypeSignalId = 0;
@@ -2434,6 +2432,8 @@ var WindowManager = new Lang.Class({
 
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
+            this._codeViewManager.handleDestroyWindow(actor);
+
             actor.set_pivot_point(0.5, 0.5);
             this._destroying.push(actor);
 
