@@ -744,31 +744,16 @@ var CodingSession = new Lang.Class({
     // or left the overview. This will cause the state to instantly change
     // and prevent things from being flipped later in _windowRestacked
     _switchToWindowWithoutFlipping: function(actor) {
-        // Neither the app window nor the toolbox, return
-        if (actor !== this.app && actor !== this.toolbox)
-            return;
-
         // We need to do a few housekeeping things here:
         // 1. Change the _state variable to indicate whether we are now
         //    on the app, or the toolbox window.
-        // 2. Depending on that state, hide and show windows. We might have
-        //    hidden windows during the flip animation, so we need to show
-        //    any relevant windows and hide any irrelevant ones
-        // 3. Ensure that the relevant window is activated (usually just
+        // 2. Ensure that the relevant window is activated (usually just
         //    by activating it again). For instance, in the unminimize case,
         //    unminimizing the sibling window will cause it to activate
         //    which then breaks the user's expectations (it should unminimize
         //    but not activate). Re-activating ensures that we present
         //    the right story to the user.
         this._state = (actor === this.app ? STATE_APP : STATE_TOOLBOX);
-        if (this._state === STATE_APP) {
-            this.toolbox.hide();
-            this.app.show();
-        } else {
-            this.app.hide();
-            this.toolbox.show();
-        }
-
         actor.meta_window.activate(global.get_current_time());
     },
 
@@ -798,17 +783,7 @@ var CodingSession = new Lang.Class({
             return;
 
         let [src, dst] = this._srcAndDstPairFromWindow(window);
-        let maximizationStateChanged = _synchronizeMetaWindowActorGeometries(src, dst);
-
-        // If the maximization state changed, we may end up with windows that
-        // are shown. Use the current state to determine which window to hide.
-        if (!maximizationStateChanged)
-            return;
-
-        if (this._state === STATE_TOOLBOX)
-            this.app.hide();
-        else
-            this.toolbox.hide();
+        _synchronizeMetaWindowActorGeometries(src, dst);
     },
 
     _applyWindowMinimizationState: function(shellwm, actor) {
