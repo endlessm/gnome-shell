@@ -459,6 +459,31 @@ var CodingSession = new Lang.Class({
         return this._toolbox;
     },
 
+    _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
+        if (this._state === targetState)
+            return;
+
+        this._state = targetState;
+
+        // Now, if we're not already on the desired state, we want to start
+        // animating to it here.
+        this._prepareAnimate(src, oldDst, newDst, direction);
+
+        // We wait until the first frame of the window has been drawn
+        // and damage updated in the compositor before we start rotating.
+        //
+        // This way we don't get ugly artifacts when rotating if
+        // a window is slow to draw.
+        if (!newDst._drawnFirstFrame) {
+            let firstFrameConnection = newDst.connect('first-frame', () => {
+                newDst.disconnect(firstFrameConnection);
+                this._completeAnimate(src, oldDst, newDst, direction);
+            });
+        } else {
+            this._completeAnimate(src, oldDst, newDst, direction);
+        }
+    },
+
     admitAppWindowActor: function(actor) {
         // If there is a currently bound window then we can't admit this window.
         if (this.app)
@@ -473,39 +498,10 @@ var CodingSession = new Lang.Class({
         this.button.window = actor.meta_window;
 
         _synchronizeMetaWindowActorGeometries(this.toolbox, this.app);
-
-        // Now, if we're not already on the app window, we want to start
-        // animating to it here. This is different from just calling
-        // _switchToApp - we already have the window and we want to
-        // rotate to it as soon as its first frame appears
-        if (this._state === STATE_TOOLBOX) {
-            this._prepareAnimate(this.toolbox,
-                                 appRemovedActor,
-                                 this.app,
-                                 Gtk.DirectionType.RIGHT);
-            this._state = STATE_APP;
-
-            // We wait until the first frame of the window has been drawn
-            // and damage updated in the compositor before we start rotating.
-            //
-            // This way we don't get ugly artifacts when rotating if
-            // a window is slow to draw.
-            if (!this.app._drawnFirstFrame) {
-                let firstFrameConnection = this.app.connect('first-frame', () => {
-                    this.app.disconnect(firstFrameConnection);
-                    this._completeAnimate(this.toolbox,
-                                          appRemovedActor,
-                                          this.app,
-                                          Gtk.DirectionType.RIGHT);
-                });
-            } else {
-                this._completeAnimate(this.toolbox,
-                                      appRemovedActor,
-                                      this.app,
-                                      Gtk.DirectionType.RIGHT);
-            }
-        }
-
+        this._setupAnimation(STATE_APP,
+                             this.toolbox,
+                             appRemovedActor, this.app,
+                             Gtk.DirectionType.RIGHT);
         return true;
     },
 
@@ -526,39 +522,10 @@ var CodingSession = new Lang.Class({
         this._toolboxActionGroup.list_actions();
 
         _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
-
-        // Now, if we're not already on the toolbox window, we want to start
-        // animating to it here. This is different from just calling
-        // _switchToToolbox - we already have the window and we want to
-        // rotate to it as soon as its first frame appears
-        if (this._state === STATE_APP) {
-            this._prepareAnimate(this.app,
-                                 null,
-                                 this.toolbox,
-                                 Gtk.DirectionType.LEFT);
-            this._state = STATE_TOOLBOX;
-
-            // We wait until the first frame of the window has been drawn
-            // and damage updated in the compositor before we start rotating.
-            //
-            // This way we don't get ugly artifacts when rotating if
-            // a window is slow to draw.
-            if (!this.toolbox._drawnFirstFrame) {
-                let firstFrameConnection = this.toolbox.connect('first-frame', () => {
-                    this.toolbox.disconnect(firstFrameConnection);
-                    this._completeAnimate(this.app,
-                                          null,
-                                          this.toolbox,
-                                          Gtk.DirectionType.LEFT);
-                }));
-            } else {
-                this._completeAnimate(this.app,
-                                      null,
-                                      this.toolbox,
-                                      Gtk.DirectionType.LEFT);
-            }
-        }
-
+        this._setupAnimation(STATE_TOOLBOX,
+                             this.app,
+                             null, this.toolbox,
+                             Gtk.DirectionType.LEFT);
         return true;
     },
 
@@ -749,15 +716,10 @@ var CodingSession = new Lang.Class({
                 new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
                                           this.app.meta_window.gtk_window_object_path]));
         } else {
-            this._prepareAnimate(this.app,
-                                 null,
-                                 this.toolbox,
+            this._setupAnimation(STATE_TOOLBOX,
+                                 this.app,
+                                 null, this.toolbox,
                                  Gtk.DirectionType.LEFT);
-            this._completeAnimate(this.app,
-                                  null,
-                                  this.toolbox,
-                                  Gtk.DirectionType.LEFT);
-            this._state = STATE_TOOLBOX;
         }
     },
 
@@ -766,15 +728,10 @@ var CodingSession = new Lang.Class({
             this._toolboxActionGroup.activate_action('flip-back', null);
             this.appRemovedByFlipBack = true;
         } else {
-            this._prepareAnimate(this.toolbox,
-                                 null,
-                                 this.app,
+            this._setupAnimation(STATE_APP,
+                                 this.toolbox,
+                                 null, this.app,
                                  Gtk.DirectionType.RIGHT);
-            this._completeAnimate(this.toolbox,
-                                  null,
-                                  this.app,
-                                  Gtk.DirectionType.RIGHT);
-            this._state = STATE_APP;
         }
     },
 
