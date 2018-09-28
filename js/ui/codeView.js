@@ -1046,24 +1046,23 @@ var CodeViewManager = new Lang.Class({
 
     _addAppWindow: function(actor) {
         if (!global.settings.get_boolean('enable-code-view'))
-            return false;
+            return;
 
         let window = actor.meta_window;
         if (!_isCodingApp(window.get_flatpak_id()))
-            return false;
+            return;
 
         this._sessions.push(new CodingSession({
             app: actor,
             toolbox: null,
             button: new WindowTrackingButton({ window: window })
         }));
-        return true;
     },
 
     _removeAppWindow: function(actor) {
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
         if (!session)
-            return false;
+            return;
 
         if (session.appRemovedByFlipBack) {
             session.removeAppWindow();
@@ -1073,23 +1072,20 @@ var CodeViewManager = new Lang.Class({
 
             let idx = this._sessions.indexOf(session);
             if (idx === -1)
-                return false;
+                return;
 
             this._sessions.splice(idx, 1);
         }
-
-        return true;
     },
 
     _removeToolboxWindow: function(actor) {
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (!session)
-            return false;
+            return;
 
         // We can remove the normal toolbox window.
         // That window will be registered in the session at this point.
         session.removeToolboxWindow();
-        return true;
     },
 
     handleDestroyWindow: function(actor) {
