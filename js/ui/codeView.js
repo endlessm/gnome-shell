@@ -679,8 +679,14 @@ var CodingSession = new Lang.Class({
         }
     },
 
+    _windowsNeedSync: function() {
+        // Synchronization is only needed when we have both an app and
+        // a toolbox
+        return this.app && this.toolbox;
+    },
+
     _constrainGeometry: function(window) {
-        if (!this.toolbox)
+        if (!this._windowsNeedSync())
             return;
 
         // Get the minimum size of both the app and the toolbox window
@@ -778,8 +784,7 @@ var CodingSession = new Lang.Class({
     },
 
     _synchronizeWindows: function(window) {
-        // No synchronization if toolbox has not been set here
-        if (!this.toolbox)
+        if (!this._windowsNeedSync())
             return;
 
         let [src, dst] = this._srcAndDstPairFromWindow(window);
@@ -787,10 +792,6 @@ var CodingSession = new Lang.Class({
     },
 
     _applyWindowMinimizationState: function(shellwm, actor) {
-        // No synchronization if toolbox has not been set here
-        if (!this.toolbox)
-            return;
-
         let toMini = this._isActorFromSession(actor);
 
         // Only want to minimize if we weren't already minimized.
@@ -799,10 +800,6 @@ var CodingSession = new Lang.Class({
     },
 
     _applyWindowUnminimizationState: function(shellwm, actor) {
-        // No synchronization if toolbox has not been set here
-        if (!this.toolbox)
-            return;
-
         let toUnMini = this._isActorFromSession(actor);
 
         // We only want to unminimize a window here if it was previously
