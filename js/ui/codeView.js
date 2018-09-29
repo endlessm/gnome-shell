@@ -27,7 +27,8 @@ const STATE_TOOLBOX = 1;
 const _CODING_APPS = [
     // FIXME: this should be extended with a more complex lookup
     'com.endlessm.dinosaurs.en',
-    'com.endlessm.hackybird'
+    'com.endlessm.hackybird',
+    'com.endlessm.hackyballs'
 ];
 
 function _isCodingApp(flatpakID) {
