@@ -498,7 +498,6 @@ var CodingSession = new Lang.Class({
         this.app = actor;
         this.button.window = actor.meta_window;
 
-        _synchronizeMetaWindowActorGeometries(this.toolbox, this.app);
         this._setupAnimation(STATE_APP,
                              this.toolbox,
                              appRemovedActor, this.app,
@@ -522,7 +521,6 @@ var CodingSession = new Lang.Class({
                                     this.toolbox.meta_window.gtk_window_object_path);
         this._toolboxActionGroup.list_actions();
 
-        _synchronizeMetaWindowActorGeometries(this.app, this.toolbox);
         this._setupAnimation(STATE_TOOLBOX,
                              this.app,
                              null, this.toolbox,
