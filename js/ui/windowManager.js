@@ -2310,10 +2310,8 @@ var WindowManager = new Lang.Class({
                                    onOverwriteParams: [shellwm, actor]
                                  });
             } else {
-                if (this._codeViewManager.handleMapWindow(actor)) {
-                    shellwm.completed_map(actor);
+                if (this._codeViewManager.handleMapWindow(actor))
                     return;
-                }
 
                 actor.set_pivot_point(0.5, 1.0);
                 actor.scale_x = 0.01;
