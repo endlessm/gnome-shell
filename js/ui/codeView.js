@@ -405,6 +405,7 @@ var CodingSession = new Lang.Class({
 
     _init: function(params) {
         this._app = null;
+        this._button = null;
         this._toolbox = null;
         this._appRemovedActor = null;
         this.appRemovedByFlipBack = false;
@@ -429,7 +430,6 @@ var CodingSession = new Lang.Class({
                                     '/com/endlessm/HackToolbox');
         this._toolboxAppActionGroup.list_actions();
 
-        this.button.connect('clicked', this._switchWindows.bind(this));
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._windowsRestacked.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
@@ -458,6 +458,16 @@ var CodingSession = new Lang.Class({
 
     get toolbox() {
         return this._toolbox;
+    },
+
+    set button(value) {
+        this._button = value;
+        if (this._button)
+            this._button.connect('clicked', this._switchWindows.bind(this));
+    },
+
+    get button() {
+        return this._button;
     },
 
     _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
