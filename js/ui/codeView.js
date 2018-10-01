@@ -14,6 +14,7 @@ const St = imports.gi.St;
 
 const AppActivation = imports.ui.appActivation;
 const Main = imports.ui.main;
+const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
 
 const WINDOW_ANIMATION_TIME = 0.25;
@@ -88,26 +89,21 @@ function _synchronizeViewSourceButtonToRectCorner(button, rect) {
                         rect.y + rect.height - BUTTON_OFFSET_Y);
 }
 
-function _createViewSourceButtonInRectCorner(rect) {
-    let button = new St.Button({
+function _getViewSourceButtonParams(interactive) {
+    return {
         style_class: 'view-source',
         x_fill: true,
-        y_fill: true
-    });
-    button.set_child(_createIcon());
-    _synchronizeViewSourceButtonToRectCorner(button, rect);
-    return button;
+        y_fill: true,
+        child: _createIcon(),
+        reactive: interactive,
+        can_focus: interactive,
+        track_hover: interactive,
+    }
 }
 
-function _createInputEnabledViewSourceButtonInRectCorner(rect) {
-    // Do required setup to make this button interactive,
-    // by allowing it to be focused and adding chrome
-    // to the toplevel layoutManager.
-    let button = _createViewSourceButtonInRectCorner(rect);
-    button.reactive = true;
-    button.can_focus = true;
-    button.track_hover = true;
-    Main.layoutManager.addChrome(button);
+function _createViewSourceButtonInRectCorner(rect) {
+    let button = new St.Button(_getViewSourceButtonParams(false));
+    _synchronizeViewSourceButtonToRectCorner(button, rect);
     return button;
 }
 
@@ -164,7 +160,7 @@ function _flipButtonAroundRectCenter(props) {
 
 var WindowTrackingButton = new Lang.Class({
     Name: 'WindowTrackingButton',
-    Extends: GObject.Object,
+    Extends: St.Button,
     Properties: {
         'window': GObject.ParamSpec.object('window',
                                            '',
@@ -177,23 +173,21 @@ var WindowTrackingButton = new Lang.Class({
                                                    GObject.ParamFlags.READWRITE,
                                                    Meta.Window)
     },
-    Signals: {
-        'clicked': {}
-    },
 
     _init: function(params) {
         this._toolbox_window = null;
         this._window = null;
 
+        let buttonParams = _getViewSourceButtonParams(true);
+        params = Params.parse(params, buttonParams, true);
+
         this.parent(params);
 
-        // The button will be auto-added to the manager. Note that in order to
-        // remove this button, you will need to call destroy() from outside
-        // this class or use removeChrome from within it.
-        this._button = _createInputEnabledViewSourceButtonInRectCorner(this.window.get_frame_rect());
-        this._button.connect('clicked', () => {
-            this.emit('clicked');
-        });
+        this.connect('destroy', this._onDestroy.bind(this));
+
+        // Note that in order to remove this button, you will need to call
+        // destroy() from outside this class or use removeChrome from within it.
+        Main.layoutManager.addChrome(this);
 
         // Connect to signals on the window to determine when to move
         // hide, and show the button. Note that WindowTrackingButton is
@@ -205,13 +199,13 @@ var WindowTrackingButton = new Lang.Class({
         this._overviewHidingId = Main.overview.connect('hiding',
                                                        this._showIfWindowVisible.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
-                                                        this._hide.bind(this));
+                                                        this.hide.bind(this));
         this._sessionModeChangedId = Main.sessionMode.connect('updated',
                                                               this._showIfWindowVisible.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
-                                                                this._hide.bind(this));
+                                                                this.hide.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
-                                                                  this._show.bind(this));
+                                                                  this.show.bind(this));
     },
 
     _setupWindow: function() {
@@ -219,6 +213,7 @@ var WindowTrackingButton = new Lang.Class({
                                                       this._updatePosition.bind(this));
         this._sizeChangedId = this.window.connect('size-changed',
                                                   this._updatePosition.bind(this));
+        this._updatePosition();
     },
 
     _cleanupWindow: function() {
@@ -233,10 +228,7 @@ var WindowTrackingButton = new Lang.Class({
         }
     },
 
-    // Users MUST call destroy before unreferencing this button - this will
-    // cause it to disconnect all signals and remove its button from any
-    // layout managers.
-    destroy: function() {
+    _onDestroy: function() {
         if (this._windowsRestackedId) {
             Main.overview.disconnect(this._windowsRestackedId);
             this._windowsRestackedId = 0;
@@ -269,8 +261,7 @@ var WindowTrackingButton = new Lang.Class({
 
         this.window = null;
 
-        Main.layoutManager.removeChrome(this._button);
-        this._button.destroy();
+        Main.layoutManager.removeChrome(this);
     },
 
     // Just fade out and fade the button back in again. This makes it
@@ -282,7 +273,7 @@ var WindowTrackingButton = new Lang.Class({
         // Start an animation for flipping the main button around the
         // center of the window.
         _flipButtonAroundRectCenter({
-            button: this._button,
+            button: this,
             rect: rect,
             startAngle: 0,
             midpointAngle: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
@@ -291,11 +282,11 @@ var WindowTrackingButton = new Lang.Class({
             finishOpacity: 0,
             opacityDelay: 0,
             onButtonFadeComplete: () => {
-                Tweener.removeTweens(this._button);
-                this._button.rotation_angle_y = 0;
+                Tweener.removeTweens(this);
+                this.rotation_angle_y = 0;
                 // Fade in again once we're done, since
                 // we'll need to display this button
-                Tweener.addTween(this._button, {
+                Tweener.addTween(this, {
                     opacity: 255,
                     time: WINDOW_ANIMATION_TIME * 0.5,
                     transition: 'linear',
@@ -350,7 +341,7 @@ var WindowTrackingButton = new Lang.Class({
 
     _updatePosition: function() {
         let rect = this.window.get_frame_rect();
-        _synchronizeViewSourceButtonToRectCorner(this._button, rect);
+        _synchronizeViewSourceButtonToRectCorner(this, rect);
     },
 
     _showIfWindowVisible: function() {
@@ -367,18 +358,10 @@ var WindowTrackingButton = new Lang.Class({
         if ((focusedWindow === this.window ||
              focusedWindow === this.toolbox_window) &&
             !locked)
-            this._show();
+            this.show();
         else
-            this._hide();
+            this.hide();
     },
-
-    _show: function() {
-        this._button.show();
-    },
-
-    _hide: function() {
-        this._button.hide();
-    }
 });
 
 var CodingSession = new Lang.Class({
