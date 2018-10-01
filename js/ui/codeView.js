@@ -1069,6 +1069,7 @@ var CodeViewManager = new Lang.Class({
         // It might be a "HackToolbox". Check that, and if so,
         // add it to the window group for the window.
         let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(actor.meta_window);
+        let handled = false;
 
         // This is a new proxy window, make it join the session
         if (proxy) {
@@ -1076,20 +1077,26 @@ var CodeViewManager = new Lang.Class({
             let [targetBusName, targetObjectPath] = variant.deep_unpack();
             let session = this._getSessionForTargetApp(
                 targetBusName, targetObjectPath);
+
             if (session)
-                return session.admitToolboxWindowActor(actor);
+                handled = session.admitToolboxWindowActor(actor);
+        } else {
+            // See if this is a new app window for an existing toolbox session
+            let session = this._getSessionForToolboxTarget(
+                actor.meta_window.gtk_application_id,
+                actor.meta_window.gtk_window_object_path);
+
+            if (session)
+                handled = session.admitAppWindowActor(actor);
+            else
+                // This is simply a new application window
+                this._addAppWindow(actor);
         }
 
-        // See if this is a new app window for an existing toolbox session
-        let session = this._getSessionForToolboxTarget(
-            actor.meta_window.gtk_application_id,
-            actor.meta_window.gtk_window_object_path);
-        if (session)
-            return session.admitAppWindowActor(actor);
+        if (handled)
+            global.window_manager.completed_map(actor);
 
-        // This is simply a new application window
-        this._addAppWindow(actor);
-        return false;
+        return handled;
     },
 
     killEffectsOnActor: function(actor) {
