@@ -202,10 +202,6 @@ var WindowTrackingButton = new Lang.Class({
                                                         this.hide.bind(this));
         this._sessionModeChangedId = Main.sessionMode.connect('updated',
                                                               this._showIfWindowVisible.bind(this));
-        this._windowMinimizedId = global.window_manager.connect('minimize',
-                                                                this.hide.bind(this));
-        this._windowUnminimizedId = global.window_manager.connect('unminimize',
-                                                                  this.show.bind(this));
     },
 
     _setupWindow: function() {
@@ -247,16 +243,6 @@ var WindowTrackingButton = new Lang.Class({
         if (this._sessionModeChangedId) {
             Main.sessionMode.disconnect(this._sessionModeChangedId);
             this._sessionModeChangedId = 0;
-        }
-
-        if (this._windowMinimizedId) {
-            global.window_manager.disconnect(this._windowMinimizedId);
-            this._windowMinimizedId = 0;
-        }
-
-        if (this._windowUnminimizedId) {
-            global.window_manager.disconnect(this._windowUnminimizedId);
-            this._windowUnminimizedId = 0;
         }
 
         this.window = null;
@@ -528,6 +514,17 @@ var CodingSession = new Lang.Class({
             return this.toolbox;
     },
 
+    _isActorFromSession: function(actor) {
+        return actor === this.app || actor === this.toolbox;
+    },
+
+    _getOtherActor: function(actor) {
+        if (!this._isActorFromSession(actor))
+            return null;
+
+        return actor === this.app ? this.toolbox : this.app;
+    },
+
     _completeRemoveWindow: function() {
         let actor = this._actorForCurrentState();
 
@@ -767,14 +764,6 @@ var CodingSession = new Lang.Class({
         return [src, dst];
     },
 
-    _isActorFromSession: function(actor) {
-        if (actor === this.app && this.toolbox)
-            return this.toolbox;
-        else if (actor === this.toolbox && this.app)
-            return this.app;
-        return null;
-    },
-
     _synchronizeWindows: function(window) {
         if (!this._windowsNeedSync())
             return;
@@ -784,7 +773,12 @@ var CodingSession = new Lang.Class({
     },
 
     _applyWindowMinimizationState: function(shellwm, actor) {
-        let toMini = this._isActorFromSession(actor);
+        if (!this._isActorFromSession(actor))
+            return;
+
+        this._button.hide();
+
+        let toMini = this._getOtherActor(actor);
 
         // Only want to minimize if we weren't already minimized.
         if (toMini && !toMini.meta_window.minimized)
@@ -792,7 +786,12 @@ var CodingSession = new Lang.Class({
     },
 
     _applyWindowUnminimizationState: function(shellwm, actor) {
-        let toUnMini = this._isActorFromSession(actor);
+        if (!this._isActorFromSession(actor))
+            return;
+
+        this._button.show();
+
+        let toUnMini = this._getOtherActor(actor);
 
         // We only want to unminimize a window here if it was previously
         // unminimized. Unminimizing it again and switching to it without
