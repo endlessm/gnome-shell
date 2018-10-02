@@ -832,3 +832,90 @@ popup-separator-menu-item {
   background-image: url("resource:///org/gnome/shell/theme/toggle-off-hc.svg");
   &:checked { background-image: url("resource:///org/gnome/shell/theme/toggle-on-hc.svg"); }
 }
+
+// Clubhouse Notifications View
+
+$clubhouse-notification-width: 444px;
+$clubhouse-image-width: 175px;
+$clubhouse-image-height: 187px;
+
+.clubhouse-notification {
+  background-color: transparent;
+  width: $clubhouse-notification-width;
+  &:hover, &:focus {
+    background-color: transparent;
+  }
+  .clubhouse-notification-close-button {
+    color: #8A6A45;
+    padding: 9px 5px 0 0;
+  }
+  .notification-actions {
+    padding: 0;
+    margin: 0 0 10px 30px;
+  }
+  .notification-button {
+    color: white;
+    background-color: #CE5611;
+    border-radius: 17.5px;
+    border: none;
+    padding: 10px;
+    margin: 5px 12px 5px 0;
+    font: 15px "Metropolis Medium, Sans-Serif";
+    box-shadow: 0 2px 4px 4px rgba(0, 0, 0, .2);
+    text-shadow: 0 0.5px 2px rgba(0, 0, 0, .4);
+    min-width: 115px;
+    &.next {
+        min-width: 50px;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        padding: 0;
+        margin: 0;
+        & > StIcon {
+            icon-size: 24px;
+            icon-shadow: 0 0.5px 2px rgba(0, 0, 0, .2);
+        }
+    }
+    &:hover {
+        background-color: #D56F34;
+    }
+    &:active {
+        background-color: #AF490E;
+    }
+  }
+  .clubhouse-content-box {
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 12px;
+    border: 1px solid #8A6A45;
+    box-shadow: 0 2px 8px 8px rgba(0, 0, 0, .2);
+    padding: 0;
+    min-height: ($clubhouse-image-height - 52px);
+    margin-bottom: 33px;
+  }
+  .clubhouse-notification-label {
+    color: black;
+    margin: 0 $clubhouse-image-width 25px 30px;
+    font: 15px "Metropolis Medium, Sans-Serif";
+  }
+  .clubhouse-notification-icon-bin {
+    padding: 0;
+    margin: 0 0 1px 0;
+  }
+  .clubhouse-notification-image {
+    icon-size: $clubhouse-image-width;
+    min-width: $clubhouse-image-width;
+    min-height: $clubhouse-image-height;
+  }
+}
+
+.clubhouse-open-button-icon {
+  width: 110px;
+  height: 110px;
+  background-image: url('resource:///org/gnome/shell/theme/clubhouse-icon-normal.png');
+}
+
+.clubhouse-close-button-icon {
+  width: 110px;
+  height: 110px;
+  background-image: url('resource:///org/gnome/shell/theme/clubhouse-close-button-normal.png');
+}
