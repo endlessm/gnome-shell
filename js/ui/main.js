@@ -84,7 +84,6 @@ var magnifier = null;
 var xdndHandler = null;
 var keyboard = null;
 var layoutManager = null;
-var codingManager = null;
 var discoveryFeed = null;
 var paygManager = null;
 var trayArea = null;
