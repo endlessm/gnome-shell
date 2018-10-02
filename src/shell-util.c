@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/xattr.h>
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
 #endif
@@ -30,6 +31,10 @@
 
 #define DEFAULT_XKB_RULES_FILE "evdev"
 #define DEFAULT_XKB_MODEL "pc105"
+
+#define EOS_IMAGE_VERSION_XATTR "user.eos-image-version"
+#define EOS_IMAGE_VERSION_PATH "/sysroot"
+#define EOS_IMAGE_VERSION_ALT_PATH "/"
 
 typedef struct _FindLatinKeysymsState
 {
@@ -724,4 +729,50 @@ shell_util_check_cloexec_fds (void)
 {
   fdwalk (check_cloexec, NULL);
   g_info ("Open fd CLOEXEC check complete");
+}
+
+static char *
+get_eos_image_version_for_path (const char *path)
+{
+  ssize_t xattr_size = 0;
+  char *image_version = NULL;
+
+  xattr_size = getxattr (path, EOS_IMAGE_VERSION_XATTR, NULL, 0);
+
+  if (xattr_size == -1)
+    return NULL;
+
+  image_version = g_malloc0 (xattr_size + 1);
+
+  xattr_size = getxattr (path, EOS_IMAGE_VERSION_XATTR,
+                         image_version, xattr_size);
+
+  /* this check is just in case the xattr has changed in between the
+   * size checks */
+  if (xattr_size == -1)
+    {
+      g_warning ("Error when getting the 'eos-image-version' from %s",
+                 path);
+      return NULL;
+    }
+
+  return image_version;
+}
+
+/**
+ * shell_util_get_eos_image_version:
+ *
+ * Convenience function to get the EOS version for the image.
+ *
+ * Returns: (transfer full): The image version
+ */
+gchar *
+shell_util_get_eos_image_version (void)
+{
+  char *image_version = get_eos_image_version_for_path (EOS_IMAGE_VERSION_PATH);
+
+  if (!image_version)
+    image_version = get_eos_image_version_for_path (EOS_IMAGE_VERSION_ALT_PATH);
+
+  return image_version;
 }
