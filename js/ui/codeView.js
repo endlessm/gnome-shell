@@ -512,6 +512,11 @@ var CodingSession = new Lang.Class({
         return actor === this.app || actor === this.toolbox;
     },
 
+    _isCurrentWindow: function(window) {
+        let actor = this._actorForCurrentState();
+        return actor.meta_window === window;
+    },
+
     _getOtherActor: function(actor) {
         if (!this._isActorFromSession(actor))
             return null;
@@ -672,6 +677,9 @@ var CodingSession = new Lang.Class({
         if (!this._windowsNeedSync())
             return;
 
+        if (!this._isCurrentWindow(window))
+            return;
+
         // Get the minimum size of both the app and the toolbox window
         // and then determine the maximum of the two. We won't permit
         // either window to get any smaller.
@@ -746,24 +754,15 @@ var CodingSession = new Lang.Class({
         actor.meta_window.activate(global.get_current_time());
     },
 
-    // Assuming that we are only listening to some signal on app and toolbox,
-    // given some window, determine which MetaWindowActor instance is the
-    // source and which is the destination, such that the source is where
-    // the signal occurred and the destination is where changes should be
-    // applied.
-    _srcAndDstPairFromWindow: function(window) {
-        let src = (window === this.app.meta_window ? this.app : this.toolbox);
-        let dst = (window === this.app.meta_window ? this.toolbox : this.app);
-
-        return [src, dst];
-    },
-
     _synchronizeWindows: function(window) {
         if (!this._windowsNeedSync())
             return;
 
-        let [src, dst] = this._srcAndDstPairFromWindow(window);
-        _synchronizeMetaWindowActorGeometries(src, dst);
+        if (!this._isCurrentWindow(window))
+            return;
+
+        let actor = window.get_compositor_private();
+        _synchronizeMetaWindowActorGeometries(actor, this._getOtherActor(actor));
     },
 
     _applyWindowMinimizationState: function(shellwm, actor) {
