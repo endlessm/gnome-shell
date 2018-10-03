@@ -769,6 +769,9 @@ var CodingSession = new Lang.Class({
         if (!this._isActorFromSession(actor))
             return;
 
+        if (!this._isCurrentWindow(actor.meta_window))
+            return;
+
         this._button.hide();
 
         let toMini = this._getOtherActor(actor);
@@ -780,6 +783,9 @@ var CodingSession = new Lang.Class({
 
     _applyWindowUnminimizationState: function(shellwm, actor) {
         if (!this._isActorFromSession(actor))
+            return;
+
+        if (!this._isCurrentWindow(actor.meta_window))
             return;
 
         this._button.show();
