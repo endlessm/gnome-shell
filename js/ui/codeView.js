@@ -793,16 +793,9 @@ var CodingSession = new Lang.Class({
         let toUnMini = this._getOtherActor(actor);
 
         // We only want to unminimize a window here if it was previously
-        // unminimized. Unminimizing it again and switching to it without
-        // flipping will cause the secondary unminimized window to be
-        // activated and flipped to.
-        if (toUnMini && toUnMini.meta_window.minimized) {
+        // minimized.
+        if (toUnMini && toUnMini.meta_window.minimized)
             toUnMini.meta_window.unminimize();
-
-            // Window was unminimized. Ensure that this actor is focused
-            // and switch to it instantly
-            this._switchToWindowWithoutFlipping(actor);
-        }
     },
 
     _windowsRestacked: function() {
