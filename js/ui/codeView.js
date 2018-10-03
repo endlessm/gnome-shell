@@ -48,9 +48,6 @@ function _createIcon() {
 //
 // Synchronize geometry of MetaWindowActor src to dst by
 // applying both the physical geometry and maximization state.
-//
-// The return value signifies whether the maximization state changed,
-// which may cause the hidden window to be shown.
 function _synchronizeMetaWindowActorGeometries(src, dst) {
     let srcGeometry = src.meta_window.get_frame_rect();
     let dstGeometry = dst.meta_window.get_frame_rect();
@@ -72,16 +69,13 @@ function _synchronizeMetaWindowActorGeometries(src, dst) {
     if (srcIsMaximized && !dstIsMaximized)
         dst.meta_window.maximize(Meta.MaximizeFlags.BOTH);
 
-    if (srcGeometry.equal(dstGeometry))
-        return maximizationStateChanged;
 
-    dst.meta_window.move_resize_frame(false,
-                                      srcGeometry.x,
-                                      srcGeometry.y,
-                                      srcGeometry.width,
-                                      srcGeometry.height);
-
-    return maximizationStateChanged;
+    if (!srcGeometry.equal(dstGeometry))
+        dst.meta_window.move_resize_frame(false,
+                                          srcGeometry.x,
+                                          srcGeometry.y,
+                                          srcGeometry.width,
+                                          srcGeometry.height);
 }
 
 function _synchronizeViewSourceButtonToRectCorner(button, rect) {
