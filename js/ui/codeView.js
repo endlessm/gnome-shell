@@ -395,6 +395,8 @@ var CodingSession = new Lang.Class({
 
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._windowsRestacked.bind(this));
+        this._focusWindowId = global.display.connect('notify::focus-window',
+                                                     this._focusWindowChanged.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
                                                                 this._applyWindowMinimizationState.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
@@ -638,6 +640,10 @@ var CodingSession = new Lang.Class({
     // The assumption here is that the session will be removed immediately
     // after destruction.
     destroy: function() {
+        if (this._focusWindowId != 0) {
+            global.display.disconnect(this._focusWindowId);
+            this._focusWindowId = 0;
+        }
         if (this._windowsRestackedId !== 0) {
             Main.overview.disconnect(this._windowsRestackedId);
             this._windowsRestackedId = 0;
@@ -800,6 +806,21 @@ var CodingSession = new Lang.Class({
         // minimized.
         if (toUnMini && toUnMini.meta_window.minimized)
             toUnMini.meta_window.unminimize();
+    },
+
+    _focusWindowChanged: function() {
+        let focusedWindow = global.display.get_focus_window();
+        if (!focusedWindow)
+            return;
+
+        let focusedActor = focusedWindow.get_compositor_private();
+        if (!this._isActorFromSession(focusedActor))
+            return;
+
+        // Ensure correct stacking order by activating the window that just got focus.
+        // shell_app_activate_window() will raise all the other windows of the app
+        // while preserving stacking order.
+        this._shellApp.activate_window(focusedActor.meta_window, global.get_current_time());
     },
 
     _windowsRestacked: function() {
