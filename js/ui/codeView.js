@@ -339,8 +339,6 @@ var CodingSession = new Lang.Class({
                                     '/com/endlessm/HackToolbox');
         this._toolboxAppActionGroup.list_actions();
 
-        this._windowsRestackedId = Main.overview.connect('windows-restacked',
-                                                         this._windowsRestacked.bind(this));
         this._overviewHiddenId = Main.overview.connect('hidden',
                                                        this._syncButtonVisibility.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
@@ -389,6 +387,10 @@ var CodingSession = new Lang.Class({
 
     _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
         if (this._state === targetState)
+            return;
+
+        // Bail out if we are already running an animation.
+        if (this._rotatingInActor || this._rotatingOutActor)
             return;
 
         this._state = targetState;
@@ -608,10 +610,6 @@ var CodingSession = new Lang.Class({
             Main.sessionMode.disconnect(this._sessionModeChangedId);
             this._sessionModeChangedId = 0;
         }
-        if (this._windowsRestackedId !== 0) {
-            Main.overview.disconnect(this._windowsRestackedId);
-            this._windowsRestackedId = 0;
-        }
         if (this._windowMinimizedId !== 0) {
             global.window_manager.disconnect(this._windowMinimizedId);
             this._windowMinimizedId = 0;
@@ -709,25 +707,6 @@ var CodingSession = new Lang.Class({
         }
     },
 
-    // Given some recently-focused actor, switch to it without
-    // flipping the two windows. We might want this behaviour instead
-    // of flipping the windows in cases where we unminimized a window
-    // or left the overview. This will cause the state to instantly change
-    // and prevent things from being flipped later in _windowRestacked
-    _switchToWindowWithoutFlipping: function(actor) {
-        // We need to do a few housekeeping things here:
-        // 1. Change the _state variable to indicate whether we are now
-        //    on the app, or the toolbox window.
-        // 2. Ensure that the relevant window is activated (usually just
-        //    by activating it again). For instance, in the unminimize case,
-        //    unminimizing the sibling window will cause it to activate
-        //    which then breaks the user's expectations (it should unminimize
-        //    but not activate). Re-activating ensures that we present
-        //    the right story to the user.
-        this._state = (actor === this.app ? STATE_APP : STATE_TOOLBOX);
-        actor.meta_window.activate(global.get_current_time());
-    },
-
     _synchronizeWindows: function(window) {
         if (!this._windowsNeedSync())
             return;
@@ -791,6 +770,13 @@ var CodingSession = new Lang.Class({
             this._button.hide();
     },
 
+    _activateAppFlip: function() {
+        // Support a 'flip' action in the app, if it exposes it
+        const flipState = (this._state == STATE_TOOLBOX);
+        if (this._appActionProxy.has_action('flip'))
+            this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
+    },
+
     _focusWindowChanged: function() {
         let focusedWindow = global.display.get_focus_window();
         if (!focusedWindow)
@@ -802,39 +788,24 @@ var CodingSession = new Lang.Class({
         if (!this._isActorFromSession(focusedActor))
             return;
 
+        let actor = this._actorForCurrentState();
+        if (actor !== focusedActor) {
+            // FIXME: we probably selected this window from the overview or the taskbar.
+            // Flipping makes little sense as the window has already been activated,
+            // immediately change the state and reset any rotation for now.
+            // In the future, we want to change the behavior of those activation points
+            // so that when a toolbox is present, it is only possible to switch side
+            // when the flip button is clicked.
+            this._state = (focusedActor === this.app ? STATE_APP : STATE_TOOLBOX);
+            this._activateAppFlip();
+            focusedActor.rotation_angle_y = 0;
+            actor.rotation_angle_y = 180;
+        }
+
         // Ensure correct stacking order by activating the window that just got focus.
         // shell_app_activate_window() will raise all the other windows of the app
         // while preserving stacking order.
         this._shellApp.activate_window(focusedActor.meta_window, global.get_current_time());
-    },
-
-    _windowsRestacked: function() {
-        let focusedWindow = global.display.get_focus_window();
-        if (!focusedWindow)
-            return;
-
-        let focusedActor = focusedWindow.get_compositor_private();
-        if (!this._isActorFromSession(focusedActor))
-            return;
-
-        // If the overview is still showing or animating out, we probably
-        // selected this window from the overview. In that case, flipping
-        // make no sense, immediately change the state and show the
-        // recently activated window.
-        if (Main.overview.visible || Main.overview.animationInProgress) {
-            this._switchToWindowWithoutFlipping(focusedActor);
-            return;
-        }
-
-        // If we reached this point, we'll be rotating the two windows.
-        // First, make sure we do not rotate when a rotation is running,
-        // then use the state to figure out which way to flip
-        if (this._rotatingInActor || this._rotatingOutActor)
-            return;
-
-        let actor = this._actorForCurrentState();
-        if (actor !== focusedActor)
-            this._switchWindows();
     },
 
     _prepareAnimate: function(src, oldDst, newDst, direction) {
@@ -908,10 +879,7 @@ var CodingSession = new Lang.Class({
     },
 
     _rotateOutToMidpointCompleted: function(src, direction) {
-        // Support a 'flip' action in the app too, if it exposes it
-        const flipState = (this._state == STATE_TOOLBOX);
-        if (this._appActionProxy.has_action('flip'))
-            this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
+        this._activateAppFlip();
 
         Tweener.addTween(src, {
             rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
