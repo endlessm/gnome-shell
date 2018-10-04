@@ -803,15 +803,9 @@ var CodingSession = new Lang.Class({
         if (!focusedWindow)
             return;
 
-        let appWindow = this.app ? this.app.meta_window : null;
-        let toolboxWindow = this.toolbox ? this.toolbox.meta_window : null;
-
-        // Determine if we need to change the state of this session by
-        // examining the focused window
-        if (focusedWindow != appWindow && focusedWindow != toolboxWindow)
-            return;
-
         let focusedActor = focusedWindow.get_compositor_private();
+        if (!this._isActorFromSession(focusedActor))
+            return;
 
         // If the overview is still showing or animating out, we probably
         // selected this window from the overview. In that case, flipping
