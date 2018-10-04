@@ -182,20 +182,6 @@ var WindowTrackingButton = new Lang.Class({
         // Note that in order to remove this button, you will need to call
         // destroy() from outside this class or use removeChrome from within it.
         Main.layoutManager.addChrome(this);
-
-        // Connect to signals on the window to determine when to move
-        // hide, and show the button. Note that WindowTrackingButton is
-        // constructed with the primary app window and we listen for signals
-        // on that. This is because of the assumption that both the app
-        // window and toolbox window are completely synchronized.
-        this._windowsRestackedId = Main.overview.connect('windows-restacked',
-                                                         this._showIfWindowVisible.bind(this));
-        this._overviewHidingId = Main.overview.connect('hiding',
-                                                       this._showIfWindowVisible.bind(this));
-        this._overviewShowingId = Main.overview.connect('showing',
-                                                        this.hide.bind(this));
-        this._sessionModeChangedId = Main.sessionMode.connect('updated',
-                                                              this._showIfWindowVisible.bind(this));
     },
 
     _setupWindow: function() {
@@ -219,26 +205,6 @@ var WindowTrackingButton = new Lang.Class({
     },
 
     _onDestroy: function() {
-        if (this._windowsRestackedId) {
-            Main.overview.disconnect(this._windowsRestackedId);
-            this._windowsRestackedId = 0;
-        }
-
-        if (this._overviewShowingId) {
-            Main.overview.disconnect(this._overviewShowingId);
-            this._overviewShowingId = 0;
-        }
-
-        if (this._overviewHidingId) {
-            Main.overview.disconnect(this._overviewHidingId);
-            this._overviewHidingId = 0;
-        }
-
-        if (this._sessionModeChangedId) {
-            Main.sessionMode.disconnect(this._sessionModeChangedId);
-            this._sessionModeChangedId = 0;
-        }
-
         this.window = null;
 
         Main.layoutManager.removeChrome(this);
@@ -301,7 +267,6 @@ var WindowTrackingButton = new Lang.Class({
         // the toolbox window was set, so do the check again
         // here, too.
         this._toolbox_window = value;
-        this._showIfWindowVisible();
     },
 
     get toolbox_window() {
@@ -322,25 +287,6 @@ var WindowTrackingButton = new Lang.Class({
     _updatePosition: function() {
         let rect = this.window.get_frame_rect();
         _synchronizeViewSourceButtonToRectCorner(this, rect);
-    },
-
-    _showIfWindowVisible: function() {
-        let focusedWindow = global.display.get_focus_window();
-        // Probably the root window, ignore.
-        if (!focusedWindow)
-            return;
-
-        // Don't show if the screen is locked
-        let locked = Main.sessionMode.isLocked;
-
-        // Show only if either this window or the toolbox window
-        // is in focus
-        if ((focusedWindow === this.window ||
-             focusedWindow === this.toolbox_window) &&
-            !locked)
-            this.show();
-        else
-            this.hide();
     },
 });
 
@@ -395,6 +341,12 @@ var CodingSession = new Lang.Class({
 
         this._windowsRestackedId = Main.overview.connect('windows-restacked',
                                                          this._windowsRestacked.bind(this));
+        this._overviewHiddenId = Main.overview.connect('hidden',
+                                                       this._syncButtonVisibility.bind(this));
+        this._overviewShowingId = Main.overview.connect('showing',
+                                                        this._syncButtonVisibility.bind(this));
+        this._sessionModeChangedId = Main.sessionMode.connect('updated',
+                                                              this._syncButtonVisibility.bind(this));
         this._focusWindowId = global.display.connect('notify::focus-window',
                                                      this._focusWindowChanged.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
@@ -644,6 +596,18 @@ var CodingSession = new Lang.Class({
             global.display.disconnect(this._focusWindowId);
             this._focusWindowId = 0;
         }
+        if (this._overviewHiddenId) {
+            Main.overview.disconnect(this._overviewHiddenId);
+            this._overviewHiddenId = 0;
+        }
+        if (this._overviewShowingId) {
+            Main.overview.disconnect(this._overviewShowingId);
+            this._overviewShowingId = 0;
+        }
+        if (this._sessionModeChangedId) {
+            Main.sessionMode.disconnect(this._sessionModeChangedId);
+            this._sessionModeChangedId = 0;
+        }
         if (this._windowsRestackedId !== 0) {
             Main.overview.disconnect(this._windowsRestackedId);
             this._windowsRestackedId = 0;
@@ -808,10 +772,31 @@ var CodingSession = new Lang.Class({
             toUnMini.meta_window.unminimize();
     },
 
+    _syncButtonVisibility: function() {
+        let focusedWindow = global.display.get_focus_window();
+        if (!focusedWindow)
+            return;
+
+        // Don't show if the screen is locked
+        let locked = Main.sessionMode.isLocked;
+
+        // Show only if either this window or the toolbox window
+        // is in focus
+        let focusedActor = focusedWindow.get_compositor_private();
+        if (this._isActorFromSession(focusedActor) &&
+            !Main.overview.visible &&
+            !locked)
+            this._button.show();
+        else
+            this._button.hide();
+    },
+
     _focusWindowChanged: function() {
         let focusedWindow = global.display.get_focus_window();
         if (!focusedWindow)
             return;
+
+        this._syncButtonVisibility();
 
         let focusedActor = focusedWindow.get_compositor_private();
         if (!this._isActorFromSession(focusedActor))
