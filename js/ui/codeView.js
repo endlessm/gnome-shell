@@ -596,6 +596,9 @@ var CodingSession = new Lang.Class({
                                     this.app.meta_window.gtk_application_id,
                                     this.app.meta_window.gtk_application_object_path);
         this._appActionProxy.list_actions();
+
+        let windowTracker = Shell.WindowTracker.get_default();
+        this._shellApp = windowTracker.get_window_app(this.app.meta_window);
     },
 
     _cleanupAppWindow: function() {
@@ -649,6 +652,7 @@ var CodingSession = new Lang.Class({
         }
 
         this.app = null;
+        this._shellApp = null;
 
         // Destroy the button too
         this.button.destroy();
