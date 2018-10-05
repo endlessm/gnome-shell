@@ -19,9 +19,6 @@ const Tweener = imports.ui.tweener;
 
 const WINDOW_ANIMATION_TIME = 0.25;
 
-const BUTTON_OFFSET_X = 33;
-const BUTTON_OFFSET_Y = 40;
-
 const STATE_APP = 0;
 const STATE_TOOLBOX = 1;
 
@@ -79,8 +76,8 @@ function _synchronizeMetaWindowActorGeometries(src, dst) {
 }
 
 function _synchronizeViewSourceButtonToRectCorner(button, rect) {
-    button.set_position(rect.x + rect.width - BUTTON_OFFSET_X,
-                        rect.y + rect.height - BUTTON_OFFSET_Y);
+    button.set_position(rect.x - button.width / 2,
+                        rect.y + (rect.height - button.height) / 2);
 }
 
 function _getViewSourceButtonParams(interactive) {
@@ -95,12 +92,6 @@ function _getViewSourceButtonParams(interactive) {
     }
 }
 
-function _createViewSourceButtonInRectCorner(rect) {
-    let button = new St.Button(_getViewSourceButtonParams(false));
-    _synchronizeViewSourceButtonToRectCorner(button, rect);
-    return button;
-}
-
 function _flipButtonAroundRectCenter(props) {
     let {
         button,
@@ -108,27 +99,25 @@ function _flipButtonAroundRectCenter(props) {
         startAngle,
         midpointAngle,
         finishAngle,
-        startOpacity,
-        finishOpacity,
-        opacityDelay,
+        onRotationMidpoint,
         onRotationComplete,
-        onButtonFadeComplete
     } = props;
 
     // this API is deprecated but the best option here to
     // animate around a point outside of the actor
     button.rotation_center_y = new Clutter.Vertex({
-        x: button.width - (rect.width * 0.5),
+        x: rect.width * 0.5,
         y: button.height * 0.5,
         z: 0
     });
     button.rotation_angle_y = startAngle;
-    button.opacity = startOpacity;
     Tweener.addTween(button, {
         rotation_angle_y: midpointAngle,
         time: WINDOW_ANIMATION_TIME * 2,
         transition: 'easeInQuad',
         onComplete: function() {
+            if (onRotationMidpoint)
+                onRotationMidpoint();
             Tweener.addTween(button, {
                 rotation_angle_y: finishAngle,
                 time: WINDOW_ANIMATION_TIME * 2,
@@ -138,16 +127,6 @@ function _flipButtonAroundRectCenter(props) {
                         onRotationComplete();
                 }
             });
-        }
-    });
-    Tweener.addTween(button, {
-        opacity: finishOpacity,
-        time: WINDOW_ANIMATION_TIME * 2,
-        transition: 'linear',
-        delay: opacityDelay,
-        onComplete: function() {
-            if (onButtonFadeComplete)
-                onButtonFadeComplete();
         }
     });
 }
@@ -182,6 +161,16 @@ var WindowTrackingButton = new Lang.Class({
         // Note that in order to remove this button, you will need to call
         // destroy() from outside this class or use removeChrome from within it.
         Main.layoutManager.addChrome(this);
+    },
+
+    vfunc_allocate: function(box, flags) {
+        this.parent(box, flags);
+
+        if (!this.window)
+            return;
+
+        let rect = this.window.get_frame_rect();
+        _synchronizeViewSourceButtonToRectCorner(this, rect);
     },
 
     _setupWindow: function() {
@@ -224,39 +213,34 @@ var WindowTrackingButton = new Lang.Class({
             startAngle: 0,
             midpointAngle: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
             finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
-            startOpacity: 255,
-            finishOpacity: 0,
-            opacityDelay: 0,
-            onButtonFadeComplete: () => {
+            onRotationMidpoint: () => {
+                this.opacity = 0;
+            },
+            onRotationComplete: () => {
                 Tweener.removeTweens(this);
                 this.rotation_angle_y = 0;
-                // Fade in again once we're done, since
-                // we'll need to display this button
-                Tweener.addTween(this, {
-                    opacity: 255,
-                    time: WINDOW_ANIMATION_TIME * 0.5,
-                    transition: 'linear',
-                    delay: WINDOW_ANIMATION_TIME * 1.5
-                });
-            }
+                this.opacity = 255;
+            },
         });
 
         // Create a temporary button which we'll use to show a "flip-in"
         // animation along with the incoming window. This is removed as soon
         // as the animation is complete.
-        let animationButton = _createViewSourceButtonInRectCorner(rect);
+        let animationButton = new St.Button(_getViewSourceButtonParams(false));
         Main.layoutManager.uiGroup.add_actor(animationButton);
+        _synchronizeViewSourceButtonToRectCorner(animationButton, rect);
 
+        animationButton.opacity = 0;
         _flipButtonAroundRectCenter({
             button: animationButton,
             rect: rect,
             startAngle: direction == Gtk.DirectionType.RIGHT ? -180 : 180,
             midpointAngle: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
             finishAngle: 0,
-            startOpacity: 0,
-            finishOpacity: 255,
-            opacityDelay: WINDOW_ANIMATION_TIME,
-            onRotationComplete: function() {
+            onRotationMidpoint: () => {
+                animationButton.opacity = 255;
+            },
+            onRotationComplete: () => {
                 animationButton.destroy();
             }
         });
@@ -285,8 +269,7 @@ var WindowTrackingButton = new Lang.Class({
     },
 
     _updatePosition: function() {
-        let rect = this.window.get_frame_rect();
-        _synchronizeViewSourceButtonToRectCorner(this, rect);
+        this.queue_relayout();
     },
 });
 
