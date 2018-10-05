@@ -1846,7 +1846,6 @@ var WindowManager = new Lang.Class({
             Tweener.removeTweens(actor);
             actor.set_scale(1.0, 1.0);
             actor.set_opacity(255);
-            actor.set_pivot_point(0, 0);
 
             shellwm.completed_minimize(actor);
         }
@@ -1913,7 +1912,6 @@ var WindowManager = new Lang.Class({
             Tweener.removeTweens(actor);
             actor.set_scale(1.0, 1.0);
             actor.set_opacity(255);
-            actor.set_pivot_point(0, 0);
 
             shellwm.completed_unminimize(actor);
         }
@@ -2228,11 +2226,14 @@ var WindowManager = new Lang.Class({
                     this._checkDimming(parent);
         }));
 
-        if (this._codeViewManager.addBuilderWindow(actor)) {
-            shellwm.completed_map(actor);
-            return;
-        }
-        this._codeViewManager.addAppWindow(actor);
+        // Endless libanimation extension
+        if (this._animationsServer)
+            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
+
+        // Add the wobbly effect if it is enabled
+        if (this._wobblyEffect)
+            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
+                                                                                  this._wobblyEffect);
 
         let metaWindow = actor.meta_window;
         let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
@@ -2262,16 +2263,6 @@ var WindowManager = new Lang.Class({
 
             shellwm.completed_map(actor);
             return;
-        }
-
-        // Endless libanimation extension
-        if (this._animationsServer)
-            actor._animatableSurface = this._animationsServer.register_surface(new ShellWindowManagerAnimatableSurface(actor));
-
-        // Add the wobbly effect if it is enabled
-        if (this._wobblyEffect) {
-            actor._animatableSurface.attach_animation_effect_with_server_priority('move',
-                                                                                  this._wobblyEffect);
         }
 
         if (SideComponent.isSideComponentWindow(actor.meta_window)) {
@@ -2317,6 +2308,9 @@ var WindowManager = new Lang.Class({
                                    onOverwriteParams: [shellwm, actor]
                                  });
             } else {
+                if (this._codeViewManager.handleMapWindow(actor))
+                    return;
+
                 actor.set_pivot_point(0.5, 1.0);
                 actor.scale_x = 0.01;
                 actor.scale_y = 0.05;
@@ -2389,9 +2383,6 @@ var WindowManager = new Lang.Class({
     _destroyWindow : function(shellwm, actor) {
         let window = actor.meta_window;
 
-        this._codeViewManager.removeAppWindow(actor);
-        this._codeViewManager.removeBuilderWindow(actor);
-
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
             actor._notifyWindowTypeSignalId = 0;
@@ -2437,6 +2428,9 @@ var WindowManager = new Lang.Class({
 
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
+            if (this._codeViewManager.handleDestroyWindow(actor))
+                return;
+
             actor.set_pivot_point(0.5, 0.5);
             this._destroying.push(actor);
 

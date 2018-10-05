@@ -9,6 +9,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
+#include <gio/gio.h>
 #include <meta/display.h>
 #include <meta/group.h>
 #include <meta/util.h>
@@ -32,8 +33,6 @@
 #define SIDE_COMPONENT_ROLE "eos-side-component"
 #define SPEEDWAGON_ROLE "eos-speedwagon"
 
-#define BUILDER_WINDOW "org.gnome.Builder"
-
 /**
  * SECTION:shell-window-tracker
  * @short_description: Associate windows with applications
@@ -52,8 +51,6 @@ struct _ShellWindowTracker
 
   /* <MetaWindow * window, ShellApp *app> */
   GHashTable *window_to_app;
-
-  MetaWindow *coding_app;
 };
 
 G_DEFINE_TYPE (ShellWindowTracker, shell_window_tracker, G_TYPE_OBJECT);
@@ -364,6 +361,95 @@ get_app_from_window_pid (ShellWindowTracker  *tracker,
   return result;
 }
 
+static ShellApp *
+maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
+                                   MetaWindow          *window)
+{
+  g_autoptr(GError) local_error = NULL;
+  g_autoptr(GDBusProxy) proxy = NULL;
+  g_autoptr(GVariant) target_property_variant = NULL;
+  GSettings *settings;
+  const gchar *window_app_id = NULL;
+  const gchar *window_object_path = NULL;
+  const gchar *target_bus_name = NULL;
+  const gchar *target_object_path = NULL;
+  GHashTableIter iter;
+  gpointer key, value;
+
+  /* If code view is disabled globally, do nothing here */
+  settings = shell_global_get_settings (shell_global_get ());
+  if (!g_settings_get_boolean (settings, "enable-code-view"))
+    return NULL;
+
+  /* Check if there is a set application id and object path
+   * on this window. If not, then it can't be a toolbox. */
+  window_app_id = meta_window_get_gtk_application_id (window);
+  window_object_path = meta_window_get_gtk_window_object_path (window);
+
+  if (window_app_id == NULL ||
+      window_object_path == NULL)
+    return NULL;
+
+  /* Not a bus name, no way that this could be a toolbox */
+  if (!g_dbus_is_name (window_app_id))
+    return NULL;
+
+  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+                                         G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
+                                         G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
+                                         NULL,
+                                         window_app_id,
+                                         window_object_path,
+                                         "com.endlessm.HackToolbox.Toolbox",
+                                         NULL,
+                                         &local_error);
+
+  if (proxy == NULL)
+    {
+      if (!g_error_matches (local_error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_INTERFACE))
+        g_warning ("Error in finding candidate app for potential Hack Toolbox: %s",
+                   local_error->message);
+      return NULL;
+    }
+
+  target_property_variant = g_dbus_proxy_get_cached_property (proxy, "Target");
+  if (target_property_variant == NULL)
+    return NULL;
+
+  g_variant_get (target_property_variant, "(&s&s)",
+                 &target_bus_name,
+                 &target_object_path);
+
+  if (target_bus_name == NULL || target_object_path == NULL)
+    {
+      g_warning ("Invalid Target property on Hack Toolbox: %s %s",
+                 target_bus_name, target_object_path);
+      return NULL;
+    }
+
+  g_object_set_data_full (G_OBJECT (window), "hack-toolbox-proxy",
+                          g_object_ref (proxy), g_object_unref);
+
+  /* Now that we have the target bus name and object path, we need to look
+   * up the corresponding app for the bus name by enumerating all the
+   * windows on the window tracker */
+  g_hash_table_iter_init (&iter, tracker->window_to_app);
+
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      MetaWindow *window = key;
+      ShellApp *app = value;
+      const char *candidate_app_id = meta_window_get_gtk_application_id (window);
+      const char *candidate_object_path = meta_window_get_gtk_window_object_path (window);
+
+      if (g_strcmp0 (candidate_app_id, target_bus_name) == 0 &&
+          g_strcmp0 (candidate_object_path, target_object_path) == 0)
+        return app;
+    }
+
+  return NULL;
+}
+
 /**
  * get_app_for_window:
  *
@@ -385,20 +471,14 @@ get_app_for_window (ShellWindowTracker    *tracker,
   if (g_strcmp0 (meta_window_get_role (window), SIDE_COMPONENT_ROLE) == 0)
     return NULL;
 
-  /* We do want to associate the GNOME Builder window with
-   * an open app of a coding session */
-  if (g_strcmp0 (meta_window_get_flatpak_id (window), BUILDER_WINDOW) == 0 &&
-      tracker->coding_app)
-    {
-      result = g_hash_table_lookup (tracker->window_to_app, tracker->coding_app);
-      shell_window_tracker_untrack_coding_app_window (tracker);
-
-      if (result != NULL)
-        {
-          g_object_ref (result);
-          return result;
-        }
-    }
+  /* Check if the window is a HackToolbox and if so
+   * associate it with the corresponding target application.
+   * It is definitely not ideal that this has to happen
+   * synchronously for each window that gets opened, but
+   * that's just the way that this function happens to work. */
+  result = maybe_find_target_app_for_toolbox (tracker, window);
+  if (result != NULL)
+    return g_object_ref (result);
 
   transient_for = meta_window_get_transient_for (window);
   if (transient_for != NULL)
@@ -874,31 +954,16 @@ shell_window_tracker_is_speedwagon_window (MetaWindow *window)
 }
 
 /**
- * shell_window_tracker_track_coding_app_window:
- * @tracker: An app monitor instance
- * @app_window: A #MetaWindow
+ * shell_window_tracker_get_hack_toolbox_proxy:
  *
- * Track a coding app to pair with an associated GNOME Builder window.
+ * Gets the #GDBusProxy for the hack toolbox represented by this window.
  *
+ * Returns: (transfer none): a #GDBusProy, or %NULL
  */
-void
-shell_window_tracker_track_coding_app_window (ShellWindowTracker *tracker,
-                                              MetaWindow *app_window)
+GDBusProxy *
+shell_window_tracker_get_hack_toolbox_proxy (MetaWindow *window)
 {
-  tracker->coding_app = app_window;
-}
-
-/**
- * shell_window_tracker_untrack_coding_app_window:
- * @tracker: An app monitor instance
- *
- * Untrack the coding app.
- *
- */
-void
-shell_window_tracker_untrack_coding_app_window (ShellWindowTracker *tracker)
-{
-  tracker->coding_app = NULL;
+  return g_object_get_data (G_OBJECT (window), "hack-toolbox-proxy");
 }
 
 /* sn_startup_sequence_ref returns void, so make a
