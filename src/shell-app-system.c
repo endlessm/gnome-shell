@@ -123,10 +123,10 @@ static void shell_app_system_class_init(ShellAppSystemClass *klass)
 
 static void
 add_aliases (ShellAppSystem  *self,
-             const char      *id,
              GDesktopAppInfo *info)
 {
   ShellAppSystemPrivate *priv = self->priv;
+  const char *id = g_app_info_get_id (G_APP_INFO (info));
   const char *alias;
   g_autofree char *renamed_from = NULL;
 
@@ -172,12 +172,7 @@ scan_alias_to_id (ShellAppSystem *self)
 
   apps = g_app_info_get_all ();
   for (l = apps; l != NULL; l = l->next)
-    {
-      GAppInfo *info = l->data;
-      const char *id = g_app_info_get_id (info);
-
-      add_aliases (self, id, G_DESKTOP_APP_INFO (info));
-    }
+    add_aliases (self, G_DESKTOP_APP_INFO (l->data));
 
   g_list_free_full (apps, g_object_unref);
 }
