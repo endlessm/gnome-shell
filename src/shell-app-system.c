@@ -123,10 +123,10 @@ static void shell_app_system_class_init(ShellAppSystemClass *klass)
 
 static void
 add_aliases (ShellAppSystem  *self,
-             const char      *id,
              GDesktopAppInfo *info)
 {
   ShellAppSystemPrivate *priv = self->priv;
+  const char *id = g_app_info_get_id (G_APP_INFO (info));
   const char *alias;
   g_autofree char *renamed_from = NULL;
 
@@ -150,7 +150,7 @@ add_aliases (ShellAppSystem  *self,
 
       for (i = 0; renamed_from_list[i] != NULL; i++)
         {
-          if (renamed_from_list[i] != '\0')
+          if (renamed_from_list[i][0] != '\0')
             g_hash_table_insert (priv->alias_to_id,
                                  g_steal_pointer (&renamed_from_list[i]),
                                  g_strdup (id));
@@ -172,12 +172,7 @@ scan_alias_to_id (ShellAppSystem *self)
 
   apps = g_app_info_get_all ();
   for (l = apps; l != NULL; l = l->next)
-    {
-      GAppInfo *info = l->data;
-      const char *id = g_app_info_get_id (info);
-
-      add_aliases (self, id, G_DESKTOP_APP_INFO (info));
-    }
+    add_aliases (self, G_DESKTOP_APP_INFO (l->data));
 
   g_list_free_full (apps, g_object_unref);
 }
@@ -430,7 +425,6 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 
   app = _shell_app_new (info);
   g_hash_table_insert (priv->id_to_app, (char *) shell_app_get_id (app), app);
-  add_aliases (self, id, info);
 
   return app;
 }
