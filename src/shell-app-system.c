@@ -150,7 +150,7 @@ add_aliases (ShellAppSystem  *self,
 
       for (i = 0; renamed_from_list[i] != NULL; i++)
         {
-          if (renamed_from_list[i] != '\0')
+          if (renamed_from_list[i][0] != '\0')
             g_hash_table_insert (priv->alias_to_id,
                                  g_steal_pointer (&renamed_from_list[i]),
                                  g_strdup (id));
