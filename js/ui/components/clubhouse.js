@@ -193,6 +193,9 @@ var ClubhouseComponent = new Lang.Class({
     },
 
     _imageUsesClubhouse: function() {
+        if (GLib.getenv('CLUBHOUSE_DEBUG_ENABLED'))
+            return true;
+
         // We are only using the Clubhouse component in Endless Hack images for now, so
         // check if the prefix of the image version matches the mentioned flavor.
         let eosImageVersion = Shell.util_get_eos_image_version();
