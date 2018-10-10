@@ -91,10 +91,10 @@ var ClubhouseNotification = new Lang.Class({
         // doesn't take any new "buttons" parameter into account.
         let buttons = params.buttons;
         if (buttons) {
-            buttons.deep_unpack().forEach(Lang.bind(this, function(button) {
+            buttons.deep_unpack().forEach((button) => {
                 this.addAction(button.label.unpack(),
                                Lang.bind(this, this._onButtonClicked, button));
-            }));
+            });
         }
         this.emit('updated', clear);
     },
@@ -149,12 +149,12 @@ var ClubhouseComponent = new Lang.Class({
                                                           CLUBHOUSE_ID,
                                                           null);
         this._clubhouseProxyHandler =
-            this._clubhouseProxy.connect('notify::g-name-owner', Lang.bind(this, function() {
+            this._clubhouseProxy.connect('notify::g-name-owner', () => {
                 if (!this._clubhouseProxy.g_name_owner) {
                     log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
                     this._dismissQuestCb();
                 }
-            }));
+            });
 
         this.actor = new St.Widget({ visible: true,
                                      clip_to_allocation: true,
@@ -205,23 +205,17 @@ var ClubhouseComponent = new Lang.Class({
     _overrideAddNotification: function() {
         this._oldAddNotificationFuncPrototype =
             NotificationDaemon.GtkNotificationDaemon.prototype.AddNotificationAsync;
-        NotificationDaemon.GtkNotificationDaemon.prototype.ClubhouseData = [CLUBHOUSE_ID,
-                                                                            this._clubhouseSource,
-                                                                            this._oldAddNotificationFuncPrototype];
-        NotificationDaemon.GtkNotificationDaemon.prototype.AddNotificationAsync = function(params, invocation) {
+        NotificationDaemon.GtkNotificationDaemon.prototype.AddNotificationAsync = (params, invocation) => {
             let [appId, notificationId, notification] = params;
 
-            let clubhouseId = this.ClubhouseData[0];
-
             // If the app sending the notification is the Clubhouse, then use our own source
-            if (appId == clubhouseId) {
-                let source = this.ClubhouseData[1];
-                source.addNotification(notificationId, notification, true);
+            if (appId == CLUBHOUSE_ID) {
+                this._clubhouseSource.addNotification(notificationId, notification, true);
                 invocation.return_value(null);
                 return;
             }
 
-            this.ClubhouseData[2].apply(Main.notificationDaemon._gtkNotificationDaemon, arguments);
+            this._oldAddNotificationFuncPrototype.apply(Main.notificationDaemon._gtkNotificationDaemon, [params, invocation]);
         }
     },
 
