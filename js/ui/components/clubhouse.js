@@ -100,7 +100,6 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseSource = null;
         this._clubhouseProxy = null;
         this._clubhouseProxyHandler = 0;
-        this._oldAddNotificationFuncPrototype = null;
     },
 
     enable: function() {
@@ -136,7 +135,9 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
         this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
 
-        this._overrideAddNotification();
+        // Inject this source in GtkNotificationDaemon's lookup table
+        Main.notificationDaemon._gtkNotificationDaemon._sources[CLUBHOUSE_ID] =
+            this._clubhouseSource;
     },
 
     disable: function() {
@@ -148,11 +149,6 @@ var ClubhouseComponent = new Lang.Class({
 
         if (this._clubhouseProxyHandler > 0)
             this._clubhouseProxy.disconnect(this._clubhouseProxyHandler);
-
-        if (this._oldAddNotificationFuncPrototype) {
-            NotificationDaemon.GtkNotificationDaemon.prototype.AddNotificationAsync =
-                this._oldAddNotificationFuncPrototype;
-        }
 
         this.actor = null;
         this._clubhouseSource = null;
@@ -176,23 +172,6 @@ var ClubhouseComponent = new Lang.Class({
         // check if the prefix of the image version matches the mentioned flavor.
         let eosImageVersion = Shell.util_get_eos_image_version();
         return eosImageVersion && eosImageVersion.startsWith('hack-');
-    },
-
-    _overrideAddNotification: function() {
-        this._oldAddNotificationFuncPrototype =
-            NotificationDaemon.GtkNotificationDaemon.prototype.AddNotificationAsync;
-        NotificationDaemon.GtkNotificationDaemon.prototype.AddNotificationAsync = (params, invocation) => {
-            let [appId, notificationId, notification] = params;
-
-            // If the app sending the notification is the Clubhouse, then use our own source
-            if (appId == CLUBHOUSE_ID) {
-                this._clubhouseSource.addNotification(notificationId, notification, true);
-                invocation.return_value(null);
-                return;
-            }
-
-            this._oldAddNotificationFuncPrototype.apply(Main.notificationDaemon._gtkNotificationDaemon, [params, invocation]);
-        }
     },
 
     _onNotify: function(source, notification) {
