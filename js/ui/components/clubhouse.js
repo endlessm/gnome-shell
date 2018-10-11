@@ -60,6 +60,16 @@ var ClubhouseNotificationBanner = new Lang.Class({
         // Always wrap the body's text
         this._expandedLabel.actor.add_style_class_name('clubhouse-quest-view-label');
     },
+
+    reposition: function() {
+        let monitor = Main.layoutManager.primaryMonitor;
+        if (!monitor)
+            return;
+
+        let margin = 50;
+        this.actor.x = monitor.width - (this.actor.width + margin);
+        this.actor.y = Math.floor((monitor.height - this.actor.height) / 2.0) - margin;
+    },
 });
 
 var ClubhouseNotification = new Lang.Class({
@@ -96,7 +106,6 @@ var ClubhouseComponent = new Lang.Class({
             return;
 
         this._banner = null;
-        this.actor = null;
         this._clubhouseSource = null;
         this._clubhouseProxy = null;
         this._clubhouseProxyHandler = 0;
@@ -123,15 +132,6 @@ var ClubhouseComponent = new Lang.Class({
                 }
             });
 
-        this.actor = new St.Widget({ visible: true,
-                                     clip_to_allocation: true,
-                                     can_focus: true,
-                                     track_hover: true,
-                                     reactive: true,
-                                     layout_manager: new Clutter.BinLayout() });
-
-        Main.layoutManager.addChrome(this.actor);
-
         this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
         this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
 
@@ -144,24 +144,21 @@ var ClubhouseComponent = new Lang.Class({
         if (!this._useClubhouse)
             return;
 
-        if (this.actor)
-            this.actor.destroy();
+        this._clearBanner();
 
         if (this._clubhouseProxyHandler > 0)
             this._clubhouseProxy.disconnect(this._clubhouseProxyHandler);
 
-        this.actor = null;
         this._clubhouseSource = null;
-        this._banner = null;
         this._clubhouseProxy = null;
     },
 
     _clearBanner: function() {
-        this.actor.visible = false;
-        if (this._banner) {
-            this.actor.remove_child(this._banner.actor);
-            this._banner = null;
-        }
+        if (!this._banner)
+            return;
+
+        this._banner.actor.destroy();
+        this._banner = null;
     },
 
     _imageUsesClubhouse: function() {
@@ -175,8 +172,6 @@ var ClubhouseComponent = new Lang.Class({
     },
 
     _onNotify: function(source, notification) {
-        this.actor.visible = true;
-
         notification.connect('destroy', (notification, reason) => {
             if (reason != MessageTray.NotificationDestroyedReason.REPLACED)
                 this._dismissQuest();
@@ -186,8 +181,8 @@ var ClubhouseComponent = new Lang.Class({
 
         if (!this._banner) {
             this._banner = notification.createBanner();
-            this.actor.add_child(this._banner.actor);
-            this._reposition();
+            Main.layoutManager.addChrome(this._banner.actor);
+            this._banner.reposition();
         }
     },
 
@@ -195,16 +190,6 @@ var ClubhouseComponent = new Lang.Class({
         // Stop the quest since the banner has been dismissed
         if (this._clubhouseProxy.g_name_owner)
             this._clubhouseSource.activateAction('stop-quest', null);
-    },
-
-    _reposition: function() {
-        let monitor = Main.layoutManager.primaryMonitor;
-        if (!monitor)
-            return;
-
-        let margin = 50;
-        this.actor.x = monitor.width - (this.actor.width + margin);
-        this.actor.y = Math.floor((monitor.height - this.actor.height) / 2.0) - margin;
     },
 });
 var Component = ClubhouseComponent;
