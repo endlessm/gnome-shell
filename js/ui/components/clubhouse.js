@@ -76,46 +76,14 @@ var ClubhouseNotification = new Lang.Class({
     createBanner: function() {
         return new ClubhouseNotificationBanner(this);
     },
-
-    updateFromParams: function(params) {
-        // Update icon
-        let newGicon = null;
-        let gicon = params.icon;
-        if (gicon)
-            newGicon = Gio.icon_deserialize(gicon);
-
-        let clear = true;
-        this.update('', params.body.unpack(), {gicon: newGicon, clear: clear});
-
-        // We need to set up the actions here because the update method above unfortunately
-        // doesn't take any new "buttons" parameter into account.
-        let buttons = params.buttons;
-        if (buttons) {
-            buttons.deep_unpack().forEach((button) => {
-                this.addAction(button.label.unpack(),
-                               Lang.bind(this, this._onButtonClicked, button));
-            });
-        }
-        this.emit('updated', clear);
-    },
 });
 
 var ClubhouseNotificationSource = new Lang.Class({
     Name: 'ClubhouseNotificationSource',
     Extends: NotificationDaemon.GtkNotificationDaemonAppSource,
 
-    _init: function(appId) {
-        this.parent(appId);
-        this._notification = null;
-    },
-
-    addNotification: function(notificationId, notificationParams, showBanner) {
-        if (this._notification == null)
-            this._notification = new ClubhouseNotification(this, notificationParams);
-        else
-            this._notification.updateFromParams(notificationParams);
-
-        this.notify(this._notification);
+    _createNotification: function(params) {
+        return new ClubhouseNotification(this, params);
     },
 });
 
@@ -152,7 +120,7 @@ var ClubhouseComponent = new Lang.Class({
             this._clubhouseProxy.connect('notify::g-name-owner', () => {
                 if (!this._clubhouseProxy.g_name_owner) {
                     log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
-                    this._dismissQuestCb();
+                    this._clearBanner();
                 }
             });
 
@@ -192,6 +160,14 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseProxy = null;
     },
 
+    _clearBanner: function() {
+        this.actor.visible = false;
+        if (this._banner) {
+            this.actor.remove_child(this._banner.actor);
+            this._banner = null;
+        }
+    },
+
     _imageUsesClubhouse: function() {
         if (GLib.getenv('CLUBHOUSE_DEBUG_ENABLED'))
             return true;
@@ -222,27 +198,24 @@ var ClubhouseComponent = new Lang.Class({
     _onNotify: function(source, notification) {
         this.actor.visible = true;
 
-        // Only create the banner if it doesn't yet exist, otherwise just rely on the notification
-        // object getting updated.
+        notification.connect('destroy', (notification, reason) => {
+            if (reason != MessageTray.NotificationDestroyedReason.REPLACED)
+                this._dismissQuest();
+
+            this._clearBanner();
+        });
+
         if (!this._banner) {
             this._banner = notification.createBanner();
-            this._bannerCloseHandler =
-                this._banner.connect('close', Lang.bind(this, this._dismissQuestCb));
             this.actor.add_child(this._banner.actor);
             this._reposition();
         }
     },
 
-    _dismissQuestCb: function() {
-        this.actor.visible = false;
-        if (this._banner) {
-            // Stop the quest since the banner has been dismissed
-            if (this._clubhouseProxy.g_name_owner)
-                this._clubhouseSource.activateAction('stop-quest', null);
-
-            this.actor.remove_child(this._banner.actor);
-            this._banner = null;
-        }
+    _dismissQuest: function() {
+        // Stop the quest since the banner has been dismissed
+        if (this._clubhouseProxy.g_name_owner)
+            this._clubhouseSource.activateAction('stop-quest', null);
     },
 
     _reposition: function() {
