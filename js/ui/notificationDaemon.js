@@ -743,7 +743,7 @@ var GtkNotificationDaemonAppSource = new Lang.Class({
         this._notificationPending = true;
 
         if (this._notifications[notificationId])
-            this._notifications[notificationId].destroy();
+            this._notifications[notificationId].destroy(MessageTray.NotificationDestroyedReason.REPLACED);
 
         let notification = this._createNotification(notificationParams);
         notification.connect('destroy', Lang.bind(this, function() {
