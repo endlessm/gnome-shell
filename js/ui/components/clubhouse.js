@@ -252,7 +252,7 @@ var ClubhouseComponent = new Lang.Class({
 
         let margin = 50;
         this.actor.x = monitor.width - (this.actor.width + margin);
-        this.actor.y = monitor.height / 2.0 - this.actor.height / 2.0 - margin;
+        this.actor.y = Math.floor((monitor.height - this.actor.height) / 2.0) - margin;
     },
 });
 var Component = ClubhouseComponent;
