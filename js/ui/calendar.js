@@ -776,10 +776,12 @@ var NotificationMessage = new Lang.Class({
         this.connect('close', Lang.bind(this,
             function() {
                 this._closed = true;
-                this.notification.destroy(MessageTray.NotificationDestroyedReason.DISMISSED);
+                if (!this._notificationDestroyed)
+                    this.notification.destroy(MessageTray.NotificationDestroyedReason.DISMISSED);
             }));
         this._destroyId = notification.connect('destroy', Lang.bind(this,
             function() {
+                this._notificationDestroyed = true;
                 if (!this._closed)
                     this.close();
             }));
