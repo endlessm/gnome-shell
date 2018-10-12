@@ -2246,7 +2246,8 @@ var WindowManager = new Lang.Class({
                 return Shell.WindowTracker.is_speedwagon_window(w);
             }));
             if (hasSplashWindow) {
-                shellwm.completed_map(actor);
+                if (!this._codeViewManager.handleMapWindow(actor))
+                    shellwm.completed_map(actor);
                 return;
             }
         }
