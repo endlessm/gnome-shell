@@ -713,6 +713,10 @@ var GtkNotificationDaemonAppSource = new Lang.Class({
         return new FdoApplicationProxy(Gio.DBus.session, this._appId, this._objectPath, callback);
     },
 
+    _createNotification: function(params) {
+        return new GtkNotificationDaemonNotification(this, params);
+    },
+
     activateAction: function(actionId, target) {
         this._createApp(function (app, error) {
             if (error == null)
@@ -739,9 +743,9 @@ var GtkNotificationDaemonAppSource = new Lang.Class({
         this._notificationPending = true;
 
         if (this._notifications[notificationId])
-            this._notifications[notificationId].destroy();
+            this._notifications[notificationId].destroy(MessageTray.NotificationDestroyedReason.REPLACED);
 
-        let notification = new GtkNotificationDaemonNotification(this, notificationParams);
+        let notification = this._createNotification(notificationParams);
         notification.connect('destroy', Lang.bind(this, function() {
             delete this._notifications[notificationId];
         }));
