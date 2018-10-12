@@ -101,7 +101,7 @@ var ClubhouseComponent = new Lang.Class({
     Name: 'ClubhouseComponent',
 
     _init: function() {
-        this._useClubhouse = this._imageUsesClubhouse();
+        this._useClubhouse = this._imageUsesClubhouse() && this._hasClubhouse();
         if (!this._useClubhouse)
             return;
 
@@ -159,6 +159,10 @@ var ClubhouseComponent = new Lang.Class({
 
         this._banner.actor.destroy();
         this._banner = null;
+    },
+
+    _hasClubhouse: function() {
+        return !!Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
     },
 
     _imageUsesClubhouse: function() {
