@@ -22,18 +22,6 @@ const WINDOW_ANIMATION_TIME = 0.25;
 const STATE_APP = 0;
 const STATE_TOOLBOX = 1;
 
-const _CODING_APPS = [
-    // FIXME: this should be extended with a more complex lookup
-    'com.endlessm.dinosaurs.en',
-    'com.endlessm.hackybird',
-    'com.endlessm.hackyballs',
-    'com.endlessm.OperatingSystemApp'
-];
-
-function _isCodingApp(flatpakID) {
-    return _CODING_APPS.indexOf(flatpakID) != -1;
-}
-
 const _FLIP_ICON_FRONT = 'resource:///org/gnome/shell/theme/flip-symbolic.svg';
 
 const FlipIcon = GObject.registerClass(class FlipIcon extends St.Icon {
@@ -989,14 +977,10 @@ var CodeViewManager = new Lang.Class({
         if (!global.settings.get_boolean('enable-code-view'))
             return;
 
-        let window = actor.meta_window;
-        if (!_isCodingApp(window.get_flatpak_id()))
-            return;
-
         this._sessions.push(new CodingSession({
             app: actor,
             toolbox: null,
-            button: new WindowTrackingButton({ window: window })
+            button: new WindowTrackingButton({ window: actor.meta_window })
         }));
     },
 
