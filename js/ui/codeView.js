@@ -34,13 +34,51 @@ function _isCodingApp(flatpakID) {
     return _CODING_APPS.indexOf(flatpakID) != -1;
 }
 
-function _createIcon() {
-    let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/rotate.svg');
-    let gicon = new Gio.FileIcon({ file: iconFile });
-    let icon = new St.Icon({ style_class: 'view-source-icon',
-                             gicon: gicon });
-    return icon;
-}
+const _FLIP_ICON_FRONT = 'resource:///org/gnome/shell/theme/flip-symbolic.svg';
+
+const FlipIcon = GObject.registerClass(class FlipIcon extends St.Icon {
+    _init(props = {}) {
+        const gicon = new Gio.FileIcon({
+            file: Gio.File.new_for_uri(_FLIP_ICON_FRONT),
+        });
+
+        Object.assign(props, {
+            style_class: 'view-source-icon',
+            gicon,
+        });
+        super._init(props);
+
+        this._flipped = false;
+        this._sensitive = true;
+    }
+
+    get flipped() {
+        return this._flipped;
+    }
+
+    set flipped(value) {
+        this._flipped = value;
+        this._updateStyle();
+    }
+
+    get sensitive() {
+        return this._sensitive;
+    }
+
+    set sensitive(value) {
+        this._sensitive = value;
+        this._updateStyle();
+    }
+
+    _updateStyle() {
+        this.remove_style_class_name('back');
+        this.remove_style_class_name('insensitive');
+        if (!this.sensitive)
+            this.add_style_class_name('insensitive');
+        else if (this.flipped)
+            this.add_style_class_name('back');
+    }
+});
 
 // _synchronizeMetaWindowActorGeometries
 //
@@ -86,7 +124,7 @@ function _getViewSourceButtonParams(interactive) {
         style_class: 'view-source',
         x_fill: true,
         y_fill: true,
-        child: _createIcon(),
+        child: new FlipIcon(),
         reactive: interactive,
         can_focus: interactive,
         track_hover: interactive,
@@ -216,6 +254,7 @@ var WindowTrackingButton = new Lang.Class({
             finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             onRotationMidpoint: () => {
                 this.opacity = 0;
+                this.child.flipped = direction !== Gtk.DirectionType.RIGHT;
             },
             onRotationComplete: () => {
                 Tweener.removeTweens(this);

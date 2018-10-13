@@ -751,22 +751,40 @@ popup-separator-menu-item {
     &:active { @extend %search-result-active; }
 }
 
-// Endless Coding
+// Endless Hack
 
 .view-source {
-  background-color: white;
-  opacity: 0.902;
-  box-shadow: 0px 1px 3px 0px rgba(36, 34, 34, 0.6);
-  border-radius: 9px 0px 0px 9px;
-  width: 64px;
-  height: 64px;
+    opacity: 0.902;
 
-  .view-source-icon {
-      color: #222;
-      icon-size: 30px;
-  }
+    $front-color: #004292;
+    $back-color: #ed7800;
+    $insensitive-color: #999;
 
-  &:hover { background-color: #dcdedc; }
+    .view-source-icon {
+        -st-icon-style: symbolic;
+        color: $front-color;
+        icon-size: 64px;
+    }
+
+    &:hover .view-source-icon {
+        color: scale-color($front-color, white, 20%);
+    }
+
+    .view-source-icon.back {
+        color: $back-color;
+    }
+
+    &:hover .view-source-icon.back {
+        color: scale-color($back-color, white, 20%);
+    }
+
+    .view-source-icon.insensitive {
+        color: $insensitive-color;
+    }
+
+    // FIXME this should animate. Leave it constant for now so that the whole
+    // icon is visible.
+    padding-left: 80px;
 }
 
 // Discovery Feed
