@@ -267,6 +267,7 @@ var WindowTrackingButton = new Lang.Class({
             finishAngle: 0,
             onRotationMidpoint: () => {
                 animationButton.opacity = 255;
+                animationButton.child.flipped = targetState == STATE_TOOLBOX;
             },
             onRotationComplete: () => {
                 animationButton.destroy();
