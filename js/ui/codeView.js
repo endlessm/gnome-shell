@@ -242,7 +242,7 @@ var WindowTrackingButton = new Lang.Class({
             finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             onRotationMidpoint: () => {
                 this.opacity = 0;
-                this.child.flipped = targetState == STATE_TOOLBOX;
+                this.state = targetState;
             },
             onRotationComplete: () => {
                 Tweener.removeTweens(this);
@@ -295,6 +295,10 @@ var WindowTrackingButton = new Lang.Class({
 
     get window() {
         return this._window;
+    },
+
+    set state(value) {
+        this.child.flipped = value == STATE_TOOLBOX;
     },
 
     _updatePosition: function() {
@@ -397,6 +401,12 @@ var CodingSession = new Lang.Class({
         return this._button;
     },
 
+    _setState: function(value, includeButton=true) {
+        this._state = value;
+        if (includeButton)
+            this.button.state = value;
+    },
+
     _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
         if (this._state === targetState)
             return;
@@ -405,7 +415,7 @@ var CodingSession = new Lang.Class({
         if (this._rotatingInActor || this._rotatingOutActor)
             return;
 
-        this._state = targetState;
+        this._setState(targetState, false);
 
         // Now, if we're not already on the desired state, we want to start
         // animating to it here.
@@ -543,7 +553,7 @@ var CodingSession = new Lang.Class({
         // need to disconnect any signals here since the button doesn't
         // care about signals on the toolbox.
         this.button.toolbox_window = null;
-        this._state = STATE_APP;
+        this._setState(STATE_APP);
 
         this._completeRemoveWindow();
     },
@@ -595,7 +605,7 @@ var CodingSession = new Lang.Class({
         this.app = null;
 
         this.button.window = null;
-        this._state = STATE_TOOLBOX;
+        this._setState(STATE_TOOLBOX);
 
         this._completeRemoveWindow();
     },
@@ -810,7 +820,7 @@ var CodingSession = new Lang.Class({
             // In the future, we want to change the behavior of those activation points
             // so that when a toolbox is present, it is only possible to switch side
             // when the flip button is clicked.
-            this._state = (focusedActor === this.app ? STATE_APP : STATE_TOOLBOX);
+            this._setState(focusedActor === this.app ? STATE_APP : STATE_TOOLBOX);
             this._activateAppFlip();
             focusedActor.rotation_angle_y = 0;
             actor.rotation_angle_y = 180;
