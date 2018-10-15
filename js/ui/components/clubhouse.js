@@ -34,9 +34,24 @@ const Lang = imports.lang;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
+const SideComponent = imports.ui.sideComponent;
 
 const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
+
+const ClubhouseIface =
+'<node> \
+  <interface name="com.endlessm.Clubhouse"> \
+    <method name="show"> \
+      <arg type="u" direction="in" name="timestamp"/> \
+    </method> \
+    <method name="hide"> \
+      <arg type="u" direction="in" name="timestamp"/> \
+    </method> \
+    <property name="Visible" type="b" access="read"/> \
+  </interface> \
+</node>';
+
 
 var ClubhouseNotificationBanner = new Lang.Class({
     Name: 'ClubhouseNotificationBanner',
@@ -99,15 +114,17 @@ var ClubhouseNotificationSource = new Lang.Class({
 
 var ClubhouseComponent = new Lang.Class({
     Name: 'ClubhouseComponent',
+    Extends: SideComponent.SideComponent,
 
     _init: function() {
         this._useClubhouse = this._imageUsesClubhouse() && this._hasClubhouse();
         if (!this._useClubhouse)
             return;
 
+        this.parent(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
+
         this._banner = null;
         this._clubhouseSource = null;
-        this._clubhouseProxy = null;
         this._clubhouseProxyHandler = 0;
     },
 
@@ -117,16 +134,11 @@ var ClubhouseComponent = new Lang.Class({
             return;
         }
 
-        this._clubhouseProxy = new Gio.DBusProxy.new_sync(Gio.DBus.session,
-                                                          Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION,
-                                                          null,
-                                                          CLUBHOUSE_ID,
-                                                          CLUBHOUSE_DBUS_OBJ_PATH,
-                                                          CLUBHOUSE_ID,
-                                                          null);
+        this.parent();
+
         this._clubhouseProxyHandler =
-            this._clubhouseProxy.connect('notify::g-name-owner', () => {
-                if (!this._clubhouseProxy.g_name_owner) {
+            this.proxy.connect('notify::g-name-owner', () => {
+                if (!this.proxy.g_name_owner) {
                     log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
                     this._clearBanner();
                 }
@@ -147,10 +159,18 @@ var ClubhouseComponent = new Lang.Class({
         this._clearBanner();
 
         if (this._clubhouseProxyHandler > 0)
-            this._clubhouseProxy.disconnect(this._clubhouseProxyHandler);
+            this.proxy.disconnect(this._clubhouseProxyHandler);
 
+        this.parent();
         this._clubhouseSource = null;
-        this._clubhouseProxy = null;
+    },
+
+    callShow: function(timestamp) {
+        this.proxy.showRemote(timestamp);
+    },
+
+    callHide: function(timestamp) {
+        this.proxy.hideRemote(timestamp);
     },
 
     _clearBanner: function() {
@@ -192,7 +212,7 @@ var ClubhouseComponent = new Lang.Class({
 
     _dismissQuest: function() {
         // Stop the quest since the banner has been dismissed
-        if (this._clubhouseProxy.g_name_owner)
+        if (this.proxy.g_name_owner)
             this._clubhouseSource.activateAction('stop-quest', null);
     },
 });
