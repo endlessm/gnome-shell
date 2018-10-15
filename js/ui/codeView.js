@@ -229,7 +229,7 @@ var WindowTrackingButton = new Lang.Class({
     // Just fade out and fade the button back in again. This makes it
     // look as though we have two buttons, but in reality we just have
     // one.
-    switchAnimation: function(direction) {
+    switchAnimation: function(direction, targetState) {
         let rect = this.window.get_frame_rect();
 
         // Start an animation for flipping the main button around the
@@ -242,7 +242,7 @@ var WindowTrackingButton = new Lang.Class({
             finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             onRotationMidpoint: () => {
                 this.opacity = 0;
-                this.child.flipped = direction !== Gtk.DirectionType.RIGHT;
+                this.child.flipped = targetState == STATE_TOOLBOX;
             },
             onRotationComplete: () => {
                 Tweener.removeTweens(this);
@@ -418,10 +418,10 @@ var CodingSession = new Lang.Class({
         if (!newDst._drawnFirstFrame) {
             let firstFrameConnection = newDst.connect('first-frame', () => {
                 newDst.disconnect(firstFrameConnection);
-                this._completeAnimate(src, oldDst, newDst, direction);
+                this._completeAnimate(src, oldDst, newDst, direction, targetState);
             });
         } else {
-            this._completeAnimate(src, oldDst, newDst, direction);
+            this._completeAnimate(src, oldDst, newDst, direction, targetState);
         }
     },
 
@@ -862,12 +862,12 @@ var CodingSession = new Lang.Class({
         }
     },
 
-    _completeAnimate: function(src, oldDst, newDst, direction) {
+    _completeAnimate: function(src, oldDst, newDst, direction, targetState) {
         this._animateToMidpoint(src,
                                 oldDst,
                                 newDst,
                                 direction);
-        this.button.switchAnimation(direction);
+        this.button.switchAnimation(direction, targetState);
     },
 
     _animateToMidpoint: function(src, oldDst, newDst, direction) {
