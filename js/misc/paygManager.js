@@ -85,34 +85,6 @@ const notificationAlertTimesSecs = [
     30,           // 30 seconds
 ];
 
-// This function checks the configuration file of PAYG directly
-// from the expected locations on disk, on an attempt to figure
-// out whether the feature is enabled, so that we don't wake up
-// the D-Bus service and keep it running when it's disabled.
-function _isPaygEnabled() {
-    // See man page eos-payg.conf(5)
-    let searchDirs = [
-        '/etc/eos-payg',
-        '/usr/local/share/eos-payg',
-        '/usr/share/eos-payg',
-    ];
-
-    let configFileName = 'eos-payg.conf'
-    let keyfile = new GLib.KeyFile();
-    try {
-        keyfile.load_from_dirs(configFileName,
-                               searchDirs,
-                               GLib.KeyFileFlags.NONE);
-        return keyfile.get_boolean('PAYG', 'Enabled');
-    } catch (e) {
-        // A non-existent file is a perfectly normal use case.
-        if (!e.matches(GLib.KeyFileError, GLib.KeyFileError.NOT_FOUND))
-            logError(e, "Error reading PAYG configuration file from " + configFileName);
-    }
-
-    return false;
-}
-
 // Takes an UNIX timestamp (in seconds) and returns a string
 // with a precision level appropriate to show to the user.
 //
@@ -175,13 +147,6 @@ var PaygManager = new Lang.Class({
         this._expiryTime = 0;
         this._rateLimitEndTime = 0;
         this._notification = null;
-
-        if (!_isPaygEnabled()) {
-            // Consider this manager initialized if PAYG is not
-            // enabled, and skip all the D-Bus related bits.
-            this._initialized = true;
-            return;
-        }
 
         // Keep track of clock changes to update notifications.
 
