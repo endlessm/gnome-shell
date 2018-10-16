@@ -336,7 +336,11 @@ var CodingSession = new Lang.Class({
 
         this._button = new WindowTrackingButton();
         this._button.connect('clicked', this._switchWindows.bind(this));
-        Main.layoutManager.addChrome(this._button);
+
+        _ensureAfterFirstFrame(actor, () => {
+            Main.layoutManager.addChrome(this._button);
+            this._synchronizeButton(actor.meta_window);
+        });
     },
 
     _setState: function(value, includeButton=true) {
