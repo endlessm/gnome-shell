@@ -68,6 +68,18 @@ const FlipIcon = GObject.registerClass(class FlipIcon extends St.Icon {
     }
 });
 
+function _ensureAfterFirstFrame(win, callback) {
+    if (win._drawnFirstFrame) {
+        callback();
+        return;
+    }
+
+    let firstFrameConnection = win.connect('first-frame', () => {
+        win.disconnect(firstFrameConnection);
+        callback();
+    });
+};
+
 // _synchronizeMetaWindowActorGeometries
 //
 // Synchronize geometry of MetaWindowActor src to dst by
@@ -426,14 +438,9 @@ var CodingSession = new Lang.Class({
         //
         // This way we don't get ugly artifacts when rotating if
         // a window is slow to draw.
-        if (!newDst._drawnFirstFrame) {
-            let firstFrameConnection = newDst.connect('first-frame', () => {
-                newDst.disconnect(firstFrameConnection);
-                this._completeAnimate(src, oldDst, newDst, direction, targetState);
-            });
-        } else {
-            this._completeAnimate(src, oldDst, newDst, direction, targetState);
-        }
+        _ensureAfterFirstFrame(newDst,
+                               this._completeAnimate.bind(this, src, oldDst, newDst,
+                                                          direction, targetState));
     },
 
     admitAppWindowActor: function(actor) {
