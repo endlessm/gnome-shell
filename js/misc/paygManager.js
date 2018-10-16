@@ -42,6 +42,7 @@ const EOS_PAYG_IFACE = '<node> \
 <property name="ExpiryTime" type="t" access="read"/> \
 <property name="Enabled" type="b" access="read"/> \
 <property name="RateLimitEndTime" type="t" access="read"/> \
+<property name="CodeFormat" type="s" access="read"/> \
 </interface> \
 </node>';
 
@@ -135,6 +136,7 @@ function timeToString(seconds) {
 
 var PaygManager = GObject.registerClass({
     Signals: { 'code-expired': { },
+               'code-format-changed': { },
                'enabled-changed': [GObject.TYPE_BOOLEAN] },
                'expiry-time-changed': { GObject.TYPE_INT64 },
                'initialized': [GObject.TYPE_BOOLEAN] } },
@@ -149,6 +151,8 @@ var PaygManager = GObject.registerClass({
         this._enabled = false;
         this._expiryTime = 0;
         this._rateLimitEndTime = 0;
+        this._codeFormat = '';
+        this._codeFormatRegex = null;
         this._notification = null;
 
         // Keep track of clock changes to update notifications.
@@ -192,6 +196,7 @@ var PaygManager = GObject.registerClass({
             this._enabled = this._proxy.Enabled;
             this._expiryTime = this._proxy.ExpiryTime;
             this._rateLimitEndTime = this._proxy.RateLimitEndTime;
+            this._setCodeFormat(this._proxy.CodeFormat || "^[0-9]{8}$");
 
             this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
             this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
@@ -214,6 +219,9 @@ var PaygManager = GObject.registerClass({
 
         if (propsDict.hasOwnProperty('RateLimitEndTime'))
             this._setRateLimitEndTime(this._proxy.RateLimitEndTime);
+
+        if (propsDict.hasOwnProperty('CodeFormat'))
+            this._setCodeFormat(this._proxy.CodeFormat, true);
     }
 
     _setEnabled(value) {
@@ -240,6 +248,24 @@ var PaygManager = GObject.registerClass({
 
         this._rateLimitEndTime = value;
         this.emit('rate-limit-end-time-changed', this._rateLimitEndTime);
+    }
+
+    _setCodeFormat(value, notify=false) {
+        if (this._codeFormat === value)
+            return;
+
+        this._codeFormat = value;
+        try {
+            this._codeFormatRegex = new GLib.Regex(this._codeFormat,
+                                                   GLib.RegexCompileFlags.DOLLAR_ENDONLY,
+                                                   GLib.RegexMatchFlags.PARTIAL);
+        } catch (e) {
+            logError(e, `Error compiling CodeFormat regex "${this._codeFormat}"`);
+            this._codeFormatRegex = null;
+        }
+
+        if (notify)
+            this.emit('code-format-changed');
     }
 
     _onCodeExpired(proxy) {
@@ -352,6 +378,16 @@ var PaygManager = GObject.registerClass({
         }
 
         this._proxy.ClearCodeRemote();
+    }
+
+    validateCode(code, partial=false) {
+        if (!this._codeFormatRegex) {
+            log("Unable to validate PAYG code: no regex")
+            return false;
+        }
+
+        let [is_match, match_info] = this._codeFormatRegex.match(code, 0);
+        return is_match || (partial && match_info.is_partial_match());
     }
 
     get initialized() {
