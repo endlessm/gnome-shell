@@ -173,62 +173,32 @@ function _flipButtonAroundRectCenter(props) {
 var WindowTrackingButton = new Lang.Class({
     Name: 'WindowTrackingButton',
     Extends: St.Button,
-    Properties: {
-        'window': GObject.ParamSpec.object('window',
-                                           '',
-                                           '',
-                                           GObject.ParamFlags.READWRITE,
-                                           Meta.Window),
-        'toolbox_window': GObject.ParamSpec.object('toolbox-window',
-                                                   '',
-                                                   '',
-                                                   GObject.ParamFlags.READWRITE,
-                                                   Meta.Window)
-    },
 
     _init: function(params) {
-        this._toolbox_window = null;
-        this._window = null;
+        this._rect = null;
 
         let buttonParams = _getViewSourceButtonParams(true);
         params = Params.parse(params, buttonParams, true);
 
         this.parent(params);
-
-        this.connect('destroy', this._onDestroy.bind(this));
-
-        // Note that in order to remove this button, you will need to call
-        // destroy() from outside this class or use removeChrome from within it.
-        Main.layoutManager.addChrome(this);
     },
 
     vfunc_allocate: function(box, flags) {
         this.parent(box, flags);
 
-        if (!this.window)
-            return;
-
-        let rect = this.window.get_frame_rect();
-        _synchronizeViewSourceButtonToRectCorner(this, rect);
-    },
-
-    _onDestroy: function() {
-        this.window = null;
-
-        Main.layoutManager.removeChrome(this);
+        if (this._rect)
+            _synchronizeViewSourceButtonToRectCorner(this, this._rect);
     },
 
     // Just fade out and fade the button back in again. This makes it
     // look as though we have two buttons, but in reality we just have
     // one.
     switchAnimation: function(direction, targetState) {
-        let rect = this.window.get_frame_rect();
-
         // Start an animation for flipping the main button around the
-        // center of the window.
+        // center of the rect.
         _flipButtonAroundRectCenter({
             button: this,
-            rect: rect,
+            rect: this._rect,
             startAngle: 0,
             midpointAngle: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
             finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
@@ -248,12 +218,12 @@ var WindowTrackingButton = new Lang.Class({
         // as the animation is complete.
         let animationButton = new St.Button(_getViewSourceButtonParams(false));
         Main.layoutManager.uiGroup.add_actor(animationButton);
-        _synchronizeViewSourceButtonToRectCorner(animationButton, rect);
+        _synchronizeViewSourceButtonToRectCorner(animationButton, this._rect);
 
         animationButton.opacity = 0;
         _flipButtonAroundRectCenter({
             button: animationButton,
-            rect: rect,
+            rect: this._rect,
             startAngle: direction == Gtk.DirectionType.RIGHT ? -180 : 180,
             midpointAngle: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
             finishAngle: 0,
@@ -267,23 +237,9 @@ var WindowTrackingButton = new Lang.Class({
         });
     },
 
-    set toolbox_window(value) {
-        // It's possible that the toolbox window got focused before
-        // the toolbox window was set, so do the check again
-        // here, too.
-        this._toolbox_window = value;
-    },
-
-    get toolbox_window() {
-        return this._toolbox_window;
-    },
-
-    set window(value) {
-        this._window = value;
-    },
-
-    get window() {
-        return this._window;
+    set rect(value) {
+        this._rect = value;
+        this.queue_relayout();
     },
 
     set state(value) {
@@ -305,12 +261,6 @@ var CodingSession = new Lang.Class({
                                             '',
                                             GObject.ParamFlags.READWRITE,
                                             Meta.WindowActor),
-        'button': GObject.ParamSpec.object('button',
-                                           '',
-                                           '',
-                                           GObject.ParamFlags.READWRITE |
-                                           GObject.ParamFlags.CONSTRUCT_ONLY,
-                                           WindowTrackingButton.$gtype)
     },
 
     _init: function(params) {
@@ -327,10 +277,10 @@ var CodingSession = new Lang.Class({
         this._constrainGeometryAppId = 0;
         this._constrainGeometryToolboxId = 0;
 
-        this.parent(params);
-
         this._state = STATE_APP;
         this._toolboxActionGroup = null;
+
+        this.parent(params);
 
         // FIXME: this should be extended to make it possible to launch
         // arbitrary toolboxes in the future, depending on the application
@@ -376,20 +326,23 @@ var CodingSession = new Lang.Class({
         return this._toolbox;
     },
 
-    set button(value) {
-        this._button = value;
+    _ensureButton: function() {
         if (this._button)
-            this._button.connect('clicked', this._switchWindows.bind(this));
-    },
+            return;
 
-    get button() {
-        return this._button;
+        let actor = this._actorForCurrentState();
+        if (!actor)
+            return;
+
+        this._button = new WindowTrackingButton();
+        this._button.connect('clicked', this._switchWindows.bind(this));
+        Main.layoutManager.addChrome(this._button);
     },
 
     _setState: function(value, includeButton=true) {
         this._state = value;
         if (includeButton)
-            this.button.state = value;
+            this._button.state = value;
     },
 
     _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
@@ -427,7 +380,6 @@ var CodingSession = new Lang.Class({
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
         this.app = actor;
-        this.button.window = actor.meta_window;
 
         this._setupAnimation(STATE_APP,
                              this.toolbox,
@@ -445,7 +397,6 @@ var CodingSession = new Lang.Class({
         // We can admit this window. Wire up signals and synchronize
         // geometries now.
         this.toolbox = actor;
-        this.button.toolbox_window = actor.meta_window;
         this._toolboxActionGroup =
             Gio.DBusActionGroup.get(Gio.DBus.session,
                                     this.toolbox.meta_window.gtk_application_id,
@@ -529,10 +480,6 @@ var CodingSession = new Lang.Class({
     removeToolboxWindow: function() {
         this.toolbox = null;
 
-        // Remove the toolbox_window reference from the button. There's no
-        // need to disconnect any signals here since the button doesn't
-        // care about signals on the toolbox.
-        this.button.toolbox_window = null;
         this._setState(STATE_APP);
 
         this._completeRemoveWindow();
@@ -557,6 +504,8 @@ var CodingSession = new Lang.Class({
 
         let windowTracker = Shell.WindowTracker.get_default();
         this._shellApp = windowTracker.get_window_app(this.app.meta_window);
+
+        this._ensureButton();
     },
 
     _cleanupAppWindow: function() {
@@ -584,7 +533,6 @@ var CodingSession = new Lang.Class({
         this.appRemovedByFlipBack = false;
         this.app = null;
 
-        this.button.window = null;
         this._setState(STATE_TOOLBOX);
 
         this._completeRemoveWindow();
@@ -625,7 +573,7 @@ var CodingSession = new Lang.Class({
         this._shellApp = null;
 
         // Destroy the button too
-        this.button.destroy();
+        this._button.destroy();
 
         // If we have a toolbox window, disconnect any signals and destroy it.
         if (this.toolbox) {
@@ -711,11 +659,15 @@ var CodingSession = new Lang.Class({
         }
     },
 
+    _synchronizeButton: function(window) {
+        this._button.rect = window.get_frame_rect();
+    },
+
     _synchronizeWindows: function(window) {
         if (!this._isCurrentWindow(window))
             return;
 
-        this.button.queue_relayout();
+        this._synchronizeButton(window);
 
         if (!this._windowsNeedSync())
             return;
@@ -860,7 +812,7 @@ var CodingSession = new Lang.Class({
                                 oldDst,
                                 newDst,
                                 direction);
-        this.button.switchAnimation(direction, targetState);
+        this._button.switchAnimation(direction, targetState);
     },
 
     _animateToMidpoint: function(src, oldDst, newDst, direction) {
@@ -970,11 +922,7 @@ var CodeViewManager = new Lang.Class({
         if (!global.settings.get_boolean('enable-code-view'))
             return;
 
-        this._sessions.push(new CodingSession({
-            app: actor,
-            toolbox: null,
-            button: new WindowTrackingButton({ window: actor.meta_window })
-        }));
+        this._sessions.push(new CodingSession({ app: actor }));
     },
 
     _removeAppWindow: function(actor) {
