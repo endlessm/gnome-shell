@@ -212,26 +212,6 @@ var WindowTrackingButton = new Lang.Class({
         _synchronizeViewSourceButtonToRectCorner(this, rect);
     },
 
-    _setupWindow: function() {
-        this._positionChangedId = this.window.connect('position-changed',
-                                                      this._updatePosition.bind(this));
-        this._sizeChangedId = this.window.connect('size-changed',
-                                                  this._updatePosition.bind(this));
-        this._updatePosition();
-    },
-
-    _cleanupWindow: function() {
-        if (this._positionChangedId) {
-            this.window.disconnect(this._positionChangedId);
-            this._positionChangedId = 0;
-        }
-
-        if (this._sizeChangedId) {
-            this.window.disconnect(this._sizeChangedId);
-            this._sizeChangedId = 0;
-        }
-    },
-
     _onDestroy: function() {
         this.window = null;
 
@@ -299,10 +279,7 @@ var WindowTrackingButton = new Lang.Class({
     },
 
     set window(value) {
-        this._cleanupWindow();
         this._window = value;
-        if (this._window)
-            this._setupWindow();
     },
 
     get window() {
@@ -311,10 +288,6 @@ var WindowTrackingButton = new Lang.Class({
 
     set state(value) {
         this.child.flipped = value == STATE_TOOLBOX;
-    },
-
-    _updatePosition: function() {
-        this.queue_relayout();
     },
 });
 
@@ -499,7 +472,7 @@ var CodingSession = new Lang.Class({
 
     _isCurrentWindow: function(window) {
         let actor = this._actorForCurrentState();
-        return actor.meta_window === window;
+        return actor && actor.meta_window === window;
     },
 
     _getOtherActor: function(actor) {
@@ -739,10 +712,12 @@ var CodingSession = new Lang.Class({
     },
 
     _synchronizeWindows: function(window) {
-        if (!this._windowsNeedSync())
+        if (!this._isCurrentWindow(window))
             return;
 
-        if (!this._isCurrentWindow(window))
+        this.button.queue_relayout();
+
+        if (!this._windowsNeedSync())
             return;
 
         let actor = window.get_compositor_private();
