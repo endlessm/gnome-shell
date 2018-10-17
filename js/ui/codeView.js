@@ -291,9 +291,9 @@ var CodingSession = new Lang.Class({
         this._toolboxAppActionGroup.list_actions();
 
         this._overviewHiddenId = Main.overview.connect('hidden',
-                                                       this._syncButtonVisibility.bind(this));
+                                                       this._overviewStateChanged.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
-                                                        this._syncButtonVisibility.bind(this));
+                                                        this._overviewStateChanged.bind(this));
         this._sessionModeChangedId = Main.sessionMode.connect('updated',
                                                               this._syncButtonVisibility.bind(this));
         this._focusWindowId = global.display.connect('notify::focus-window',
@@ -437,11 +437,22 @@ var CodingSession = new Lang.Class({
         return actor === this.app ? this.toolbox : this.app;
     },
 
+    _setEffectsEnabled: function(actor, enabled) {
+        let desaturate = actor.get_effect('codeview-desaturate');
+        if (desaturate) {
+            desaturate.enabled = enabled;
+        } else {
+            desaturate = new Shell.CodeViewEffect({ enabled: enabled });
+            actor.add_effect_with_name('codeview-desaturate', desaturate);
+        }
+    },
+
     _completeRemoveWindow: function() {
         let actor = this._actorForCurrentState();
 
         if (actor) {
             actor.rotation_angle_y = 0;
+            this._setEffectsEnabled(actor, false);
             actor.show();
             actor.meta_window.activate(global.get_current_time());
         } else {
@@ -713,6 +724,15 @@ var CodingSession = new Lang.Class({
             toUnMini.meta_window.unminimize();
     },
 
+    _overviewStateChanged: function() {
+        let actor = this._actorForCurrentState();
+        let otherActor = this._getOtherActor(actor);
+        if (otherActor)
+            this._setEffectsEnabled(otherActor, !Main.overview.visible);
+
+        this._syncButtonVisibility();
+    },
+
     _syncButtonVisibility: function() {
         let focusedWindow = global.display.get_focus_window();
         if (!focusedWindow)
@@ -762,6 +782,8 @@ var CodingSession = new Lang.Class({
             this._activateAppFlip();
             focusedActor.rotation_angle_y = 0;
             actor.rotation_angle_y = 180;
+            this._setEffectsEnabled(focusedActor, false);
+            this._setEffectsEnabled(actor, true);
         }
 
         // Ensure correct stacking order by activating the window that just got focus.
@@ -805,6 +827,9 @@ var CodingSession = new Lang.Class({
         newDst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
         src.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
 
+        // Pre-create the effect if it hasn't been already
+        this._setEffectsEnabled(src, false);
+
         if (oldDst) {
             oldDst.rotation_angle_y = newDst.rotation_angle_y;
             oldDst.pivot_point = newDst.pivot_point;
@@ -843,6 +868,8 @@ var CodingSession = new Lang.Class({
     _rotateOutToMidpointCompleted: function(src, direction) {
         this._activateAppFlip();
 
+        this._setEffectsEnabled(src, true);
+
         Tweener.addTween(src, {
             rotation_angle_y: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
             time: WINDOW_ANIMATION_TIME * 2,
@@ -857,6 +884,8 @@ var CodingSession = new Lang.Class({
             newDst.rotation_angle_y = oldDst.rotation_angle_y;
             global.window_manager.completed_destroy(oldDst);
         }
+
+        this._setEffectsEnabled(newDst, false);
 
         // Now show the destination
         newDst.meta_window.activate(global.get_current_time());
