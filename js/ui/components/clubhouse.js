@@ -328,7 +328,8 @@ var ClubhouseComponent = new Lang.Class({
 
     _onNotify: function(source, notification) {
         notification.connect('destroy', (notification, reason) => {
-            if (reason != MessageTray.NotificationDestroyedReason.REPLACED)
+            if (reason != MessageTray.NotificationDestroyedReason.REPLACED &&
+                reason != MessageTray.NotificationDestroyedReason.SOURCE_CLOSED)
                 this._dismissQuest();
 
             this._clearBanner();
