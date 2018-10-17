@@ -128,18 +128,12 @@ var PaygUnlockCodeEntry = new Lang.Class({
         if (isExitKey || isEnterKey || isDeleteKey || isMovementKey)
             return Clutter.EVENT_PROPAGATE
 
-        // Do nothing if the entry is disabled.
-        if (!this._enabled)
-            return Clutter.EVENT_STOP;
-
         // Don't allow inserting more digits than required.
         if (this._code.length >= CODE_REQUIRED_LENGTH_CHARS)
             return Clutter.EVENT_STOP;
 
-        // Allow digits only
         let character = event.get_key_unicode();
-        if (GLib.unichar_isdigit(character))
-            this.clutter_text.insert_unichar(character);
+        this.addCharacter(character);
 
         return Clutter.EVENT_STOP;
     },
