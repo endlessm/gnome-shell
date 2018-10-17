@@ -36,8 +36,6 @@ const MSEC_PER_SEC = 1000
 // The timeout before going back automatically to the lock screen
 const IDLE_TIMEOUT_SECS = 2 * 60;
 
-const CODE_REQUIRED_LENGTH_CHARS = 8;
-
 const SPINNER_ICON_SIZE_PIXELS = 16;
 const SPINNER_ANIMATION_DELAY_SECS = 1.0;
 const SPINNER_ANIMATION_TIME_SECS = 0.3;
@@ -118,10 +116,6 @@ var PaygUnlockCodeEntry = GObject.registerClass({
         if (isExitKey || isEnterKey || isDeleteKey || isMovementKey)
             return Clutter.EVENT_PROPAGATE
 
-        // Don't allow inserting more digits than required.
-        if (this._code.length >= CODE_REQUIRED_LENGTH_CHARS)
-            return Clutter.EVENT_STOP;
-
         let character = event.get_key_unicode();
         this.addCharacter(character);
 
@@ -142,7 +136,15 @@ var PaygUnlockCodeEntry = GObject.registerClass({
     }
 
     addCharacter(character) {
-        if (!this._enabled || !GLib.unichar_isdigit(character))
+        if (!this._enabled || !GLib.unichar_isprint(character))
+            return;
+
+        let pos = this.clutter_text.get_cursor_position();
+        let before = pos === -1 ? this._code : this._code.slice(0, pos);
+        let after = pos === -1 ? "" : this._code.slice(pos);
+        let newCode = before + character + after;
+
+        if (!Main.paygManager.validateCode(newCode, true))
             return;
 
         this.clutter_text.insert_unichar(character);
@@ -371,9 +373,7 @@ class PaygUnlockDialog extends GObject.Object {
     }
 
     _validateCurrentCode() {
-        // The PaygUnlockCodeEntry widget will only accept valid
-        // characters, so we only need to check the length here.
-        return this._entry.length == CODE_REQUIRED_LENGTH_CHARS;
+        return Main.paygManager.validateCode(this._entry.code);
     }
 
     _updateNextButtonSensitivity() {
