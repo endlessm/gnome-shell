@@ -34,9 +34,24 @@ const Lang = imports.lang;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
+const SideComponent = imports.ui.sideComponent;
 
 const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
+
+const ClubhouseIface =
+'<node> \
+  <interface name="com.endlessm.Clubhouse"> \
+    <method name="show"> \
+      <arg type="u" direction="in" name="timestamp"/> \
+    </method> \
+    <method name="hide"> \
+      <arg type="u" direction="in" name="timestamp"/> \
+    </method> \
+    <property name="Visible" type="b" access="read"/> \
+  </interface> \
+</node>';
+
 
 var ClubhouseNotificationBanner = new Lang.Class({
     Name: 'ClubhouseNotificationBanner',
@@ -97,17 +112,140 @@ var ClubhouseNotificationSource = new Lang.Class({
     },
 });
 
+var ClubhouseButtonManager = new Lang.Class({
+    Name: 'ClubhouseButtonManager',
+
+    _init: function() {
+        this._openButton =
+            new St.Button({ child: new St.Icon({ style_class: 'clubhouse-open-button-icon' }) });
+        this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
+
+        Main.layoutManager.addChrome(this._openButton);
+
+        this._closeButton =
+            new St.Button({ child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }) });
+        this._closeButton.connect('clicked', () => { this.emit('close-clubhouse'); })
+
+        Main.layoutManager.addChrome(this._closeButton);
+
+        this._clubhouseWindowActor = null;
+        this._clubhouseNotifyHandler = 0;
+
+        this._updateVisibility();
+
+        // If the Clubhouse is open and the Shell is restarted, then global.get_window_actors()
+        // will still not have any contents when components are initialized, and there's no "map"
+        // signal emitted from the Window Manager either. So instead of relying on the map signal
+        // (which would allow us to track windows individually instead of always having to check the
+        // current list of windows) we connect to the screen's "restacked" signal.
+        this._restackedHandler = global.screen.connect('restacked',
+                                                       this._trackWindowActor.bind(this));
+        this._overviewShowingHandler = Main.overview.connect('showing',
+                                                             this._updateVisibility.bind(this));
+        this._overviewHiddenHandler = Main.overview.connect('hidden',
+                                                            this._updateVisibility.bind(this));
+    },
+
+    _updateCloseButtonPosition: function() {
+        this._closeButton.y = this._openButton.y;
+        if (this._clubhouseWindowActor)
+            this._closeButton.x = this._clubhouseWindowActor.x - this._closeButton.width / 2;
+    },
+
+    _reposition: function() {
+        let monitor = Main.layoutManager.primaryMonitor;
+        if (!monitor)
+            return;
+
+        this._openButton.x = monitor.width - this._openButton.width / 2;
+        this._openButton.y = Math.floor(monitor.height / 2.0 - this._openButton.width / 2.0);
+
+        this._updateCloseButtonPosition();
+    },
+
+    _updateVisibility: function() {
+        this._closeButton.visible = !Main.overview.visible && this._clubhouseWindowActor;
+        this._openButton.visible = !this._closeButton.visible;
+        this._reposition();
+    },
+
+    _getClubhouseActorFromWM: function() {
+        return global.get_window_actors().find((actor) => {
+            return (actor.meta_window.get_gtk_application_id() == CLUBHOUSE_ID);
+        });
+    },
+
+    _trackWindowActor: function() {
+        let actor = this._getClubhouseActorFromWM();
+        if (!actor)
+            return;
+
+        if (this._clubhouseWindowActor == actor)
+            return;
+
+        // Reset the current window actor
+        this._untrackWindowActor();
+
+        this._clubhouseWindowActor = actor;
+        this._updateVisibility();
+
+        // Track Clubhouse's window actor to make the closeButton always show on top of
+        // the Clubhouse's window edge
+        this._clubhouseNotifyHandler = actor.connect('notify::x',
+                                                     this._updateCloseButtonPosition.bind(this));
+
+        this._clubhouseDestroyHandler = actor.connect('destroy', () => {
+            this._untrackWindowActor();
+
+            this._updateVisibility();
+        });
+    },
+
+    _untrackWindowActor: function() {
+        if (!this._clubhouseWindowActor)
+            return;
+
+        // Reset the current window actor
+        this._clubhouseWindowActor.disconnect(this._clubhouseNotifyHandler);
+        this._clubhouseNotifyHandler = 0;
+
+        this._clubhouseWindowActor.disconnect(this._clubhouseDestroyHandler);
+        this._clubhouseDestroyHandler = 0;
+
+        this._clubhouseWindowActor = null;
+    },
+
+    destroy: function() {
+        Main.overview.disconnect(this._overviewShowingHandler);
+        this._overviewShowingHandler = 0;
+
+        Main.overview.disconnect(this._overviewHiddenHandler);
+        this._overviewHiddenHandler = 0;
+
+        global.screen.disconnect(this._restackedHandler);
+        this._restackedHandler = 0;
+
+        this._untrackWindowActor();
+        this._closeButton.destroy();
+        this._openButton.destroy();
+    },
+});
+Signals.addSignalMethods(ClubhouseButtonManager.prototype);
+
 var ClubhouseComponent = new Lang.Class({
     Name: 'ClubhouseComponent',
+    Extends: SideComponent.SideComponent,
 
     _init: function() {
         this._useClubhouse = this._imageUsesClubhouse() && this._hasClubhouse();
         if (!this._useClubhouse)
             return;
 
+        this.parent(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
+
+        this._clubhouseButtonManager = null;
         this._banner = null;
         this._clubhouseSource = null;
-        this._clubhouseProxy = null;
         this._clubhouseProxyHandler = 0;
     },
 
@@ -117,20 +255,23 @@ var ClubhouseComponent = new Lang.Class({
             return;
         }
 
-        this._clubhouseProxy = new Gio.DBusProxy.new_sync(Gio.DBus.session,
-                                                          Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION,
-                                                          null,
-                                                          CLUBHOUSE_ID,
-                                                          CLUBHOUSE_DBUS_OBJ_PATH,
-                                                          CLUBHOUSE_ID,
-                                                          null);
+        this.parent();
+
         this._clubhouseProxyHandler =
-            this._clubhouseProxy.connect('notify::g-name-owner', () => {
-                if (!this._clubhouseProxy.g_name_owner) {
+            this.proxy.connect('notify::g-name-owner', () => {
+                if (!this.proxy.g_name_owner) {
                     log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
                     this._clearBanner();
                 }
             });
+
+        this._clubhouseButtonManager = new ClubhouseButtonManager();
+        this._clubhouseButtonManager.connect('open-clubhouse', () => {
+            this.show(global.get_current_time());
+        });
+        this._clubhouseButtonManager.connect('close-clubhouse', () => {
+            this.hide(global.get_current_time());
+        });
 
         this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
         this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
@@ -147,10 +288,20 @@ var ClubhouseComponent = new Lang.Class({
         this._clearBanner();
 
         if (this._clubhouseProxyHandler > 0)
-            this._clubhouseProxy.disconnect(this._clubhouseProxyHandler);
+            this.proxy.disconnect(this._clubhouseProxyHandler);
 
+        this.parent();
+        this._clubhouseButtonManager.destroy();
+        this._clubhouseButtonManager = null;
         this._clubhouseSource = null;
-        this._clubhouseProxy = null;
+    },
+
+    callShow: function(timestamp) {
+        this.proxy.showRemote(timestamp);
+    },
+
+    callHide: function(timestamp) {
+        this.proxy.hideRemote(timestamp);
     },
 
     _clearBanner: function() {
@@ -192,7 +343,7 @@ var ClubhouseComponent = new Lang.Class({
 
     _dismissQuest: function() {
         // Stop the quest since the banner has been dismissed
-        if (this._clubhouseProxy.g_name_owner)
+        if (this.proxy.g_name_owner)
             this._clubhouseSource.activateAction('stop-quest', null);
     },
 });
