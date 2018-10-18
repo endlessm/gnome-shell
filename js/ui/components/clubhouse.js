@@ -81,9 +81,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
         if (!monitor)
             return;
 
-        let margin = 50;
+        let margin = 30;
         this.actor.x = monitor.width - (this.actor.width + margin);
-        this.actor.y = Math.floor((monitor.height - this.actor.height) / 2.0) - margin;
+        this.actor.y = margin;
     },
 });
 
