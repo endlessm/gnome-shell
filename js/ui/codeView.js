@@ -958,9 +958,6 @@ var CodeViewManager = new Lang.Class({
     },
 
     _addAppWindow: function(actor) {
-        if (!global.settings.get_boolean('enable-code-view'))
-            return;
-
         this._sessions.push(new CodingSession({ app: actor }));
     },
 
@@ -1004,6 +1001,9 @@ var CodeViewManager = new Lang.Class({
     },
 
     handleMapWindow: function(actor) {
+        if (!global.settings.get_boolean('enable-code-view'))
+            return false;
+
         // Check if the window is a GtkApplicationWindow. If it is
         // then it might be either a "hack" toolbox window or target
         // window and we'll need to check on the session bus and
