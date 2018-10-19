@@ -1004,6 +1004,17 @@ var CodeViewManager = new Lang.Class({
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
+        // Do not manage apps that don't have an associated .desktop file
+        let windowTracker = Shell.WindowTracker.get_default();
+        let shellApp = windowTracker.get_window_app(actor.meta_window);
+        let appInfo = shellApp.get_app_info();
+        if (!appInfo)
+            return false;
+
+        // Do not manage apps that are NoDisplay=true
+        if (!appInfo.should_show())
+            return false;
+
         // Check if the window is a GtkApplicationWindow. If it is
         // then it might be either a "hack" toolbox window or target
         // window and we'll need to check on the session bus and
