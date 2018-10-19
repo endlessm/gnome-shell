@@ -35,18 +35,18 @@ const Signals = imports.signals;
 const EOS_PAYG_NAME = 'com.endlessm.Payg1';
 const EOS_PAYG_PATH = '/com/endlessm/Payg1';
 
-const EOS_PAYG_IFACE = `<node>
-    <interface name="com.endlessm.Payg1">
-        <method name="AddCode">
-            <arg type="s" direction="in" name="code"/>
-        </method>
-        <method name="ClearCode" />
-        <signal name="Expired" />
-        <property name="ExpiryTime" type="t" access="read"/>
-        <property name="Enabled" type="b" access="read"/>
-        <property name="RateLimitEndTime" type="t" access="read"/>
-    </interface>
-</node>`;
+const EOS_PAYG_IFACE = '<node> \
+<interface name="com.endlessm.Payg1"> \
+<method name="AddCode"> \
+  <arg type="s" direction="in" name="code"/> \
+</method> \
+<method name="ClearCode" /> \
+<signal name="Expired" /> \
+<property name="ExpiryTime" type="t" access="read"/> \
+<property name="Enabled" type="b" access="read"/> \
+<property name="RateLimitEndTime" type="t" access="read"/> \
+</interface> \
+</node>';
 
 var PaygErrorDomain = GLib.quark_from_string('payg-error');
 
