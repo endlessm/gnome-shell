@@ -80,6 +80,12 @@ function _ensureAfterFirstFrame(win, callback) {
     });
 };
 
+function _getWindowId(win) {
+    if (win.gtk_window_object_path)
+        return win.gtk_window_object_path;
+    return ('window:%d').format(win.get_stable_sequence());
+};
+
 // _synchronizeMetaWindowActorGeometries
 //
 // Synchronize geometry of MetaWindowActor src to dst by
@@ -513,11 +519,15 @@ var CodingSession = new Lang.Class({
             this.app.meta_window.connect('geometry-allocate',
                                          this._constrainGeometry.bind(this));
 
-        this._appActionProxy =
-            Gio.DBusActionGroup.get(Gio.DBus.session,
-                                    this.app.meta_window.gtk_application_id,
-                                    this.app.meta_window.gtk_application_object_path);
-        this._appActionProxy.list_actions();
+        if (this.app.meta_window.gtk_application_id) {
+            this._appActionProxy =
+                Gio.DBusActionGroup.get(Gio.DBus.session,
+                                        this.app.meta_window.gtk_application_id,
+                                        this.app.meta_window.gtk_application_object_path);
+            this._appActionProxy.list_actions();
+        } else {
+            this._appActionProxy = null;
+        }
 
         let windowTracker = Shell.WindowTracker.get_default();
         this._shellApp = windowTracker.get_window_app(this.app.meta_window);
@@ -652,8 +662,8 @@ var CodingSession = new Lang.Class({
         if (!this.toolbox) {
             this._toolboxAppActionGroup.activate_action(
                 'flip',
-                new GLib.Variant('(ss)', [this.app.meta_window.gtk_application_id,
-                                          this.app.meta_window.gtk_window_object_path]));
+                new GLib.Variant('(ss)', [this._shellApp.get_id(),
+                                          _getWindowId(this.app.meta_window)]));
             this._button.reactive = false;
         } else {
             this._setupAnimation(STATE_TOOLBOX,
@@ -761,7 +771,7 @@ var CodingSession = new Lang.Class({
     _activateAppFlip: function() {
         // Support a 'flip' action in the app, if it exposes it
         const flipState = (this._state == STATE_TOOLBOX);
-        if (this._appActionProxy.has_action('flip'))
+        if (this._appActionProxy && this._appActionProxy.has_action('flip'))
             this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
     },
 
@@ -1015,13 +1025,6 @@ var CodeViewManager = new Lang.Class({
         if (!appInfo.should_show())
             return false;
 
-        // Check if the window is a GtkApplicationWindow. If it is
-        // then it might be either a "hack" toolbox window or target
-        // window and we'll need to check on the session bus and
-        // make associations as appropriate
-        if (!actor.meta_window.gtk_application_object_path)
-            return false;
-
         // It might be a "HackToolbox". Check that, and if so,
         // add it to the window group for the window.
         let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(actor.meta_window);
@@ -1030,17 +1033,18 @@ var CodeViewManager = new Lang.Class({
         // This is a new proxy window, make it join the session
         if (proxy) {
             let variant = proxy.get_cached_property('Target');
-            let [targetBusName, targetObjectPath] = variant.deep_unpack();
+            let [targetAppId, targetWindowId] = variant.deep_unpack();
             let session = this._getSessionForTargetApp(
-                targetBusName, targetObjectPath);
+                targetAppId, targetWindowId);
 
             if (session)
                 handled = session.admitToolboxWindowActor(actor);
         } else {
+            let shellApp = Shell.WindowTracker.get_default().get_window_app(actor.meta_window);
+
             // See if this is a new app window for an existing toolbox session
             let session = this._getSessionForToolboxTarget(
-                actor.meta_window.gtk_application_id,
-                actor.meta_window.gtk_window_object_path);
+                shellApp.get_id(), _getWindowId(actor.meta_window));
 
             if (session)
                 handled = session.admitAppWindowActor(actor);
@@ -1074,27 +1078,26 @@ var CodeViewManager = new Lang.Class({
         return null;
     },
 
-    _getSessionForTargetApp: function(targetBusName, targetObjectPath) {
+    _getSessionForTargetApp: function(targetAppId, targetWindowId) {
         for (let session of this._sessions) {
             if ((session.app &&
-                 (session.app.meta_window.gtk_application_id == targetBusName &&
-                  session.app.meta_window.gtk_window_object_path == targetObjectPath)))
+                 (session._shellApp.get_id() == targetAppId &&
+                  _getWindowId(session.app.meta_window) == targetWindowId)))
                 return session;
         }
 
         return null;
     },
 
-    _getSessionForToolboxTarget: function(appBusName, appObjectPath) {
+    _getSessionForToolboxTarget: function(appId, windowId) {
         for (let session of this._sessions) {
             if (!session.toolbox)
                 continue;
 
             let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(session.toolbox.meta_window);
             let variant = proxy.get_cached_property('Target');
-            let [targetBusName, targetObjectPath] = variant.deep_unpack();
-            if (targetBusName == appBusName &&
-                targetObjectPath == appObjectPath)
+            let [targetAppId, targetWindowId] = variant.deep_unpack();
+            if (targetAppId == appId && targetWindowId == windowId)
                 return session;
         }
 

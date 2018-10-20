@@ -371,10 +371,9 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
   GSettings *settings;
   const gchar *window_app_id = NULL;
   const gchar *window_object_path = NULL;
-  const gchar *target_bus_name = NULL;
-  const gchar *target_object_path = NULL;
-  GHashTableIter iter;
-  gpointer key, value;
+  const gchar *target_app_id = NULL;
+  const gchar *target_window_id = NULL;
+  ShellAppSystem *appsys;
 
   /* If code view is disabled globally, do nothing here */
   settings = shell_global_get_settings (shell_global_get ());
@@ -417,37 +416,23 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
     return NULL;
 
   g_variant_get (target_property_variant, "(&s&s)",
-                 &target_bus_name,
-                 &target_object_path);
+                 &target_app_id,
+                 &target_window_id);
 
-  if (target_bus_name == NULL || target_object_path == NULL)
+  if (target_app_id == NULL || target_window_id == NULL)
     {
       g_warning ("Invalid Target property on Hack Toolbox: %s %s",
-                 target_bus_name, target_object_path);
+                 target_app_id, target_window_id);
       return NULL;
     }
 
   g_object_set_data_full (G_OBJECT (window), "hack-toolbox-proxy",
                           g_object_ref (proxy), g_object_unref);
 
-  /* Now that we have the target bus name and object path, we need to look
-   * up the corresponding app for the bus name by enumerating all the
-   * windows on the window tracker */
-  g_hash_table_iter_init (&iter, tracker->window_to_app);
-
-  while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-      MetaWindow *window = key;
-      ShellApp *app = value;
-      const char *candidate_app_id = meta_window_get_gtk_application_id (window);
-      const char *candidate_object_path = meta_window_get_gtk_window_object_path (window);
-
-      if (g_strcmp0 (candidate_app_id, target_bus_name) == 0 &&
-          g_strcmp0 (candidate_object_path, target_object_path) == 0)
-        return app;
-    }
-
-  return NULL;
+  /* Now that we have the target app ID, let's look up if we can find
+   * a match. */
+  appsys = shell_app_system_get_default ();
+  return shell_app_system_lookup_app (appsys, target_app_id);
 }
 
 /**
