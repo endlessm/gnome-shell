@@ -80,6 +80,12 @@ function _ensureAfterFirstFrame(win, callback) {
     });
 };
 
+function _getAppId(win) {
+    let app = Shell.WindowTracker.get_default().get_window_app(win);
+    // remove .desktop suffix
+    return app.get_id().slice(0, -8);
+};
+
 function _getWindowId(win) {
     if (win.gtk_window_object_path)
         return win.gtk_window_object_path;
@@ -662,7 +668,7 @@ var CodingSession = new Lang.Class({
         if (!this.toolbox) {
             this._toolboxAppActionGroup.activate_action(
                 'flip',
-                new GLib.Variant('(ss)', [this._shellApp.get_id(),
+                new GLib.Variant('(ss)', [_getAppId(this.app.meta_window),
                                           _getWindowId(this.app.meta_window)]));
             this._button.reactive = false;
         } else {
@@ -1034,8 +1040,11 @@ var CodeViewManager = new Lang.Class({
         if (proxy) {
             let variant = proxy.get_cached_property('Target');
             let [targetAppId, targetWindowId] = variant.deep_unpack();
-            let session = this._getSessionForTargetApp(
+
+            let session = this._getSessionForTargetAppWindow(
                 targetAppId, targetWindowId);
+            if (!session)
+                session = this._getAvailableSessionForTargetApp(targetAppId);
 
             if (session)
                 handled = session.admitToolboxWindowActor(actor);
@@ -1044,7 +1053,9 @@ var CodeViewManager = new Lang.Class({
 
             // See if this is a new app window for an existing toolbox session
             let session = this._getSessionForToolboxTarget(
-                shellApp.get_id(), _getWindowId(actor.meta_window));
+                _getAppId(actor.meta_window), _getWindowId(actor.meta_window));
+            if (!session)
+                session = this._getAvailableSessionForToolboxTarget(_getAppId(actor.meta_window));
 
             if (session)
                 handled = session.admitAppWindowActor(actor);
@@ -1074,10 +1085,30 @@ var CodeViewManager = new Lang.Class({
         });
     },
 
-    _getSessionForTargetApp: function(targetAppId, targetWindowId) {
+    _getAvailableSessionForTargetApp: function(targetAppId) {
         return this._sessions.find((session) => {
             return (session.app &&
-                    session._shellApp.get_id() == targetAppId &&
+                    !session.toolbox &&
+                    _getAppId(session.app.meta_window) == targetAppId);
+        });
+    },
+
+    _getAvailableSessionForToolboxTarget: function(appId) {
+        return this._sessions.find((session) => {
+            if (!session.toolbox || session.app)
+                return false;
+
+            let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(session.toolbox.meta_window);
+            let variant = proxy.get_cached_property('Target');
+            let [targetAppId, targetWindowId] = variant.deep_unpack();
+            return (targetAppId == appId);
+        });
+    },
+
+    _getSessionForTargetAppWindow: function(targetAppId, targetWindowId) {
+        return this._sessions.find((session) => {
+            return (session.app &&
+                    _getAppId(session.app.meta_window) == targetAppId &&
                     _getWindowId(session.app.meta_window) == targetWindowId);
         });
     },
