@@ -373,7 +373,6 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
   const gchar *window_object_path = NULL;
   const gchar *target_app_id = NULL;
   const gchar *target_window_id = NULL;
-  ShellAppSystem *appsys;
 
   /* If code view is disabled globally, do nothing here */
   settings = shell_global_get_settings (shell_global_get ());
@@ -431,8 +430,7 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
 
   /* Now that we have the target app ID, let's look up if we can find
    * a match. */
-  appsys = shell_app_system_get_default ();
-  return shell_app_system_lookup_app (appsys, target_app_id);
+  return get_app_from_id (window, target_app_id);
 }
 
 /**
