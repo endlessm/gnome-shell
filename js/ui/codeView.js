@@ -1068,39 +1068,29 @@ var CodeViewManager = new Lang.Class({
     },
 
     _getSession: function(actor, flags) {
-        for (let i = 0; i < this._sessions.length; i++) {
-            let session = this._sessions[i];
-            if (((session.app === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_APP)) ||
-                ((session.toolbox === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)))
-                return session;
-        }
-
-        return null;
+        return this._sessions.find((session) => {
+            return (((session.app === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_APP)) ||
+                    ((session.toolbox === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)));
+        });
     },
 
     _getSessionForTargetApp: function(targetAppId, targetWindowId) {
-        for (let session of this._sessions) {
-            if ((session.app &&
-                 (session._shellApp.get_id() == targetAppId &&
-                  _getWindowId(session.app.meta_window) == targetWindowId)))
-                return session;
-        }
-
-        return null;
+        return this._sessions.find((session) => {
+            return (session.app &&
+                    session._shellApp.get_id() == targetAppId &&
+                    _getWindowId(session.app.meta_window) == targetWindowId);
+        });
     },
 
     _getSessionForToolboxTarget: function(appId, windowId) {
-        for (let session of this._sessions) {
+        return this._sessions.find((session) => {
             if (!session.toolbox)
-                continue;
+                return false;
 
             let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(session.toolbox.meta_window);
             let variant = proxy.get_cached_property('Target');
             let [targetAppId, targetWindowId] = variant.deep_unpack();
-            if (targetAppId == appId && targetWindowId == windowId)
-                return session;
-        }
-
-        return null;
+            return (targetAppId == appId && targetWindowId == windowId);
+        });
     }
 });
