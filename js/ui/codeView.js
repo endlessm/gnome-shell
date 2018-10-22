@@ -298,6 +298,8 @@ var CodingSession = new Lang.Class({
                                                               this._syncButtonVisibility.bind(this));
         this._focusWindowId = global.display.connect('notify::focus-window',
                                                      this._focusWindowChanged.bind(this));
+        this._fullscreenId = global.screen.connect('in-fullscreen-changed',
+                                                   this._syncButtonVisibility.bind(this));
         this._windowMinimizedId = global.window_manager.connect('minimize',
                                                                 this._applyWindowMinimizationState.bind(this));
         this._windowUnminimizedId = global.window_manager.connect('unminimize',
@@ -741,11 +743,15 @@ var CodingSession = new Lang.Class({
         // Don't show if the screen is locked
         let locked = Main.sessionMode.isLocked;
 
+        let primaryMonitor = Main.layoutManager.primaryMonitor;
+        let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
+
         // Show only if either this window or the toolbox window
         // is in focus
         let focusedActor = focusedWindow.get_compositor_private();
         if (this._isActorFromSession(focusedActor) &&
             !Main.overview.visible &&
+            !inFullscreen &&
             !locked)
             this._button.show();
         else
@@ -952,9 +958,6 @@ var CodeViewManager = new Lang.Class({
     },
 
     _addAppWindow: function(actor) {
-        if (!global.settings.get_boolean('enable-code-view'))
-            return;
-
         this._sessions.push(new CodingSession({ app: actor }));
     },
 
@@ -998,6 +1001,20 @@ var CodeViewManager = new Lang.Class({
     },
 
     handleMapWindow: function(actor) {
+        if (!global.settings.get_boolean('enable-code-view'))
+            return false;
+
+        // Do not manage apps that don't have an associated .desktop file
+        let windowTracker = Shell.WindowTracker.get_default();
+        let shellApp = windowTracker.get_window_app(actor.meta_window);
+        let appInfo = shellApp.get_app_info();
+        if (!appInfo)
+            return false;
+
+        // Do not manage apps that are NoDisplay=true
+        if (!appInfo.should_show())
+            return false;
+
         // Check if the window is a GtkApplicationWindow. If it is
         // then it might be either a "hack" toolbox window or target
         // window and we'll need to check on the session bus and
