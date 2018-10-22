@@ -1049,8 +1049,6 @@ var CodeViewManager = new Lang.Class({
             if (session)
                 handled = session.admitToolboxWindowActor(actor);
         } else {
-            let shellApp = Shell.WindowTracker.get_default().get_window_app(actor.meta_window);
-
             // See if this is a new app window for an existing toolbox session
             let session = this._getSessionForToolboxTarget(
                 _getAppId(actor.meta_window), _getWindowId(actor.meta_window));
