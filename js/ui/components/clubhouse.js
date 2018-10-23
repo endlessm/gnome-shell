@@ -82,7 +82,7 @@ var ClubhouseNotificationBanner = new Lang.Class({
             return;
 
         let margin = 30;
-        this.actor.x = monitor.width - (this.actor.width + margin);
+        this.actor.x = monitor.x + monitor.width - (this.actor.width + margin);
         this.actor.y = margin;
     },
 });
@@ -157,7 +157,7 @@ var ClubhouseButtonManager = new Lang.Class({
         if (!monitor)
             return;
 
-        this._openButton.x = monitor.width - this._openButton.width / 2;
+        this._openButton.x = monitor.x + monitor.width - this._openButton.width / 2;
         this._openButton.y = Math.floor(monitor.height / 2.0 - this._openButton.width / 2.0);
 
         this._updateCloseButtonPosition();
