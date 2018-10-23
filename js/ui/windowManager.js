@@ -2495,8 +2495,8 @@ var WindowManager = new Lang.Class({
                     this._showOtherWindows(actor, false);
             }
 
-            /* If this is the Discovery Feed, notify it that it has
-             * finished closing now */
+            // If this is the Discovery Feed, notify it that it has
+            // finished closing now
             if (SideComponent.isDiscoveryFeedWindow(actor.meta_window))
                 Main.discoveryFeed.notifyHideAnimationCompleted();
 
