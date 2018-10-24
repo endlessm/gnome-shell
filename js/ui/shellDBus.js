@@ -171,7 +171,7 @@ var GnomeShell = new Lang.Class({
     },
 
     ShowApplications: function() {
-        Main.overview.viewSelector.showApps();
+        Main.overview.showApps();
     },
 
     GrabAcceleratorAsync: function(params, invocation) {
