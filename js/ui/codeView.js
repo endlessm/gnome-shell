@@ -23,6 +23,7 @@ const STATE_APP = 0;
 const STATE_TOOLBOX = 1;
 
 const _FLIP_ICON_FRONT = 'resource:///org/gnome/shell/theme/flip-symbolic.svg';
+const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
 
 const FlipIcon = GObject.registerClass(class FlipIcon extends St.Icon {
     _init(props = {}) {
@@ -1027,8 +1028,9 @@ var CodeViewManager = new Lang.Class({
         if (!appInfo)
             return false;
 
-        // Do not manage apps that are NoDisplay=true
-        if (!appInfo.should_show())
+        // Do not manage apps that are NoDisplay=true, but take into account
+        // the custom X-Endless-Hackable key to override that
+        if (!appInfo.should_show() && !appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
             return false;
 
         // It might be a "HackToolbox". Check that, and if so,
