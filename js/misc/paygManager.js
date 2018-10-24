@@ -45,6 +45,7 @@ const EOS_PAYG_IFACE = '<node> \
 <property name="ExpiryTime" type="t" access="read"/> \
 <property name="Enabled" type="b" access="read"/> \
 <property name="RateLimitEndTime" type="t" access="read"/> \
+<property name="CodeFormat" type="s" access="read"/> \
 </interface> \
 </node>';
 
@@ -84,34 +85,6 @@ const notificationAlertTimesSecs = [
     60 * 2,       // 2 minutes
     30,           // 30 seconds
 ];
-
-// This function checks the configuration file of PAYG directly
-// from the expected locations on disk, on an attempt to figure
-// out whether the feature is enabled, so that we don't wake up
-// the D-Bus service and keep it running when it's disabled.
-function _isPaygEnabled() {
-    // See man page eos-payg.conf(5)
-    let searchDirs = [
-        '/etc/eos-payg',
-        '/usr/local/share/eos-payg',
-        '/usr/share/eos-payg',
-    ];
-
-    let configFileName = 'eos-payg.conf'
-    let keyfile = new GLib.KeyFile();
-    try {
-        keyfile.load_from_dirs(configFileName,
-                               searchDirs,
-                               GLib.KeyFileFlags.NONE);
-        return keyfile.get_boolean('PAYG', 'Enabled');
-    } catch (e) {
-        // A non-existent file is a perfectly normal use case.
-        if (!e.matches(GLib.KeyFileError, GLib.KeyFileError.NOT_FOUND))
-            logError(e, "Error reading PAYG configuration file from " + configFileName);
-    }
-
-    return false;
-}
 
 // Takes an UNIX timestamp (in seconds) and returns a string
 // with a precision level appropriate to show to the user.
@@ -174,14 +147,9 @@ var PaygManager = new Lang.Class({
         this._enabled = false;
         this._expiryTime = 0;
         this._rateLimitEndTime = 0;
+        this._codeFormat = '';
+        this._codeFormatRegex = null;
         this._notification = null;
-
-        if (!_isPaygEnabled()) {
-            // Consider this manager initialized if PAYG is not
-            // enabled, and skip all the D-Bus related bits.
-            this._initialized = true;
-            return;
-        }
 
         // Keep track of clock changes to update notifications.
 
@@ -224,6 +192,7 @@ var PaygManager = new Lang.Class({
             this._enabled = this._proxy.Enabled;
             this._expiryTime = this._proxy.ExpiryTime;
             this._rateLimitEndTime = this._proxy.RateLimitEndTime;
+            this._setCodeFormat(this._proxy.CodeFormat || "^[0-9]{8}$");
 
             this._propertiesChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
             this._codeExpiredId = this._proxy.connectSignal('Expired', this._onCodeExpired.bind(this));
@@ -246,6 +215,9 @@ var PaygManager = new Lang.Class({
 
         if (propsDict.hasOwnProperty('RateLimitEndTime'))
             this._setRateLimitEndTime(this._proxy.RateLimitEndTime);
+
+        if (propsDict.hasOwnProperty('CodeFormat'))
+            this._setCodeFormat(this._proxy.CodeFormat, true);
     },
 
     _setEnabled: function(value) {
@@ -272,6 +244,24 @@ var PaygManager = new Lang.Class({
 
         this._rateLimitEndTime = value;
         this.emit('rate-limit-end-time-changed', this._rateLimitEndTime);
+    },
+
+    _setCodeFormat(value, notify=false) {
+        if (this._codeFormat === value)
+            return;
+
+        this._codeFormat = value;
+        try {
+            this._codeFormatRegex = new GLib.Regex(this._codeFormat,
+                                                   GLib.RegexCompileFlags.DOLLAR_ENDONLY,
+                                                   GLib.RegexMatchFlags.PARTIAL);
+        } catch (e) {
+            logError(e, `Error compiling CodeFormat regex "${this._codeFormat}"`);
+            this._codeFormatRegex = null;
+        }
+
+        if (notify)
+            this.emit('code-format-changed');
     },
 
     _onCodeExpired: function(proxy) {
@@ -383,6 +373,16 @@ var PaygManager = new Lang.Class({
         }
 
         this._proxy.ClearCodeRemote();
+    },
+
+    validateCode(code, partial=false) {
+        if (!this._codeFormatRegex) {
+            log("Unable to validate PAYG code: no regex")
+            return false;
+        }
+
+        let [is_match, match_info] = this._codeFormatRegex.match(code, 0);
+        return is_match || (partial && match_info.is_partial_match());
     },
 
     get initialized() {
