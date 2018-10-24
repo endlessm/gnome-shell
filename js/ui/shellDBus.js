@@ -121,7 +121,7 @@ var GnomeShell = class {
     }
 
     ShowApplications() {
-        Main.overview.viewSelector.showApps();
+        Main.overview.showApps();
     }
 
     GrabAcceleratorAsync(params, invocation) {
