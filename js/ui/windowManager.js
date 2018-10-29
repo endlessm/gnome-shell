@@ -2224,6 +2224,11 @@ var WindowManager = new Lang.Class({
                 let parent = window.get_transient_for();
                 if (parent)
                     this._checkDimming(parent);
+
+                if (actor._animatableSurface) {
+                    this._animationsServer.unregister_surface(actor._animatableSurface);
+                    actor._animatableSurface = null;
+                }
         }));
 
         // Endless libanimation extension
@@ -2429,10 +2434,8 @@ var WindowManager = new Lang.Class({
 
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
-            if (this._codeViewManager.handleDestroyWindow(actor)) {
-                this._unregisterAnimations(actor);
+            if (this._codeViewManager.handleDestroyWindow(actor))
                 return;
-            }
 
             actor.set_pivot_point(0.5, 0.5);
             this._destroying.push(actor);
@@ -2502,16 +2505,7 @@ var WindowManager = new Lang.Class({
             if (SideComponent.isDiscoveryFeedWindow(actor.meta_window))
                 Main.discoveryFeed.notifyHideAnimationCompleted();
 
-            this._unregisterAnimations(actor);
             shellwm.completed_destroy(actor);
-        }
-    },
-
-    _unregisterAnimations: function(actor) {
-        // Endless libanimation extension
-        if (actor._animatableSurface) {
-            this._animationsServer.unregister_surface(actor._animatableSurface);
-            actor._animatableSurface = null;
         }
     },
 
