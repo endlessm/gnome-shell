@@ -24,6 +24,13 @@ const STATE_TOOLBOX = 1;
 
 const _FLIP_ICON_FRONT = 'resource:///org/gnome/shell/theme/flip-symbolic.svg';
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
+const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
+
+const _HACK_SHADER_MAP = {
+    'none': null,
+    'desaturate': Shell.CodeViewEffect
+};
+const _HACK_DEFAULT_SHADER = 'desaturate';
 
 const FlipIcon = GObject.registerClass(class FlipIcon extends St.Icon {
     _init(props = {}) {
@@ -453,12 +460,20 @@ var CodingSession = new Lang.Class({
     },
 
     _setEffectsEnabled: function(actor, enabled) {
-        let desaturate = actor.get_effect('codeview-desaturate');
-        if (desaturate) {
-            desaturate.enabled = enabled;
+        let effect = actor.get_effect('codeview-effect');
+        if (effect) {
+            effect.enabled = enabled;
         } else {
-            desaturate = new Shell.CodeViewEffect({ enabled: enabled });
-            actor.add_effect_with_name('codeview-desaturate', desaturate);
+            let appInfo = this._shellApp.get_app_info();
+            let shaderEffect = appInfo.get_string(_HACK_SHADER_DESKTOP_KEY);
+            if (!shaderEffect)
+                shaderEffect = _HACK_DEFAULT_SHADER;
+
+            let shaderProto = _HACK_SHADER_MAP[shaderEffect];
+            if (shaderProto) {
+                effect = new shaderProto({enabled});
+                actor.add_effect_with_name('codeview-effect', effect);
+            }
         }
     },
 
