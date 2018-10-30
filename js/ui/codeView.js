@@ -978,6 +978,17 @@ var CodeViewManager = new Lang.Class({
         this._sessions.push(new CodingSession({ app: actor }));
     },
 
+    _removeSession: function(session) {
+        // Destroy the session here and remove it from the list
+        session.destroy();
+
+        let idx = this._sessions.indexOf(session);
+        if (idx === -1)
+            return;
+
+        this._sessions.splice(idx, 1);
+    },
+
     _removeAppWindow: function(actor) {
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
         if (!session)
@@ -986,16 +997,9 @@ var CodeViewManager = new Lang.Class({
         if (session.appRemovedByFlipBack) {
             session.removeAppWindow();
             return true;
-        } else {
-            // Destroy the session here and remove it from the list
-            session.destroy();
-
-            let idx = this._sessions.indexOf(session);
-            if (idx === -1)
-                return false;
-
-            this._sessions.splice(idx, 1);
         }
+
+        this._removeSession(session);
 
         return false;
     },
