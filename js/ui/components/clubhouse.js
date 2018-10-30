@@ -110,6 +110,17 @@ var ClubhouseNotificationSource = new Lang.Class({
     _createNotification: function(params) {
         return new ClubhouseNotification(this, params);
     },
+
+    // Override the method so we don't emit the 'destroy' signal, which would end up
+    // actually destroying the source and removing it from the GtkNotificationDaemon,
+    // meaning we could only use the source (and thus the Shell Quest View) once.
+    destroy: function(reason) {
+        let notifications = this.notifications;
+        this.notifications = [];
+
+        for (let i = 0; i < notifications.length; i++)
+            notifications[i].destroy(reason);
+    },
 });
 
 var ClubhouseButtonManager = new Lang.Class({
