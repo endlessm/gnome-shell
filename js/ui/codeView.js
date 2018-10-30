@@ -504,17 +504,6 @@ var CodingSession = new Lang.Class({
         }
     },
 
-    // Remove the toolbox window from this session. Disconnect
-    // any signals that we have connected to the toolbox window
-    // and show the app window
-    removeToolboxWindow: function() {
-        this.toolbox = null;
-
-        this._setState(STATE_APP);
-
-        this._completeRemoveWindow();
-    },
-
     _setupAppWindow: function() {
         this._positionChangedIdApp =
             this.app.meta_window.connect('position-changed',
@@ -603,24 +592,25 @@ var CodingSession = new Lang.Class({
             this._windowUnminimizedId = 0;
         }
 
-        this.app = null;
-        this._shellApp = null;
+        // If we have an app window, disconnect any signals and destroy it.
+        if (this.app) {
+            let appWindow = this.app.meta_window;
+            this.app = null;
+            this._shellApp = null;
 
-        // Destroy the button too
-        this._button.destroy();
+            appWindow.delete(global.get_current_time());
+        }
 
         // If we have a toolbox window, disconnect any signals and destroy it.
         if (this.toolbox) {
             let toolboxWindow = this.toolbox.meta_window;
             this.toolbox = null;
 
-            // Destroy the toolbox window now
             toolboxWindow.delete(global.get_current_time());
-
-            // Note that we do not set this._state to STATE_APP here. Any
-            // further usage of this session is undefined and it should
-            // be removed.
         }
+
+        // Destroy the button too
+        this._button.destroy();
     },
 
     _windowsNeedSync: function() {
@@ -1009,9 +999,7 @@ var CodeViewManager = new Lang.Class({
         if (!session)
             return;
 
-        // We can remove the normal toolbox window.
-        // That window will be registered in the session at this point.
-        session.removeToolboxWindow();
+        this._removeSession(session);
     },
 
     handleDestroyWindow: function(actor) {
