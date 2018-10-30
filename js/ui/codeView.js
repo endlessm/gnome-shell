@@ -974,7 +974,7 @@ var CodeViewManager = new Lang.Class({
         });
     },
 
-    _addAppWindow: function(actor) {
+    _addSession: function(actor) {
         this._sessions.push(new CodingSession({ app: actor }));
     },
 
@@ -1061,7 +1061,7 @@ var CodeViewManager = new Lang.Class({
                 handled = session.admitAppWindowActor(actor);
             else
                 // This is simply a new application window
-                this._addAppWindow(actor);
+                this._addSession(actor);
         }
 
         if (handled)
