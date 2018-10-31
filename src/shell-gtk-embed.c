@@ -25,6 +25,8 @@ struct _ShellGtkEmbedPrivate
   guint window_actor_destroyed_handler;
 
   guint window_created_handler;
+
+  guint n_allocations;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (ShellGtkEmbed, shell_gtk_embed, CLUTTER_TYPE_CLONE);
@@ -280,6 +282,50 @@ shell_gtk_embed_allocate (ClutterActor          *actor,
   CLUTTER_ACTOR_CLASS (shell_gtk_embed_parent_class)->
     allocate (actor, box, flags);
 
+  /* HACK!!! There is an asynchronous roundtrip cycle that happens in this
+   * code. It goes through:
+   *
+   *  1. Clutter calls ClutterActor.allocate() on ShellEmbeddedWindow
+   *  2. That calls into here, which calls _shell_embedded_window_allocate
+   *  3. ShellEmbeddedWindow calls gdk_window_move_resize()
+   *  4. That generates an XEvent
+   *  5. X11 sends that event to Mutter
+   *  6. meta_compositor_sync_window_geometry()
+   *  7. meta_window_actor_sync_actor_geometry()
+   *  8. MetaWindowActor.sync_actor_geometry() sets the position and size of
+   *     the systray actor, and that causes a relayout
+   *  9. goto 1
+   *
+   * This is a known problem, and ShellEmbeddedWindow works around that by
+   * checking if the position and sizes actually changed. If they didn't,
+   * bail out of the allocation phase and stop generating the XEvents - and
+   * that used to work.
+   *
+   * Right now though there is a bug in between Clutter and St that causes
+   * the cached X position to be garbage by the time we need to check it to
+   * avoid relayouts. This causes an neverending asynchronous loop between
+   * Xorg and GNOME Shell when there is any systray icon around.
+   *
+   * While the actual bug isn't fixed, though, manually keep track of the
+   * number of allocations and prevent the layout cycle. 4 is the hardcoded
+   * number because:
+   *
+   *  * 1st allocation happens during the initial size negotiation, and it
+   *    must be kept;
+   *  * 2nd allocation is the response to the 1st one;
+   *  * 3rd is the actual, valid allocation that Clutter does;
+   *  * 4th time is the first allocation from the Panel.Panel class;
+   *
+   * After that, every other allocation should be ignored, becuase they're
+   * the asynchronous responses to their previous allocations. This breaks
+   * the allocation cycle.
+   */
+  if (priv->n_allocations >= 4)
+    {
+      priv->n_allocations--;
+      return;
+    }
+
   /* Find the actor's new coordinates in terms of the stage (which is
    * priv->window's parent window.
    */
@@ -293,6 +339,8 @@ shell_gtk_embed_allocate (ClutterActor          *actor,
 
       actor = clutter_actor_get_parent (actor);
     }
+
+  priv->n_allocations++;
 
   _shell_embedded_window_allocate (priv->window,
                                    (int)(0.5 + wx), (int)(0.5 + wy),
