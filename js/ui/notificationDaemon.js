@@ -817,12 +817,12 @@ var GtkNotificationDaemon = new Lang.Class({
         if (this._sources[appId])
             return this._sources[appId];
 
-        if (appId == Clubhouse.CLUBHOUSE_ID) {
-            this._sources[appId] = new Clubhouse.ClubhouseNotificationSource(appId);
-            return this._sources[appId];
-        }
+        let source;
 
-        let source = new GtkNotificationDaemonAppSource(appId);
+        if (appId == Clubhouse.CLUBHOUSE_ID)
+            source = new Clubhouse.ClubhouseNotificationSource(appId);
+        else
+            source = new GtkNotificationDaemonAppSource(appId);
 
         source.connect('destroy', Lang.bind(this, function() {
             delete this._sources[appId];
