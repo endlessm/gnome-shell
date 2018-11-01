@@ -36,6 +36,8 @@ const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
 
+const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
+
 const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
 
@@ -247,6 +249,8 @@ var ClubhouseComponent = new Lang.Class({
         this._banner = null;
         this._clubhouseSource = null;
         this._clubhouseProxyHandler = 0;
+
+        this._oldAddNotificationFunc = null;
     },
 
     enable: function() {
@@ -273,12 +277,7 @@ var ClubhouseComponent = new Lang.Class({
             this.hide(global.get_current_time());
         });
 
-        this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
-        this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
-
-        // Inject this source in GtkNotificationDaemon's lookup table
-        Main.notificationDaemon._gtkNotificationDaemon._sources[CLUBHOUSE_ID] =
-            this._clubhouseSource;
+        this._overrideAddNotification();
     },
 
     disable: function() {
@@ -294,6 +293,10 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseButtonManager.destroy();
         this._clubhouseButtonManager = null;
         this._clubhouseSource = null;
+
+        // Reset the AddNotificationAsync old prototype
+        if (this._oldAddNotificationFunc)
+            GtkNotificationDaemon.prototype.AddNotificationAsync = this._oldAddNotificationFunc;
     },
 
     callShow: function(timestamp) {
@@ -302,6 +305,20 @@ var ClubhouseComponent = new Lang.Class({
 
     callHide: function(timestamp) {
         this.proxy.hideRemote(timestamp);
+    },
+
+    _getClubhouseSource: function() {
+        if (this._clubhouseSource != null)
+            return this._clubhouseSource;
+
+        this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
+        this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
+        this._clubhouseSource.connect('destroy', () => {
+            this._clubhouseSource.activateAction('stop-quest', null);
+            this._clubhouseSource = null;
+        })
+
+        return this._clubhouseSource;
     },
 
     _clearBanner: function() {
@@ -326,6 +343,23 @@ var ClubhouseComponent = new Lang.Class({
         return eosImageVersion && eosImageVersion.startsWith('hack-');
     },
 
+    _overrideAddNotification: function() {
+        this._oldAddNotificationFunc = GtkNotificationDaemon.prototype.AddNotificationAsync;
+        GtkNotificationDaemon.prototype.AddNotificationAsync = (params, invocation) => {
+            let [appId, notificationId, notification] = params;
+
+            // If the app sending the notification is the Clubhouse, then use our own source
+            if (appId == CLUBHOUSE_ID) {
+                this._getClubhouseSource().addNotification(notificationId, notification, true);
+                invocation.return_value(null);
+                return;
+            }
+
+            this._oldAddNotificationFunc.apply(Main.notificationDaemon._gtkNotificationDaemon,
+                                               [params, invocation]);
+        }
+    },
+
     _onNotify: function(source, notification) {
         notification.connect('destroy', (notification, reason) => {
             if (reason != MessageTray.NotificationDestroyedReason.REPLACED &&
@@ -344,7 +378,7 @@ var ClubhouseComponent = new Lang.Class({
 
     _dismissQuest: function() {
         // Stop the quest since the banner has been dismissed
-        if (this.proxy.g_name_owner)
+        if (this.proxy.g_name_owner && this._clubhouseSource)
             this._clubhouseSource.activateAction('stop-quest', null);
     },
 });
