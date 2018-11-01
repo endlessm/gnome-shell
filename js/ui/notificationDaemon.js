@@ -794,6 +794,11 @@ const GtkNotificationsIface = '<node> \
 </interface> \
 </node>';
 
+// It's important that this is only imported after GtkNotificationDaemonNotification
+// and GtkNotificationDaemonAppSource have been defined, since clubhouse.js will
+// extend them.
+const Clubhouse = imports.ui.components.clubhouse;
+
 var GtkNotificationDaemon = new Lang.Class({
     Name: 'GtkNotificationDaemon',
 
@@ -811,6 +816,11 @@ var GtkNotificationDaemon = new Lang.Class({
     _ensureAppSource: function(appId) {
         if (this._sources[appId])
             return this._sources[appId];
+
+        if (appId == Clubhouse.CLUBHOUSE_ID) {
+            this._sources[appId] = new Clubhouse.ClubhouseNotificationSource(appId);
+            return this._sources[appId];
+        }
 
         let source = new GtkNotificationDaemonAppSource(appId);
 

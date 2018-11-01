@@ -36,7 +36,7 @@ const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
 
-const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
+var CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
 
 const ClubhouseIface =
@@ -273,12 +273,10 @@ var ClubhouseComponent = new Lang.Class({
             this.hide(global.get_current_time());
         });
 
-        this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
+        // Trigger creation of our source, and connect to it
+        this._clubhouseSource =
+            Main.notificationDaemon._gtkNotificationDaemon._ensureAppSource(CLUBHOUSE_ID);
         this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
-
-        // Inject this source in GtkNotificationDaemon's lookup table
-        Main.notificationDaemon._gtkNotificationDaemon._sources[CLUBHOUSE_ID] =
-            this._clubhouseSource;
     },
 
     disable: function() {
