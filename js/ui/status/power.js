@@ -73,14 +73,13 @@ var Indicator = new Lang.Class({
     _getStatus: function() {
         let seconds = 0;
 
-        if (this._proxy.State == UPower.DeviceState.FULLY_CHARGED ||
-            this._proxy.State == UPower.DeviceState.PENDING_CHARGE)
+        if (this._proxy.State == UPower.DeviceState.FULLY_CHARGED)
             return _("Fully Charged");
         else if (this._proxy.State == UPower.DeviceState.CHARGING)
             seconds = this._proxy.TimeToFull;
         else if (this._proxy.State == UPower.DeviceState.DISCHARGING)
             seconds = this._proxy.TimeToEmpty;
-        // state is PENDING_DISCHARGE
+        // state is one of PENDING_CHARGING, PENDING_DISCHARGING
         else
             return _("Estimating…");
 
