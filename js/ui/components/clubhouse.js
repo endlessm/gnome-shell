@@ -87,6 +87,10 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this.actor.x = monitor.x + monitor.width - (this.actor.width + margin);
         this.actor.y = margin;
     },
+
+    _onClicked: function() {
+        // Do nothing because we don't want to activate the Clubhouse ATM
+    },
 });
 
 var ClubhouseNotification = new Lang.Class({
