@@ -137,6 +137,8 @@ var ClubhouseButtonManager = new Lang.Class({
         this._clubhouseWindowActor = null;
         this._clubhouseNotifyHandler = 0;
 
+        this._visible = true;
+
         this._updateVisibility();
 
         // If the Clubhouse is open and the Shell is restarted, then global.get_window_actors()
@@ -170,8 +172,8 @@ var ClubhouseButtonManager = new Lang.Class({
     },
 
     _updateVisibility: function() {
-        this._closeButton.visible = !Main.overview.visible && this._clubhouseWindowActor;
-        this._openButton.visible = !this._closeButton.visible;
+        this._closeButton.visible = this._visible && !Main.overview.visible && this._clubhouseWindowActor;
+        this._openButton.visible = this._visible && !this._closeButton.visible;
         this._reposition();
     },
 
@@ -235,6 +237,11 @@ var ClubhouseButtonManager = new Lang.Class({
         this._closeButton.destroy();
         this._openButton.destroy();
     },
+
+    setVisible: function(visible) {
+        this._visible = visible;
+        this._updateVisibility();
+    }
 });
 Signals.addSignalMethods(ClubhouseButtonManager.prototype);
 
@@ -249,29 +256,12 @@ var ClubhouseComponent = new Lang.Class({
 
         this.parent(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
 
-        this._clubhouseButtonManager = null;
+        this._enabled = false;
+
         this._banner = null;
         this._clubhouseSource = null;
-        this._clubhouseProxyHandler = 0;
-
         this._oldAddNotificationFunc = null;
-    },
-
-    enable: function() {
-        if (!this._useClubhouse) {
-            log('Cannot enable Clubhouse in this image version');
-            return;
-        }
-
-        this.parent();
-
-        this._clubhouseProxyHandler =
-            this.proxy.connect('notify::g-name-owner', () => {
-                if (!this.proxy.g_name_owner) {
-                    log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
-                    this._clearBanner();
-                }
-            });
+        this._clubhouseProxyHandler = 0;
 
         this._clubhouseButtonManager = new ClubhouseButtonManager();
         this._clubhouseButtonManager.connect('open-clubhouse', () => {
@@ -284,23 +274,35 @@ var ClubhouseComponent = new Lang.Class({
         this._overrideAddNotification();
     },
 
+    enable: function() {
+        if (!this._useClubhouse) {
+            log('Cannot enable Clubhouse in this image version');
+            return;
+        }
+
+        this.parent();
+
+        if (this._clubhouseProxyHandler == 0) {
+            this._clubhouseProxyHandler = this.proxy.connect('notify::g-name-owner', () => {
+                if (!this.proxy.g_name_owner) {
+                    log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
+                    this._clearBanner();
+                }
+            });
+        }
+
+        this._enabled = true;
+        this._syncVisibility();
+    },
+
     disable: function() {
         if (!this._useClubhouse)
             return;
 
-        this._clearBanner();
-
-        if (this._clubhouseProxyHandler > 0)
-            this.proxy.disconnect(this._clubhouseProxyHandler);
-
         this.parent();
-        this._clubhouseButtonManager.destroy();
-        this._clubhouseButtonManager = null;
-        this._clubhouseSource = null;
 
-        // Reset the AddNotificationAsync old prototype
-        if (this._oldAddNotificationFunc)
-            GtkNotificationDaemon.prototype.AddNotificationAsync = this._oldAddNotificationFunc;
+        this._enabled = false;
+        this._syncVisibility();
     },
 
     callShow: function(timestamp) {
@@ -378,12 +380,23 @@ var ClubhouseComponent = new Lang.Class({
             Main.layoutManager.addChrome(this._banner.actor);
             this._banner.reposition();
         }
+
+        // Sync the visibility here because the screen may be locked when a notification
+        // happens
+        this._syncVisibility();
     },
 
     _dismissQuest: function() {
         // Stop the quest since the banner has been dismissed
         if (this.proxy.g_name_owner && this._clubhouseSource)
             this._clubhouseSource.activateAction('stop-quest', null);
+    },
+
+    _syncVisibility: function() {
+        this._clubhouseButtonManager.setVisible(this._enabled);
+
+        if (this._banner)
+            this._banner.actor.visible = this._enabled;
     },
 });
 var Component = ClubhouseComponent;
