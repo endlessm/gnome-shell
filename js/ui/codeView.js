@@ -16,6 +16,7 @@ const AppActivation = imports.ui.appActivation;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Tweener = imports.ui.tweener;
+const SoundServer = imports.misc.soundServer;
 
 const WINDOW_ANIMATION_TIME = 0.25;
 
@@ -201,6 +202,9 @@ var WindowTrackingButton = new Lang.Class({
         params = Params.parse(params, buttonParams, true);
 
         this.parent(params);
+
+        this.connect('notify::hover', this._onHoverChanged.bind(this));
+        this.connect('clicked', this._onClick.bind(this));
     },
 
     vfunc_allocate: function(box, flags) {
@@ -265,6 +269,24 @@ var WindowTrackingButton = new Lang.Class({
     set state(value) {
         this.child.flipped = value == STATE_TOOLBOX;
     },
+
+    _onHoverChanged: function() {
+        if (this.hover) {
+            if (!this.child.flipped) {
+                SoundServer.getDefault().play('shell/tracking-button/flip/enter');
+            } else {
+                SoundServer.getDefault().play('shell/tracking-button/flip-inverse/enter');
+            }
+        }
+    },
+
+    _onClick: function() {
+        if (!this.child.flipped) {
+            SoundServer.getDefault().play('shell/tracking-button/flip/click');
+        } else {
+            SoundServer.getDefault().play('shell/tracking-button/flip-inverse/click');
+        }
+    }
 });
 
 var CodingSession = new Lang.Class({
