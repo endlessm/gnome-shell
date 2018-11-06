@@ -51,6 +51,7 @@ const ClubhouseIface =
       <arg type="u" direction="in" name="timestamp"/> \
     </method> \
     <property name="Visible" type="b" access="read"/> \
+    <signal name="SuggestOpen" /> \
   </interface> \
 </node>';
 
@@ -118,12 +119,30 @@ var ClubhouseNotificationSource = new Lang.Class({
     },
 });
 
+var ClubhouseOpenButton = new Lang.Class({
+    Name: 'ClubhouseOpenButton',
+    Extends: St.Button,
+
+    _init: function(params) {
+        params = params || {};
+        this._icon = new St.Icon({ style_class: 'clubhouse-open-button-icon' });
+        params.child = this._icon;
+        this.parent(params);
+    },
+
+    setHighlighted: function(highlighted) {
+        if (highlighted)
+            this._icon.add_style_pseudo_class('highlighted');
+        else
+            this._icon.remove_style_pseudo_class('highlighted');
+    },
+});
+
 var ClubhouseButtonManager = new Lang.Class({
     Name: 'ClubhouseButtonManager',
 
     _init: function() {
-        this._openButton =
-            new St.Button({ child: new St.Icon({ style_class: 'clubhouse-open-button-icon' }) });
+        this._openButton = new ClubhouseOpenButton();
         this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
 
         Main.layoutManager.addChrome(this._openButton);
@@ -223,6 +242,10 @@ var ClubhouseButtonManager = new Lang.Class({
         this._clubhouseWindowActor = null;
     },
 
+    setSuggestOpen: function(suggestOpen) {
+        this._openButton.setHighlighted(suggestOpen);
+    },
+
     destroy: function() {
         Main.overview.disconnect(this._overviewShowingHandler);
         this._overviewShowingHandler = 0;
@@ -262,12 +285,15 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseSource = null;
         this._oldAddNotificationFunc = null;
         this._clubhouseProxyHandler = 0;
+        this._clubhouseProxySuggestOpenHandler = 0;
 
         this._clubhouseButtonManager = new ClubhouseButtonManager();
         this._clubhouseButtonManager.connect('open-clubhouse', () => {
+            this._clubhouseButtonManager.setSuggestOpen(false);
             this.show(global.get_current_time());
         });
         this._clubhouseButtonManager.connect('close-clubhouse', () => {
+            this._clubhouseButtonManager.setSuggestOpen(false);
             this.hide(global.get_current_time());
         });
 
@@ -289,6 +315,13 @@ var ClubhouseComponent = new Lang.Class({
                     this._clearBanner();
                 }
             });
+        }
+
+        if (this._clubhouseProxySuggestOpenHandler == 0) {
+            this._clubhouseProxySuggestOpenHandler =
+                this.proxy.connectSignal('SuggestOpen', () => {
+                    this._clubhouseButtonManager.setSuggestOpen(true);
+                });
         }
 
         this._enabled = true;
