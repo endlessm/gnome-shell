@@ -262,25 +262,15 @@ var ClubhouseButtonManager = new Lang.Class({
 
         this._updateVisibility();
 
-        // If the Clubhouse is open and the Shell is restarted, then global.get_window_actors()
-        // will still not have any contents when components are initialized, and there's no "map"
-        // signal emitted from the Window Manager either. So instead of relying on the map signal
-        // (which would allow us to track windows individually instead of always having to check the
-        // current list of windows) we connect to the screen's "restacked" signal.
-        this._restackedHandler = global.screen.connect('restacked',
-                                                       this._trackWindowActor.bind(this));
-        this._overviewShowingHandler = Main.overview.connect('showing',
-                                                             this._updateVisibility.bind(this));
-        this._overviewHiddenHandler = Main.overview.connect('hidden',
-                                                            this._updateVisibility.bind(this));
-        this._sessionModeHandler = Main.sessionMode.connect('updated',
-                                                            this._updateVisibility.bind(this));
+        getClubhouseWindowTracker().connect('window-changed', this._updateVisibility.bind(this));
     },
 
     _updateCloseButtonPosition: function() {
         this._closeButton.y = this._openButton.y;
-        if (this._clubhouseWindowActor)
-            this._closeButton.x = this._clubhouseWindowActor.x - this._closeButton.width / 2;
+
+        let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
+        if (clubhouseWindowX != -1)
+            this._closeButton.x = clubhouseWindowX - this._closeButton.width / 2;
     },
 
     _reposition: function() {
@@ -295,57 +285,10 @@ var ClubhouseButtonManager = new Lang.Class({
     },
 
     _updateVisibility: function() {
-        this._closeButton.visible = this._visible && Main.sessionMode.hasOverview &&
-                                    !Main.overview.visible && this._clubhouseWindowActor;
+        this._closeButton.visible = this._visible && getClubhouseWindowTracker().getWindowX() != -1;
         this._openButton.visible = this._visible && Main.sessionMode.hasOverview &&
                                    !this._closeButton.visible;
         this._reposition();
-    },
-
-    _getClubhouseActorFromWM: function() {
-        return global.get_window_actors().find((actor) => {
-            return (actor.meta_window.get_gtk_application_id() == CLUBHOUSE_ID);
-        });
-    },
-
-    _trackWindowActor: function() {
-        let actor = this._getClubhouseActorFromWM();
-        if (!actor)
-            return;
-
-        if (this._clubhouseWindowActor == actor)
-            return;
-
-        // Reset the current window actor
-        this._untrackWindowActor();
-
-        this._clubhouseWindowActor = actor;
-        this._updateVisibility();
-
-        // Track Clubhouse's window actor to make the closeButton always show on top of
-        // the Clubhouse's window edge
-        this._clubhouseNotifyHandler = actor.connect('notify::x',
-                                                     this._updateCloseButtonPosition.bind(this));
-
-        this._clubhouseDestroyHandler = actor.connect('destroy', () => {
-            this._untrackWindowActor();
-
-            this._updateVisibility();
-        });
-    },
-
-    _untrackWindowActor: function() {
-        if (!this._clubhouseWindowActor)
-            return;
-
-        // Reset the current window actor
-        this._clubhouseWindowActor.disconnect(this._clubhouseNotifyHandler);
-        this._clubhouseNotifyHandler = 0;
-
-        this._clubhouseWindowActor.disconnect(this._clubhouseDestroyHandler);
-        this._clubhouseDestroyHandler = 0;
-
-        this._clubhouseWindowActor = null;
     },
 
     setSuggestOpen: function(suggestOpen) {
