@@ -352,24 +352,6 @@ var ClubhouseButtonManager = new Lang.Class({
         this._openButton.setHighlighted(suggestOpen);
     },
 
-    destroy: function() {
-        Main.overview.disconnect(this._overviewShowingHandler);
-        this._overviewShowingHandler = 0;
-
-        Main.overview.disconnect(this._overviewHiddenHandler);
-        this._overviewHiddenHandler = 0;
-
-        Main.sessionMode.disconnect(this._sessionModeHandler);
-        this._sessionModeHandler = 0;
-
-        global.screen.disconnect(this._restackedHandler);
-        this._restackedHandler = 0;
-
-        this._untrackWindowActor();
-        this._closeButton.destroy();
-        this._openButton.destroy();
-    },
-
     setVisible: function(visible) {
         this._visible = visible;
         this._updateVisibility();
