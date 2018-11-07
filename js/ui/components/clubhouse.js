@@ -171,6 +171,8 @@ var ClubhouseButtonManager = new Lang.Class({
                                                              this._updateVisibility.bind(this));
         this._overviewHiddenHandler = Main.overview.connect('hidden',
                                                             this._updateVisibility.bind(this));
+        this._sessionModeHandler = Main.sessionMode.connect('updated',
+                                                            this._updateVisibility.bind(this));
     },
 
     _updateCloseButtonPosition: function() {
@@ -191,7 +193,8 @@ var ClubhouseButtonManager = new Lang.Class({
     },
 
     _updateVisibility: function() {
-        this._closeButton.visible = this._visible && !Main.overview.visible && this._clubhouseWindowActor;
+        this._closeButton.visible = this._visible && Main.sessionMode.hasOverview &&
+                                    !Main.overview.visible && this._clubhouseWindowActor;
         this._openButton.visible = this._visible && !this._closeButton.visible;
         this._reposition();
     },
@@ -252,6 +255,9 @@ var ClubhouseButtonManager = new Lang.Class({
 
         Main.overview.disconnect(this._overviewHiddenHandler);
         this._overviewHiddenHandler = 0;
+
+        Main.sessionMode.disconnect(this._sessionModeHandler);
+        this._sessionModeHandler = 0;
 
         global.screen.disconnect(this._restackedHandler);
         this._restackedHandler = 0;
