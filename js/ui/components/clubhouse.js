@@ -148,7 +148,19 @@ var ClubhouseNotificationBanner = new Lang.Class({
     Extends: MessageTray.NotificationBanner,
 
     _init: function(notification) {
+        this._textPages = [];
+        this._textIdx = 0;
+        this._splitTextInPages(notification.bannerBodyText);
+
+        // We will show the text differently, so have the parent set no text for now
+        notification.bannerBodyText = '';
+
         this.parent(notification);
+
+        this._setNextPage();
+
+        if (this._textPages.length > 1)
+            this._setupNextPageButton();
 
         // We don't have an "unexpanded" state for now
         this.expand(false);
@@ -173,6 +185,19 @@ var ClubhouseNotificationBanner = new Lang.Class({
         });
     },
 
+    _addActions: function() {
+        // Only set up the actions if we're showing the last page of text
+        if (!this._inLastPage())
+            return;
+
+        this.parent();
+    },
+
+    _splitTextInPages: function(fulltext) {
+        // @todo: Ensure that paragraphs longer than 5 lines (in the banner) is also split up
+        this._textPages = fulltext.split('\n\n');
+    },
+
     reposition: function() {
         let monitor = Main.layoutManager.primaryMonitor;
         if (!monitor)
@@ -193,6 +218,33 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
     _onClicked: function() {
         // Do nothing because we don't want to activate the Clubhouse ATM
+    },
+
+    _setNextPage: function() {
+        if (this._inLastPage())
+            return;
+
+        this.setBody(this._textPages[this._textIdx++]);
+    },
+
+    _inLastPage: function() {
+        return this._textIdx == this._textPages.length;
+    },
+
+    _setupNextPageButton: function() {
+        let button = new St.Button({ style_class: 'notification-button',
+                                     label: '»',
+                                     x_expand: true,
+                                     can_focus: true });
+
+        return this.addButton(button, () => {
+            this._setNextPage();
+
+            if (this._inLastPage()) {
+                button.destroy();
+                this._addActions();
+            }
+        });
     },
 });
 
