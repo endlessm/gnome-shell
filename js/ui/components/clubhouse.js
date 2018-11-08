@@ -195,7 +195,8 @@ var ClubhouseButtonManager = new Lang.Class({
     _updateVisibility: function() {
         this._closeButton.visible = this._visible && Main.sessionMode.hasOverview &&
                                     !Main.overview.visible && this._clubhouseWindowActor;
-        this._openButton.visible = this._visible && !this._closeButton.visible;
+        this._openButton.visible = this._visible && Main.sessionMode.hasOverview &&
+                                   !this._closeButton.visible;
         this._reposition();
     },
 
