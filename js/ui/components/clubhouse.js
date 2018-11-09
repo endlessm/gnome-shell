@@ -248,12 +248,38 @@ var ClubhouseNotificationBanner = new Lang.Class({
     },
 });
 
+var ClubhouseItemBanner = new Lang.Class({
+    Name: 'ClubhouseItemBanner',
+    Extends: ClubhouseNotificationBanner,
+
+    _init: function(notification) {
+        this.parent(notification);
+        this._topBanner = null;
+
+        this._addActions();
+    },
+
+    setTopBanner: function(topBanner) {
+        this._topBanner = topBanner;
+        this.reposition();
+    },
+
+    reposition: function() {
+        this.parent();
+
+        if (this._topBanner && this._topBanner.actor)
+            this.actor.y += this._topBanner.actor.height;
+    },
+});
+
 var ClubhouseNotification = new Lang.Class({
     Name: 'ClubhouseNotification',
     Extends: NotificationDaemon.GtkNotificationDaemonNotification,
 
     _init: function(source, notification) {
         this.parent(source, notification);
+
+        this.notificationId = notification.notificationId.unpack();
 
         // Avoid destroying the notification when clicking it
         this.setResident(true);
@@ -264,11 +290,30 @@ var ClubhouseNotification = new Lang.Class({
     },
 });
 
+var ClubhouseItemNotification = new Lang.Class({
+    Name: 'ClubhouseItemNotification',
+    Extends: ClubhouseNotification,
+
+    _init: function(source, notification) {
+        this.parent(source, notification);
+        this.setResident(false);
+    },
+
+    createBanner: function() {
+        return new ClubhouseItemBanner(this)
+    },
+});
+
 var ClubhouseNotificationSource = new Lang.Class({
     Name: 'ClubhouseNotificationSource',
     Extends: NotificationDaemon.GtkNotificationDaemonAppSource,
 
     _createNotification: function(params) {
+        let notificationId = params.notificationId.unpack();
+
+        if (notificationId == 'quest-item')
+            return new ClubhouseItemNotification(this, params);
+
         return new ClubhouseNotification(this, params);
     },
 });
@@ -367,7 +412,7 @@ var ClubhouseComponent = new Lang.Class({
 
         this._enabled = false;
 
-        this._banner = null;
+        this._questBanner = null;
         this._clubhouseSource = null;
         this._oldAddNotificationFunc = null;
         this._clubhouseProxyHandler = 0;
@@ -398,7 +443,7 @@ var ClubhouseComponent = new Lang.Class({
             this._clubhouseProxyHandler = this.proxy.connect('notify::g-name-owner', () => {
                 if (!this.proxy.g_name_owner) {
                     log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
-                    this._clearBanner();
+                    this._clearQuestBanner();
                 }
             });
         }
@@ -446,12 +491,27 @@ var ClubhouseComponent = new Lang.Class({
         return this._clubhouseSource;
     },
 
-    _clearBanner: function() {
-        if (!this._banner)
+    _syncBanners: function() {
+        if (this._itemBanner)
+            this._itemBanner.setTopBanner(this._questBanner);
+    },
+
+    _clearQuestBanner: function() {
+        if (!this._questBanner)
             return;
 
-        this._banner.actor.destroy();
-        this._banner = null;
+        this._questBanner.actor.destroy();
+        this._questBanner = null;
+
+        this._syncBanners();
+    },
+
+    _clearItemBanner: function() {
+        if (!this._itemBanner)
+            return;
+
+        this._itemBanner.actor.destroy();
+        this._itemBanner = null;
     },
 
     _hasClubhouse: function() {
@@ -475,6 +535,7 @@ var ClubhouseComponent = new Lang.Class({
 
             // If the app sending the notification is the Clubhouse, then use our own source
             if (appId == CLUBHOUSE_ID) {
+                notification['notificationId'] = new GLib.Variant('s', notificationId);
                 this._getClubhouseSource().addNotification(notificationId, notification, true);
                 invocation.return_value(null);
                 return;
@@ -486,19 +547,35 @@ var ClubhouseComponent = new Lang.Class({
     },
 
     _onNotify: function(source, notification) {
-        notification.connect('destroy', (notification, reason) => {
-            if (reason != MessageTray.NotificationDestroyedReason.REPLACED &&
-                reason != MessageTray.NotificationDestroyedReason.SOURCE_CLOSED)
-                this._dismissQuest();
+        // @todo: Abstract the banner logic into the notifications themselves as much as possible
+        // (to just keep track of when they're destroyed).
+        if (notification.notificationId == 'quest-message') {
+            notification.connect('destroy', (notification, reason) => {
+                if (reason != MessageTray.NotificationDestroyedReason.REPLACED &&
+                    reason != MessageTray.NotificationDestroyedReason.SOURCE_CLOSED)
+                    this._dismissQuest();
 
-            this._clearBanner();
-        });
+                this._clearQuestBanner();
+            });
 
-        if (!this._banner) {
-            this._banner = notification.createBanner();
-            Main.layoutManager.addChrome(this._banner.actor);
-            this._banner.reposition();
+            if (!this._questBanner) {
+                this._questBanner = notification.createBanner();
+                Main.layoutManager.addChrome(this._questBanner.actor);
+                this._questBanner.reposition();
+            }
+        } else if (notification.notificationId == 'quest-item') {
+            notification.connect('destroy', (notification, reason) => {
+                this._clearItemBanner();
+            });
+
+            if (!this._itemBanner) {
+                this._itemBanner = notification.createBanner();
+                Main.layoutManager.addChrome(this._itemBanner.actor);
+                this._itemBanner.reposition();
+            }
         }
+
+        this._syncBanners();
 
         // Sync the visibility here because the screen may be locked when a notification
         // happens
@@ -514,8 +591,11 @@ var ClubhouseComponent = new Lang.Class({
     _syncVisibility: function() {
         this._clubhouseButtonManager.setVisible(this._enabled);
 
-        if (this._banner)
-            this._banner.actor.visible = this._enabled;
+        if (this._questBanner)
+            this._questBanner.actor.visible = this._enabled;
+
+        if (this._itemBanner)
+            this._itemBanner.actor.visible = this._enabled;
     },
 });
 var Component = ClubhouseComponent;
