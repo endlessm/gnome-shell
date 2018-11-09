@@ -29,7 +29,9 @@ const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
 
 const _HACK_SHADER_MAP = {
     'none': null,
-    'desaturate': Shell.CodeViewEffect
+    'desaturate': { constructor: Shell.CodeViewEffect,
+                    colors: ['#05213f', '#031c39', '#00275c', '#8d6531', '#f4f1a2'],
+                    points: [0.00, 0.07, 0.32, 0.65, 1.00] }
 };
 const _HACK_DEFAULT_SHADER = 'desaturate';
 
@@ -491,9 +493,10 @@ var CodingSession = new Lang.Class({
             if (!shaderEffect)
                 shaderEffect = _HACK_DEFAULT_SHADER;
 
-            let shaderProto = _HACK_SHADER_MAP[shaderEffect];
-            if (shaderProto) {
-                effect = new shaderProto({enabled});
+            let shaderDef = _HACK_SHADER_MAP[shaderEffect];
+            if (shaderDef) {
+                effect = new shaderDef.constructor({enabled});
+                effect.set_gradient_stops(shaderDef.colors, shaderDef.points);
                 actor.add_effect_with_name('codeview-effect', effect);
             }
         }
