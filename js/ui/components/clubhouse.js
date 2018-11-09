@@ -149,7 +149,7 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
     _init: function(notification) {
         this._textPages = [];
-        this._textIdx = 0;
+        this._textIdx = -1;
         this._splitTextInPages(notification.bannerBodyText);
 
         // We will show the text differently, so have the parent set no text for now
@@ -224,11 +224,13 @@ var ClubhouseNotificationBanner = new Lang.Class({
         if (this._inLastPage())
             return;
 
-        this.setBody(this._textPages[this._textIdx++]);
+        this.setBody(this._textPages[++this._textIdx]);
+        if (this._inLastPage())
+            this._addActions();
     },
 
     _inLastPage: function() {
-        return this._textIdx == this._textPages.length;
+        return this._textIdx == this._textPages.length - 1;
     },
 
     _setupNextPageButton: function() {
@@ -240,10 +242,8 @@ var ClubhouseNotificationBanner = new Lang.Class({
         return this.addButton(button, () => {
             this._setNextPage();
 
-            if (this._inLastPage()) {
+            if (this._inLastPage())
                 button.destroy();
-                this._addActions();
-            }
         });
     },
 });
