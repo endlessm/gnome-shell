@@ -468,9 +468,9 @@ var CodingSession = GObject.registerClass({
         this._hackModeChangedId = global.settings.connect('changed::hack-mode-enabled',
             this._syncButtonVisibility.bind(this));
         this._overviewHiddenId = Main.overview.connect('hidden',
-            this._syncButtonVisibility.bind(this));
+            this._overviewStateChanged.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
-            this._syncButtonVisibility.bind(this));
+            this._overviewStateChanged.bind(this));
         this._sessionModeChangedId = Main.sessionMode.connect('updated',
             this._syncButtonVisibility.bind(this));
         this._focusWindowId = global.display.connect('notify::focus-window',
@@ -1102,6 +1102,15 @@ var CodingSession = GObject.registerClass({
         this.emit('unminimized');
     }
 
+    _overviewStateChanged() {
+        let actor = this._actorForCurrentState();
+        let otherActor = this._getOtherActor(actor);
+        if (otherActor)
+            this._setEffectsEnabled(otherActor, !Main.overview.visible);
+
+        this._syncButtonVisibility();
+    }
+
     _syncButtonVisibility() {
         let focusedWindow = global.display.get_focus_window();
         if (!focusedWindow)
@@ -1182,6 +1191,8 @@ var CodingSession = GObject.registerClass({
             this._activateAppFlip();
             focusedActor.rotation_angle_y = 0;
             actor.rotation_angle_y = 180;
+            this._setEffectsEnabled(focusedActor, false);
+            this._setEffectsEnabled(actor, true);
         }
 
         // Ensure correct stacking order by activating the window that just got focus.
@@ -1224,6 +1235,9 @@ var CodingSession = GObject.registerClass({
         src.rotation_angle_y = 0;
         newDst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
         src.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
+
+        // Pre-create the effect if it hasn't been already
+        this._setEffectsEnabled(src, false);
 
         if (oldDst) {
             oldDst.rotation_angle_y = newDst.rotation_angle_y;
@@ -1269,6 +1283,8 @@ var CodingSession = GObject.registerClass({
 
     _rotateOutToMidpointCompleted(src, direction) {
         this._activateAppFlip();
+
+        this._setEffectsEnabled(src, true);
 
         src.ease_property(
             'rotation_angle_y',
