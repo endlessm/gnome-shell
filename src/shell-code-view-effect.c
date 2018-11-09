@@ -248,27 +248,41 @@ shell_code_view_effect_init (ShellCodeViewEffect *self)
 
   priv->pipeline = cogl_pipeline_copy (klass->base_pipeline);
 
-  /* FIXME: this should not be hardcoded here, and be set ideally from
-   * the CSS theme.
-   */
-  clutter_color_from_string (&priv->gradient_colors[0], "#05213f");
-  clutter_color_from_string (&priv->gradient_colors[1], "#031c39");
-  clutter_color_from_string (&priv->gradient_colors[2], "#00275c");
-  clutter_color_from_string (&priv->gradient_colors[3], "#8d6531");
-  clutter_color_from_string (&priv->gradient_colors[4], "#f4f1a2");
-
-  priv->gradient_points[0] = 0.00f;
-  priv->gradient_points[1] = 0.07f;
-  priv->gradient_points[2] = 0.32f;
-  priv->gradient_points[3] = 0.65f;
-  priv->gradient_points[4] = 1.00f;
-
   priv->gradient_colors_uniform =
     cogl_pipeline_get_uniform_location (priv->pipeline, "colors");
   priv->gradient_points_uniform =
     cogl_pipeline_get_uniform_location (priv->pipeline, "points");
 
   update_gradient_uniforms (self);
+}
+
+/**
+ * shell_code_view_effect_set_gradient_stops:
+ * @effect: a #ShellCodeViewEffect
+ * @gradient_colors: (array length=gradient_len) (element-type utf8): gradient colors
+ * @gradient_points: (array length=gradient_len) (element-type gfloat): gradient points
+ * @gradient_len: length of gradient stops
+ *
+ * Set the gradient colors and stop points for this effect.
+ */
+void
+shell_code_view_effect_set_gradient_stops (ShellCodeViewEffect *effect,
+                                           gchar **gradient_colors,
+                                           gfloat *gradient_points,
+                                           gsize gradient_len)
+{
+  ShellCodeViewEffectPrivate *priv = shell_code_view_effect_get_instance_private (effect);
+  gint i;
+
+  g_return_if_fail (gradient_colors != NULL);
+  g_return_if_fail (gradient_points != NULL);
+  g_return_if_fail (gradient_len == 5);
+
+  memcpy (priv->gradient_points, gradient_points, sizeof (gfloat) * gradient_len);
+  for (i = 0; i < gradient_len; i++)
+    clutter_color_from_string (&priv->gradient_colors[i], gradient_colors[i]);
+
+  update_gradient_uniforms (effect);
 }
 
 /**

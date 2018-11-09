@@ -37,6 +37,11 @@ G_DECLARE_DERIVABLE_TYPE (ShellCodeViewEffect, shell_code_view_effect,
 
 ClutterEffect *shell_code_view_effect_new        (void);
 
+void shell_code_view_effect_set_gradient_stops (ShellCodeViewEffect *effect,
+                                                gchar **gradient_colors,
+                                                gfloat *gradient_points,
+                                                gsize gradient_len);
+
 G_END_DECLS
 
 #endif /* __SHELL_CODE_VIEW_EFFECT_H__ */
