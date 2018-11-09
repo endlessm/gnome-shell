@@ -32,11 +32,14 @@ const St = imports.gi.St;
 
 const Lang = imports.lang;
 const Main = imports.ui.main;
+const Mainloop = imports.mainloop;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
 
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
+
+const CLUBHOUSE_BANNER_TIMEOUT_MSEC = 3000;
 
 const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
@@ -182,6 +185,29 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
         this.actor.connect('destroy', () => {
             getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
+        });
+
+        // Hide on timeout if needed
+        this._hideTimeout = 0;
+        if (!notification.resident) {
+            this._resetTimeout();
+            this.actor.connect('notify::hover', this._resetTimeout.bind(this));
+        }
+    },
+
+    _resetTimeout: function() {
+        if (this._hideTimeout > 0) {
+            Mainloop.source_remove(this._hideTimeout);
+            this._hideTimeout = 0;
+        }
+
+        if (this.actor.hover)
+            return;
+
+        // @todo: Gradually fade out so the user sees the banner is going away
+        this._hideTimeout = Mainloop.timeout_add(CLUBHOUSE_BANNER_TIMEOUT_MSEC, () => {
+            this.close();
+            return GLib.SOURCE_REMOVE;
         });
     },
 
