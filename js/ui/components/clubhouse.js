@@ -171,11 +171,11 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
         // Override the style name because this is a not a regular notification
         this.actor.remove_style_class_name('notification-banner');
-        this.actor.add_style_class_name('clubhouse-quest-view');
-        this._iconBin.add_style_class_name('clubhouse-quest-view-icon-bin');
+        this.actor.add_style_class_name('clubhouse-notification');
+        this._iconBin.add_style_class_name('clubhouse-notification-icon-bin');
 
         // Always wrap the body's text
-        this._expandedLabel.actor.add_style_class_name('clubhouse-quest-view-label');
+        this._expandedLabel.actor.add_style_class_name('clubhouse-notification-label');
 
         this._clubhouseTrackerHandler =
             getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
