@@ -440,7 +440,6 @@ var ClubhouseComponent = new Lang.Class({
 
         this._questBanner = null;
         this._clubhouseSource = null;
-        this._oldAddNotificationFunc = null;
         this._clubhouseProxyHandler = 0;
         this._clubhouseProxySuggestOpenHandler = 0;
 
@@ -555,7 +554,7 @@ var ClubhouseComponent = new Lang.Class({
     },
 
     _overrideAddNotification: function() {
-        this._oldAddNotificationFunc = GtkNotificationDaemon.prototype.AddNotificationAsync;
+        let oldAddNotificationFunc = GtkNotificationDaemon.prototype.AddNotificationAsync;
         GtkNotificationDaemon.prototype.AddNotificationAsync = (params, invocation) => {
             let [appId, notificationId, notification] = params;
 
@@ -567,8 +566,8 @@ var ClubhouseComponent = new Lang.Class({
                 return;
             }
 
-            this._oldAddNotificationFunc.apply(Main.notificationDaemon._gtkNotificationDaemon,
-                                               [params, invocation]);
+            oldAddNotificationFunc.apply(Main.notificationDaemon._gtkNotificationDaemon,
+                                         [params, invocation]);
         }
     },
 
