@@ -569,6 +569,22 @@ var ClubhouseComponent = new Lang.Class({
             oldAddNotificationFunc.apply(Main.notificationDaemon._gtkNotificationDaemon,
                                          [params, invocation]);
         }
+
+        let oldRemoveNotificationFunc = GtkNotificationDaemon.prototype.RemoveNotificationAsync;
+        GtkNotificationDaemon.prototype.RemoveNotificationAsync = (params, invocation) => {
+            let [appId, notificationId] = params;
+
+            // If the app sending the notification is the Clubhouse, then use our own source
+            if (appId == CLUBHOUSE_ID) {
+                this._getClubhouseSource().removeNotification(notificationId);
+                invocation.return_value(null);
+                return;
+            }
+
+            oldRemoveNotificationFunc.apply(Main.notificationDaemon._gtkNotificationDaemon,
+                                            [params, invocation]);
+        }
+
     },
 
     _onNotify: function(source, notification) {
