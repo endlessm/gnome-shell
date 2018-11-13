@@ -44,7 +44,6 @@ var Avatar = class {
             iconFile = null;
 
         if (iconFile) {
-            let file = Gio.File.new_for_path(iconFile);
             this.actor.child = null;
             this.actor.style = `
                 background-image: url("${iconFile}");
