@@ -318,10 +318,8 @@ st_widget_texture_cache_changed (StTextureCache *cache,
        * the paint state. We should probably implement a method to
        * the theme node to determine this, but for now, just wipe
        * the entire paint state.
-       *
-       * Use the existing state instead of a new one because it's
-       * assumed the rest of the state will stay the same.
        */
+      next_paint_state (actor);
       st_theme_node_paint_state_invalidate (current_paint_state (actor));
 
       if (clutter_actor_is_mapped (CLUTTER_ACTOR (actor)))
