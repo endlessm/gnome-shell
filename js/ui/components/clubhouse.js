@@ -111,6 +111,10 @@ var ClubhouseWindowTracker = new Lang.Class({
 
         this._windowActor = actor;
 
+        // We need to activate the window directly as otherwise it won't be focused because
+        // of having a DOCK hint type
+        actor.meta_window.activate(global.get_current_time());
+
         this.emit('window-changed');
 
         // Track Clubhouse's window actor to make the closeButton always show on top of
