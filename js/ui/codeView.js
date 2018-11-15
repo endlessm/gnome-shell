@@ -275,13 +275,50 @@ var WindowTrackingButton = new Lang.Class({
         this.child.flipped = value == STATE_TOOLBOX;
     },
 
+    _startHoverSound(flipped) {
+        if (this._hoverSoundID === 'pending')
+            return;
+        if (this._hoverSoundID === 'cancel') {
+            // Hovered in and out and back in quickly, before the first UUID was
+            // returned. In this case, un-cancel the original sound but don't
+            // request another one.
+            this._hoverSoundID = 'pending';
+            return;
+        }
+        this._hoverSoundID = 'pending';
+        const id = flipped ? 'flip-inverse' : 'flip';
+        SoundServer.getDefault().playAsync(`shell/tracking-button/${id}/hover`)
+        .then(uuid => {
+            if (this._hoverSoundID === 'cancel') {
+                SoundServer.getDefault().stop(uuid);
+                this._hoverSoundID = null;
+                return;
+            }
+
+            this._hoverSoundID = uuid;
+        });
+    },
+
+    _stopHoverSound() {
+        if (this._hoverSoundID === 'pending') {
+            this._hoverSoundID = 'cancel';
+        } else if (this._hoverSoundID) {
+            SoundServer.getDefault().stop(this._hoverSoundID);
+            this._hoverSoundID = null;
+        }
+    },
+
     _onHoverChanged: function() {
         if (this.hover) {
             if (!this.child.flipped) {
                 SoundServer.getDefault().play('shell/tracking-button/flip/enter');
+                this._startHoverSound(false);
             } else {
                 SoundServer.getDefault().play('shell/tracking-button/flip-inverse/enter');
+                this._startHoverSound(true);
             }
+        } else {
+            this._stopHoverSound();
         }
     },
 
