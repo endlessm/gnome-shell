@@ -652,6 +652,8 @@ class WindowCyclerPopup extends CyclerPopup {
 var AppIcon = GObject.registerClass(
 class AppIcon extends St.BoxLayout {
     _init(app) {
+        this._cachedWindows = [];
+
         super._init({ style_class: 'alt-tab-app',
                       vertical: true });
 
@@ -675,6 +677,16 @@ class AppIcon extends St.BoxLayout {
 
         minWidth = Math.max(minWidth, forHeight);
         return [minWidth, minWidth];
+    }
+
+    get cachedWindows() {
+        return this._cachedWindows.filter((win) => {
+            return !win._hackIsInactiveWindow;
+        });
+    }
+
+    cacheWindowList(windowList) {
+        this._cachedWindows = windowList;
     }
 });
 
@@ -703,9 +715,10 @@ class AppSwitcher extends SwitcherPopup.SwitcherList {
             let appIcon = new AppIcon(apps[i]);
             // Cache the window list now; we don't handle dynamic changes here,
             // and we don't want to be continually retrieving it
-            appIcon.cachedWindows = allWindows.filter(
+            let windowList = allWindows.filter(
                 w => windowTracker.get_window_app (w) == appIcon.app
             );
+            appIcon.cacheWindowList(windowList);
             if (appIcon.cachedWindows.length > 0)
                 this._addIcon(appIcon);
         }
