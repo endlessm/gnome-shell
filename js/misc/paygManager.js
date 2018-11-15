@@ -270,7 +270,7 @@ var PaygManager = new Lang.Class({
 
     _timeRemainingSecs: function() {
         if (!this._enabled)
-            return GLib.MAXUINT64;
+            return Number.MAX_SAFE_INTEGER;
 
         return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
     },
