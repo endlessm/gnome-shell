@@ -1826,7 +1826,7 @@ var Workspace = new Lang.Class({
 
     // Tests if @win should be shown in the Overview
     _isOverviewWindow : function (win) {
-        return !win.get_meta_window().skip_taskbar;
+        return !win.get_meta_window().skip_taskbar && !win.get_meta_window()._hackIsInactiveWindow;
     },
 
     // Create a clone of a (non-desktop) window and add it to the window list
