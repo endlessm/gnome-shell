@@ -611,6 +611,8 @@ var AppIcon = new Lang.Class({
     Extends: St.BoxLayout,
 
     _init: function(app) {
+        this._cachedWindows = [];
+
         this.parent({ style_class: 'alt-tab-app',
                       vertical: true });
 
@@ -634,6 +636,16 @@ var AppIcon = new Lang.Class({
 
         minWidth = Math.max(minWidth, forHeight);
         return [minWidth, minWidth];
+    },
+
+    get cachedWindows() {
+        return this._cachedWindows.filter((win) => {
+            return !win._hackIsInactiveWindow;
+        });
+    },
+
+    cacheWindowList: function(windowList) {
+        this._cachedWindows = windowList;
     }
 });
 
@@ -658,9 +670,10 @@ var AppSwitcher = new Lang.Class({
             let appIcon = new AppIcon(apps[i]);
             // Cache the window list now; we don't handle dynamic changes here,
             // and we don't want to be continually retrieving it
-            appIcon.cachedWindows = allWindows.filter(function(w) {
+            let windowList = allWindows.filter(function(w) {
                 return windowTracker.get_window_app (w) == appIcon.app;
             });
+            appIcon.cacheWindowList(windowList);
             if (appIcon.cachedWindows.length > 0)
                 this._addIcon(appIcon);
         }
