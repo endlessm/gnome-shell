@@ -392,10 +392,23 @@ var CodingSession = new Lang.Class({
         });
     },
 
+    _updateWindowPairingState: function() {
+        let actor = this._actorForCurrentState();
+        if (!actor)
+            return;
+
+        actor.meta_window._hackIsInactiveWindow = false;
+
+        let otherActor = this._getOtherActor(actor);
+        if (otherActor)
+            otherActor.meta_window._hackIsInactiveWindow = true;
+    },
+
     _setState: function(value, includeButton=true) {
         this._state = value;
         if (includeButton)
             this._button.state = value;
+        this._updateWindowPairingState();
     },
 
     _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
