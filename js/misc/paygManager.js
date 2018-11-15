@@ -268,13 +268,6 @@ var PaygManager = new Lang.Class({
         this.emit('code-expired');
     },
 
-    _timeRemainingSecs: function() {
-        if (!this._enabled)
-            return Number.MAX_SAFE_INTEGER;
-
-        return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
-    },
-
     _clockUpdated: function() {
         this._updateExpirationReminders();
     },
@@ -309,7 +302,7 @@ var PaygManager = new Lang.Class({
         if (notificationAlertTimesSecs.length == 0)
             return;
 
-        let secondsLeft = this._timeRemainingSecs();
+        let secondsLeft = this.timeRemainingSecs();
         if (secondsLeft > 0 && secondsLeft <= notificationAlertTimesSecs[0])
             this._notifyPaygReminder(secondsLeft);
     },
@@ -320,7 +313,7 @@ var PaygManager = new Lang.Class({
             this._expirationReminderId = 0;
         }
 
-        let secondsLeft = this._timeRemainingSecs();
+        let secondsLeft = this.timeRemainingSecs();
 
         // The interval passed to timeout_add_seconds needs to be a 32-bit
         // unsigned integer, so don't bother with notifications otherwise.
@@ -352,6 +345,13 @@ var PaygManager = new Lang.Class({
 
             return GLib.SOURCE_REMOVE;
         });
+    },
+
+    timeRemainingSecs() {
+        if (!this._enabled)
+            return Number.MAX_SAFE_INTEGER;
+
+        return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
     },
 
     addCode: function(code, callback) {
@@ -405,7 +405,7 @@ var PaygManager = new Lang.Class({
         if (!this.enabled)
             return false;
 
-        return this._timeRemainingSecs() <= 0;
+        return this.timeRemainingSecs() <= 0;
     },
 
 });
