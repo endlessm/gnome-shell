@@ -62,32 +62,36 @@ static const gchar *glsl_declarations =
   "uniform vec3 colors[5];\n"
   "uniform float points[5];\n"
   "\n"
-  "vec3 gradient_map (const vec3 color)\n"
+  "vec4 gradient_map (const vec4 color)\n"
   "{\n"
+  "  if (color.a != 1.0)\n"
+  "  {\n"
+  "    return color;\n"
+  "  }\n"
   "  const vec3 gray_conv = vec3 (0.299, 0.587, 0.114);\n"
-  "  float desaturated = dot (color, gray_conv);\n"
-  "  vec3 color_out = color;\n"
+  "  float desaturated = dot (color.rgb, gray_conv);\n"
+  "  vec4 color_out = color;\n"
   "  if (desaturated <= points[1])\n"
   "  {\n"
-  "    color_out = mix (colors[0], colors[1], (desaturated - points[0]) / (points[1] - points[0]));\n"
+  "    color_out.rgb = mix (colors[0], colors[1], (desaturated - points[0]) / (points[1] - points[0]));\n"
   "  }\n"
   "  else if (desaturated <= points[2])\n"
   "  {\n"
-  "    color_out = mix (colors[1], colors[2], (desaturated - points[1]) / (points[2] - points[1]));\n"
+  "    color_out.rgb = mix (colors[1], colors[2], (desaturated - points[1]) / (points[2] - points[1]));\n"
   "  }\n"
   "  else if (desaturated <= points[3])\n"
   "  {\n"
-  "    color_out = mix (colors[2], colors[3], (desaturated - points[2]) / (points[3] - points[2]));\n"
+  "    color_out.rgb = mix (colors[2], colors[3], (desaturated - points[2]) / (points[3] - points[2]));\n"
   "  }\n"
   "  else\n"
   "  {\n"
-  "    color_out = mix (colors[3], colors[4], (desaturated - points[3]) / (points[4] - points[3]));\n"
+  "    color_out.rgb = mix (colors[3], colors[4], (desaturated - points[3]) / (points[4] - points[3]));\n"
   "  }\n"
   "  return color_out;\n"
   "}\n";
 
 static const gchar *glsl_source =
-  "  cogl_color_out.rgb = gradient_map (cogl_color_out.rgb);";
+  "  cogl_color_out.rgba = gradient_map (cogl_color_out.rgba);";
 
 
 G_DEFINE_TYPE_WITH_PRIVATE (ShellCodeViewEffect,
