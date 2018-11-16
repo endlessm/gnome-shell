@@ -106,6 +106,56 @@ function _getWindowId(win) {
     return ('window:%d').format(win.get_stable_sequence());
 };
 
+const _ensureHackDataFile = (function () {
+    let keyfile = new GLib.KeyFile();
+    let initialized = false;
+
+    const flatpakInstallationPaths = [
+        GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
+        '/var/lib/flatpak',
+    ];
+    const flatpakPath = 'app/com.endlessm.HackComponents/current/active/files';
+    const fileRelPath = 'share/hack-components';
+    const searchPaths = flatpakInstallationPaths.map(installation =>
+        GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
+
+    return function() {
+        if (initialized)
+            return keyfile;
+
+        try {
+            keyfile.load_from_dirs('hack-data.ini', searchPaths,
+                GLib.KeyFileFlags.NONE);
+        } catch (err) {
+            if (!err.matches(GLib.FileError, GLib.FileError.NOENT))
+                logError(err, 'Error reading hack data file');
+            keyfile = null;
+        }
+
+        initialized = true;
+        return keyfile;
+    }
+}());
+
+function _isBlacklistedApp(desktop_id) {
+    const keyfile = _ensureHackDataFile();
+    if (keyfile === null)
+        return false;
+
+    const app_id = desktop_id.slice(0, -8);  // remove ".desktop"
+    let blacklist;
+    try {
+        [blacklist] = keyfile.get_string_list('flip-to-hack', 'blacklist');
+    } catch (err) {
+        if (!err.matches(GLib.KeyFileError, GLib.KeyFileError.KEY_NOT_FOUND) &&
+            !err.matches(GLib.KeyFileError, GLib.KeyFileError.GROUP_NOT_FOUND))
+            logError(err, 'Error with blacklist in hack data file');
+        blacklist = [];
+    }
+
+    return blacklist.includes(app_id);
+}
+
 // _synchronizeMetaWindowActorGeometries
 //
 // Synchronize geometry of MetaWindowActor src to dst by
@@ -1116,6 +1166,10 @@ var CodeViewManager = new Lang.Class({
         // Do not manage apps that are NoDisplay=true, but take into account
         // the custom X-Endless-Hackable key to override that
         if (!appInfo.should_show() && !appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
+            return false;
+
+        // Do not manage apps that we blacklist in com.endlessm.HackComponents
+        if (_isBlacklistedApp(appInfo.get_id()))
             return false;
 
         // It might be a "HackToolbox". Check that, and if so,
