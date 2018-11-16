@@ -75,7 +75,7 @@ const _modes = {
 
     'unlock-dialog': {
         isLocked: true,
-        unlockDialog: imports.ui.unlockDialog.UnlockDialog,
+        unlockDialog: undefined,
         components: ['polkitAgent', 'telepathyClient'],
         panel: {
             left: [],
