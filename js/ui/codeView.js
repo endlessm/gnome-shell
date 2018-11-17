@@ -191,7 +191,7 @@ function _synchronizeMetaWindowActorGeometries(src, dst) {
 }
 
 function _synchronizeViewSourceButtonToRectCorner(button, rect) {
-    button.set_position(rect.x - button.width / 2,
+    button.set_position(rect.x,
                         rect.y + (rect.height - button.height) / 2);
 }
 
