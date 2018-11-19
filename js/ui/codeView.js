@@ -259,7 +259,6 @@ var WindowTrackingButton = new Lang.Class({
         this.parent(params);
 
         this.connect('notify::hover', this._onHoverChanged.bind(this));
-        this.connect('clicked', this._onClick.bind(this));
     },
 
     vfunc_allocate: function(box, flags) {
@@ -369,14 +368,6 @@ var WindowTrackingButton = new Lang.Class({
             }
         } else {
             this._stopHoverSound();
-        }
-    },
-
-    _onClick: function() {
-        if (!this.child.flipped) {
-            SoundServer.getDefault().play('shell/tracking-button/flip/click');
-        } else {
-            SoundServer.getDefault().play('shell/tracking-button/flip-inverse/click');
         }
     }
 });
@@ -992,12 +983,20 @@ var CodingSession = new Lang.Class({
         }
     },
 
+    _playAnimationSound: function(direction) {
+        if (direction == Gtk.DirectionType.LEFT)
+            SoundServer.getDefault().play('shell/tracking-button/flip/click');
+        else
+            SoundServer.getDefault().play('shell/tracking-button/flip-inverse/click');
+    },
+
     _completeAnimate: function(src, oldDst, newDst, direction, targetState) {
         this._animateToMidpoint(src,
                                 oldDst,
                                 newDst,
                                 direction);
         this._button.switchAnimation(direction, targetState);
+        this._playAnimationSound(direction);
     },
 
     _animateToMidpoint: function(src, oldDst, newDst, direction) {
