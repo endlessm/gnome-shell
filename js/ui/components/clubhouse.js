@@ -274,6 +274,18 @@ var ClubhouseNotificationBanner = new Lang.Class({
     },
 });
 
+
+var ClubhouseQuestBanner = new Lang.Class({
+    Name: 'ClubhouseQuestBanner',
+    Extends: ClubhouseNotificationBanner,
+
+    _init: function(notification) {
+        this.parent(notification);
+
+        this._closeButton.visible = Main.sessionMode.hasOverview;
+    },
+});
+
 var ClubhouseItemBanner = new Lang.Class({
     Name: 'ClubhouseItemBanner',
     Extends: ClubhouseNotificationBanner,
@@ -312,7 +324,7 @@ var ClubhouseNotification = new Lang.Class({
     },
 
     createBanner: function() {
-        return new ClubhouseNotificationBanner(this);
+        return new ClubhouseQuestBanner(this);
     },
 });
 
