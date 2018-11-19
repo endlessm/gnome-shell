@@ -364,8 +364,8 @@ var CodingSession = new Lang.Class({
         this._positionChangedIdToolbox = 0;
         this._sizeChangedIdApp = 0;
         this._sizeChangedIdToolbox = 0;
-        this._constrainGeometryAppId = 0;
-        this._constrainGeometryToolboxId = 0;
+        this._constrainGeometryIdApp = 0;
+        this._constrainGeometryIdToolbox = 0;
 
         this._state = STATE_APP;
         this._toolboxActionGroup = null;
@@ -581,7 +581,7 @@ var CodingSession = new Lang.Class({
         this._sizeChangedIdToolbox =
             this.toolbox.meta_window.connect('size-changed',
                                              this._synchronizeWindows.bind(this));
-        this._constrainGeometryToolboxId =
+        this._constrainGeometryIdToolbox =
             this.toolbox.meta_window.connect('geometry-allocate',
                                              this._constrainGeometry.bind(this));
     },
@@ -597,9 +597,9 @@ var CodingSession = new Lang.Class({
             this._sizeChangedIdToolbox = 0;
         }
 
-        if (this._constrainGeometryToolboxId) {
-            this.toolbox.meta_window.disconnect(this._constrainGeometryToolboxId);
-            this._constrainGeometryToolboxId = 0;
+        if (this._constrainGeometryIdToolbox) {
+            this.toolbox.meta_window.disconnect(this._constrainGeometryIdToolbox);
+            this._constrainGeometryIdToolbox = 0;
         }
     },
 
@@ -610,7 +610,7 @@ var CodingSession = new Lang.Class({
         this._sizeChangedIdApp =
             this.app.meta_window.connect('size-changed',
                                          this._synchronizeWindows.bind(this));
-        this._constrainGeometryAppId =
+        this._constrainGeometryIdApp =
             this.app.meta_window.connect('geometry-allocate',
                                          this._constrainGeometry.bind(this));
 
@@ -639,9 +639,9 @@ var CodingSession = new Lang.Class({
             this.app.meta_window.disconnect(this._sizeChangedIdApp);
             this._sizeChangedIdApp = 0;
         }
-        if (this._constrainGeometryAppId) {
-            this.app.meta_window.disconnect(this._constrainGeometryAppId);
-            this._constrainGeometryAppId = 0;
+        if (this._constrainGeometryIdApp) {
+            this.app.meta_window.disconnect(this._constrainGeometryIdApp);
+            this._constrainGeometryIdApp = 0;
         }
 
         this._appActionProxy = null;
