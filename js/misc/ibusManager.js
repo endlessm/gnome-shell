@@ -36,6 +36,8 @@ function getIBusManager() {
     return _ibusManager;
 }
 
+const SIGTERM = 15; // TODO: get this somewhere else
+
 var IBusManager = new Lang.Class({
     Name: 'IBusManager',
 
@@ -67,15 +69,25 @@ var IBusManager = new Lang.Class({
         this._ibus.connect('global-engine-changed', Lang.bind(this, this._engineChanged));
 
         this._spawn();
+        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, SIGTERM, () => this._terminate);
     },
 
     _spawn: function() {
         try {
-            Gio.Subprocess.new(['ibus-daemon', '--xim', '--panel', 'disable'],
-                               Gio.SubprocessFlags.NONE);
+            this._process = Gio.Subprocess.new(['ibus-daemon', '--xim', '--panel', 'disable'],
+                                               Gio.SubprocessFlags.NONE);
         } catch(e) {
             log('Failed to launch ibus-daemon: ' + e.message);
         }
+    },
+
+    _terminate() {
+        if (this._process) {
+            this._process.send_signal(SIGTERM);
+            this._process = null;
+        }
+
+        return false;
     },
 
     _clear: function() {
