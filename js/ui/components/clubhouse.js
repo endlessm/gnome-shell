@@ -489,6 +489,8 @@ var ClubhouseComponent = new Lang.Class({
             });
         }
 
+        this._clubhouseButtonManager.setSuggestOpen(this.proxy.SuggestingOpen);
+
         this._enabled = true;
         this._syncVisibility();
     },
