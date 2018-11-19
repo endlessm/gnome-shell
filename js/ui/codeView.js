@@ -366,6 +366,8 @@ var CodingSession = new Lang.Class({
         this._sizeChangedIdToolbox = 0;
         this._constrainGeometryIdApp = 0;
         this._constrainGeometryIdToolbox = 0;
+        this._notifyVisibleIdApp = 0;
+        this._notifyVisibleIdToolbox = 0;
 
         this._state = STATE_APP;
         this._toolboxActionGroup = null;
@@ -584,6 +586,9 @@ var CodingSession = new Lang.Class({
         this._constrainGeometryIdToolbox =
             this.toolbox.meta_window.connect('geometry-allocate',
                                              this._constrainGeometry.bind(this));
+        this._notifyVisibleIdToolbox =
+            this.toolbox.connect('notify::visible',
+                                 this._syncButtonVisibility.bind(this));
     },
 
     _cleanupToolboxWindow: function() {
@@ -601,6 +606,10 @@ var CodingSession = new Lang.Class({
             this.toolbox.meta_window.disconnect(this._constrainGeometryIdToolbox);
             this._constrainGeometryIdToolbox = 0;
         }
+        if (this._notifyVisibleIdToolbox) {
+            this.toolbox.disconnect(this._notifyVisibleIdToolbox);
+            this._notifyVisibleIdToolbox = 0;
+        }
     },
 
     _setupAppWindow: function() {
@@ -613,6 +622,9 @@ var CodingSession = new Lang.Class({
         this._constrainGeometryIdApp =
             this.app.meta_window.connect('geometry-allocate',
                                          this._constrainGeometry.bind(this));
+        this._notifyVisibleIdApp =
+            this.app.connect('notify::visible',
+                             this._syncButtonVisibility.bind(this));
 
         if (this.app.meta_window.gtk_application_id) {
             this._appActionProxy =
@@ -642,6 +654,10 @@ var CodingSession = new Lang.Class({
         if (this._constrainGeometryIdApp) {
             this.app.meta_window.disconnect(this._constrainGeometryIdApp);
             this._constrainGeometryIdApp = 0;
+        }
+        if (this._notifyVisibleIdApp) {
+            this.app.disconnect(this._notifyVisibleIdApp);
+            this._notifyVisibleIdApp = 0;
         }
 
         this._appActionProxy = null;
@@ -853,9 +869,10 @@ var CodingSession = new Lang.Class({
         let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
 
         // Show only if either this window or the toolbox window
-        // is in focus
+        // is in focus and visible
         let focusedActor = focusedWindow.get_compositor_private();
         if (this._isActorFromSession(focusedActor) &&
+            focusedActor.visible &&
             !Main.overview.visible &&
             !inFullscreen &&
             !locked)
