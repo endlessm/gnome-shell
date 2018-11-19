@@ -54,7 +54,7 @@ const ClubhouseIface =
       <arg type="u" direction="in" name="timestamp"/> \
     </method> \
     <property name="Visible" type="b" access="read"/> \
-    <signal name="SuggestOpen" /> \
+    <property name="SuggestingOpen" type="b" access="read"/> \
   </interface> \
 </node>';
 
@@ -453,19 +453,23 @@ var ClubhouseComponent = new Lang.Class({
         this._questBanner = null;
         this._clubhouseSource = null;
         this._clubhouseProxyHandler = 0;
-        this._clubhouseProxySuggestOpenHandler = 0;
 
         this._clubhouseButtonManager = new ClubhouseButtonManager();
         this._clubhouseButtonManager.connect('open-clubhouse', () => {
-            this._clubhouseButtonManager.setSuggestOpen(false);
             this.show(global.get_current_time());
         });
         this._clubhouseButtonManager.connect('close-clubhouse', () => {
-            this._clubhouseButtonManager.setSuggestOpen(false);
             this.hide(global.get_current_time());
         });
 
         this._overrideAddNotification();
+    },
+
+    _onPropertiesChanged: function(proxy, changedProps, invalidatedProps) {
+        this.parent(proxy, changedProps, invalidatedProps);
+        let propsDict = changedProps.deep_unpack();
+        if (propsDict.hasOwnProperty('SuggestingOpen'))
+            this._clubhouseButtonManager.setSuggestOpen(this.proxy.SuggestingOpen);
     },
 
     enable: function() {
@@ -483,13 +487,6 @@ var ClubhouseComponent = new Lang.Class({
                     this._clearQuestBanner();
                 }
             });
-        }
-
-        if (this._clubhouseProxySuggestOpenHandler == 0) {
-            this._clubhouseProxySuggestOpenHandler =
-                this.proxy.connectSignal('SuggestOpen', () => {
-                    this._clubhouseButtonManager.setSuggestOpen(true);
-                });
         }
 
         this._enabled = true;
