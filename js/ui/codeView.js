@@ -82,7 +82,8 @@ const _ensureHackDataFile = (function () {
             keyfile.load_from_dirs('hack-data.ini', searchPaths,
                 GLib.KeyFileFlags.NONE);
         } catch (err) {
-            if (!err.matches(GLib.FileError, GLib.FileError.NOENT))
+            if (!err.matches(GLib.FileError, GLib.FileError.NOENT) &&
+                !err.matches(GLib.KeyFileError, GLib.KeyFileError.NOT_FOUND))
                 logError(err, 'Error reading hack data file');
             keyfile = null;
         }
