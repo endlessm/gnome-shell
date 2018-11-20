@@ -275,7 +275,7 @@ var PaygManager = GObject.registerClass({
         if (!this._enabled)
             return Number.MAX_SAFE_INTEGER;
 
-        return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
+        return Math.max(0, this._expiryTime - (Shell.util_get_boottime() / GLib.USEC_PER_SEC));
     }
 
     addCode(code, callback) {
