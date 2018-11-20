@@ -23,7 +23,6 @@ const WINDOW_ANIMATION_TIME = 0.25;
 const STATE_APP = 0;
 const STATE_TOOLBOX = 1;
 
-const _FLIP_ICON_FRONT = 'resource:///org/gnome/shell/theme/flip-symbolic.svg';
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
 const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
 
@@ -37,50 +36,6 @@ const _HACK_SHADER_MAP = {
                  points: [0.00, 0.10, 0.20, 0.60, 1.00] },
 };
 const _HACK_DEFAULT_SHADER = 'desaturate';
-
-const FlipIcon = GObject.registerClass(class FlipIcon extends St.Icon {
-    _init(props = {}) {
-        const gicon = new Gio.FileIcon({
-            file: Gio.File.new_for_uri(_FLIP_ICON_FRONT),
-        });
-
-        Object.assign(props, {
-            style_class: 'view-source-icon',
-            gicon,
-        });
-        super._init(props);
-
-        this._flipped = false;
-        this._sensitive = true;
-    }
-
-    get flipped() {
-        return this._flipped;
-    }
-
-    set flipped(value) {
-        this._flipped = value;
-        this._updateStyle();
-    }
-
-    get sensitive() {
-        return this._sensitive;
-    }
-
-    set sensitive(value) {
-        this._sensitive = value;
-        this._updateStyle();
-    }
-
-    _updateStyle() {
-        this.remove_style_class_name('back');
-        this.remove_style_class_name('insensitive');
-        if (!this.sensitive)
-            this.add_style_class_name('insensitive');
-        else if (this.flipped)
-            this.add_style_class_name('back');
-    }
-});
 
 function _ensureAfterFirstFrame(win, callback) {
     if (win._drawnFirstFrame) {
@@ -200,11 +155,18 @@ function _getViewSourceButtonParams(interactive) {
         style_class: 'view-source',
         x_fill: true,
         y_fill: true,
-        child: new FlipIcon(),
         reactive: interactive,
         can_focus: interactive,
         track_hover: interactive,
+        clip_to_allocation: true
     }
+}
+
+function _setFlippedState(button, flipped) {
+    if (flipped)
+        button.add_style_class_name('back');
+    else
+        button.remove_style_class_name('back');
 }
 
 function _flipButtonAroundRectCenter(props) {
@@ -251,6 +213,7 @@ var WindowTrackingButton = new Lang.Class({
     Extends: St.Button,
 
     _init: function(params) {
+        this._flipped = false;
         this._rect = null;
 
         let buttonParams = _getViewSourceButtonParams(true);
@@ -307,7 +270,7 @@ var WindowTrackingButton = new Lang.Class({
             finishAngle: 0,
             onRotationMidpoint: () => {
                 animationButton.opacity = 255;
-                animationButton.child.flipped = targetState == STATE_TOOLBOX;
+                _setFlippedState(animationButton, targetState == STATE_TOOLBOX);
             },
             onRotationComplete: () => {
                 animationButton.destroy();
@@ -321,7 +284,8 @@ var WindowTrackingButton = new Lang.Class({
     },
 
     set state(value) {
-        this.child.flipped = value == STATE_TOOLBOX;
+        this._flipped = value == STATE_TOOLBOX;
+        _setFlippedState(this, this._flipped);
     },
 
     _startHoverSound(flipped) {
@@ -359,7 +323,7 @@ var WindowTrackingButton = new Lang.Class({
 
     _onHoverChanged: function() {
         if (this.hover) {
-            if (!this.child.flipped) {
+            if (!this._flipped) {
                 SoundServer.getDefault().play('shell/tracking-button/flip/enter');
                 this._startHoverSound(false);
             } else {
