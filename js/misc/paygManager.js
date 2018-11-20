@@ -21,8 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-const { Gio, GLib, GnomeDesktop, GObject } = imports.gi;
-
+const { Gio, GLib, GnomeDesktop, GObject, Shell } = imports.gi;
 const Gettext = imports.gettext;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
@@ -276,7 +275,7 @@ var PaygManager = GObject.registerClass({
         if (!this._enabled)
             return Number.MAX_SAFE_INTEGER;
 
-        return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
+        return Math.max(0, this._expiryTime - (Shell.util_get_boottime() / GLib.USEC_PER_SEC));
     }
 
     addCode(code, callback) {
