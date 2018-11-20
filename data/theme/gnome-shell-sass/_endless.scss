@@ -754,35 +754,23 @@ popup-separator-menu-item {
 // Endless Hack
 
 .view-source {
-    opacity: 0.902;
+    background-image: url("resource:///org/gnome/shell/theme/flip-front-normal.png");
+    width: 66px;
+    height: 124px;
+    background-position: -30px 0px;
+    transition-duration: 100ms;
 
-    $front-color: #004292;
-    $back-color: #ed7800;
-    $insensitive-color: #999;
-
-    .view-source-icon {
-        -st-icon-style: symbolic;
-        color: $front-color;
-        icon-size: 64px;
+    &.back {
+        background-image: url("resource:///org/gnome/shell/theme/flip-back-normal.png");
     }
 
-    &:hover .view-source-icon {
-        color: scale-color($front-color, white, 20%);
+    &:hover {
+        background-image: url("resource:///org/gnome/shell/theme/flip-front-hover.png");
     }
 
-    .view-source-icon.back {
-        color: $back-color;
+    &.back:hover {
+        background-image: url("resource:///org/gnome/shell/theme/flip-back-hover.png");
     }
-
-    &:hover .view-source-icon.back {
-        color: scale-color($back-color, white, 20%);
-    }
-
-    .view-source-icon.insensitive {
-        color: $insensitive-color;
-    }
-
-    padding-left: 8px;
 }
 
 // Discovery Feed
