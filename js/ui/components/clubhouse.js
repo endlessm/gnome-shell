@@ -288,6 +288,34 @@ var ClubhouseNotificationBanner = new Lang.Class({
                 button.destroy();
         });
     },
+
+    _slideOut: function() {
+        let monitor = Main.layoutManager.primaryMonitor;
+        if (!monitor)
+            return;
+
+        let endX = monitor.x + monitor.width;
+
+        Tweener.addTween(this.actor,
+                         { x: endX,
+                           time: CLUBHOUSE_BANNER_ANIMATION_TIME,
+                           transition: 'easeOutQuad',
+                           onComplete: () => {
+                               this.actor.destroy();
+                               this.actor = null;
+                           }
+                         });
+    },
+
+    dismiss: function(shouldSlideOut) {
+        if (shouldSlideOut) {
+            this._slideOut();
+            return;
+        }
+
+        this.actor.destroy();
+        this.actor = null;
+    },
 });
 
 
@@ -555,7 +583,8 @@ var ClubhouseComponent = new Lang.Class({
         if (!this._questBanner)
             return;
 
-        this._questBanner.actor.destroy();
+        this._questBanner.dismiss(!this._isRunningQuest);
+
         this._questBanner = null;
 
         this._syncBanners();
@@ -565,7 +594,7 @@ var ClubhouseComponent = new Lang.Class({
         if (!this._itemBanner)
             return;
 
-        this._itemBanner.actor.destroy();
+        this._itemBanner.dismiss(true);
         this._itemBanner = null;
     },
 
