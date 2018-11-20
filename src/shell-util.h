@@ -70,6 +70,8 @@ gint shell_util_get_uid (void);
 
 gchar * shell_util_get_eos_image_version (void);
 
+gint64 shell_util_get_boottime (void);
+
 G_END_DECLS
 
 #endif /* __SHELL_UTIL_H__ */
