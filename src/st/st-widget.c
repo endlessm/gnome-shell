@@ -282,20 +282,13 @@ current_paint_state (StWidget *widget)
   return &priv->paint_states[priv->current_paint_state];
 }
 
-static void
-st_widget_texture_cache_changed (StTextureCache *cache,
-                                 GFile          *file,
-                                 gpointer        user_data)
+static gboolean
+invalidate_node_for_file (StThemeNode *node,
+                          GFile       *file)
 {
-  StWidget *actor = ST_WIDGET (user_data);
-  StWidgetPrivate *priv = st_widget_get_instance_private (actor);
-  StThemeNode *node = priv->theme_node;
   StBorderImage *border_image;
   gboolean changed = FALSE;
   GFile *theme_file;
-
-  if (node == NULL)
-    return;
 
   theme_file = st_theme_node_get_background_image (node);
   if ((theme_file != NULL) && g_file_equal (theme_file, file))
@@ -312,19 +305,34 @@ st_widget_texture_cache_changed (StTextureCache *cache,
       changed = TRUE;
     }
 
-  if (changed)
-    {
-      /* If we prerender the background / border, we need to update
-       * the paint state. We should probably implement a method to
-       * the theme node to determine this, but for now, just wipe
-       * the entire paint state.
-       */
-      next_paint_state (actor);
-      st_theme_node_paint_state_invalidate (current_paint_state (actor));
+  return changed;
+}
 
-      if (clutter_actor_is_mapped (CLUTTER_ACTOR (actor)))
-        clutter_actor_queue_redraw (CLUTTER_ACTOR (actor));
-    }
+static void
+st_widget_texture_cache_changed (StTextureCache *cache,
+                                 GFile          *file,
+                                 gpointer        user_data)
+{
+  StWidget *actor = ST_WIDGET (user_data);
+  StWidgetPrivate *priv = st_widget_get_instance_private (actor);
+  StThemeNode *node = priv->theme_node;
+
+  if (node == NULL)
+    return;
+
+  if (!invalidate_node_for_file (node, file))
+    return;
+
+  /* If we prerender the background / border, we need to update
+   * the paint state. We should probably implement a method to
+   * the theme node to determine this, but for now, just wipe
+   * the entire paint state.
+   */
+  next_paint_state (actor);
+  st_theme_node_paint_state_invalidate (current_paint_state (actor));
+
+  if (clutter_actor_is_mapped (CLUTTER_ACTOR (actor)))
+    clutter_actor_queue_redraw (CLUTTER_ACTOR (actor));
 }
 
 static void
