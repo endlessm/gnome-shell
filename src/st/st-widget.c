@@ -327,7 +327,11 @@ st_widget_texture_cache_changed (StTextureCache *cache,
    * the paint state. We should probably implement a method to
    * the theme node to determine this, but for now, just wipe
    * the entire paint state.
+   *
+   * Note that we need to invalidate both paint states here, since
+   * the file that has changed may be cached in either of them.
    */
+  st_theme_node_paint_state_invalidate (current_paint_state (actor));
   swap_paint_state (actor);
   st_theme_node_paint_state_invalidate (current_paint_state (actor));
 
