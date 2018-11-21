@@ -267,11 +267,20 @@ st_widget_remove_transition (StWidget *widget)
 }
 
 static void
-next_paint_state (StWidget *widget)
+swap_paint_state (StWidget *widget)
 {
   StWidgetPrivate *priv = st_widget_get_instance_private (widget);
 
   priv->current_paint_state = (priv->current_paint_state + 1) % G_N_ELEMENTS (priv->paint_states);
+}
+
+static StThemeNodePaintState *
+next_paint_state (StWidget *widget)
+{
+  StWidgetPrivate *priv = st_widget_get_instance_private (widget);
+  gint idx = (priv->current_paint_state + 1) % G_N_ELEMENTS (priv->paint_states);
+
+  return &priv->paint_states[idx];
 }
 
 static StThemeNodePaintState *
@@ -282,20 +291,13 @@ current_paint_state (StWidget *widget)
   return &priv->paint_states[priv->current_paint_state];
 }
 
-static void
-st_widget_texture_cache_changed (StTextureCache *cache,
-                                 GFile          *file,
-                                 gpointer        user_data)
+static gboolean
+invalidate_node_for_file (StThemeNode *node,
+                          GFile       *file)
 {
-  StWidget *actor = ST_WIDGET (user_data);
-  StWidgetPrivate *priv = st_widget_get_instance_private (actor);
-  StThemeNode *node = priv->theme_node;
   StBorderImage *border_image;
   gboolean changed = FALSE;
   GFile *theme_file;
-
-  if (node == NULL)
-    return;
 
   theme_file = st_theme_node_get_background_image (node);
   if ((theme_file != NULL) && g_file_equal (theme_file, file))
@@ -312,19 +314,27 @@ st_widget_texture_cache_changed (StTextureCache *cache,
       changed = TRUE;
     }
 
-  if (changed)
-    {
-      /* If we prerender the background / border, we need to update
-       * the paint state. We should probably implement a method to
-       * the theme node to determine this, but for now, just wipe
-       * the entire paint state.
-       */
-      next_paint_state (actor);
-      st_theme_node_paint_state_invalidate (current_paint_state (actor));
+  return changed;
+}
 
-      if (clutter_actor_is_mapped (CLUTTER_ACTOR (actor)))
-        clutter_actor_queue_redraw (CLUTTER_ACTOR (actor));
-    }
+static void
+st_widget_texture_cache_changed (StTextureCache *cache,
+                                 GFile          *file,
+                                 gpointer        user_data)
+{
+  StWidget *actor = ST_WIDGET (user_data);
+  StThemeNodePaintState *paint_state;
+
+  paint_state = current_paint_state (actor);
+  if (paint_state->node != NULL && invalidate_node_for_file (paint_state->node, file))
+    st_theme_node_paint_state_invalidate (paint_state);
+
+  paint_state = next_paint_state (actor);
+  if (paint_state->node != NULL && invalidate_node_for_file (paint_state->node, file))
+    st_theme_node_paint_state_invalidate (paint_state);
+
+  if (clutter_actor_is_mapped (CLUTTER_ACTOR (actor)))
+    clutter_actor_queue_redraw (CLUTTER_ACTOR (actor));
 }
 
 static void
@@ -1574,7 +1584,7 @@ static void
 on_transition_completed (StThemeNodeTransition *transition,
                          StWidget              *widget)
 {
-  next_paint_state (widget);
+  swap_paint_state (widget);
 
   st_theme_node_paint_state_copy (current_paint_state (widget),
                                   st_theme_node_transition_get_new_paint_state (transition));
@@ -1648,7 +1658,7 @@ st_widget_recompute_style (StWidget    *widget,
 
   if (!paint_equal)
     {
-      next_paint_state (widget);
+      swap_paint_state (widget);
 
       if (!st_theme_node_paint_equal (new_theme_node, current_paint_state (widget)->node))
         st_theme_node_paint_state_invalidate (current_paint_state (widget));
