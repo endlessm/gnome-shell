@@ -267,7 +267,7 @@ st_widget_remove_transition (StWidget *widget)
 }
 
 static void
-next_paint_state (StWidget *widget)
+swap_paint_state (StWidget *widget)
 {
   StWidgetPrivate *priv = st_widget_get_instance_private (widget);
 
@@ -328,7 +328,7 @@ st_widget_texture_cache_changed (StTextureCache *cache,
    * the theme node to determine this, but for now, just wipe
    * the entire paint state.
    */
-  next_paint_state (actor);
+  swap_paint_state (actor);
   st_theme_node_paint_state_invalidate (current_paint_state (actor));
 
   if (clutter_actor_is_mapped (CLUTTER_ACTOR (actor)))
@@ -1582,7 +1582,7 @@ static void
 on_transition_completed (StThemeNodeTransition *transition,
                          StWidget              *widget)
 {
-  next_paint_state (widget);
+  swap_paint_state (widget);
 
   st_theme_node_paint_state_copy (current_paint_state (widget),
                                   st_theme_node_transition_get_new_paint_state (transition));
@@ -1656,7 +1656,7 @@ st_widget_recompute_style (StWidget    *widget,
 
   if (!paint_equal)
     {
-      next_paint_state (widget);
+      swap_paint_state (widget);
 
       if (!st_theme_node_paint_equal (new_theme_node, current_paint_state (widget)->node))
         st_theme_node_paint_state_invalidate (current_paint_state (widget));
