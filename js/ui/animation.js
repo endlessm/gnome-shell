@@ -16,6 +16,7 @@ var Animation = new Lang.Class({
         this.actor = new St.Bin();
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
         this._speed = speed;
+        this._frameTimeouts = [this._speed];
 
         this._isLoaded = false;
         this._isPlaying = false;
@@ -30,11 +31,15 @@ var Animation = new Lang.Class({
 
     play: function() {
         if (this._isLoaded && this._timeoutId == 0) {
+            // Set the frame to be the previous one, so when we update it
+            // when play is called, it shows the current frame instead of
+            // the next one.
             if (this._frame == 0)
-                this._showFrame(0);
+                this._frame = this._animations.get_n_children() - 1;
+            else
+                this._frame -= 1;
 
-            this._timeoutId = GLib.timeout_add(GLib.PRIORITY_LOW, this._speed, Lang.bind(this, this._update));
-            GLib.Source.set_name_by_id(this._timeoutId, '[gnome-shell] this._update');
+            this._update();
         }
 
         this._isPlaying = true;
@@ -63,7 +68,16 @@ var Animation = new Lang.Class({
 
     _update: function() {
         this._showFrame(this._frame + 1);
-        return GLib.SOURCE_CONTINUE;
+
+        // Show the next frame after the timeout of the current one
+        let currentFrameTimeoutIndex = this._frame % this._frameTimeouts.length;
+        this._timeoutId = GLib.timeout_add(GLib.PRIORITY_LOW,
+                                           this._frameTimeouts[currentFrameTimeoutIndex],
+                                           Lang.bind(this, this._update));
+
+        GLib.Source.set_name_by_id(this._timeoutId, '[gnome-shell] this._update');
+
+        return GLib.SOURCE_REMOVE;
     },
 
     _animationsLoaded: function() {
@@ -75,6 +89,21 @@ var Animation = new Lang.Class({
 
     _onDestroy: function() {
         this.stop();
+    },
+
+    setFrameTimeouts: function(timeoutList) {
+        if (timeoutList.length == 0)
+            throw new Error('Cannot set an empty list as the frame-timeouts for animation!');
+
+        let wasPlaying = this._isPlaying;
+        this.stop();
+
+        this._frameTimeouts = timeoutList;
+
+        // If the animation was playing, we continue to play it here (where it will
+        // use the new timeouts)
+        if (wasPlaying)
+            this.play();
     }
 });
 
