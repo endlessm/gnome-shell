@@ -22,6 +22,7 @@ const Overview = imports.ui.overview;
 const PadOsd = imports.ui.padOsd;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const RunDialog = imports.ui.runDialog;
 const Layout = imports.ui.layout;
 const LoginManager = imports.misc.loginManager;
@@ -128,6 +129,9 @@ function start() {
 
     sessionMode = new SessionMode.SessionMode();
     sessionMode.connect('updated', _sessionUpdated);
+
+    // Initialize ParentalControlsManager before the UI
+    ParentalControlsManager.getDefault();
 
     St.Settings.get().connect('notify::gtk-theme', _loadDefaultStylesheet);
     _initializeUI();
