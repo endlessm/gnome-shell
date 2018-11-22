@@ -66,6 +66,8 @@ gboolean shell_util_needs_secondary_layout (const char *layouts,
 
 void shell_util_check_cloexec_fds (void);
 
+gint shell_util_get_uid (void);
+
 gchar * shell_util_get_eos_image_version (void);
 
 gint64 shell_util_get_boottime (void);
