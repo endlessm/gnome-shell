@@ -36,10 +36,12 @@ const Mainloop = imports.mainloop;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
+const Tweener = imports.ui.tweener;
 
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
 const CLUBHOUSE_BANNER_TIMEOUT_MSEC = 3000;
+const CLUBHOUSE_BANNER_ANIMATION_TIME = 0.2;
 
 const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
@@ -160,6 +162,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
         this.parent(notification);
 
+        // Whether it should animate when positioning it
+        this._shouldSlideIn = true;
+
         this._setNextPage();
 
         if (this._textPages.length > 1)
@@ -238,7 +243,18 @@ var ClubhouseNotificationBanner = new Lang.Class({
         else
             this.actor.x = clubhouseWindowX;
 
-        this.actor.x -= this.actor.width + margin;
+        let endX = this.actor.x - this.actor.width - margin;
+
+        if (this._shouldSlideIn) {
+            Tweener.addTween(this.actor,
+                             { x: endX,
+                               time: CLUBHOUSE_BANNER_ANIMATION_TIME,
+                               transition: 'easeOutQuad'
+                             });
+        } else {
+            this.actor.x = endX;
+        }
+
         this.actor.y = margin;
     },
 
@@ -272,6 +288,34 @@ var ClubhouseNotificationBanner = new Lang.Class({
                 button.destroy();
         });
     },
+
+    _slideOut: function() {
+        let monitor = Main.layoutManager.primaryMonitor;
+        if (!monitor)
+            return;
+
+        let endX = monitor.x + monitor.width;
+
+        Tweener.addTween(this.actor,
+                         { x: endX,
+                           time: CLUBHOUSE_BANNER_ANIMATION_TIME,
+                           transition: 'easeOutQuad',
+                           onComplete: () => {
+                               this.actor.destroy();
+                               this.actor = null;
+                           }
+                         });
+    },
+
+    dismiss: function(shouldSlideOut) {
+        if (shouldSlideOut) {
+            this._slideOut();
+            return;
+        }
+
+        this.actor.destroy();
+        this.actor = null;
+    },
 });
 
 
@@ -279,8 +323,10 @@ var ClubhouseQuestBanner = new Lang.Class({
     Name: 'ClubhouseQuestBanner',
     Extends: ClubhouseNotificationBanner,
 
-    _init: function(notification) {
+    _init: function(notification, isFirstBanner) {
         this.parent(notification);
+
+        this._shouldSlideIn = isFirstBanner;
 
         this._closeButton.visible = Main.sessionMode.hasOverview;
     },
@@ -323,8 +369,8 @@ var ClubhouseNotification = new Lang.Class({
         this.setResident(true);
     },
 
-    createBanner: function() {
-        return new ClubhouseQuestBanner(this);
+    createBanner: function(isFirstBanner) {
+        return new ClubhouseQuestBanner(this, isFirstBanner);
     },
 });
 
@@ -449,6 +495,7 @@ var ClubhouseComponent = new Lang.Class({
         this.parent(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
 
         this._enabled = false;
+        this._isRunningQuest = false;
 
         this._questBanner = null;
         this._clubhouseSource = null;
@@ -536,7 +583,8 @@ var ClubhouseComponent = new Lang.Class({
         if (!this._questBanner)
             return;
 
-        this._questBanner.actor.destroy();
+        this._questBanner.dismiss(!this._isRunningQuest);
+
         this._questBanner = null;
 
         this._syncBanners();
@@ -546,7 +594,7 @@ var ClubhouseComponent = new Lang.Class({
         if (!this._itemBanner)
             return;
 
-        this._itemBanner.actor.destroy();
+        this._itemBanner.dismiss(true);
         this._itemBanner = null;
     },
 
@@ -611,7 +659,9 @@ var ClubhouseComponent = new Lang.Class({
             });
 
             if (!this._questBanner) {
-                this._questBanner = notification.createBanner();
+                this._questBanner = notification.createBanner(!this._isRunningQuest);
+                this._isRunningQuest = true;
+
                 Main.layoutManager.addChrome(this._questBanner.actor);
                 this._questBanner.reposition();
             }
@@ -638,6 +688,8 @@ var ClubhouseComponent = new Lang.Class({
         // Stop the quest since the banner has been dismissed
         if (this.proxy.g_name_owner && this._clubhouseSource)
             this._clubhouseSource.activateAction('stop-quest', null);
+
+        this._isRunningQuest = false;
     },
 
     _syncVisibility: function() {
