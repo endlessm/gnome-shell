@@ -10,6 +10,7 @@ const Shell = imports.gi.Shell;
 const AppActivation = imports.ui.appActivation;
 const FileUtils = imports.misc.fileUtils;
 const IconGridLayout = imports.ui.iconGridLayout;
+const Main = imports.ui.main;
 const Search = imports.ui.search;
 
 const KEY_FILE_GROUP = 'Shell Search Provider';
