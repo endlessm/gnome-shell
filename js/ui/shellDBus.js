@@ -30,7 +30,7 @@ var GnomeShell = class {
         this._screenshotService = new Screenshot.ScreenshotService();
 
         this._appstoreService = null;
-        this._appLauncherService = new AppLauncher();
+        this._appLauncherService = null;
 
         Main.sessionMode.connect('updated', this._sessionModeChanged.bind(this));
         this._sessionModeChanged();
@@ -58,8 +58,11 @@ var GnomeShell = class {
         if (Main.sessionMode.isGreeter !== true) {
             if (!this._appstoreService)
                 this._appstoreService = new AppStoreService();
+            if (!this._appLauncherService)
+                this._appLauncherService = new AppLauncher();
         } else {
             this._appstoreService = null;
+            this._appLauncherService = null;
         }
     }
 
