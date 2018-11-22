@@ -930,38 +930,65 @@ popup-separator-menu-item {
 }
 
 // Clubhouse Notifications View
-.clubhouse-notification {
-  font-size: 14pt;
-  width: 20em;
-  margin: 5px;
-  border-radius: 12px;
-  color: #000000;
-  background-color: #ffffff;
-  border: 1px solid #afafaf;
-  &:hover, &:focus { background-color: #dfdfdf; color: #000000; }
 
-  .notification-icon { padding: 5px; icon-size: 4.09em; }
-  .notification-content { padding: 5px; spacing: 5px; }
-  .secondary-icon { icon-size: 2.09em; }
-  .notification-actions {
+$clubhouse-notification-width: 444px;
+$clubhouse-image-width: 175px;
+$clubhouse-image-height: 177px;
+
+.clubhouse-notification {
+  background-color: transparent;
+  width: $clubhouse-notification-width;
+  &:hover, &:focus {
     background-color: transparent;
-    padding-top: 2px;
-    spacing: 1px;
+  }
+  .clubhouse-notification-close-button {
+    color: black;
+    padding: 7px 5px 0 0;
+  }
+  .notification-actions {
+    padding: 0;
+    margin: 0 0 0 30px;
   }
   .notification-button {
-    padding: 4px 4px 5px;
-    background-color: #ffffff;
-    border: 1px solid #afafaf;
-    border-radius: 15px 15px;
+    color: white;
+    background-color: #E97C28;
+    border-radius: 17.5px;
+    border: none;
+    padding: 10px;
+    margin: 5px 12px 5px 0;
+    font: 15px "Metropolis Medium, Sans-Serif";
+    box-shadow: 0 2px 4px 4px rgba(0, 0, 0, .4);
+    text-shadow: 0 0.5px 2px rgba(0, 0, 0, .4);
+    .next {
+        border-radius: 30px;
+        padding: 15px 20px;
+        margin: 0 12px 0 0;
+    }
   }
-}
-
-.clubhouse-notification-label {
-  color: #000000;
-}
-
-.clubhouse-notification-icon-bin > StIcon {
-  icon-size: 5em;
+  .clubhouse-content-box {
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 12px;
+    border: 1px solid #8A6A45;
+    box-shadow: 0 2px 8px 8px rgba(0, 0, 0, .4);
+    padding: 0;
+    height: ($clubhouse-image-height - 42px);
+    margin-bottom: 23px;
+  }
+  .clubhouse-notification-label {
+    color: black;
+    margin: 7px ($clubhouse-image-width + 15px) 17.5px 30px;
+    font: 15px "Metropolis Medium, Sans-Serif";
+  }
+  .clubhouse-notification-icon-bin {
+    padding: 0;
+    margin: 0;
+  }
+  .clubhouse-notification-image {
+    icon-size: $clubhouse-image-width;
+    width: $clubhouse-image-width;
+    height: $clubhouse-image-height;
+    margin-bottom: 5px;
+  }
 }
 
 .clubhouse-open-button-icon {
