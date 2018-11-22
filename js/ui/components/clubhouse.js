@@ -26,11 +26,13 @@ const Flatpak = imports.gi.Flatpak
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
+const Json = imports.gi.Json;
 const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 const St = imports.gi.St;
 
+const Animation = imports.ui.animation.Animation;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
@@ -55,6 +57,10 @@ const ClubhouseIface =
     </method> \
     <method name="hide"> \
       <arg type="u" direction="in" name="timestamp"/> \
+    </method> \
+    <method name="getAnimationMetadata"> \
+      <arg type="s" direction="in" name="path"/> \
+      <arg type="v" direction="out" name="metadata"/> \
     </method> \
     <property name="Visible" type="b" access="read"/> \
     <property name="SuggestingOpen" type="b" access="read"/> \
@@ -146,6 +152,140 @@ var ClubhouseWindowTracker = new Lang.Class({
         if (!Main.sessionMode.hasOverview || Main.overview.visible || this._windowActor == null)
             return -1;
         return this._windowActor.x;
+    },
+});
+
+var getClubhouseAnimator = (function () {
+    let clubhouseAnimator;
+    return function() {
+        if (!clubhouseAnimator)
+            clubhouseAnimator = new ClubhouseAnimator();
+        return clubhouseAnimator;
+    };
+}());
+
+var ClubhouseAnimator = new Lang.Class({
+    Name: 'ClubhouseAnimator',
+    Extends: GObject.Object,
+
+    _init: function() {
+        this.parent();
+        this._proxy = null;
+        this._animations = {};
+        this._clubhousePaths = this._getClubhousePaths();
+    },
+
+    setClubhouseProxy: function(proxy) {
+        this._proxy = proxy;
+    },
+
+    _getClubhousePaths: function() {
+        let paths = [];
+        let installations = [];
+
+        try {
+            installations = Flatpak.get_system_installations(null);
+        } catch (err) {
+            logError(err, 'Error while getting Flatpak system installations');
+        }
+
+        let userInstallation = null;
+        try {
+            userInstallation = Flatpak.Installation.new_user(null);
+        } catch (err) {
+            logError(err, 'Error while getting Flatpak user installation');
+        }
+
+        if (userInstallation)
+            installations.unshift(userInstallation);
+
+        for (let installation of installations) {
+            let app = null;
+            try {
+                app = installation.get_current_installed_app(CLUBHOUSE_ID, null);
+            } catch (err) {
+                if (!err.matches(Flatpak.Error, Flatpak.Error.NOT_INSTALLED))
+                    logError(err, 'Error while getting installed %s'.format(CLUBHOUSE_ID));
+
+                continue;
+            }
+
+            if (app) {
+                let deployDir = app.get_deploy_dir();
+                paths.push(this._getActivateDir(deployDir));
+            }
+        }
+
+        return paths;
+    },
+
+    _getActivateDir: function(deployDir) {
+        // Replace the hash part of the deploy directory by "active", so the directory
+        // is always the most recent one (i.e. allows us to update the Clubhouse and
+        // still have the right dir).
+        let dir = deployDir.substr(-1) == '/' ? deployDir.slice(0, -1) : deployDir;
+        let splitDir = dir.split('/')
+
+        splitDir[splitDir.length - 1] = 'active';
+
+        return splitDir.join('/');
+    },
+
+    _getClubhousePath: function(path) {
+        // Discard the /app/ prefix
+        let pathSuffix = path.replace(/^\/app\//g, '');
+
+        for (let path of this._clubhousePaths) {
+            let completePath = GLib.build_filenamev([path, 'files', pathSuffix]);
+            if (GLib.file_test(completePath, GLib.FileTest.EXISTS))
+                return completePath;
+        }
+
+        return null;
+    },
+
+    _loadAnimationByPath: function(path, callback) {
+        let metadata = this._animations[path];
+        if (metadata) {
+            GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                callback(metadata);
+                return GLib.SOURCE_REMOVE;
+            });
+
+            return;
+        }
+
+        this._proxy.getAnimationMetadataRemote(path, (results, err) => {
+            if (err) {
+                logError(err, 'Error getting animation metadata json');
+                callback(null);
+                return;
+            }
+
+            let [metadataVariant] = results;
+            let jsonData = Json.gvariant_serialize(metadataVariant);
+            let jsonStr = Json.to_string(jsonData, false);
+            let metadata = JSON.parse(jsonStr);
+            this._animations[path] = metadata;
+
+            callback(metadata);
+        });
+    },
+
+    getAnimation: function(path, callback) {
+        this._loadAnimationByPath(path, (metadata) => {
+            if (!metadata) {
+                callback(null);
+                return;
+            }
+
+            let realPath = this._getClubhousePath(path);
+            let animation = new Animation(Gio.File.new_for_path(realPath),
+                                          metadata.width,
+                                          metadata.height,
+                                          200);
+            callback(animation);
+        });
     },
 });
 
@@ -391,11 +531,30 @@ var ClubhouseQuestBanner = new Lang.Class({
     Extends: ClubhouseNotificationBanner,
 
     _init: function(notification, isFirstBanner) {
+        let icon = notification.gicon;
+        let imagePath = null;
+
+        if (icon instanceof Gio.FileIcon) {
+            let file = icon.get_file();
+            imagePath = file.get_path();
+            notification.gicon = null;
+        }
+
         this.parent(notification);
 
         this._shouldSlideIn = isFirstBanner;
 
         this._closeButton.visible = Main.sessionMode.hasOverview;
+
+        if (imagePath) {
+            getClubhouseAnimator().getAnimation(imagePath, (animation) => {
+                if (!animation)
+                    return;
+
+                animation.play();
+                this.setIcon(animation.actor);
+            });
+        }
     },
 });
 
@@ -607,6 +766,9 @@ var ClubhouseComponent = new Lang.Class({
                     this._clearQuestBanner();
                 }
             });
+
+            let clubhouseAnimator = getClubhouseAnimator();
+            clubhouseAnimator.setClubhouseProxy(this.proxy);
         }
 
         this._enabled = true;
