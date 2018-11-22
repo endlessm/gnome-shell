@@ -284,6 +284,9 @@ var ClubhouseAnimator = new Lang.Class({
                                           metadata.width,
                                           metadata.height,
                                           200);
+            if (metadata.delays)
+                animation.setFrameTimeouts(metadata.delays);
+
             callback(animation);
         });
     },
