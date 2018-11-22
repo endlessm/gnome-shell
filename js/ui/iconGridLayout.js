@@ -33,6 +33,15 @@ function findInArray(array, func) {
     return null;
 }
 
+let _singleton = null;
+
+function getDefault() {
+    if (_singleton == null)
+        _singleton = new IconGridLayout();
+
+    return _singleton;
+}
+
 var IconGridLayout = GObject.registerClass({
     Signals: { 'changed': {},
                'folder-added': { param_types: [GObject.TYPE_STRING] } },
@@ -500,6 +509,3 @@ var IconGridLayout = GObject.registerClass({
         icons.splice(insertIdx, 0, id);
     }
 });
-
-// to be used as singleton
-var layout = new IconGridLayout();
