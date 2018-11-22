@@ -26,6 +26,7 @@ const Flatpak = imports.gi.Flatpak
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
+const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 const St = imports.gi.St;
@@ -181,9 +182,14 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this.actor.remove_style_class_name('notification-banner');
         this.actor.add_style_class_name('clubhouse-notification');
         this._iconBin.add_style_class_name('clubhouse-notification-icon-bin');
+        this._closeButton.add_style_class_name('clubhouse-notification-close-button');
+        let image = this._iconBin.get_first_child();
+        image.add_style_class_name('clubhouse-notification-image');
 
         // Always wrap the body's text
         this._expandedLabel.actor.add_style_class_name('clubhouse-notification-label');
+
+        this._rearrangeElements();
 
         this._clubhouseTrackerHandler =
             getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
@@ -198,12 +204,80 @@ var ClubhouseNotificationBanner = new Lang.Class({
         }
     },
 
+    _rearrangeElements: function() {
+        let contentBox = this._bodyStack.get_parent();
+        contentBox.add_style_class_name('clubhouse-content-box');
+        let hbox = contentBox.get_parent();
+        let vbox = hbox.get_parent();
+
+        let wrapBin = new St.Bin({ x_fill: true,
+                                   y_fill: true,
+                                   x_align: St.Align.END,
+                                   y_align: St.Align.END,
+                                   x_expand: true,
+                                   y_expand: true });
+        hbox.add_child(wrapBin);
+
+        // A Clutter.BinLayout is used to rearrange the notification
+        // elements in layers:
+        let wrapWidget = new St.Widget({ layout_manager: new Clutter.BinLayout(),
+                                         x_align: Clutter.ActorAlign.FILL,
+                                         y_align: Clutter.ActorAlign.END });
+        wrapBin.set_child(wrapWidget);
+
+        let iconBinParams = { x_fill: false,
+                              y_fill: false,
+                              x_expand: true,
+                              y_expand: true,
+                              x_align: Clutter.ActorAlign.END,
+                              y_align: Clutter.ActorAlign.END };
+        Object.assign(this._iconBin, iconBinParams);
+
+        let contentBoxParams = { x_expand: true,
+                                 y_expand: false,
+                                 x_align: Clutter.ActorAlign.FILL,
+                                 y_align: Clutter.ActorAlign.END };
+        Object.assign(contentBox, contentBoxParams);
+
+        let actionBinParams = { x_expand: true,
+                                y_expand: true,
+                                x_align: Clutter.ActorAlign.START,
+                                y_align: Clutter.ActorAlign.END };
+        Object.assign(this._actionBin, actionBinParams);
+
+        let expandedLabelActorParams = { y_expand: true,
+                                         y_align: Clutter.ActorAlign.CENTER };
+        Object.assign(this._expandedLabel.actor, expandedLabelActorParams);
+        this._expandedLabel.actor.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+
+        hbox.remove_child(contentBox);
+        wrapWidget.add_child(contentBox);
+
+        hbox.remove_child(this._iconBin);
+        wrapWidget.add_child(this._iconBin);
+
+        vbox.remove_child(this._actionBin);
+        wrapWidget.add_child(this._actionBin);
+    },
+
+    // Override the callback that changes the button opacity on hover:
+    _sync: function() {
+        this._closeButton.opacity = 255;
+    },
+
     _addActions: function() {
         // Only set up the actions if we're showing the last page of text
         if (!this._inLastPage())
             return;
 
         this.parent();
+    },
+
+    // Override this method because we don't want the button
+    // horizontally expanded:
+    addButton: function(button, callback) {
+        button.set_x_expand(false);
+        this.parent(button, callback);
     },
 
     _splitTextInPages: function(fulltext) {
@@ -263,8 +337,8 @@ var ClubhouseNotificationBanner = new Lang.Class({
     _setupNextPageButton: function() {
         let button = new St.Button({ style_class: 'notification-button',
                                      label: '»',
-                                     x_expand: true,
                                      can_focus: true });
+        button.add_style_class_name('next');
 
         return this.addButton(button, () => {
             this._setNextPage();
