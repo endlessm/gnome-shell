@@ -1579,8 +1579,8 @@ var AppSearchProvider = new Lang.Class({
         let results = [];
         let replacementMap = {};
 
-        groups.forEach(function(group) {
-            group = group.filter(function(appID) {
+        groups.forEach((group) => {
+            group = group.filter((appID) => {
                 let app = Gio.DesktopAppInfo.new(appID);
                 let isLink = appID.startsWith(EOS_LINK_PREFIX);
                 let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
