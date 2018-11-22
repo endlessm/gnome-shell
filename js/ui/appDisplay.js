@@ -140,6 +140,8 @@ class BaseAppView {
                                                 padWithSpacing: true });
         params = Params.parse(params, { usePagination: false });
 
+        this._iconGridLayout = IconGridLayout.getDefault();
+
         if(params.usePagination)
             this._grid = new IconGrid.PaginatedIconGrid(gridParams);
         else
@@ -160,7 +162,7 @@ class BaseAppView {
     }
 
     _createItemForId(itemId) {
-        if (IconGridLayout.layout.iconIsFolder(itemId))
+        if (this._iconGridLayout.iconIsFolder(itemId))
             return Shell.DesktopDirInfo.new(itemId);
 
         return Shell.AppSystem.get_default().lookup_app(itemId);
@@ -172,13 +174,13 @@ class BaseAppView {
 
     getLayoutIds() {
         let viewId = this.getViewId();
-        return IconGridLayout.layout.getIcons(viewId).slice();
+        return this._iconGridLayout.getIcons(viewId).slice();
     }
 
     _trimInvisible(ids) {
         let appSystem = Shell.AppSystem.get_default();
         return ids.filter((id) => {
-            return IconGridLayout.layout.iconIsFolder(id) || appSystem.lookup_app(id) || (id == EOS_APP_CENTER_ID);
+            return this._iconGridLayout.iconIsFolder(id) || appSystem.lookup_app(id) || (id == EOS_APP_CENTER_ID);
         });
     }
 
@@ -594,7 +596,7 @@ var AllView = class AllView extends BaseAppView {
         Shell.AppSystem.get_default().connect('installed-changed', () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
-        IconGridLayout.layout.connect('changed', () => {
+        this._iconGridLayout.connect('changed', () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
         global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, () => {
@@ -602,7 +604,7 @@ var AllView = class AllView extends BaseAppView {
         });
 
         this._addedFolderId = null;
-        IconGridLayout.layout.connect('folder-added', (iconGridLayout, id) => {
+        this._iconGridLayout.connect('folder-added', (iconGridLayout, id) => {
             // Go to last page; ideally the grid should know in
             // which page the change took place and show it automatically
             // which would avoid us having to navigate there directly
@@ -678,7 +680,7 @@ var AllView = class AllView extends BaseAppView {
 
         let itemId = item.get_id();
 
-        if (!IconGridLayout.layout.iconIsFolder(itemId)) {
+        if (!this._iconGridLayout.iconIsFolder(itemId)) {
             return new AppIcon(item,
                                { isDraggable: true,
                                  parentView: this },
@@ -1154,7 +1156,7 @@ var AllView = class AllView extends BaseAppView {
             this._currentPopup.popdown();
         }
 
-        IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
+        this._iconGridLayout.repositionIcon(source.getId(), insertId, folderId);
         return true;
     }
 
@@ -1373,6 +1375,7 @@ var AppSearchProvider = class AppSearchProvider {
         this.isRemoteProvider = false;
         this.canLaunchSearch = false;
 
+        this._iconGridLayout = IconGridLayout.getDefault();
         this._systemActions = new SystemActions.getDefault();
     }
 
@@ -1419,7 +1422,7 @@ var AppSearchProvider = class AppSearchProvider {
             group = group.filter(appID => {
                 let app = Gio.DesktopAppInfo.new(appID);
                 let isLink = appID.startsWith(EOS_LINK_PREFIX);
-                let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
+                let isOnDesktop = this._iconGridLayout.hasIcon(appID);
 
                 // exclude links that are not part of the desktop grid
                 if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
@@ -1443,9 +1446,9 @@ var AppSearchProvider = class AppSearchProvider {
         results = results.concat(this._systemActions.getMatchingActions(terms));
 
         // resort to keep results on the desktop grid before the others
-        results = results.sort(function(a, b) {
-            let hasA = a === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(a);
-            let hasB = b === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(b);
+        results = results.sort((a, b) => {
+            let hasA = a === EOS_APP_CENTER_ID || this._iconGridLayout.hasIcon(a);
+            let hasB = b === EOS_APP_CENTER_ID || this._iconGridLayout.hasIcon(b);
 
             return hasB - hasA;
         });
@@ -1522,14 +1525,14 @@ var FolderView = class FolderView extends BaseAppView {
         });
 
         this._redisplayFolderWorkId = Main.initializeDeferredWork(this._folderIcon.actor, this._redisplay.bind(this));
-        let layoutChangedId = IconGridLayout.layout.connect('changed', () => {
+        let layoutChangedId = this._iconGridLayout.connect('changed', () => {
             // AllView only checks for the toplevel icons, not those inside folders.
             Main.queueDeferredWork(this._redisplayFolderWorkId);
         });
 
         this._folderIcon.actor.connect('destroy', () => {
             // The deferred work will not be valid after the folderIcon is destroyed.
-            IconGridLayout.layout.disconnect(layoutChangedId);
+            this._iconGridLayout.disconnect(layoutChangedId);
         });
 
         // Don't call _redisplay() here, since that will call reloadIcon() which, besides
@@ -1742,6 +1745,8 @@ var ViewIcon = GObject.registerClass({
         this.blockHandler = false;
 
         this._scaleInId = 0;
+
+        this._iconGridLayout = IconGridLayout.getDefault();
 
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
@@ -1981,7 +1986,7 @@ var ViewIcon = GObject.registerClass({
 
     remove() {
         this.blockHandler = true;
-        IconGridLayout.layout.removeIcon(this.getId(), true);
+        this._iconGridLayout.removeIcon(this.getId(), true);
         this.blockHandler = false;
 
         this.handleViewDragEnd();
@@ -2257,7 +2262,7 @@ var FolderIcon = GObject.registerClass({
 
     handleIconDrop(source) {
         // Move the source icon into this folder
-        IconGridLayout.layout.appendIcon(source.getId(), this.getId());
+        this._iconGridLayout.appendIcon(source.getId(), this.getId());
         return true;
     }
 
