@@ -4,6 +4,7 @@ const { EosMetrics, Gio, GLib, GObject, Json, Shell } = imports.gi;
 
 const Config = imports.misc.config;
 const Main = imports.ui.main;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 
 var DESKTOP_GRID_ID = 'desktop';
 
@@ -49,6 +50,7 @@ var IconGridLayout = GObject.registerClass({
     _init(params) {
         super._init();
 
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
         this._updateIconTree();
 
         this._removeUndone = false;
@@ -67,6 +69,16 @@ var IconGridLayout = GObject.registerClass({
             let context = allIcons.get_child_value(i);
             let [folder, ] = context.get_child_value(0).get_string();
             let children = context.get_child_value(1).get_strv();
+
+            children = children.filter((appId) => {
+                let app = appSys.lookup_alias(appId);
+                if (!app)
+                    return true;
+
+                // Ensure the app is not blacklisted.
+                return this._parentalControlsManager.shouldShowApp(app.get_app_info());
+            });
+
             iconTree[folder] = children.map(function(appId) {
                 // Some older versions of eos-app-store incorrectly added eos-app-*.desktop
                 // files to the icon grid layout, instead of the proper unprefixed .desktop

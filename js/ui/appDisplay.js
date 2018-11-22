@@ -16,6 +16,7 @@ const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PageIndicators = imports.ui.pageIndicators;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 const ViewSelector = imports.ui.viewSelector;
@@ -1265,6 +1266,8 @@ var FrequentView = class FrequentView extends BaseAppView {
             if (this.actor.mapped)
                 this._redisplay();
         });
+
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
     }
 
     hasUsefulData() {
@@ -1279,7 +1282,7 @@ var FrequentView = class FrequentView extends BaseAppView {
             return;
 
         for (let i = 0; i < mostUsed.length; i++) {
-            if (!mostUsed[i].get_app_info().should_show())
+            if (!this._parentalControlsManager.shouldShowApp(mostUsed[i].get_app_info()))
                 continue;
             let appIcon = new AppIcon(mostUsed[i],
                                       { isDraggable: true },
@@ -1418,6 +1421,7 @@ var AppSearchProvider = class AppSearchProvider {
         let usage = Shell.AppUsage.get_default();
         let results = [];
         let replacementMap = {};
+        let parentalControlsManager = ParentalControlsManager.getDefault();
 
         groups.forEach(group => {
             group = group.filter(appID => {
@@ -1426,10 +1430,12 @@ var AppSearchProvider = class AppSearchProvider {
                 let isOnDesktop = this._iconGridLayout.hasIcon(appID);
 
                 // exclude links that are not part of the desktop grid
-                if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
+                if (!app ||
+                    !parentalControlsManager.shouldShowApp(app) ||
+                    (isLink && !isOnDesktop))
                     return false;
 
-                if (app && app.should_show()) {
+                if (app && parentalControlsManager.shouldShowApp(app)) {
                     let replacedByID = app.get_string(EOS_REPLACED_BY_KEY);
                     if (replacedByID)
                         replacementMap[appID] = replacedByID;

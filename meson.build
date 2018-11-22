@@ -113,6 +113,9 @@ eosmetrics_dep = dependency('eosmetrics-0')
 # Endless-specific: Required for keyboard layout switcher in password entries
 xkbcommon_dep = dependency('xkbcommon')
 
+# Endless-specific: parental controls
+eos_parental_controls_dep = dependency('eos-parental-controls-0', required: true)
+
 nm_deps = []
 if get_option('networkmanager')
   nm_deps += dependency('libnm', version: nm_req)
