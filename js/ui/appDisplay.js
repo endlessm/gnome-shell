@@ -166,6 +166,8 @@ class BaseAppView {
                                                 padWithSpacing: true });
         params = Params.parse(params, { usePagination: false });
 
+        this._iconGridLayout = IconGridLayout.getDefault();
+
         if (params.usePagination)
             this._grid = new IconGrid.PaginatedIconGrid(gridParams);
         else
@@ -247,7 +249,7 @@ class BaseAppView {
             realPosition = this._allItems.indexOf(targetId);
         }
 
-        IconGridLayout.layout.repositionIcon(item.id, targetId, this.id);
+        this._iconGridLayout.repositionIcon(item.id, targetId, this.id);
 
         return realPosition;
     }
@@ -531,7 +533,7 @@ var AllView = class AllView extends BaseAppView {
         Shell.AppSystem.get_default().connect('installed-changed', () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
-        IconGridLayout.layout.connect('changed', () => {
+        this._iconGridLayout.connect('changed', () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
         global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, () => {
@@ -552,7 +554,7 @@ var AllView = class AllView extends BaseAppView {
         let newApps = [];
         let items = [];
 
-        let desktopIds = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+        let desktopIds = this._iconGridLayout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
 
         for (let idx in desktopIds) {
             let itemId = desktopIds[idx];
@@ -574,7 +576,7 @@ var AllView = class AllView extends BaseAppView {
         items.forEach((itemId) => {
             let icon = null;
 
-            if (IconGridLayout.layout.iconIsFolder(itemId)) {
+            if (this._iconGridLayout.iconIsFolder(itemId)) {
                 icon = this._items[itemId];
                 if (!icon) {
                     let item = Shell.DesktopDirInfo.new(itemId);
@@ -960,12 +962,12 @@ var AllView = class AllView extends BaseAppView {
         let appItems = apps.map(id => this._items[id].app);
         let folderName = _findBestFolderName(appItems);
 
-        let newFolderId = IconGridLayout.layout.addFolder(folderName);
+        let newFolderId = this._iconGridLayout.addFolder(folderName);
         if (!newFolderId)
             return false;
 
         for (let app of apps)
-            IconGridLayout.layout.appendIcon(app, newFolderId);
+            this._iconGridLayout.appendIcon(app, newFolderId);
 
         return true;
     }
@@ -1044,6 +1046,7 @@ var AppSearchProvider = class AppSearchProvider {
         this.isRemoteProvider = false;
         this.canLaunchSearch = false;
 
+        this._iconGridLayout = IconGridLayout.getDefault();
         this._systemActions = new SystemActions.getDefault();
     }
 
@@ -1089,7 +1092,7 @@ var AppSearchProvider = class AppSearchProvider {
             group = group.filter(appID => {
                 let app = Gio.DesktopAppInfo.new(appID);
                 let isLink = appID.startsWith(EOS_LINK_PREFIX);
-                let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
+                let isOnDesktop = this._iconGridLayout.hasIcon(appID);
 
                 // exclude links that are not part of the desktop grid
                 if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
@@ -1113,9 +1116,9 @@ var AppSearchProvider = class AppSearchProvider {
         results = results.concat(this._systemActions.getMatchingActions(terms));
 
         // resort to keep results on the desktop grid before the others
-        results = results.sort(function(a, b) {
-            let hasA = a === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(a);
-            let hasB = b === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(b);
+        results = results.sort((a, b) => {
+            let hasA = a === EOS_APP_CENTER_ID || this._iconGridLayout.hasIcon(a);
+            let hasB = b === EOS_APP_CENTER_ID || this._iconGridLayout.hasIcon(b);
 
             return hasB - hasA;
         });
@@ -1298,7 +1301,7 @@ var FolderView = class FolderView extends BaseAppView {
         };
 
         let id = this._dirInfo.get_id();
-        let folderApps = IconGridLayout.layout.getIcons(id);
+        let folderApps = this._iconGridLayout.getIcons(id);
         folderApps.forEach(addAppId);
 
         return apps;
@@ -1306,12 +1309,12 @@ var FolderView = class FolderView extends BaseAppView {
 
     removeApp(app) {
         let id = this._dirInfo.get_id();
-        let folderApps = IconGridLayout.layout.getIcons(id);
+        let folderApps = this._iconGridLayout.getIcons(id);
 
         // Remove the folder if this is the last app icon; otherwise,
         // just remove the icon
         if (folderApps.length == 0) {
-            IconGridLayout.layout.removeIcon(id);
+            this._iconGridLayout.removeIcon(id);
         } else {
             /* FIXME */
         }
@@ -1340,6 +1343,8 @@ class ViewIcon extends GObject.Object {
         iconParams = Params.parse(iconParams, {
             showLabel: true,
         }, true);
+
+        this._iconGridLayout = IconGridLayout.getDefault();
 
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
@@ -1571,7 +1576,7 @@ var FolderIcon = GObject.registerClass({
         if (!view || !(view instanceof AllView))
             return false;
 
-        let folderApps = IconGridLayout.layout.getIcons(source.id);
+        let folderApps = this._iconGridLayout.getIcons(source.id);
         if (folderApps.includes(source.id))
             return false;
 
@@ -1593,7 +1598,7 @@ var FolderIcon = GObject.registerClass({
             return false;
 
         let app = source.app;
-        IconGridLayout.layout.appendIcon(app.id, this.id);
+        this._iconGridLayout.appendIcon(app.id, this.id);
 
         this._redisplay();
         this.view._redisplay();
@@ -1869,7 +1874,7 @@ var RenameFolderMenu = class RenameFolderMenu extends PopupMenu.PopupMenu {
         let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
         this.addMenuItem(item);
         item.connect('activate', () => {
-            IconGridLayout.layout.removeIcon(source.id, true);
+            this._iconGridLayout.removeIcon(source.id, true);
         });
 
         Main.uiGroup.add_actor(this.actor);
@@ -2409,6 +2414,8 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
 
         super(source.actor, 0.5, side);
 
+        this._iconGridLayout = IconGridLayout.getDefault();
+
         // We want to keep the item hovered while the menu is up
         this.blockSourceEvents = true;
 
@@ -2495,7 +2502,7 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
         // Add the "Remove from desktop" menu item at the end.
         let item = this._appendMenuItem(_("Remove from desktop"));
         item.connect('activate', () => {
-            IconGridLayout.layout.removeIcon(this._source.id, true);
+            this._iconGridLayout.removeIcon(this._source.id, true);
         });
     }
 
@@ -2596,7 +2603,7 @@ class AppCenterIcon extends AppIcon {
         if (!this._canAccept(source))
             return false;
 
-        IconGridLayout.layout.removeIcon(source.id, true);
+        this._iconGridLayout.removeIcon(source.id, true);
         return true;
     }
 });

@@ -33,6 +33,15 @@ function findInArray(array, func) {
     return null;
 }
 
+let _singleton = null;
+
+function getDefault() {
+    if (_singleton == null)
+        _singleton = new IconGridLayout();
+
+    return _singleton;
+}
+
 var IconGridLayout = GObject.registerClass({
     Signals: { 'changed': {} },
 }, class IconGridLayout extends GObject.Object {
@@ -504,6 +513,3 @@ var IconGridLayout = GObject.registerClass({
         return id;
     }
 });
-
-// to be used as singleton
-var layout = new IconGridLayout();
