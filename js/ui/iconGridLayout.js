@@ -9,6 +9,7 @@ const Json = imports.gi.Json;
 const Config = imports.misc.config;
 const EosMetrics = imports.gi.EosMetrics;
 const Main = imports.ui.main;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const Shell = imports.gi.Shell;
 
 var DESKTOP_GRID_ID = 'desktop';
@@ -52,7 +53,16 @@ var IconGridLayout = new Lang.Class({
     Name: 'IconGridLayout',
 
     _init: function(params) {
-        this._updateIconTree();
+        this._iconTree = {};
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
+
+        if (this._parentalControlsManager.initialized)
+            this._updateIconTree();
+        else
+            this._parentalControlsManager.connect('initialized', () => {
+                this._updateIconTree();
+                this.emit('changed');
+            });
 
         this._removeUndone = false;
 
@@ -70,6 +80,16 @@ var IconGridLayout = new Lang.Class({
             let context = allIcons.get_child_value(i);
             let [folder, ] = context.get_child_value(0).get_string();
             let children = context.get_child_value(1).get_strv();
+
+            children = children.filter((appId) => {
+                let app = appSys.lookup_alias(appId);
+                if (!app)
+                    return true;
+
+                // Ensure the app is not blacklisted.
+                return this._parentalControlsManager.shouldShowApp(app.get_app_info());
+            });
+
             iconTree[folder] = children.map(function(appId) {
                 // Some older versions of eos-app-store incorrectly added eos-app-*.desktop
                 // files to the icon grid layout, instead of the proper unprefixed .desktop
