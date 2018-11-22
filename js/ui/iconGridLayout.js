@@ -39,6 +39,15 @@ function findInArray(array, func) {
     return null;
 }
 
+let _singleton = null;
+
+function getDefault() {
+    if (_singleton == null)
+        _singleton = new IconGridLayout();
+
+    return _singleton;
+}
+
 var IconGridLayout = new Lang.Class({
     Name: 'IconGridLayout',
 
@@ -500,6 +509,3 @@ var IconGridLayout = new Lang.Class({
     }
 });
 Signals.addSignalMethods(IconGridLayout.prototype);
-
-// to be used as singleton
-var layout = new IconGridLayout();
