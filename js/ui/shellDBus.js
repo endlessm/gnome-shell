@@ -95,8 +95,11 @@ var GnomeShell = new Lang.Class({
         this._extensionsService = new GnomeShellExtensions();
         this._screenshotService = new Screenshot.ScreenshotService();
 
-        this._appstoreService = new AppStoreService();
-        this._appLauncherService = new AppLauncher();
+        this._appstoreService = null;
+        this._appLauncherService = null;
+
+        Main.sessionMode.connect('updated', this._sessionModeChanged.bind(this));
+        this._sessionModeChanged();
 
         this._grabbedAccelerators = new Map();
         this._grabbers = new Map();
@@ -111,6 +114,20 @@ var GnomeShell = new Lang.Class({
                               Lang.bind(this, this._checkOverviewVisibleChanged));
         Main.overview.connect('hidden',
                               Lang.bind(this, this._checkOverviewVisibleChanged));
+    },
+
+    _sessionModeChanged: function() {
+        // These two D-Bus interfaces are only useful if a user is logged in
+        // and can run apps or has a desktop.
+        if (Main.sessionMode.isGreeter !== true) {
+            if (!this._appstoreService)
+                this._appstoreService = new AppStoreService();
+            if (!this._appLauncherService)
+                this._appLauncherService = new AppLauncher();
+        } else {
+            this._appstoreService = null;
+            this._appLauncherService = null;
+        }
     },
 
     /**
