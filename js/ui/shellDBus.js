@@ -524,7 +524,8 @@ const AppStoreIface = '<node> \
 </node>';
 
 function _iconIsVisibleOnDesktop(id) {
-    let visibleIcons = IconGridLayout.layout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
+    let iconGridLayout = IconGridLayout.getDefault();
+    let visibleIcons = iconGridLayout.getIcons(IconGridLayout.DESKTOP_GRID_ID);
     return visibleIcons.indexOf(id) !== -1;
 }
 
@@ -540,8 +541,9 @@ var AppStoreService = new Lang.Class({
     _init: function() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(AppStoreIface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
+        this._iconGridLayout = IconGridLayout.getDefault();
 
-        IconGridLayout.layout.connect('changed', this._emitApplicationsChanged.bind(this));
+        this._iconGridLayout.connect('changed', this._emitApplicationsChanged.bind(this));
     },
 
     AddApplication: function(id) {
@@ -549,29 +551,29 @@ var AppStoreService = new Lang.Class({
         let appId = new GLib.Variant('s', id);
         eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
 
-        if (!IconGridLayout.layout.iconIsFolder(id))
-            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+        if (!this._iconGridLayout.iconIsFolder(id))
+            this._iconGridLayout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
     },
 
     AddAppIfNotVisible: function(id) {
-        if (IconGridLayout.layout.iconIsFolder(id))
+        if (this._iconGridLayout.iconIsFolder(id))
             return;
 
         if (!_iconIsVisibleOnDesktop(id)) {
-            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+            this._iconGridLayout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
             _reportAppAddedMetric(id);
         }
     },
 
     ReplaceApplication: function(originalId, replacementId) {
         // Can't replace a folder
-        if (IconGridLayout.layout.iconIsFolder(originalId))
+        if (this._iconGridLayout.iconIsFolder(originalId))
             return;
 
         // We can just replace the app icon directly now,
         // since the replace operation degenerates to
         // append if the source icon was not available
-        IconGridLayout.layout.replaceIcon(originalId, replacementId, IconGridLayout.DESKTOP_GRID_ID);
+        this._iconGridLayout.replaceIcon(originalId, replacementId, IconGridLayout.DESKTOP_GRID_ID);
 
         // We only care about reporting a metric if the replacement id was visible
         if (!_iconIsVisibleOnDesktop(replacementId))
@@ -579,30 +581,30 @@ var AppStoreService = new Lang.Class({
     },
 
     RemoveApplication: function(id) {
-        if (!IconGridLayout.layout.iconIsFolder(id))
-            IconGridLayout.layout.removeIcon(id, false);
+        if (!this._iconGridLayout.iconIsFolder(id))
+            this._iconGridLayout.removeIcon(id, false);
     },
 
     AddFolder: function(id) {
-        if (IconGridLayout.layout.iconIsFolder(id))
-            IconGridLayout.layout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
+        if (this._iconGridLayout.iconIsFolder(id))
+            this._iconGridLayout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
     },
 
     RemoveFolder: function(id) {
-        if (IconGridLayout.layout.iconIsFolder(id))
-            IconGridLayout.layout.removeIcon(id, false);
+        if (this._iconGridLayout.iconIsFolder(id))
+            this._iconGridLayout.removeIcon(id, false);
     },
 
     ResetDesktop: function() {
-        IconGridLayout.layout.resetDesktop();
+        this._iconGridLayout.resetDesktop();
     },
 
     ListApplications: function() {
-        return IconGridLayout.layout.listApplications();
+        return this._iconGridLayout.listApplications();
     },
 
     _emitApplicationsChanged: function() {
-        let allApps = IconGridLayout.layout.listApplications();
+        let allApps = this._iconGridLayout.listApplications();
         this._dbusImpl.emit_signal('ApplicationsChanged', GLib.Variant.new('(as)', [allApps]));
     }
 });
