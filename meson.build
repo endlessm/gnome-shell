@@ -35,6 +35,7 @@ ibus_req = '>= 1.5.2'
 bt_req = '>= 3.9.0'
 gst_req = '>= 0.11.92'
 nm_req = '>= 1.10.4'
+malcontent_req = '>= 0.3.0'
 secret_req = '>= 0.18'
 
 gnome = import('gnome')
@@ -115,6 +116,9 @@ eosmetrics_dep = dependency('eosmetrics-0')
 
 # Endless-specific: Required for keyboard layout switcher in password entries
 xkbcommon_dep = dependency('xkbcommon')
+
+# Endless-specific: parental controls
+malcontent_dep = dependency('malcontent-0', version: malcontent_req, required: true)
 
 nm_deps = []
 if get_option('networkmanager')
