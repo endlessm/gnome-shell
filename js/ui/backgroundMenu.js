@@ -33,7 +33,8 @@ var BackgroundMenu = new Lang.Class({
         });
 
         this.addAction(_("Add Folder"), () => {
-            IconGridLayout.layout.addFolder();
+            let iconGridLayout = IconGridLayout.getDefault();
+            iconGridLayout.addFolder();
         });
 
         this.actor.add_style_class_name('background-menu');
