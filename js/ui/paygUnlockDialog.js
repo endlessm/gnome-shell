@@ -317,6 +317,11 @@ var PaygUnlockDialog = new Lang.Class({
 
         this._clearTooManyAttemptsId = 0;
         this.connect('destroy', this._onDestroy.bind(this));
+        log('Setting signal receptor for expiry time changed');
+        Main.paygManager.connect('expiry-time-changed', () => { 
+            log('Connected to the expiry-time-changed signal');
+            this._onSuccess(); 
+        });
 
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, Lang.bind(this, this._onCancelled));
@@ -330,6 +335,41 @@ var PaygUnlockDialog = new Lang.Class({
             Mainloop.source_remove(this._clearTooManyAttemptsId);
             this._clearTooManyAttemptsId = 0;
         }
+    },
+
+    _onSuccess: function() {
+        log('Display success screen ' + Main.paygManager._expiryTime);
+        this.actor = new St.Widget({ accessible_role: Atk.Role.WINDOW,
+                                     style_class: 'unlock-dialog-payg',
+                                     layout_manager: new Clutter.BoxLayout(),
+                                     visible: false });
+        this.actor.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
+
+        this._parentActor.add_child(this.actor);
+
+        let mainBox = new St.BoxLayout({ vertical: true,
+                                         x_align: Clutter.ActorAlign.FILL,
+                                         y_align: Clutter.ActorAlign.CENTER,
+                                         x_expand: true,
+                                         y_expand: true,
+                                         style_class: 'unlock-dialog-payg-layout'});
+        this.actor.add_child(mainBox);
+
+        let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
+                                        text: _("Success!"),
+                                        x_align: Clutter.ActorAlign.CENTER });
+        mainBox.add_child(titleLabel);
+
+        let subtitleLabel = new St.Label({ style_class: 'unlock-dialog-payg-label',
+                                        text: _("You have added " + Main.paygManager._expiryTime),
+                                        x_align: Clutter.ActorAlign.CENTER });
+        mainBox.add_child(subtitleLabel);
+
+        Mainloop.timeout_add(3000, () => {
+           log ('Trigger deactivation of ScreenShield');
+           Main.paygManager.emit('success-on-expiry-changed');
+           return GLib.SOURCE_CONTINUE;
+        });
     },
 
     _createButtonsArea: function() {

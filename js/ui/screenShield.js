@@ -582,7 +582,7 @@ var ScreenShield = new Lang.Class({
         this._syncInhibitor();
 
         Main.paygManager.connect('code-expired', () => { this.lock(true) });
-        Main.paygManager.connect('expiry-time-changed', () => {
+        Main.paygManager.connect('success-on-expiry-changed', () => {
             let userManager = AccountsService.UserManager.get_default();
             let user = userManager.get_user(GLib.get_user_name());
 
@@ -601,6 +601,7 @@ var ScreenShield = new Lang.Class({
             }
 
             let paygExpectedMode = this._isGreeter ? 'gdm-unlock-dialog-payg' : 'unlock-dialog-payg';
+
             if (Main.sessionMode.currentMode == paygExpectedMode) {
                 // This is the most common case.
                 Main.sessionMode.popMode(paygExpectedMode);
@@ -1280,10 +1281,14 @@ var ScreenShield = new Lang.Class({
 
         if (Main.sessionMode.currentMode == 'lock-screen')
             Main.sessionMode.popMode('lock-screen');
-        if (Main.sessionMode.currentMode == 'gdm-unlock-dialog-payg')
+        if (Main.sessionMode.currentMode == 'gdm-unlock-dialog-payg') {
+            log('Popping gdm-unlock-dialog-payg');
             Main.sessionMode.popMode('gdm-unlock-dialog-payg');
-        if (Main.sessionMode.currentMode == 'unlock-dialog-payg')
+        }
+        if (Main.sessionMode.currentMode == 'unlock-dialog-payg') {
+            log('Popping unlock-dialog-payg');
             Main.sessionMode.popMode('unlock-dialog-payg');
+        }
         if (Main.sessionMode.currentMode == 'unlock-dialog')
             Main.sessionMode.popMode('unlock-dialog');
 
