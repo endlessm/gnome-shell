@@ -285,6 +285,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
     },
 
     dismiss: function(shouldSlideOut) {
+        if (!this.actor)
+            return;
+
         if (shouldSlideOut) {
             this._slideOut();
             return;
