@@ -268,8 +268,11 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
     _slideOut: function() {
         let monitor = Main.layoutManager.primaryMonitor;
-        if (!monitor)
+        if (!monitor) {
+            this.actor.destroy();
+            this.actor = null;
             return;
+        }
 
         let endX = monitor.x + monitor.width;
 
