@@ -1598,8 +1598,9 @@ var AppSearchProvider = new Lang.Class({
                 let isOnDesktop = this._iconGridLayout.hasIcon(appID);
 
                 // exclude links that are not part of the desktop grid
-                if (!(app && parentalControlsManager.shouldShowApp(app) &&
-                    !(isLink && !isOnDesktop)))
+                if (!app ||
+                    !parentalControlsManager.shouldShowApp(app) ||
+                    (isLink && !isOnDesktop))
                     return false;
 
                 if (app && parentalControlsManager.shouldShowApp(app)) {
