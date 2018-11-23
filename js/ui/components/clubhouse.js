@@ -188,9 +188,14 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this._clubhouseTrackerHandler =
             getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
 
-        this.actor.connect('destroy', () => {
+        this.actor.connect('destroy', this._untrackClubhouse.bind(this));
+    },
+
+    _untrackClubhouse: function() {
+        if (this._clubhouseTrackerHandler > 0) {
             getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
-        });
+            this._clubhouseTrackerHandler = 0;
+        }
     },
 
     _addActions: function() {
@@ -288,6 +293,8 @@ var ClubhouseNotificationBanner = new Lang.Class({
     },
 
     dismiss: function(shouldSlideOut) {
+        this._untrackClubhouse();
+
         if (!this.actor)
             return;
 
