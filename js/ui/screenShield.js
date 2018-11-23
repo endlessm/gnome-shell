@@ -582,7 +582,7 @@ var ScreenShield = new Lang.Class({
         this._syncInhibitor();
 
         Main.paygManager.connect('code-expired', () => { this.lock(true) });
-        Main.paygManager.connect('expiry-time-changed', () => {
+        Main.paygManager.connect('success-on-expiry-changed', () => {
             let userManager = AccountsService.UserManager.get_default();
             let user = userManager.get_user(GLib.get_user_name());
 

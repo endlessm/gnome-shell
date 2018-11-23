@@ -221,7 +221,7 @@ var PaygUnlockDialog = new Lang.Class({
         this.actor.add_child(mainBox)
 
         let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
-                                        text: _("Your Endless pay-as-you-go usage credit has expired."),
+                                        text: _("Your Endless PayGo usage credit has expired."),
                                         x_align: Clutter.ActorAlign.CENTER });
         mainBox.add_child(titleLabel);
 
@@ -314,6 +314,11 @@ var PaygUnlockDialog = new Lang.Class({
         this._clearTooManyAttemptsId = 0;
         this.connect('destroy', this._onDestroy.bind(this));
 
+        log('Displaying success screen');
+        Main.paygManager.connect('expiry-time-changed', (expirytime) => {
+            this._onSuccess(mainBox);
+        });
+
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, Lang.bind(this, this._onCancelled));
 
@@ -326,6 +331,53 @@ var PaygUnlockDialog = new Lang.Class({
             Mainloop.source_remove(this._clearTooManyAttemptsId);
             this._clearTooManyAttemptsId = 0;
         }
+    },
+
+    _onSuccess: function(mainBox) {
+            mainBox.remove_all_children();
+
+            //Measuring the ceiling of the timeRemainingSecs because by the time this runs, some time has already elapsed
+            let timeString = Main.paygManager._convertTimeToString(Math.ceil(Main.paygManager._timeRemainingSecs()));
+            let successLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
+                                        text: _(timeString + " have been added to your PayGo credit."),
+                                        x_align: Clutter.ActorAlign.CENTER });
+            mainBox.add_child(successLabel);
+
+            let successButtonBox = new St.BoxLayout({ style_class: 'unlock-dialog-payg-button-box',
+                                            vertical: false,
+                                            x_expand: true,
+                                            x_align: Clutter.ActorAlign.FILL,
+                                            y_expand: true,
+                                            y_align: Clutter.ActorAlign.END });
+
+            this._successButton = new St.Button({ style_class: 'modal-dialog-button button',
+                                           button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+                                           reactive: true,
+                                           can_focus: true,
+                                           label: _("Success!"),
+                                           x_align: St.Align.CENTER,
+                                           y_align: St.Align.CENTER });
+
+            this._successButton.add_style_pseudo_class('default');
+            successButtonBox.add_child(this._successButton);
+
+            mainBox.add_child(successButtonBox);
+
+            //Creating a variable to control the trigger to the signal whether or not it`s
+            //coming from a button, since they are asynchronous.
+            let successButtonClicked = false;
+            log ('Trigger deactivation of ScreenShield');
+            this._successButton.connect('clicked', () => {
+                successButtonClicked = true;
+                Main.paygManager.emit('success-on-expiry-changed');
+            });
+
+            Mainloop.timeout_add(3000, () => {
+                if (!successButtonClicked) {
+                    Main.paygManager.emit('success-on-expiry-changed');
+                    return GLib.SOURCE_REMOVE;
+                }
+            });
     },
 
     _createButtonsArea: function() {

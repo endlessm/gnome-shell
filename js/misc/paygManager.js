@@ -272,6 +272,8 @@ var PaygManager = new Lang.Class({
         if (!this._enabled)
             return GLib.MAXUINT64;
 
+        //Since expiryTime stores a UNIX timestamp, we subtract the current timestamp
+        //from the expiryTime, having an user readable number
         return Math.max(0, this._expiryTime - (GLib.get_real_time() / GLib.USEC_PER_SEC));
     },
 
@@ -291,7 +293,7 @@ var PaygManager = new Lang.Class({
         let source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
 
-        let timeLeft = timeToString(secondsLeft);
+        let timeLeft = this._convertTimeToString(secondsLeft);
         this._notification = new MessageTray.Notification(source,
                                                           NOTIFICATION_TITLE_TEXT,
                                                           NOTIFICATION_DETAILED_FORMAT_STRING.format(timeLeft));
@@ -302,6 +304,10 @@ var PaygManager = new Lang.Class({
         this._notification.connect('destroy', function() {
             this._notification = null;
         });
+    },
+
+    _convertTimeToString: function(seconds) {
+        return timeToString(seconds);
     },
 
     _maybeNotifyUser: function() {
