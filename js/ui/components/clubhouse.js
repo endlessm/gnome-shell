@@ -486,6 +486,7 @@ var ClubhouseComponent = new Lang.Class({
         this._isRunningQuest = false;
 
         this._questBanner = null;
+        this._itemBanner = null;
         this._clubhouseSource = null;
         this._clubhouseProxyHandler = 0;
 
