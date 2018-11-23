@@ -191,29 +191,6 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this.actor.connect('destroy', () => {
             getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
         });
-
-        // Hide on timeout if needed
-        this._hideTimeout = 0;
-        if (!notification.resident) {
-            this._resetTimeout();
-            this.actor.connect('notify::hover', this._resetTimeout.bind(this));
-        }
-    },
-
-    _resetTimeout: function() {
-        if (this._hideTimeout > 0) {
-            Mainloop.source_remove(this._hideTimeout);
-            this._hideTimeout = 0;
-        }
-
-        if (this.actor.hover)
-            return;
-
-        // @todo: Gradually fade out so the user sees the banner is going away
-        this._hideTimeout = Mainloop.timeout_add(CLUBHOUSE_BANNER_TIMEOUT_MSEC, () => {
-            this.close();
-            return GLib.SOURCE_REMOVE;
-        });
     },
 
     _addActions: function() {
