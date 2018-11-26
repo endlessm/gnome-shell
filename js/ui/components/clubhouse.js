@@ -228,6 +228,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
         let endX = this.actor.x - this.actor.width - margin;
 
         if (this._shouldSlideIn) {
+            // Ensure it only slides in the first time
+            this._shouldSlideIn = false;
+
             Tweener.addTween(this.actor,
                              { x: endX,
                                time: CLUBHOUSE_BANNER_ANIMATION_TIME,
