@@ -10,6 +10,7 @@ const Shell = imports.gi.Shell;
 const AppActivation = imports.ui.appActivation;
 const FileUtils = imports.misc.fileUtils;
 const IconGridLayout = imports.ui.iconGridLayout;
+const Main = imports.ui.main;
 const Search = imports.ui.search;
 
 const KEY_FILE_GROUP = 'Shell Search Provider';
@@ -165,6 +166,8 @@ function loadRemoteSearchProviders(searchSettings, callback) {
         let idxA, idxB;
         let appIdA, appIdB;
 
+        let iconGridLayout = IconGridLayout.getDefault();
+
         appIdA = providerA.appInfo.get_id();
         appIdB = providerB.appInfo.get_id();
 
@@ -175,9 +178,9 @@ function loadRemoteSearchProviders(searchSettings, callback) {
         if ((idxA == -1) && (idxB == -1)) {
             // We special case gnome-control-center, since we don't have it on
             // the desktop but still want to see the results it provides
-            let hasA = (IconGridLayout.layout.hasIcon(appIdA) ||
+            let hasA = (iconGridLayout.hasIcon(appIdA) ||
                         appIdA == CONTROL_CENTER_DESKTOP_ID);
-            let hasB = (IconGridLayout.layout.hasIcon(appIdB) ||
+            let hasB = (iconGridLayout.hasIcon(appIdB) ||
                         appIdB == CONTROL_CENTER_DESKTOP_ID);
 
             // if providerA is on the desktop, it's sorted before providerB

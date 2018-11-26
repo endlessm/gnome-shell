@@ -27,6 +27,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const Overview = imports.ui.overview;
 const OverviewControls = imports.ui.overviewControls;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 const ViewSelector = imports.ui.viewSelector;
@@ -156,6 +157,8 @@ var BaseAppView = new Lang.Class({
                                                 padWithSpacing: true });
         params = Params.parse(params, { usePagination: false });
 
+        this._iconGridLayout = IconGridLayout.getDefault();
+
         if(params.usePagination)
             this._grid = new IconGrid.PaginatedIconGrid(gridParams);
         else
@@ -176,7 +179,7 @@ var BaseAppView = new Lang.Class({
     },
 
     _createItemForId: function(itemId) {
-        if (IconGridLayout.layout.iconIsFolder(itemId))
+        if (this._iconGridLayout.iconIsFolder(itemId))
             return Shell.DesktopDirInfo.new(itemId);
 
         return Shell.AppSystem.get_default().lookup_app(itemId);
@@ -188,13 +191,13 @@ var BaseAppView = new Lang.Class({
 
     getLayoutIds: function() {
         let viewId = this.getViewId();
-        return IconGridLayout.layout.getIcons(viewId).slice();
+        return this._iconGridLayout.getIcons(viewId).slice();
     },
 
     _trimInvisible: function(ids) {
         let appSystem = Shell.AppSystem.get_default();
         return ids.filter((id) => {
-            return IconGridLayout.layout.iconIsFolder(id) || appSystem.lookup_app(id) || (id == EOS_APP_CENTER_ID);
+            return this._iconGridLayout.iconIsFolder(id) || appSystem.lookup_app(id) || (id == EOS_APP_CENTER_ID);
         });
     },
 
@@ -738,7 +741,7 @@ var AllView = new Lang.Class({
         Shell.AppSystem.get_default().connect('installed-changed', Lang.bind(this, function() {
             Main.queueDeferredWork(this._redisplayWorkId);
         }));
-        IconGridLayout.layout.connect('changed', () => {
+        this._iconGridLayout.connect('changed', () => {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
         global.settings.connect('changed::' + EOS_ENABLE_APP_CENTER_KEY, () => {
@@ -746,7 +749,7 @@ var AllView = new Lang.Class({
         });
 
         this._addedFolderId = null;
-        IconGridLayout.layout.connect('folder-added', (iconGridLayout, id) => {
+        this._iconGridLayout.connect('folder-added', (iconGridLayout, id) => {
             // Go to last page; ideally the grid should know in
             // which page the change took place and show it automatically
             // which would avoid us having to navigate there directly
@@ -822,7 +825,7 @@ var AllView = new Lang.Class({
 
         let itemId = item.get_id();
 
-        if (!IconGridLayout.layout.iconIsFolder(itemId)) {
+        if (!this._iconGridLayout.iconIsFolder(itemId)) {
             return new AppIcon(item,
                                { isDraggable: true,
                                  parentView: this },
@@ -1307,7 +1310,7 @@ var AllView = new Lang.Class({
             this._currentPopup.popdown();
         }
 
-        IconGridLayout.layout.repositionIcon(source.getId(), insertId, folderId);
+        this._iconGridLayout.repositionIcon(source.getId(), insertId, folderId);
         return true;
     },
 
@@ -1420,6 +1423,11 @@ var FrequentView = new Lang.Class({
             if (this.actor.mapped)
                 this._redisplay();
         }));
+
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
+        this._parentalControlsManager.connect('initialized', Lang.bind(this, function() {
+            this._redisplay();
+        }));
     },
 
     hasUsefulData: function() {
@@ -1434,7 +1442,7 @@ var FrequentView = new Lang.Class({
             return;
 
         for (let i = 0; i < mostUsed.length; i++) {
-            if (!mostUsed[i].get_app_info().should_show())
+            if (!this._parentalControlsManager.shouldShowApp(mostUsed[i].get_app_info()))
                 continue;
             let appIcon = new AppIcon(mostUsed[i],
                                       { isDraggable: true },
@@ -1537,6 +1545,7 @@ var AppSearchProvider = new Lang.Class({
         this.isRemoteProvider = false;
         this.canLaunchSearch = false;
 
+        this._iconGridLayout = IconGridLayout.getDefault();
         this._systemActions = new SystemActions.getDefault();
     },
 
@@ -1578,18 +1587,23 @@ var AppSearchProvider = new Lang.Class({
         let usage = Shell.AppUsage.get_default();
         let results = [];
         let replacementMap = {};
+        // FIXME: Technically we should yield until parentalControlsManager.initialized
+        // but in practice this works.
+        let parentalControlsManager = ParentalControlsManager.getDefault();
 
-        groups.forEach(function(group) {
-            group = group.filter(function(appID) {
+        groups.forEach((group) => {
+            group = group.filter((appID) => {
                 let app = Gio.DesktopAppInfo.new(appID);
                 let isLink = appID.startsWith(EOS_LINK_PREFIX);
-                let isOnDesktop = IconGridLayout.layout.hasIcon(appID);
+                let isOnDesktop = this._iconGridLayout.hasIcon(appID);
 
                 // exclude links that are not part of the desktop grid
-                if (!(app && app.should_show() && !(isLink && !isOnDesktop)))
+                if (!app ||
+                    !parentalControlsManager.shouldShowApp(app) ||
+                    (isLink && !isOnDesktop))
                     return false;
 
-                if (app && app.should_show()) {
+                if (app && parentalControlsManager.shouldShowApp(app)) {
                     let replacedByID = app.get_string(EOS_REPLACED_BY_KEY);
                     if (replacedByID)
                         replacementMap[appID] = replacedByID;
@@ -1607,9 +1621,9 @@ var AppSearchProvider = new Lang.Class({
         results = results.concat(this._systemActions.getMatchingActions(terms));
 
         // resort to keep results on the desktop grid before the others
-        results = results.sort(function(a, b) {
-            let hasA = a === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(a);
-            let hasB = b === EOS_APP_CENTER_ID || IconGridLayout.layout.hasIcon(b);
+        results = results.sort((a, b) => {
+            let hasA = a === EOS_APP_CENTER_ID || this._iconGridLayout.hasIcon(a);
+            let hasB = b === EOS_APP_CENTER_ID || this._iconGridLayout.hasIcon(b);
 
             return hasB - hasA;
         });
@@ -1689,14 +1703,14 @@ var FolderView = new Lang.Class({
         });
 
         this._redisplayFolderWorkId = Main.initializeDeferredWork(this._folderIcon.actor, () => { this._redisplay(); });
-        let layoutChangedId = IconGridLayout.layout.connect('changed', () => {
+        let layoutChangedId = this._iconGridLayout.connect('changed', () => {
             // AllView only checks for the toplevel icons, not those inside folders.
             Main.queueDeferredWork(this._redisplayFolderWorkId);
         });
 
         this._folderIcon.actor.connect('destroy', () => {
             // The deferred work will not be valid after the folderIcon is destroyed.
-            IconGridLayout.layout.disconnect(layoutChangedId);
+            this._iconGridLayout.disconnect(layoutChangedId);
         });
 
         // Don't call _redisplay() here, since that will call reloadIcon() which, besides
@@ -1909,6 +1923,8 @@ var ViewIcon = new Lang.Class({
         this.blockHandler = false;
 
         this._scaleInId = 0;
+
+        this._iconGridLayout = IconGridLayout.getDefault();
 
         // Might be changed once the createIcon() method is called.
         this._iconSize = IconGrid.ICON_SIZE;
@@ -2148,7 +2164,7 @@ var ViewIcon = new Lang.Class({
 
     remove: function() {
         this.blockHandler = true;
-        IconGridLayout.layout.removeIcon(this.getId(), true);
+        this._iconGridLayout.removeIcon(this.getId(), true);
         this.blockHandler = false;
 
         this.handleViewDragEnd();
@@ -2424,7 +2440,7 @@ var FolderIcon = new Lang.Class({
 
     handleIconDrop: function(source) {
         // Move the source icon into this folder
-        IconGridLayout.layout.appendIcon(source.getId(), this.getId());
+        this._iconGridLayout.appendIcon(source.getId(), this.getId());
         return true;
     },
 
