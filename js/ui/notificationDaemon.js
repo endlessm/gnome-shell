@@ -717,15 +717,22 @@ var GtkNotificationDaemonAppSource = new Lang.Class({
         return new GtkNotificationDaemonNotification(this, params);
     },
 
-    activateAction: function(actionId, target) {
+    activateActionFull: function(actionId, target, hideOverview) {
         this._createApp(function (app, error) {
             if (error == null)
                 app.ActivateActionRemote(actionId, target ? [target] : [], getPlatformData());
             else
                 logError(error, 'Failed to activate application proxy');
         });
-        Main.overview.hide();
-        Main.panel.closeCalendar();
+
+        if (hideOverview) {
+            Main.overview.hide();
+            Main.panel.closeCalendar();
+        }
+    },
+
+    activateAction: function(actionId, target) {
+        this.activateActionFull(actionId, target, true);
     },
 
     open: function() {
