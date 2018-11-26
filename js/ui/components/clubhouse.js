@@ -188,9 +188,14 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this._clubhouseTrackerHandler =
             getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
 
-        this.actor.connect('destroy', () => {
+        this.actor.connect('destroy', this._untrackClubhouse.bind(this));
+    },
+
+    _untrackClubhouse: function() {
+        if (this._clubhouseTrackerHandler > 0) {
             getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
-        });
+            this._clubhouseTrackerHandler = 0;
+        }
     },
 
     _addActions: function() {
@@ -268,8 +273,11 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
     _slideOut: function() {
         let monitor = Main.layoutManager.primaryMonitor;
-        if (!monitor)
+        if (!monitor) {
+            this.actor.destroy();
+            this.actor = null;
             return;
+        }
 
         let endX = monitor.x + monitor.width;
 
@@ -285,6 +293,11 @@ var ClubhouseNotificationBanner = new Lang.Class({
     },
 
     dismiss: function(shouldSlideOut) {
+        this._untrackClubhouse();
+
+        if (!this.actor)
+            return;
+
         if (shouldSlideOut) {
             this._slideOut();
             return;
@@ -480,6 +493,7 @@ var ClubhouseComponent = new Lang.Class({
         this._isRunningQuest = false;
 
         this._questBanner = null;
+        this._itemBanner = null;
         this._clubhouseSource = null;
         this._clubhouseProxyHandler = 0;
 
