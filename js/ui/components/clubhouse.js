@@ -377,6 +377,11 @@ var ClubhouseNotificationSource = new Lang.Class({
 
         return new ClubhouseNotification(this, params);
     },
+
+    activateAction: function(actionId, target) {
+        // Never show the overview when calling an action on this source.
+        this.activateActionFull(actionId, target, false);
+    },
 });
 
 var ClubhouseOpenButton = new Lang.Class({
