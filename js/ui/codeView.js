@@ -170,6 +170,13 @@ function _setFlippedState(button, flipped) {
         button.remove_style_class_name('back');
 }
 
+function _setDimmedState(button, dimmed) {
+    if (dimmed)
+        button.add_style_class_name('dimmed');
+    else
+        button.remove_style_class_name('dimmed');
+}
+
 function _flipButtonAroundRectCenter(props) {
     let {
         button,
@@ -754,6 +761,7 @@ var CodingSession = new Lang.Class({
     },
 
     _switchWindows: function() {
+        _setDimmedState(this._button, true);
         // Switch to toolbox if the app is active. Otherwise switch to the app.
         if (this._state === STATE_APP)
             this._switchToToolbox();
@@ -1022,6 +1030,7 @@ var CodingSession = new Lang.Class({
             global.window_manager.completed_destroy(oldDst);
         }
 
+        _setDimmedState(this._button, false);
         this._setEffectsEnabled(newDst, false);
 
         // Now show the destination
