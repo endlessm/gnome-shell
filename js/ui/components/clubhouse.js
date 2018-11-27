@@ -229,8 +229,8 @@ var ClubhouseNotificationBanner = new Lang.Class({
                               y_fill: false,
                               x_expand: true,
                               y_expand: true,
-                              x_align: Clutter.ActorAlign.END,
-                              y_align: Clutter.ActorAlign.END };
+                              x_align: St.Align.END,
+                              y_align: St.Align.END };
         Object.assign(this._iconBin, iconBinParams);
 
         let contentBoxParams = { x_expand: true,
