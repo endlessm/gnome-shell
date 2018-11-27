@@ -622,6 +622,9 @@ var _Draggable = new Lang.Class({
         dragActor.disconnect(this._dragActorDestroyId);
         this._dragActorDestroyId = 0;
 
+        this.emit('drag-end', eventTime, false);
+        this._finishAnimation();
+
         if (this._dragOrigParent) {
             Main.uiGroup.remove_child(dragActor);
             this._dragOrigParent.add_actor(dragActor);
@@ -630,9 +633,6 @@ var _Draggable = new Lang.Class({
         } else {
             dragActor.destroy();
         }
-
-        this.emit('drag-end', eventTime, false);
-        this._finishAnimation();
     },
 
     _dragComplete: function() {
