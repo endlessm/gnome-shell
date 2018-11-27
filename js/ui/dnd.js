@@ -554,12 +554,14 @@ var _Draggable = new Lang.Class({
         let [snapBackX, snapBackY, snapBackScale] = this._getRestoreLocation();
 
         if (this._actorDestroyed) {
+            let dragActor = this._dragActor;
+
             global.screen.set_cursor(Meta.Cursor.DEFAULT);
             if (!this._buttonDown)
                 this._dragComplete();
             this.emit('drag-end', eventTime, false);
             if (!this._dragOrigParent)
-                this._dragActor.destroy();
+                dragActor.destroy();
 
             return;
         }
