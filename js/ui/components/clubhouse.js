@@ -582,6 +582,8 @@ var ClubhouseComponent = new Lang.Class({
             this.hide(global.get_current_time());
         });
 
+        this.proxyConstructFlags = Gio.DBusProxyFlags.NONE;
+
         this._overrideAddNotification();
     },
 
@@ -609,10 +611,18 @@ var ClubhouseComponent = new Lang.Class({
             });
         }
 
-        this._clubhouseButtonManager.setSuggestOpen(this.proxy.SuggestingOpen);
-
         this._enabled = true;
         this._syncVisibility();
+    },
+
+    // Override this because we need to make sure we only call a property on the proxy once
+    // it's initialized.
+    _onProxyConstructed: function(object, res) {
+        this.parent(object, res);
+
+        // Make sure the proxy didn't fail to initialize
+        if (this.proxy.SuggestingOpen !== undefined)
+            this._clubhouseButtonManager.setSuggestOpen(!!this.proxy.SuggestingOpen);
     },
 
     disable: function() {
