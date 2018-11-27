@@ -1231,6 +1231,7 @@ var MessageTray = class MessageTray {
                            this._notificationTimeoutId == 0 &&
                            this._notification.urgency != Urgency.CRITICAL &&
                            !this._banner.focused &&
+                           !this._notificationFocusGrabber._focused &&
                            !this._pointerInNotification) || this._notificationExpired;
             let mustClose = (this._notificationRemoved || !hasNotifications || expired);
 
