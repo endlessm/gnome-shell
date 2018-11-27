@@ -554,12 +554,14 @@ var _Draggable = new Lang.Class({
         let [snapBackX, snapBackY, snapBackScale] = this._getRestoreLocation();
 
         if (this._actorDestroyed) {
+            let dragActor = this._dragActor;
+
             global.screen.set_cursor(Meta.Cursor.DEFAULT);
             if (!this._buttonDown)
                 this._dragComplete();
             this.emit('drag-end', eventTime, false);
             if (!this._dragOrigParent)
-                this._dragActor.destroy();
+                dragActor.destroy();
 
             return;
         }
@@ -620,17 +622,17 @@ var _Draggable = new Lang.Class({
         dragActor.disconnect(this._dragActorDestroyId);
         this._dragActorDestroyId = 0;
 
+        this.emit('drag-end', eventTime, false);
+        this._finishAnimation();
+
         if (this._dragOrigParent) {
-            Main.uiGroup.remove_child(this._dragActor);
-            this._dragOrigParent.add_actor(this._dragActor);
+            Main.uiGroup.remove_child(dragActor);
+            this._dragOrigParent.add_actor(dragActor);
             dragActor.set_scale(this._dragOrigScale, this._dragOrigScale);
             dragActor.set_position(this._dragOrigX, this._dragOrigY);
         } else {
             dragActor.destroy();
         }
-
-        this.emit('drag-end', eventTime, false);
-        this._finishAnimation();
     },
 
     _dragComplete: function() {
