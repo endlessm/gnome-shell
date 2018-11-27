@@ -1869,8 +1869,8 @@ var ViewIconMenu = new Lang.Class({
         }
 
         if (this._source.canBeRemoved()) {
-            // Add the "Remove from desktop" menu item at the end.
-            let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
+            // Add the "Remove from Desktop" menu item at the end.
+            let item = new PopupMenu.PopupMenuItem(_("Remove from Desktop"));
             this.addMenuItem(item);
             item.connect('activate', Lang.bind(this, function() {
                 this._source.remove();
