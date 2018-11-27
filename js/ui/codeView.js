@@ -137,9 +137,8 @@ function _synchronizeMetaWindowActorGeometries(src, dst) {
     if (srcIsMaximized && !dstIsMaximized)
         dst.meta_window.maximize(Meta.MaximizeFlags.BOTH);
 
-
     if (!srcGeometry.equal(dstGeometry))
-        dst.meta_window.move_resize_frame(false,
+        dst.meta_window.move_resize_frame(true,
                                           srcGeometry.x,
                                           srcGeometry.y,
                                           srcGeometry.width,
