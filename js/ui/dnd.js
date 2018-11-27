@@ -623,8 +623,8 @@ var _Draggable = new Lang.Class({
         this._dragActorDestroyId = 0;
 
         if (this._dragOrigParent) {
-            Main.uiGroup.remove_child(this._dragActor);
-            this._dragOrigParent.add_actor(this._dragActor);
+            Main.uiGroup.remove_child(dragActor);
+            this._dragOrigParent.add_actor(dragActor);
             dragActor.set_scale(this._dragOrigScale, this._dragOrigScale);
             dragActor.set_position(this._dragOrigX, this._dragOrigY);
         } else {
