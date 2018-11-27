@@ -66,6 +66,8 @@ var SideComponent = new Lang.Class({
 
         this._visible = false;
         this._launchedFromDesktop = false;
+
+        this.proxyConstructFlags = Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION;
     },
 
     enable: function() {
@@ -75,7 +77,7 @@ var SideComponent = new Lang.Class({
                                              g_interface_info: this._proxyInfo,
                                              g_name: this._proxyName,
                                              g_object_path: this._proxyPath,
-                                             g_flags: Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION });
+                                             g_flags: this.proxyConstructFlags });
             this.proxy.init_async(GLib.PRIORITY_DEFAULT, null, this._onProxyConstructed.bind(this));
         }
 
