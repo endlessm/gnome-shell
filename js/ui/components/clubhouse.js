@@ -406,8 +406,6 @@ var ClubhouseItemBanner = new Lang.Class({
     _init: function(notification) {
         this.parent(notification);
         this._topBanner = null;
-
-        this._addActions();
     },
 
     setTopBanner: function(topBanner) {
