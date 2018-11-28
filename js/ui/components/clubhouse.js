@@ -155,28 +155,13 @@ var ClubhouseWindowTracker = new Lang.Class({
     },
 });
 
-var getClubhouseAnimator = (function () {
-    let clubhouseAnimator;
-    return function() {
-        if (!clubhouseAnimator)
-            clubhouseAnimator = new ClubhouseAnimator();
-        return clubhouseAnimator;
-    };
-}());
-
 var ClubhouseAnimator = new Lang.Class({
     Name: 'ClubhouseAnimator',
-    Extends: GObject.Object,
 
-    _init: function() {
-        this.parent();
-        this._proxy = null;
+    _init: function(proxy) {
+        this._proxy = proxy;
         this._animations = {};
         this._clubhousePaths = this._getClubhousePaths();
-    },
-
-    setClubhouseProxy: function(proxy) {
-        this._proxy = proxy;
     },
 
     _getClubhousePaths: function() {
@@ -533,7 +518,7 @@ var ClubhouseQuestBanner = new Lang.Class({
     Name: 'ClubhouseQuestBanner',
     Extends: ClubhouseNotificationBanner,
 
-    _init: function(notification, isFirstBanner) {
+    _init: function(notification, isFirstBanner, animator) {
         let icon = notification.gicon;
         let imagePath = null;
 
@@ -550,7 +535,7 @@ var ClubhouseQuestBanner = new Lang.Class({
         this._closeButton.visible = Main.sessionMode.hasOverview;
 
         if (imagePath) {
-            getClubhouseAnimator().getAnimation(imagePath, (animation) => {
+            animator.getAnimation(imagePath, (animation) => {
                 if (!animation)
                     return;
 
@@ -596,8 +581,8 @@ var ClubhouseNotification = new Lang.Class({
         this.setResident(true);
     },
 
-    createBanner: function(isFirstBanner) {
-        return new ClubhouseQuestBanner(this, isFirstBanner);
+    createBanner: function(isFirstBanner, animator) {
+        return new ClubhouseQuestBanner(this, isFirstBanner, animator);
     },
 });
 
@@ -770,8 +755,7 @@ var ClubhouseComponent = new Lang.Class({
                 }
             });
 
-            let clubhouseAnimator = getClubhouseAnimator();
-            clubhouseAnimator.setClubhouseProxy(this.proxy);
+            this._clubhouseAnimator = new ClubhouseAnimator(this.proxy);
         }
 
         this._enabled = true;
@@ -905,7 +889,8 @@ var ClubhouseComponent = new Lang.Class({
             });
 
             if (!this._questBanner) {
-                this._questBanner = notification.createBanner(!this._isRunningQuest);
+                this._questBanner = notification.createBanner(!this._isRunningQuest,
+                                                              this._clubhouseAnimator);
                 this._isRunningQuest = true;
 
                 Main.layoutManager.addChrome(this._questBanner.actor);
