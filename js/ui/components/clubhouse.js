@@ -311,8 +311,6 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this.actor.add_style_class_name('clubhouse-notification');
         this._iconBin.add_style_class_name('clubhouse-notification-icon-bin');
         this._closeButton.add_style_class_name('clubhouse-notification-close-button');
-        let image = this._iconBin.get_first_child();
-        image.add_style_class_name('clubhouse-notification-image');
 
         // Always wrap the body's text
         this._expandedLabel.actor.add_style_class_name('clubhouse-notification-label');
@@ -330,6 +328,11 @@ var ClubhouseNotificationBanner = new Lang.Class({
             getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
             this._clubhouseTrackerHandler = 0;
         }
+    },
+
+    setIcon: function(actor) {
+        actor.add_style_class_name('clubhouse-notification-image');
+        this.parent(actor);
     },
 
     _rearrangeElements: function() {
