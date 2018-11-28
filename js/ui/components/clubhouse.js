@@ -800,7 +800,6 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
         this._clubhouseSource.connect('notify', Lang.bind(this, this._onNotify));
         this._clubhouseSource.connect('destroy', () => {
-            this._clubhouseSource.activateAction('stop-quest', null);
             this._clubhouseSource = null;
         })
 
