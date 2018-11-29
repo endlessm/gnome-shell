@@ -37,6 +37,14 @@ const _HACK_SHADER_MAP = {
 };
 const _HACK_DEFAULT_SHADER = 'desaturate';
 
+const ToyAppIface = `
+<node>
+  <interface name='com.endlessm.ToyApp'>
+    <property name="Hackable" type="b" access="read"/>
+  </interface>
+</node>
+`;
+
 function _ensureAfterFirstFrame(win, callback) {
     if (win._drawnFirstFrame) {
         callback();
@@ -379,6 +387,10 @@ var CodingSession = new Lang.Class({
         this._state = STATE_APP;
         this._toolboxActionGroup = null;
 
+        this._toyAppProxy = null;
+        this._toyAppPropsChangedId = 0;
+        this._hackable = true;
+
         this.parent(params);
 
         // FIXME: this should be extended to make it possible to launch
@@ -438,10 +450,30 @@ var CodingSession = new Lang.Class({
         this._button = new WindowTrackingButton();
         this._button.connect('clicked', this._switchWindows.bind(this));
 
+        // For now, only makes sense to monitor
+        // hackable state if there is a button
+        this._setupToyAppProxy();
+
         _ensureAfterFirstFrame(actor, () => {
             Main.layoutManager.addChrome(this._button);
             this._synchronizeButton(actor.meta_window);
         });
+    },
+
+    _setupToyAppProxy: function() {
+        const ToyAppProxy = Gio.DBusProxy.makeProxyWrapper(ToyAppIface);
+        this._toyAppProxy =
+            new ToyAppProxy(Gio.DBus.session,
+                            this.app.meta_window.gtk_application_id,
+                            this.app.meta_window.gtk_application_object_path);
+        this._toyAppPropsChangedId =
+            this._toyAppProxy.connect('g-properties-changed',
+                                      this._onToyAppPropsChanged.bind(this));
+    },
+
+    _onToyAppPropsChanged: function () {
+        this._hackable = this._toyAppProxy.Hackable;
+        this._syncButtonVisibility();
     },
 
     _updateWindowPairingState: function() {
@@ -714,6 +746,11 @@ var CodingSession = new Lang.Class({
             this._windowUnminimizedId = 0;
         }
 
+        if (this._toyAppPropsChangedId !== 0) {
+            this._toyAppProxy.disconnect(this._toyAppPropsChangedId)
+            this._toyAppPropsChangedId = 0;
+        }
+
         // If we have an app window, disconnect any signals and destroy it.
         if (this.app) {
             let appWindow = this.app.meta_window;
@@ -877,13 +914,14 @@ var CodingSession = new Lang.Class({
         let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
 
         // Show only if either this window or the toolbox window
-        // is in focus and visible
+        // is in focus, visible and hackable
         let focusedActor = focusedWindow.get_compositor_private();
         if (this._isActorFromSession(focusedActor) &&
             focusedActor.visible &&
             !Main.overview.visible &&
             !inFullscreen &&
-            !locked)
+            !locked &&
+            this._hackable)
             this._button.show();
         else
             this._button.hide();
