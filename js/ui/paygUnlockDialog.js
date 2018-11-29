@@ -33,6 +33,7 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const PaygManager = imports.misc.paygManager;
+const Payg = imports.ui.payg;
 
 const Animation = imports.ui.animation;
 const Main = imports.ui.main;
@@ -44,18 +45,6 @@ const MSEC_PER_SEC = 1000
 
 // The timeout before going back automatically to the lock screen
 const IDLE_TIMEOUT_SECS = 2 * 60;
-
-const SPINNER_ICON_SIZE_PIXELS = 16;
-const SPINNER_ANIMATION_DELAY_SECS = 1.0;
-const SPINNER_ANIMATION_TIME_SECS = 0.3;
-
-var UnlockStatus = {
-    NOT_VERIFYING: 0,
-    VERIFYING: 1,
-    FAILED: 2,
-    TOO_MANY_ATTEMPTS: 3,
-    SUCCEEDED: 4,
-};
 
 var PaygUnlockCodeEntry = new Lang.Class({
     Name: 'PaygUnlockCodeEntry',
@@ -187,10 +176,12 @@ var PaygUnlockCodeEntry = new Lang.Class({
 
 var PaygUnlockDialog = new Lang.Class({
     Name: 'PaygUnlockDialog',
+    Extends: Payg.UnlockUi,
 
     _init: function(parentActor) {
-        this._parentActor = parentActor;
+        this.parent();
 
+        this._parentActor = parentActor;
         this._entry = null;
         this._errorMessage = null;
         this._cancelButton = null;
@@ -198,7 +189,7 @@ var PaygUnlockDialog = new Lang.Class({
         this._spinner = null;
         this._cancelled = false;
 
-        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
+        this._verificationStatus = Payg.UnlockStatus.NOT_VERIFYING;
 
         // Clear the clipboard to make sure nothing can be copied into the entry.
         St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, '');
@@ -300,24 +291,21 @@ var PaygUnlockDialog = new Lang.Class({
             this._onCancelled();
         });
         this._nextButton.connect('clicked', () => {
-            this._startVerifyingCode();
+            this.startVerifyingCode();
         });
 
         this._entry.connect('code-changed', () => {
-            this._updateNextButtonSensitivity();
+            this.updateNextButtonSensitivity();
         });
 
         this._entry.clutter_text.connect('activate', () => {
-            this._startVerifyingCode();
+            this.startVerifyingCode();
         });
-
-        this._clearTooManyAttemptsId = 0;
-        this.connect('destroy', this._onDestroy.bind(this));
 
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, Lang.bind(this, this._onCancelled));
 
-        this._updateSensitivity();
+        this.updateSensitivity();
         this._entry.grab_key_focus();
     },
 
@@ -352,7 +340,7 @@ var PaygUnlockDialog = new Lang.Class({
 
         // We make the most of the spacer to show the spinner while verifying the code.
         let spinnerIcon = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/process-working.svg');
-        this._spinner = new Animation.AnimatedIcon(spinnerIcon, SPINNER_ICON_SIZE_PIXELS);
+        this._spinner = new Animation.AnimatedIcon(spinnerIcon, Payg.SPINNER_ICON_SIZE_PIXELS);
         this._spinner.actor.opacity = 0;
         this._spinner.actor.show();
         buttonSpacer.add_child(this._spinner.actor);
@@ -372,144 +360,56 @@ var PaygUnlockDialog = new Lang.Class({
 
     _onCancelled: function() {
         this._cancelled = true;
-        this._reset();
+        this.reset();
 
         // The ScreenShield will connect to the 'failed' signal
         // to know when to cancel the unlock dialog.
-        if (this._verificationStatus != UnlockStatus.SUCCEEDED)
+        if (this.verificationStatus != Payg.UnlockStatus.SUCCEEDED)
             this.emit('failed');
     },
 
-    _validateCurrentCode: function() {
-        return Main.paygManager.validateCode(this._entry.code);
+    entrySetEnabled: function(enabled) {
+        this._entry.setEnabled(enabled);
     },
 
-    _updateNextButtonSensitivity: function() {
-        let sensitive = this._validateCurrentCode() &&
-            this._verificationStatus != UnlockStatus.VERIFYING &&
-            this._verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
-
-        this._nextButton.reactive = sensitive;
-        this._nextButton.can_focus = sensitive;
-    },
-
-    _updateSensitivity: function() {
-        let shouldEnableEntry = this._verificationStatus != UnlockStatus.VERIFYING &&
-            this._verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
-
-        this._updateNextButtonSensitivity();
-        this._entry.setEnabled(shouldEnableEntry);
-    },
-
-    _setErrorMessage: function(message) {
-        if (message) {
-            this._errorMessage.text = message;
-            this._errorMessage.opacity = 255;
-        } else {
-            this._errorMessage.text = '';
-            this._errorMessage.opacity = 0;
-        }
-    },
-
-    _startSpinning: function() {
-        this._spinner.play();
-        this._spinner.actor.show();
-        Tweener.addTween(this._spinner.actor,
-                         { opacity: 255,
-                           time: SPINNER_ANIMATION_TIME_SECS,
-                           delay: SPINNER_ANIMATION_DELAY_SECS,
-                           transition: 'linear' });
-    },
-
-    _stopSpinning: function() {
-        this._spinner.actor.hide();
-        this._spinner.actor.opacity = 0;
-        this._spinner.stop();
-    },
-
-    _reset: function() {
-        this._stopSpinning();
+    entryReset: function() {
         this._entry.reset();
-        this._updateSensitivity();
     },
 
-    _processError: function(error) {
-        logError(error, 'Error adding PAYG code');
-
-        // The 'too many errors' case is a bit special, and sets a different state.
-        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
-            let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
-            let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
-            if (secondsLeft > 30) {
-                let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60));
-                this._setErrorMessage(Gettext.ngettext("Too many attempts. Try again in %s minute.",
-                                                       "Too many attempts. Try again in %s minutes.", minutesLeft)
-                                      .format(minutesLeft));
-            } else {
-                this._setErrorMessage(_("Too many attempts. Try again in a few seconds."));
-            }
-
-            // Make sure to clean the status once the time is up (if this dialog is still alive)
-            // and make sure that we install this callback at some point in the future (+1 sec).
-            this._clearTooManyAttemptsId = Mainloop.timeout_add_seconds(Math.max(1, secondsLeft), () => {
-                this._verificationStatus = UnlockStatus.NOT_VERIFYING;
-                this._clearError();
-                this._updateSensitivity();
-                this._entry.grab_key_focus()
-                return GLib.SOURCE_REMOVE;
-            });
-
-            this._verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
-            return;
-        }
-
-        // Common errors after this point.
-        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
-            this._setErrorMessage(_("Invalid code. Please try again."));
-        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
-            this._setErrorMessage(_("Code already used. Please enter a new code."));
-        } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
-            this._setErrorMessage(_("Time exceeded while verifying the code"));
-        } else {
-            // We don't consider any other error here (and we don't consider DISABLED explicitly,
-            // since that should not happen), but still we need to show something to the user.
-            this._setErrorMessage(_("Unknown error"));
-        }
-
-        this._verificationStatus = UnlockStatus.FAILED;
+    onCodeAdded: function() {
+        this.clearError();
     },
 
-    _clearError: function() {
-        this._setErrorMessage(null);
+    get entryCode () {
+        return this._entry.code;
     },
 
-    _addCodeCallback: function(error) {
-        // We don't care about the result if we're closing the dialog.
-        if (this._cancelled) {
-            this._verificationStatus = UnlockStatus.NOT_VERIFYING;
-            return;
-        }
-
-        if (error) {
-            this._processError(error);
-        } else {
-            this._verificationStatus = UnlockStatus.SUCCEEDED;
-            this._clearError();
-        }
-
-        this._reset();
+    get verificationStatus () {
+        return this._verificationStatus;
     },
 
-    _startVerifyingCode: function() {
-        if (!this._validateCurrentCode())
-            return;
+    set verificationStatus (value) {
+        this._verificationStatus = value;
+    },
 
-        this._verificationStatus = UnlockStatus.VERIFYING;
-        this._startSpinning();
-        this._updateSensitivity();
-        this._cancelled = false;
+    get cancelled () {
+        return this._cancelled;
+    },
 
-        Main.paygManager.addCode(this._entry.code, this._addCodeCallback.bind(this));
+    set cancelled (value) {
+        this._cancelled = value;
+    },
+
+    get errorLabel () {
+        return this._errorMessage;
+    },
+
+    get spinner () {
+        return this._spinner;
+    },
+
+    get applyButton () {
+        return this._nextButton;
     },
 
     addCharacter: function(unichar) {
@@ -517,7 +417,7 @@ var PaygUnlockDialog = new Lang.Class({
     },
 
     cancel: function() {
-        this._reset();
+        this.entryReset();
         this.destroy();
     },
 
