@@ -461,6 +461,9 @@ var CodingSession = new Lang.Class({
     },
 
     _setupHackableProxy: function() {
+        if (!this.app.meta_window.gtk_application_id)
+            return;
+
         this._hackableProxy =
             new HackableProxy(Gio.DBus.session,
                               this.app.meta_window.gtk_application_id,
