@@ -39,6 +39,7 @@ const Mainloop = imports.mainloop;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
+const Soundable = imports.ui.soundable;
 const SoundServer = imports.misc.soundServer;
 const Tweener = imports.ui.tweener;
 
@@ -670,7 +671,7 @@ var ClubhouseNotificationSource = new Lang.Class({
 
 var ClubhouseOpenButton = new Lang.Class({
     Name: 'ClubhouseOpenButton',
-    Extends: St.Button,
+    Extends: Soundable.Button,
 
     _init: function(params) {
         params = params || {};
@@ -685,6 +686,9 @@ var ClubhouseOpenButton = new Lang.Class({
         this._normalIcon = new St.Icon({ style_class: 'clubhouse-open-button-icon' });
 
         params.child = this._normalIcon;
+        params.click_sound_event_id = 'clubhouse/entry/open';
+        params.hover_sound_event_id = 'clubhouse/entry/hover';
+        params.stop_hover_sound_on_click = true;
         this.parent(params);
 
         this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse')
@@ -712,8 +716,10 @@ var ClubhouseButtonManager = new Lang.Class({
 
         Main.layoutManager.addChrome(this._openButton);
 
-        this._closeButton =
-            new St.Button({ child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }) });
+        this._closeButton = new Soundable.Button({
+            child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }),
+            click_sound_event_id: 'clubhouse/entry/close'
+        });
         this._closeButton.connect('clicked', () => { this.emit('close-clubhouse'); })
 
         Main.layoutManager.addChrome(this._closeButton);
