@@ -40,6 +40,7 @@ const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
 const Tweener = imports.ui.tweener;
+const Soundable = imports.ui.soundable;
 
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
@@ -624,12 +625,15 @@ var ClubhouseNotificationSource = new Lang.Class({
 
 var ClubhouseOpenButton = new Lang.Class({
     Name: 'ClubhouseOpenButton',
-    Extends: St.Button,
+    Extends: Soundable.Button,
 
     _init: function(params) {
         params = params || {};
         this._icon = new St.Icon({ style_class: 'clubhouse-open-button-icon' });
         params.child = this._icon;
+        params.click_sound_event_id = 'clubhouse/entry/open';
+        params.hover_sound_event_id = 'clubhouse/entry/hover';
+        params.stop_hover_sound_on_click = true;
         this.parent(params);
     },
 
@@ -650,8 +654,10 @@ var ClubhouseButtonManager = new Lang.Class({
 
         Main.layoutManager.addChrome(this._openButton);
 
-        this._closeButton =
-            new St.Button({ child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }) });
+        this._closeButton = new Soundable.Button({
+            child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }),
+            click_sound_event_id: 'clubhouse/entry/close'
+        });
         this._closeButton.connect('clicked', () => { this.emit('close-clubhouse'); })
 
         Main.layoutManager.addChrome(this._closeButton);
