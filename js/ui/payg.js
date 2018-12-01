@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-const { Clutter, Gio, GLib, GObject, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
 const Gettext = imports.gettext;
 const Signals = imports.signals;
 
@@ -97,7 +97,7 @@ var PaygUnlockUi = GObject.registerClass({
 
         // The 'too many errors' case is a bit special, and sets a different state.
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
-            let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
+            let currentTime = Shell.util_get_boottime() / GLib.USEC_PER_SEC;
             let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
             if (secondsLeft > 30) {
                 let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60));
