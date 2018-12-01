@@ -41,6 +41,7 @@ const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
 const Tweener = imports.ui.tweener;
 const Soundable = imports.ui.soundable;
+const SoundServer = imports.misc.soundServer;
 
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
@@ -322,6 +323,14 @@ var ClubhouseNotificationBanner = new Lang.Class({
             getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
 
         this.actor.connect('destroy', this._untrackClubhouse.bind(this));
+        this.connect('activated', this._activatedCb.bind(this));
+        this.actor.connect('show', () => {
+            if (this._textIdx === 0 && this._shouldSlideIn)
+                SoundServer.getDefault().play('clubhouse/dialog/open');
+        });
+        this._closeButton.connect('clicked', () => {
+            SoundServer.getDefault().play('clubhouse/dialog/close');
+        });
     },
 
     _untrackClubhouse: function() {
@@ -471,6 +480,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
                                      label: '»',
                                      can_focus: true });
         button.add_style_class_name('next');
+        button.connect('clicked', () => {
+            SoundServer.getDefault().play('clubhouse/dialog/next');
+        });
 
         return this.addButton(button, () => {
             this._setNextPage();
@@ -515,6 +527,10 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this.actor.destroy();
         this.actor = null;
     },
+
+    _activatedCb: function() {
+        print('holaaaaaaaaaaaaaaaaaaaa activated');
+    }
 });
 
 
