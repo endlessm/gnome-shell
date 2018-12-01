@@ -104,7 +104,7 @@ var UnlockUi = new Lang.Class({
 
         // The 'too many errors' case is a bit special, and sets a different state.
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
-            let currentTime = GLib.get_real_time() / GLib.USEC_PER_SEC;
+            let currentTime = Shell.util_get_boottime() / GLib.USEC_PER_SEC;
             let secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
             if (secondsLeft > 30) {
                 let minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60));
