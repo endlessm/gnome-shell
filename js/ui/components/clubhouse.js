@@ -885,7 +885,7 @@ var ClubhouseComponent = new Lang.Class({
             notification.connect('destroy', (notification, reason) => {
                 if (reason != MessageTray.NotificationDestroyedReason.REPLACED &&
                     reason != MessageTray.NotificationDestroyedReason.SOURCE_CLOSED)
-                    this._dismissQuest();
+                    this._dismissQuest(notification.source);
 
                 this._clearQuestBanner();
             });
@@ -917,10 +917,10 @@ var ClubhouseComponent = new Lang.Class({
         this._syncVisibility();
     },
 
-    _dismissQuest: function() {
+    _dismissQuest: function(source) {
         // Stop the quest since the banner has been dismissed
-        if (this.proxy.g_name_owner && this._clubhouseSource)
-            this._clubhouseSource.activateAction('stop-quest', null);
+        if (this.proxy.g_name_owner)
+            source.activateAction('stop-quest', null);
 
         this._isRunningQuest = false;
     },
