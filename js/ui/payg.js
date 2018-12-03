@@ -75,6 +75,7 @@ var UnlockUi = new Lang.Class({
 
         let sensitive = this.validateCurrentCode() &&
             this.verificationStatus != UnlockStatus.VERIFYING &&
+            this.verificationStatus != UnlockStatus.SUCCEEDED &&
             this.verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
 
         this.applyButton.reactive = sensitive;
@@ -83,6 +84,7 @@ var UnlockUi = new Lang.Class({
 
     updateSensitivity() {
         let shouldEnableEntry = this.verificationStatus != UnlockStatus.VERIFYING &&
+            this.verificationStatus != UnlockStatus.SUCCEEDED &&
             this.verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
 
         this.updateNextButtonSensitivity();
