@@ -155,6 +155,50 @@ var ClubhouseWindowTracker = new Lang.Class({
     },
 });
 
+var ClubhouseAnimation = new Lang.Class({
+    Name: 'ClubhouseAnimation',
+    Extends: Animation,
+
+    _init: function(file, width, height, defaultDelay, frames) {
+        let speed = defaultDelay || 200;
+        this.parent(file, width, height, speed);
+
+        if (frames)
+            this.setFramesInfo(this._parseFrames(frames));
+    },
+
+    _getCurrentDelay: function() {
+        let delay = this.parent();
+        if (typeof delay === 'string') {
+            let [delayA, delayB] = delay.split('-');
+            return GLib.random_int_range(parseInt(delayA), parseInt(delayB));
+        }
+        return delay;
+    },
+
+    _parseFrame: function(frame) {
+        if (typeof frame === 'string') {
+            let [frameIndex, frameDelay] = frame.split(' ');
+            frameIndex = parseInt(frameIndex);
+
+            if (frameDelay.indexOf('-') == -1)
+                frameDelay = parseInt(frameDelay);
+
+            return [frameIndex, frameDelay];
+        }
+        return [frame, this._speed];
+    },
+
+    _parseFrames: function(frames) {
+        let framesInfo = [];
+        for (let frameInfo of frames) {
+            let [frameIndex, frameDelay] = this._parseFrame(frameInfo);
+            framesInfo.push({'frameIndex': frameIndex, 'frameDelay': frameDelay});
+        }
+        return framesInfo;
+    }
+});
+
 var ClubhouseAnimator = new Lang.Class({
     Name: 'ClubhouseAnimator',
 
@@ -265,13 +309,11 @@ var ClubhouseAnimator = new Lang.Class({
             }
 
             let realPath = this._getClubhousePath(path);
-            let animation = new Animation(Gio.File.new_for_path(realPath),
-                                          metadata.width,
-                                          metadata.height,
-                                          200);
-            if (metadata.delays)
-                animation.setFrameTimeouts(metadata.delays);
-
+            let animation = new ClubhouseAnimation(Gio.File.new_for_path(realPath),
+                                                   metadata.width,
+                                                   metadata.height,
+                                                   metadata['default-delay'],
+                                                   metadata.frames);
             callback(animation);
         });
     },
