@@ -25,10 +25,6 @@ const OBJECT_PATH = '/com/endlessm/Payg1';
 const INTERFACE = 'com.endlessm.Payg1';
 const REFRESH_TIME_SECS = 60;
 
-const NOTIFICATION_TITLE_TEXT = _("Pay as You Go");
-const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _("Enter an unlock code to extend PayGo time before expiration.");
-const NOTIFICATION_DETAILED_FORMAT_STRING = _("Subscription runs out in %s.");
-
 var Indicator = new Lang.Class({
     Name: 'PayGoIndicator',
     Extends: PanelMenu.SystemIndicator,
@@ -39,6 +35,10 @@ var Indicator = new Lang.Class({
         this._paygManager = new PaygManager.PaygManager();
         this._indicator = this._addIndicator();
         this._item = new PopupMenu.PopupSubMenuMenuItem("", true);
+        this._paygNotifier = new Payg.PaygNotifier();
+        this._item.menu.addAction(_("Apply PayGo credit code"), () => {
+                this._paygNotifier.notify(-1);
+        });
         this.menu.addMenuItem(this._item);
 
         // show this status applet if PayGo is enabled and fill in
