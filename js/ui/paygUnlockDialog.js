@@ -368,15 +368,15 @@ var PaygUnlockDialog = new Lang.Class({
             this.emit('failed');
     },
 
-    entrySetEnabled: function(enabled) {
+    entrySetEnabled(enabled) {
         this._entry.setEnabled(enabled);
     },
 
-    entryReset: function() {
+    entryReset() {
         this._entry.reset();
     },
 
-    onCodeAdded: function() {
+    onCodeAdded() {
         this.clearError();
     },
 
