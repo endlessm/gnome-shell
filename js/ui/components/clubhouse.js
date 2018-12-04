@@ -49,6 +49,9 @@ const CLUBHOUSE_BANNER_ANIMATION_TIME = 0.2;
 const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
 
+const CLUBHOUSE_BUTTON_SIZE = 110
+const CLUBHOUSE_BUTTON_PULSE_SPEED = 100 // ms
+
 const ClubhouseIface =
 '<node> \
   <interface name="com.endlessm.Clubhouse"> \
@@ -670,16 +673,28 @@ var ClubhouseOpenButton = new Lang.Class({
 
     _init: function(params) {
         params = params || {};
-        this._icon = new St.Icon({ style_class: 'clubhouse-open-button-icon' });
-        params.child = this._icon;
+        let gfile =
+            Gio.File.new_for_uri('resource:///org/gnome/shell/theme/clubhouse-icon-pulse.png');
+        this._pulseAnimation = new Animation(gfile,
+                                             CLUBHOUSE_BUTTON_SIZE,
+                                             CLUBHOUSE_BUTTON_SIZE,
+                                             CLUBHOUSE_BUTTON_PULSE_SPEED);
+        this._pulseIcon = this._pulseAnimation.actor;
+
+        this._normalIcon = new St.Icon({ style_class: 'clubhouse-open-button-icon' });
+
+        params.child = this._normalIcon;
         this.parent(params);
     },
 
     setHighlighted: function(highlighted) {
-        if (highlighted)
-            this._icon.add_style_pseudo_class('highlighted');
-        else
-            this._icon.remove_style_pseudo_class('highlighted');
+        if (highlighted) {
+            this.child = this._pulseIcon;
+            this._pulseAnimation.play();
+        } else {
+            this.child = this._normalIcon;
+            this._pulseAnimation.stop();
+        }
     },
 });
 
