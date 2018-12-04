@@ -719,6 +719,11 @@ var AggregateMenu = new Lang.Class({
         } else {
             this._bluetooth = null;
         }
+        if (Config.HAVE_PAYGO) {
+            this._paygo = new imports.ui.status.paygo.Indicator();
+        } else {
+            this._paygo = null;
+        }
 
         this._power = new imports.ui.status.power.Indicator();
         this._rfkill = new imports.ui.status.rfkill.Indicator();
@@ -740,6 +745,9 @@ var AggregateMenu = new Lang.Class({
         if (this._bluetooth) {
             this._indicators.add_child(this._bluetooth.indicators);
         }
+        if (this._paygo) {
+            this._indicators.add_child(this._paygo.indicators);
+        }
         this._indicators.add_child(this._rfkill.indicators);
         this._indicators.add_child(this._volume.indicators);
         this._indicators.add_child(this._power.indicators);
@@ -752,6 +760,9 @@ var AggregateMenu = new Lang.Class({
         this.menu.addMenuItem(this._automaticUpdates.menu);
         if (this._bluetooth) {
             this.menu.addMenuItem(this._bluetooth.menu);
+        }
+        if (this._paygo) {
+            this.menu.addMenuItem(this._paygo.menu);
         }
         this.menu.addMenuItem(this._location.menu);
         this.menu.addMenuItem(this._orientation.menu);

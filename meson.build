@@ -32,6 +32,7 @@ bt_req = '>= 3.9.0'
 gst_req = '>= 0.11.92'
 nm_req = '>= 0.9.8'
 secret_req = '>= 0.18'
+paygo_req = '>= 0.2.0'
 
 gnome = import('gnome')
 i18n  = import('i18n')
@@ -146,6 +147,8 @@ else
 
   have_networkmanager = false
 endif
+
+paygo_dep = dependency('eos-payg-1', version: paygo_req, required: false)
 
 enable_systemd = get_option('enable-systemd')
 if enable_systemd != 'no'
