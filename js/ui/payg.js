@@ -67,8 +67,7 @@ class PaygUnlockUi extends GObject.Object {
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
-    updateNextButtonSensitivity() {
-
+    updateApplyButtonSensitivity() {
         let sensitive = this.validateCurrentCode() &&
             this.verificationStatus != UnlockStatus.VERIFYING &&
             this.verificationStatus != UnlockStatus.SUCCEEDED &&
@@ -83,7 +82,7 @@ class PaygUnlockUi extends GObject.Object {
             this.verificationStatus != UnlockStatus.SUCCEEDED &&
             this.verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
 
-        this.updateNextButtonSensitivity();
+        this.updateApplyButtonSensitivity();
         this.entrySetEnabled(shouldEnableEntry);
     }
 
