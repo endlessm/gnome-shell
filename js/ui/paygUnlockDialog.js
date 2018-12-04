@@ -295,7 +295,7 @@ var PaygUnlockDialog = new Lang.Class({
         });
 
         this._entry.connect('code-changed', () => {
-            this.updateNextButtonSensitivity();
+            this.updateApplyButtonSensitivity();
         });
 
         this._entry.clutter_text.connect('activate', () => {
