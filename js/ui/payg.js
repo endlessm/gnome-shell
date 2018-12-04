@@ -71,8 +71,7 @@ var UnlockUi = new Lang.Class({
         this.connect('destroy', this._onDestroy.bind(this));
     },
 
-    updateNextButtonSensitivity: function() {
-
+    updateApplyButtonSensitivity() {
         let sensitive = this.validateCurrentCode() &&
             this.verificationStatus != UnlockStatus.VERIFYING &&
             this.verificationStatus != UnlockStatus.SUCCEEDED &&
@@ -87,7 +86,7 @@ var UnlockUi = new Lang.Class({
             this.verificationStatus != UnlockStatus.SUCCEEDED &&
             this.verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
 
-        this.updateNextButtonSensitivity();
+        this.updateApplyButtonSensitivity();
         this.entrySetEnabled(shouldEnableEntry);
     },
 
