@@ -1363,7 +1363,8 @@ var ScreenShield = new Lang.Class({
                 let userManager = AccountsService.UserManager.get_default();
                 let user = userManager.get_user(GLib.get_user_name());
 
-                if (user.password_mode != AccountsService.UserPasswordMode.NONE)
+                if (user.password_mode != AccountsService.UserPasswordMode.NONE &&
+                    Main.sessionMode.currentMode != 'initial-setup')
                     Main.sessionMode.pushMode('unlock-dialog');
 
                 if (Main.paygManager.isLocked)
