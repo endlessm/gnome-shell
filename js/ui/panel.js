@@ -772,6 +772,7 @@ class AggregateMenu extends PanelMenu.Button {
         }
 
         this._remoteAccess = new imports.ui.status.remoteAccess.RemoteAccessApplet();
+        this._payg = new imports.ui.status.payg.Indicator();
         this._power = new imports.ui.status.power.Indicator();
         this._rfkill = new imports.ui.status.rfkill.Indicator();
         this._volume = new imports.ui.status.volume.Indicator();
@@ -795,6 +796,9 @@ class AggregateMenu extends PanelMenu.Button {
             this._indicators.add_child(this._bluetooth.indicators);
         }
         this._indicators.add_child(this._remoteAccess.indicators);
+        if (this._paygo) {
+            this._indicators.add_child(this._paygo.indicators);
+        }
         this._indicators.add_child(this._rfkill.indicators);
         this._indicators.add_child(this._volume.indicators);
         this._indicators.add_child(this._power.indicators);
@@ -809,6 +813,9 @@ class AggregateMenu extends PanelMenu.Button {
             this.menu.addMenuItem(this._bluetooth.menu);
         }
         this.menu.addMenuItem(this._remoteAccess.menu);
+        if (this._paygo) {
+            this.menu.addMenuItem(this._paygo.menu);
+        }
         this.menu.addMenuItem(this._location.menu);
         this.menu.addMenuItem(this._orientation.menu);
         this.menu.addMenuItem(this._rfkill.menu);
