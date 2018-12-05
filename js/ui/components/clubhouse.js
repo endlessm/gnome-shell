@@ -123,6 +123,11 @@ var ClubhouseWindowTracker = new Lang.Class({
 
         this._windowActor = actor;
 
+        // Ensure the window is focused when it re-appears: if the window gets hidden and then
+        // opened again (through the Clubhouse button), it may not be focused; so we do it here
+        // directly.
+        Main.activateWindow(this._windowActor.meta_window);
+
         this.emit('window-changed');
 
         // Track Clubhouse's window actor to make the closeButton always show on top of
