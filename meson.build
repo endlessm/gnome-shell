@@ -116,6 +116,9 @@ libeos_shell_fx_deps = [mutter_dep, gdk_pixbuf_dep, libanimation_glib_dep, m_dep
 # Endless-specific: Required for keyboard layout switcher in password entries
 xkbcommon_dep = dependency('xkbcommon')
 
+# Endless-specific: parental controls
+eos_parental_controls_dep = dependency('eos-parental-controls-0', required: true)
+
 nm_deps = []
 enable_networkmanager = get_option('enable-networkmanager')
 if enable_networkmanager != 'no'
