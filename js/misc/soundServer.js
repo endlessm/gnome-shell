@@ -23,6 +23,63 @@ const SoundServerIface = `
 </node>
 `;
 
+var SoundItemStatusEnum = {
+    NONE: 0,
+    PENDING: 1,
+    CANCELLING: 2,
+};
+
+class SoundItem {
+
+    constructor(name) {
+        this._id = this.Status.NONE;
+        this.name = name;
+    }
+
+    get Status() {
+        return SoundItemStatusEnum;
+    }
+
+    play() {
+        // If we are about to play the sound, do nothing
+        if (this._id === this.Status.PENDING)
+            return;
+
+        // If we had to play and to stop before the first UUId was returned, then un-cancel
+        // the original sound but do not request another one.
+        if (this._id === this.Status.CANCELLING) {
+            this._id = this.Status.PENDING;
+            return;
+        }
+
+	// If we are already playing a sound, do nothing (we want to avoid overlapped sounds)
+	if (this._id !== this.Status.NONE)
+	    return;
+
+        this._id = this.Status.PENDING;
+        getDefault().playAsync(this.name).then(uuid => {
+            if (this._id === this.Status.CANCELLING) {
+                getDefault().stop(uuid);
+                this._id = this.Status.NONE;
+                return;
+            }
+            this._id = uuid;
+        });
+    }
+
+    stop() {
+        if (this._id === this.Status.PENDING) {
+            this._id = this.Status.CANCELLING;
+            return;
+        }
+
+        if (this._id === this.Status.CANCELLING || this._id === this.Status.NONE)
+            return;
+        getDefault().stop(this._id);
+        this._id = this.Status.NONE;
+    }
+}
+
 class SoundServer {
     constructor() {
         const SoundServerProxy = Gio.DBusProxy.makeProxyWrapper(SoundServerIface);
