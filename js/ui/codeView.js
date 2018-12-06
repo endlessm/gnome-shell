@@ -237,6 +237,8 @@ var WindowTrackingButton = new Lang.Class({
 
         this.parent(params);
 
+        this._hoverSoundItem = new SoundServer.SoundItem(null);
+
         this.connect('notify::hover', this._onHoverChanged.bind(this));
     },
 
@@ -305,36 +307,15 @@ var WindowTrackingButton = new Lang.Class({
     },
 
     _startHoverSound(flipped) {
-        if (this._hoverSoundID === 'pending')
-            return;
-        if (this._hoverSoundID === 'cancel') {
-            // Hovered in and out and back in quickly, before the first UUID was
-            // returned. In this case, un-cancel the original sound but don't
-            // request another one.
-            this._hoverSoundID = 'pending';
-            return;
-        }
-        this._hoverSoundID = 'pending';
         const id = flipped ? 'flip-inverse' : 'flip';
-        SoundServer.getDefault().playAsync(`shell/tracking-button/${id}/hover`)
-        .then(uuid => {
-            if (this._hoverSoundID === 'cancel') {
-                SoundServer.getDefault().stop(uuid);
-                this._hoverSoundID = null;
-                return;
-            }
+        let soundName = `shell/tracking-button/${id}/hover`;
 
-            this._hoverSoundID = uuid;
-        });
+        this._hoverSoundItem.name = soundName;
+        this._hoverSoundItem.play();
     },
 
     _stopHoverSound() {
-        if (this._hoverSoundID === 'pending') {
-            this._hoverSoundID = 'cancel';
-        } else if (this._hoverSoundID) {
-            SoundServer.getDefault().stop(this._hoverSoundID);
-            this._hoverSoundID = null;
-        }
+        this._hoverSoundItem.stop();
     },
 
     _onHoverChanged: function() {
