@@ -123,11 +123,6 @@ var ClubhouseWindowTracker = new Lang.Class({
 
         this._windowActor = actor;
 
-        // Ensure the window is focused when it re-appears: if the window gets hidden and then
-        // opened again (through the Clubhouse button), it may not be focused; so we do it here
-        // directly.
-        Main.activateWindow(this._windowActor.meta_window);
-
         this.emit('window-changed');
 
         // Track Clubhouse's window actor to make the closeButton always show on top of
@@ -160,6 +155,10 @@ var ClubhouseWindowTracker = new Lang.Class({
         if (!Main.sessionMode.hasOverview || Main.overview.visible || this._windowActor == null)
             return -1;
         return this._windowActor.x;
+    },
+
+    getWindowActor: function() {
+        return this._windowActor;
     },
 });
 
@@ -784,17 +783,55 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseSource = null;
         this._clubhouseProxyHandler = 0;
 
+        this._clubhouseWindowHandler = 0;
+
         this._clubhouseButtonManager = new ClubhouseButtonManager();
         this._clubhouseButtonManager.connect('open-clubhouse', () => {
+            this._trackClubhouseWindow();
             this.show(global.get_current_time());
         });
         this._clubhouseButtonManager.connect('close-clubhouse', () => {
+            this._untrackClubhouseWindow();
             this.hide(global.get_current_time());
         });
 
         this.proxyConstructFlags = Gio.DBusProxyFlags.NONE;
 
         this._overrideAddNotification();
+    },
+
+    _trackClubhouseWindow: function() {
+        if (this._clubhouseWindowHandler != 0)
+            return;
+
+        this._clubhouseWindowHandler =
+            getClubhouseWindowTracker().connect('window-changed',
+                                                this._onClubhouseWindowChanged.bind(this));
+    },
+
+    _untrackClubhouseWindow: function() {
+        if (this._clubhouseWindowHandler == 0)
+            return;
+
+        getClubhouseWindowTracker().disconnect(this._clubhouseWindowHandler);
+        this._clubhouseWindowHandler = 0;
+    },
+
+    _onClubhouseWindowChanged: function() {
+        let windowActor = getClubhouseWindowTracker().getWindowActor();
+
+        if (!windowActor)
+            return;
+
+        // Ensure the window is focused when it re-appears: if the window gets hidden and then
+        // opened again (through the Clubhouse button), it may not be focused; so we do it
+        // here directly.
+        Main.activateWindow(windowActor.meta_window);
+
+        // We only disconnect after successfully activating the window because sometimes the when
+        // this signal is emitted, the window is null (showing the overview, and then clicking the
+        // Clubhouse button does emit the 'window-changed' signal with a null window).
+        this._untrackClubhouseWindow();
     },
 
     _onPropertiesChanged: function(proxy, changedProps, invalidatedProps) {
