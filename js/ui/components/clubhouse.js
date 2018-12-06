@@ -39,6 +39,7 @@ const Mainloop = imports.mainloop;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
+const SoundServer = imports.misc.soundServer;
 const Tweener = imports.ui.tweener;
 
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
@@ -685,15 +686,19 @@ var ClubhouseOpenButton = new Lang.Class({
 
         params.child = this._normalIcon;
         this.parent(params);
+
+        this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse')
     },
 
     setHighlighted: function(highlighted) {
         if (highlighted) {
             this.child = this._pulseIcon;
             this._pulseAnimation.play();
+            this._highlightSoundItem.play();
         } else {
             this.child = this._normalIcon;
             this._pulseAnimation.stop();
+            this._highlightSoundItem.stop();
         }
     },
 });
