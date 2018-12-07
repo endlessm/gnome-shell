@@ -212,7 +212,7 @@ var PaygUnlockDialog = new Lang.Class({
         this.actor.add_child(mainBox)
 
         let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
-                                        text: _("Your Endless pay-as-you-go usage credit has expired."),
+                                        text: _("Your Endless PayGo usage credit has expired."),
                                         x_align: Clutter.ActorAlign.CENTER });
         mainBox.add_child(titleLabel);
 
