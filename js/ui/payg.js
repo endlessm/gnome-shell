@@ -145,6 +145,13 @@ var UnlockUi = new Lang.Class({
         this.verificationStatus = UnlockStatus.FAILED;
     },
 
+    processReset() {
+        // If time has been removed entirely, we show the user the according message
+        // that the time has been reset to zero.
+        this.emit('code-reset');
+        this.verificationStatus = UnlockStatus.FAILED;
+    },
+
     _onDestroy() {
         if (this._clearTooManyAttemptsId > 0) {
             Mainloop.source_remove(this._clearTooManyAttemptsId);
@@ -210,6 +217,8 @@ var UnlockUi = new Lang.Class({
 
             if (error) {
                 this.processError(error);
+            } else if (Main.paygManager.lastTimeAdded <= 0) {
+                this.processReset();
             } else {
                 this.verificationStatus = UnlockStatus.SUCCEEDED;
                 this.onCodeAdded();
@@ -375,7 +384,7 @@ var ApplyCodeNotification = new Lang.Class({
     },
 
     _onCodeAdded() {
-        this._setMessage(_("Code applied successfully!"));
+        this._setMessage(successMessage());
 
         Mainloop.timeout_add_seconds(SUCCESS_DELAY_SECONDS, () => {
             this.emit('done-displaying');
@@ -455,6 +464,53 @@ function timeToString(seconds) {
 
     let hoursStr = Gettext.ngettext("%s hour", "%s hours", hoursPast).format(hoursPast);
     return ("%s %s").format(daysStr, hoursStr);
+}
+
+// Similar to timeToStrings, but does not process partial time,
+// since it's meant to be used for expiration time changes, with
+// a wider range of periods
+function successMessage() {
+    let seconds = Main.paygManager.lastTimeAdded;
+    if (seconds < 60) {
+        return Gettext.ngettext("%s second has been added to your Pay As You Go credit.",
+                                "%s seconds have been added to your Pay As You Go credit.")
+                                .format(Math.floor(seconds));
+    }
+
+    let minutes = Math.floor(seconds / 60);
+    if (minutes < 120) {
+        return Gettext.ngettext("%s minute has been added to your Pay As You Go credit.",
+                                "%s minutes have been added to your Pay As You Go credit.")
+                                .format(Math.floor(minutes));
+    }
+
+    let hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return Gettext.ngettext("%s hour has been added to your Pay As You Go credit.",
+                                "%s hours have been added to your Pay As You Go credit.")
+                                .format(Math.floor(hours));
+    }
+
+    let days = Math.floor(hours / 24);
+    if (days < 30) {
+        return Gettext.ngettext("%s day has been added to your Pay As You Go credit.",
+                                "%s days have been added to your Pay As You Go credit.")
+                                .format(Math.floor(days));
+    }
+
+    let months = Math.floor(days / 30);
+    if (months < 12) {
+        return Gettext.ngettext("%s month has been added to your Pay As You Go credit.",
+                                "%s months have been added to your Pay As You Go credit.")
+                                .format(Math.floor(months));
+    }
+
+    let year = Math.floor(months / 12);
+    if (year == 1)
+        return _("1 year has been added to your Pay As You Go credit.");
+
+    //Unlock permanently message
+    return _("You have successfully unlocked your Endless Machine");
 }
 
 var PaygNotifier = new Lang.Class({
