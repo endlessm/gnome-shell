@@ -929,6 +929,14 @@ var CodingSession = new Lang.Class({
             this._button.hide();
     },
 
+    _restoreButtonState: function() {
+        this._button.reactive = true;
+        // Not sure why, but we need to resync the button visibility
+        // here, or it won't appear as reactive sometimes.
+        this._button.hide();
+        this._syncButtonVisibility();
+    },
+
     _activateAppFlip: function() {
         // Support a 'flip' action in the app, if it exposes it
         const flipState = (this._state == STATE_TOOLBOX);
@@ -1081,7 +1089,10 @@ var CodingSession = new Lang.Class({
             rotation_angle_y: 0,
             time: WINDOW_ANIMATION_TIME * 2,
             transition: 'easeOutQuad',
-            onComplete: this._rotateInCompleted.bind(this)
+            onComplete: () => {
+                this._restoreButtonState();
+                this._rotateInCompleted();
+            }
         });
     },
 
@@ -1096,8 +1107,6 @@ var CodingSession = new Lang.Class({
         actor.rotation_angle_y = 0;
         actor.opacity = 255;
         this._rotatingInActor = null;
-
-        this._button.reactive = true;
     },
 
     _rotateOutCompleted: function(resetRotation) {
