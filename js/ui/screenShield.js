@@ -13,9 +13,9 @@ const OVirt = imports.gdm.oVirt;
 const LoginManager = imports.misc.loginManager;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
 const Monitor = imports.ui.monitor;
 const Overview = imports.ui.overview;
-const MessageTray = imports.ui.messageTray;
 const ShellDBus = imports.ui.shellDBus;
 const SmartcardManager = imports.misc.smartcardManager;
 const Tweener = imports.ui.tweener;
@@ -590,34 +590,38 @@ var ScreenShield = class {
                 return;
             }
 
-            // A new valid code unlocked the machine and user has no
-            // password set -> Go straight to the user's session.
-            if (user.password_mode == AccountsService.UserPasswordMode.NONE) {
-                this.deactivate(false);
-                return;
-            }
+            // Take the dialog instance and wait for the success message to be shown
+            this._dialog.connect('success-message-shown', () => {
 
-            let paygExpectedMode = this._isGreeter ? 'gdm-unlock-dialog-payg' : 'unlock-dialog-payg';
-            if (Main.sessionMode.currentMode == paygExpectedMode) {
-                // This is the most common case.
-                Main.sessionMode.popMode(paygExpectedMode);
-            } else if (Main.sessionMode.currentMode == 'lock-screen') {
-                // There's a chance we could be in the screen shield, instead of the
-                // unlock dialog, if the user wend back manually to it (e.g. pressed ESC)
-                // between introducing the code and the actual verification happening.
-                Main.sessionMode.popMode('lock-screen');
-                Main.sessionMode.popMode(paygExpectedMode);
-                Main.sessionMode.pushMode('lock-screen');
-            }
+                // A new valid code unlocked the machine and user has no
+                // password set -> Go straight to the user's session.
+                if (user.password_mode == AccountsService.UserPasswordMode.NONE) {
+                    this.deactivate(false);
+                    return;
+                }
 
-            // The machine is unlocked but we still need to unlock the
-            // user's session with the password, so don't deactivate yet.
-            if (this._dialog) {
-                this._dialog.destroy();
-                this._dialog = null;
-            }
+                let paygExpectedMode = this._isGreeter ? 'gdm-unlock-dialog-payg' : 'unlock-dialog-payg';
+                if (Main.sessionMode.currentMode == paygExpectedMode) {
+                    // This is the most common case.
+                    Main.sessionMode.popMode(paygExpectedMode);
+                } else if (Main.sessionMode.currentMode == 'lock-screen') {
+                    // There's a chance we could be in the screen shield, instead of the
+                    // unlock dialog, if the user wend back manually to it (e.g. pressed ESC)
+                    // between introducing the code and the actual verification happening.
+                    Main.sessionMode.popMode('lock-screen');
+                    Main.sessionMode.popMode(paygExpectedMode);
+                    Main.sessionMode.pushMode('lock-screen');
+                }
 
-            this.showDialog();
+                // The machine is unlocked but we still need to unlock the
+                // user's session with the password, so don't deactivate yet.
+                if (this._dialog) {
+                    this._dialog.destroy();
+                    this._dialog = null;
+                }
+
+                this.showDialog();
+            });
         });
     }
 

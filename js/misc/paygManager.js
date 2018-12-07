@@ -35,6 +35,7 @@ const EOS_PAYG_IFACE = '<node> \
 <interface name="com.endlessm.Payg1"> \
 <method name="AddCode"> \
   <arg type="s" direction="in" name="code"/> \
+  <arg type="x" direction="out" name="time_added"/> \
 </method> \
 <method name="ClearCode" /> \
 <signal name="Expired" /> \
@@ -94,6 +95,7 @@ var PaygManager = GObject.registerClass({
 
         this._enabled = false;
         this._expiryTime = 0;
+        this._lastTimeAdded = 0;
         this._rateLimitEndTime = 0;
         this._codeFormat = '';
         this._codeFormatRegex = null;
@@ -285,6 +287,9 @@ var PaygManager = GObject.registerClass({
         }
 
         this._proxy.AddCodeRemote(code, (result, error) => {
+            if (!error)
+                this._lastTimeAdded = result;
+
             if (callback)
                 callback(error);
         });
@@ -319,6 +324,10 @@ var PaygManager = GObject.registerClass({
 
     get expiryTime() {
         return this._expiryTime;
+    }
+
+    get lastTimeAdded() {
+        return this._lastTimeAdded;
     }
 
     get rateLimitEndTime() {
