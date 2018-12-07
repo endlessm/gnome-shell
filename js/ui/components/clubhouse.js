@@ -368,6 +368,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
             getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
 
         this.actor.connect('destroy', this._untrackClubhouse.bind(this));
+        this._closeButton.connect('clicked', () => {
+            SoundServer.getDefault().play('clubhouse/dialog/close');
+        });
     },
 
     _untrackClubhouse: function() {
@@ -513,9 +516,10 @@ var ClubhouseNotificationBanner = new Lang.Class({
     },
 
     _setupNextPageButton: function() {
-        let button = new St.Button({ style_class: 'notification-button',
-                                     label: '»',
-                                     can_focus: true });
+        let button = new Soundable.Button({ style_class: 'notification-button',
+                                            label: '»',
+                                            can_focus: true,
+                                            click_sound_event_id: 'clubhouse/dialog/next' });
         button.add_style_class_name('next');
 
         return this.addButton(button, () => {
