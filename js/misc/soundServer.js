@@ -29,7 +29,7 @@ var SoundItemStatusEnum = {
     CANCELLING: 2,
 };
 
-class SoundItem {
+var SoundItem = class {
 
     constructor(name) {
         this._id = this.Status.NONE;
