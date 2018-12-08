@@ -15,6 +15,7 @@ const St = imports.gi.St;
 const AppActivation = imports.ui.appActivation;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
+const Soundable = imports.ui.soundable;
 const Tweener = imports.ui.tweener;
 const SoundServer = imports.misc.soundServer;
 
@@ -226,7 +227,7 @@ function _flipButtonAroundRectCenter(props) {
 
 var WindowTrackingButton = new Lang.Class({
     Name: 'WindowTrackingButton',
-    Extends: St.Button,
+    Extends: Soundable.Button,
 
     _init: function(params) {
         this._flipped = false;
@@ -237,9 +238,7 @@ var WindowTrackingButton = new Lang.Class({
 
         this.parent(params);
 
-        this._hoverSoundItem = new SoundServer.SoundItem(null);
-
-        this.connect('notify::hover', this._onHoverChanged.bind(this));
+        this._updateHoverSound();
     },
 
     vfunc_allocate: function(box, flags) {
@@ -304,31 +303,23 @@ var WindowTrackingButton = new Lang.Class({
     set state(value) {
         this._flipped = value == STATE_TOOLBOX;
         _setFlippedState(this, this._flipped);
+        this._updateHoverSound();
     },
 
-    _startHoverSound(flipped) {
-        const id = flipped ? 'flip-inverse' : 'flip';
-        let soundName = `shell/tracking-button/${id}/hover`;
-
-        this._hoverSoundItem.name = soundName;
-        this._hoverSoundItem.play();
-    },
-
-    _stopHoverSound() {
-        this._hoverSoundItem.stop();
+    _updateHoverSound: function() {
+        const id = this._flipped ? 'flip-inverse' : 'flip';
+        this.hover_sound_event_id = `shell/tracking-button/${id}/hover`;
     },
 
     _onHoverChanged: function() {
+        this.parent();
+
         if (this.hover) {
             if (!this._flipped) {
                 SoundServer.getDefault().play('shell/tracking-button/flip/enter');
-                this._startHoverSound(false);
             } else {
                 SoundServer.getDefault().play('shell/tracking-button/flip-inverse/enter');
-                this._startHoverSound(true);
             }
-        } else {
-            this._stopHoverSound();
         }
     }
 });
