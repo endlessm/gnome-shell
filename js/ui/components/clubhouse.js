@@ -457,6 +457,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
     // Override this method because we don't want the button
     // horizontally expanded:
     addButton: function(button, callback) {
+        if (button.label === '>')
+            button.add_style_class_name('next');
+
         button.set_x_expand(false);
         this.parent(button, callback);
     },
@@ -517,10 +520,9 @@ var ClubhouseNotificationBanner = new Lang.Class({
 
     _setupNextPageButton: function() {
         let button = new Soundable.Button({ style_class: 'notification-button',
-                                            label: '»',
+                                            label: '>',
                                             can_focus: true,
                                             click_sound_event_id: 'clubhouse/dialog/next' });
-        button.add_style_class_name('next');
 
         return this.addButton(button, () => {
             this._setNextPage();
