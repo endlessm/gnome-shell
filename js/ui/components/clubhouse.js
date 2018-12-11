@@ -458,6 +458,7 @@ var ClubhouseNotificationBanner = new Lang.Class({
     // horizontally expanded:
     addButton: function(button, callback) {
         if (button.label === '>')
+            button.label = ''
             button.add_style_class_name('next');
 
         button.set_x_expand(false);
