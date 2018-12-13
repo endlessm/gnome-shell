@@ -751,8 +751,10 @@ var ClubhouseButtonManager = new Lang.Class({
         if (!monitor)
             return;
 
+        let workarea = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
+
         this._openButton.x = monitor.x + monitor.width - this._openButton.width / 2;
-        this._openButton.y = Math.floor(monitor.height / 2.0 - this._openButton.width / 2.0);
+        this._openButton.y = Math.floor(workarea.height / 2.0 - this._openButton.height / 2.0);
 
         this._updateCloseButtonPosition();
     },
