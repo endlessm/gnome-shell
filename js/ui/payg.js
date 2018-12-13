@@ -41,7 +41,7 @@ var SPINNER_ICON_SIZE_PIXELS = 16;
 var SPINNER_ANIMATION_DELAY_SECS = 1.0;
 var SPINNER_ANIMATION_TIME_SECS = 0.3;
 
-const NOTIFICATION_TITLE_TEXT = _("PayGo");
+const NOTIFICATION_TITLE_TEXT = _("Pay as You Go");
 const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _("Enter an unlock code to extend PayGo time before expiration.");
 const NOTIFICATION_DETAILED_FORMAT_STRING = _("Subscription runs out in %s.");
 
