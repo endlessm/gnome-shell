@@ -770,10 +770,10 @@ class AggregateMenu extends PanelMenu.Button {
         } else {
             this._bluetooth = null;
         }
-        if (Config.HAVE_PAYGO) {
-            this._paygo = new imports.ui.status.paygo.Indicator();
+        if (Config.HAVE_PAYG) {
+            this._payg = new imports.ui.status.payg.Indicator();
         } else {
-            this._paygo = null;
+            this._payg = null;
         }
 
         this._remoteAccess = new imports.ui.status.remoteAccess.RemoteAccessApplet();
@@ -799,9 +799,8 @@ class AggregateMenu extends PanelMenu.Button {
         if (this._bluetooth) {
             this._indicators.add_child(this._bluetooth.indicators);
         }
-        this._indicators.add_child(this._remoteAccess.indicators);
-        if (this._paygo) {
-            this._indicators.add_child(this._paygo.indicators);
+        if (this._payg) {
+            this._indicators.add_child(this._payg.indicators);
         }
         this._indicators.add_child(this._rfkill.indicators);
         this._indicators.add_child(this._volume.indicators);
@@ -816,9 +815,8 @@ class AggregateMenu extends PanelMenu.Button {
         if (this._bluetooth) {
             this.menu.addMenuItem(this._bluetooth.menu);
         }
-        this.menu.addMenuItem(this._remoteAccess.menu);
-        if (this._paygo) {
-            this.menu.addMenuItem(this._paygo.menu);
+        if (this._payg) {
+            this.menu.addMenuItem(this._payg.menu);
         }
         this.menu.addMenuItem(this._location.menu);
         this.menu.addMenuItem(this._orientation.menu);

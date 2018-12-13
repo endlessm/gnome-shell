@@ -20,10 +20,6 @@ const OBJECT_PATH = '/com/endlessm/Payg1';
 const INTERFACE = 'com.endlessm.Payg1';
 const REFRESH_TIME_SECS = 60;
 
-const NOTIFICATION_TITLE_TEXT = _("Pay as You Go");
-const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _("Enter an unlock code to extend PayGo time before expiration.");
-const NOTIFICATION_DETAILED_FORMAT_STRING = _("Subscription runs out in %s.");
-
 var Indicator = GObject.registerClass(
 class Indicator extends PanelMenu.SystemIndicator {
 
@@ -34,12 +30,12 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._indicator = this._addIndicator();
         this._item = new PopupMenu.PopupSubMenuMenuItem("", true);
         this._paygNotifier = new Payg.PaygNotifier();
-        this._item.menu.addAction(_("Apply PayGo credit code"), () => {
+        this._item.menu.addAction(_("Enter unlock code…"), () => {
                 this._paygNotifier.notify(-1);
         });
         this.menu.addMenuItem(this._item);
 
-        // show this status applet if PayGo is enabled and fill in
+        // show this status applet if PAYG is enabled and fill in
         // "determining time..." label and icon
         this._sync();
 
@@ -79,11 +75,11 @@ class Indicator extends PanelMenu.SystemIndicator {
         const URGENT_EXPIRATION_S = 15 * 60;
         let timeLeftSeconds = this._paygManager.timeRemainingSecs();
 
-        let iconUri = 'resource:///org/gnome/shell/theme/paygo-normal-symbolic.svg';
+        let iconUri = 'resource:///org/gnome/shell/theme/payg-normal-symbolic.svg';
         // if time left <= 0, we haven't yet determined it, so fall back to
         // "normal" icon
         if (timeLeftSeconds >= 0 && timeLeftSeconds <= URGENT_EXPIRATION_S) {
-            iconUri = 'resource:///org/gnome/shell/theme/paygo-near-expiration-symbolic.svg';
+            iconUri = 'resource:///org/gnome/shell/theme/payg-near-expiration-symbolic.svg';
         }
 
         return new Gio.FileIcon({ file: Gio.File.new_for_uri(iconUri) });
