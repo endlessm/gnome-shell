@@ -492,13 +492,19 @@ var ClubhouseNotificationBanner = new Lang.Class({
         let endX = this.actor.x - this.actor.width - margin;
 
         if (this._shouldSlideIn) {
-            // Ensure it only slides in the first time
-            this._shouldSlideIn = false;
+            // If the banner is still sliding in, stop it (because we have a new position for it).
+            // This should prevent the banner from not being set in the right position when the
+            // Clubhouse is hidden while the banner is still sliding in.
+            Tweener.removeTweens(this.actor);
 
             Tweener.addTween(this.actor,
                              { x: endX,
                                time: CLUBHOUSE_BANNER_ANIMATION_TIME,
-                               transition: 'easeOutQuad'
+                               transition: 'easeOutQuad',
+                               onComplete: () => {
+                                   // Ensure it only slides in once
+                                   this._shouldSlideIn = false;
+                               }
                              });
         } else {
             this.actor.x = endX;
