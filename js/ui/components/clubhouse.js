@@ -803,7 +803,7 @@ var ClubhouseComponent = new Lang.Class({
         this.parent(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
 
         this._enabled = false;
-        this._isRunningQuest = false;
+        this._hasForegroundQuest = false;
 
         this._questBanner = null;
         this._itemBanner = null;
@@ -903,7 +903,7 @@ var ClubhouseComponent = new Lang.Class({
         if (!this._questBanner)
             return;
 
-        this._questBanner.dismiss(!this._isRunningQuest);
+        this._questBanner.dismiss(!this._hasForegroundQuest);
 
         this._questBanner = null;
 
@@ -973,15 +973,15 @@ var ClubhouseComponent = new Lang.Class({
             notification.connect('destroy', (notification, reason) => {
                 if (reason != MessageTray.NotificationDestroyedReason.REPLACED &&
                     reason != MessageTray.NotificationDestroyedReason.SOURCE_CLOSED)
-                    this._dismissQuest(notification.source);
+                    this._dismissQuestBanner(notification.source);
 
                 this._clearQuestBanner();
             });
 
             if (!this._questBanner) {
-                this._questBanner = notification.createBanner(!this._isRunningQuest,
+                this._questBanner = notification.createBanner(!this._hasForegroundQuest,
                                                               this._clubhouseAnimator);
-                this._isRunningQuest = true;
+                this._hasForegroundQuest = true;
 
                 Main.layoutManager.addChrome(this._questBanner.actor);
                 this._questBanner.reposition();
@@ -1005,12 +1005,12 @@ var ClubhouseComponent = new Lang.Class({
         this._syncVisibility();
     },
 
-    _dismissQuest: function(source) {
-        // Stop the quest since the banner has been dismissed
+    _dismissQuestBanner: function(source) {
+        // Inform the Clubhouse that the quest banner has been dismissed
         if (this.proxy.g_name_owner)
-            source.activateAction('stop-quest', null);
+            source.activateAction('quest-view-close', null);
 
-        this._isRunningQuest = false;
+        this._hasForegroundQuest = false;
     },
 
     _syncVisibility: function() {
