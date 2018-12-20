@@ -814,4 +814,3 @@ shell_util_get_boottime (void)
 
   return (((gint64) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
 }
-
