@@ -71,6 +71,13 @@ function _getWindowId(win) {
     return ('window:%d').format(win.get_stable_sequence());
 };
 
+function _getToolboxTarget(win) {
+    let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(win);
+    let variant = proxy.get_cached_property('Target');
+    let [targetAppId, targetWindowId] = variant.deep_unpack();
+    return [targetAppId, targetWindowId];
+};
+
 const _ensureHackDataFile = (function () {
     let keyfile = new GLib.KeyFile();
     let initialized = false;
@@ -1190,8 +1197,7 @@ var CodeViewManager = new Lang.Class({
 
         // This is a new proxy window, make it join the session
         if (proxy) {
-            let variant = proxy.get_cached_property('Target');
-            let [targetAppId, targetWindowId] = variant.deep_unpack();
+            let [targetAppId, targetWindowId] = _getToolboxTarget(actor.meta_window);
 
             let session = this._getSessionForTargetAppWindow(
                 targetAppId, targetWindowId);
@@ -1245,13 +1251,9 @@ var CodeViewManager = new Lang.Class({
 
     _getAvailableSessionForToolboxTarget: function(appId) {
         return this._sessions.find((session) => {
-            if (!session.toolbox || session.app)
-                return false;
-
-            let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(session.toolbox.meta_window);
-            let variant = proxy.get_cached_property('Target');
-            let [targetAppId, targetWindowId] = variant.deep_unpack();
-            return (targetAppId == appId);
+            return (!session.app &&
+                    session.toolbox &&
+                    _getToolboxTarget(session.toolbox.meta_window)[0] == appId);
         });
     },
 
@@ -1265,13 +1267,9 @@ var CodeViewManager = new Lang.Class({
 
     _getSessionForToolboxTarget: function(appId, windowId) {
         return this._sessions.find((session) => {
-            if (!session.toolbox)
-                return false;
-
-            let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(session.toolbox.meta_window);
-            let variant = proxy.get_cached_property('Target');
-            let [targetAppId, targetWindowId] = variant.deep_unpack();
-            return (targetAppId == appId && targetWindowId == windowId);
+            return (session.toolbox &&
+                    _getToolboxTarget(session.toolbox.meta_window)[0] == appId &&
+                    _getToolboxTarget(session.toolbox.meta_window)[1] == windowId);
         });
     }
 });
