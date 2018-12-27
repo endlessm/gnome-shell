@@ -38,6 +38,7 @@
 #include "shell-wm-private.h"
 
 static void gnome_shell_plugin_start            (MetaPlugin          *plugin);
+static void gnome_shell_plugin_stop             (MetaPlugin          *plugin);
 static void gnome_shell_plugin_minimize         (MetaPlugin          *plugin,
                                                  MetaWindowActor     *actor);
 static void gnome_shell_plugin_unminimize       (MetaPlugin          *plugin,
@@ -131,6 +132,7 @@ gnome_shell_plugin_class_init (GnomeShellPluginClass *klass)
   MetaPluginClass *plugin_class  = META_PLUGIN_CLASS (klass);
 
   plugin_class->start            = gnome_shell_plugin_start;
+  plugin_class->stop             = gnome_shell_plugin_stop;
   plugin_class->map              = gnome_shell_plugin_map;
   plugin_class->minimize         = gnome_shell_plugin_minimize;
   plugin_class->unminimize       = gnome_shell_plugin_unminimize;
@@ -264,6 +266,12 @@ get_shell_wm (void)
   g_object_unref (wm);
 
   return wm;
+}
+
+static void
+gnome_shell_plugin_stop (MetaPlugin *plugin)
+{
+  _shell_wm_stop (get_shell_wm ());
 }
 
 static void
