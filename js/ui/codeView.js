@@ -1119,6 +1119,11 @@ var CodeViewManager = new Lang.Class({
                 windowActor._drawnFirstFrame = true;
             });
         });
+
+        this._stopped = false;
+        global.window_manager.connect('stop', () => {
+            this._stopped = true;
+        });
     },
 
     _addSession: function(actor) {
@@ -1160,6 +1165,9 @@ var CodeViewManager = new Lang.Class({
     },
 
     handleDestroyWindow: function(actor) {
+        if (this._stopped)
+            return false;
+
         let wasFlippedBack = this._removeAppWindow(actor);
         this._removeToolboxWindow(actor);
 
@@ -1167,6 +1175,9 @@ var CodeViewManager = new Lang.Class({
     },
 
     handleMapWindow: function(actor) {
+        if (this._stopped)
+            return false;
+
         if (!global.settings.get_boolean('enable-code-view'))
             return false;
 
