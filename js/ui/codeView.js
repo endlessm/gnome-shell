@@ -772,8 +772,15 @@ var CodingSession = new Lang.Class({
         let [minAppWidth, minAppHeight] = this.app.meta_window.get_minimum_size_hints();
         let [minToolboxWidth, minToolboxHeight] = this.toolbox.meta_window.get_minimum_size_hints();
 
-        let minWidth = Math.max(minAppWidth, minToolboxWidth);
-        let minHeight = Math.max(minAppHeight, minToolboxHeight);
+        // We need to compare these dimensions in frame coordinates, since
+        // one of the two windows may be client-side decorated.
+        let minAppRect = this.app.meta_window.client_rect_to_frame_rect(
+            new Meta.Rectangle({ x: 0, y: 0, width: minAppWidth, height: minAppHeight }));
+        let minToolboxRect = this.toolbox.meta_window.client_rect_to_frame_rect(
+            new Meta.Rectangle({ x: 0, y: 0, width: minToolboxWidth, height: minToolboxHeight }));
+
+        let minWidth = Math.max(minAppRect.width, minToolboxRect.width);
+        let minHeight = Math.max(minAppRect.height, minToolboxRect.height);
 
         window.expand_allocated_geometry(minWidth, minHeight);
     },
