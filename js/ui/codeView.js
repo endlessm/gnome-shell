@@ -1244,6 +1244,7 @@ var CodeViewManager = new Lang.Class({
     _getAvailableSessionForTargetApp: function(targetAppId) {
         return this._sessions.find((session) => {
             return (session.app &&
+                    !session.app.is_destroyed() &&
                     !session.toolbox &&
                     _getAppId(session.app.meta_window) == targetAppId);
         });
@@ -1253,6 +1254,7 @@ var CodeViewManager = new Lang.Class({
         return this._sessions.find((session) => {
             return (!session.app &&
                     session.toolbox &&
+                    !session.toolbox.is_destroyed() &&
                     _getToolboxTarget(session.toolbox.meta_window)[0] == appId);
         });
     },
@@ -1260,6 +1262,7 @@ var CodeViewManager = new Lang.Class({
     _getSessionForTargetAppWindow: function(targetAppId, targetWindowId) {
         return this._sessions.find((session) => {
             return (session.app &&
+                    !session.app.is_destroyed() &&
                     _getAppId(session.app.meta_window) == targetAppId &&
                     _getWindowId(session.app.meta_window) == targetWindowId);
         });
@@ -1268,6 +1271,7 @@ var CodeViewManager = new Lang.Class({
     _getSessionForToolboxTarget: function(appId, windowId) {
         return this._sessions.find((session) => {
             return (session.toolbox &&
+                    !session.toolbox.is_destroyed () &&
                     _getToolboxTarget(session.toolbox.meta_window)[0] == appId &&
                     _getToolboxTarget(session.toolbox.meta_window)[1] == windowId);
         });
