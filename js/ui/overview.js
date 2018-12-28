@@ -24,6 +24,7 @@ const Monitor = imports.ui.monitor;
 const OverviewControls = imports.ui.overviewControls;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const Tweener = imports.ui.tweener;
 const ViewSelector = imports.ui.viewSelector;
 const WorkspaceThumbnail = imports.ui.workspaceThumbnail;
@@ -295,6 +296,18 @@ var Overview = new Lang.Class({
 
         if (this.isDummy)
             return;
+
+        // To avoid creating the IconGrid (through OverviewControls),
+        // delay until ParentalControlsManager is initialized
+        let parentalControlsManager = ParentalControlsManager.getDefault();
+
+        if (!parentalControlsManager.initialized) {
+            let id = parentalControlsManager.connect('initialized', () => {
+                parentalControlsManager.disconnect(id);
+                this.init();
+            });
+            return;
+        }
 
         this._shellInfo = new ShellInfo();
 

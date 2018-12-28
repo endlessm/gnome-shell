@@ -14,6 +14,7 @@ const AppDisplay = imports.ui.appDisplay;
 const Background = imports.ui.background;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const LoginManager = imports.misc.loginManager;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 
 const DND = imports.ui.dnd;
 const Main = imports.ui.main;
@@ -87,6 +88,7 @@ var LayoutManager = new Lang.Class({
         this._isPopupWindowVisible = false;
         this._startingUp = true;
         this._pendingLoadBackground = false;
+        this._backgroundLoaded = false;
 
         // We don't want to paint the stage background color because either
         // the SystemBackground we create or the MetaBackgroundActor inside
@@ -189,6 +191,7 @@ var LayoutManager = new Lang.Class({
         Main.sessionMode.connect('updated', Lang.bind(this, this._sessionUpdated));
 
         this._loadBackground();
+        this._loadParentalControls();
     },
 
     showOverview: function() {
@@ -537,8 +540,28 @@ var LayoutManager = new Lang.Class({
             this._systemBackground.actor.show();
             global.stage.show();
 
-            this._prepareStartupAnimation();
+            this._backgroundLoaded = true;
+
+            this._maybePrepareStartupAnimation();
         }));
+    },
+
+    _loadParentalControls: function() {
+        let parentalControlsManager = ParentalControlsManager.getDefault();
+
+        if (!parentalControlsManager.initialized)
+            parentalControlsManager.connect('initialized', this._maybePrepareStartupAnimation.bind(this));
+        else
+            this._maybePrepareStartupAnimation();
+    },
+
+    _maybePrepareStartupAnimation: function() {
+        let parentalControlsManager = ParentalControlsManager.getDefault();
+
+        if (!this._backgroundLoaded || !parentalControlsManager.initialized)
+            return;
+
+        this._prepareStartupAnimation();
     },
 
     // Startup Animations
