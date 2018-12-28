@@ -23,6 +23,8 @@ const SoundServerIface = `
 </node>
 `;
 
+const SoundServerProxy = Gio.DBusProxy.makeProxyWrapper(SoundServerIface);
+
 var SoundItemStatusEnum = {
     NONE: 0,
     PENDING: 1,
@@ -82,7 +84,6 @@ var SoundItem = class {
 
 class SoundServer {
     constructor() {
-        const SoundServerProxy = Gio.DBusProxy.makeProxyWrapper(SoundServerIface);
         this._proxy = new SoundServerProxy(Gio.DBus.session,
             'com.endlessm.HackSoundServer', '/com/endlessm/HackSoundServer');
     }
