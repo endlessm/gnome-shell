@@ -45,6 +45,7 @@ var Button = new Lang.Class({
 
         this.connect('clicked', this._onClicked.bind(this));
         this.connect('notify::hover', this._onHoverChanged.bind(this));
+        this.connect('notify::visible', this._onVisibleChanged.bind(this));
     },
 
     set hover_sound_event_id(value) {
@@ -76,6 +77,11 @@ var Button = new Lang.Class({
         if (this.hover)
             this._startHoverSound();
         else
+            this._stopHoverSound();
+    },
+
+    _onVisibleChanged: function() {
+        if (!this.visible)
             this._stopHoverSound();
     },
 
