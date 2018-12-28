@@ -84,8 +84,14 @@ var SoundItem = class {
 
 class SoundServer {
     constructor() {
-        this._proxy = new SoundServerProxy(Gio.DBus.session,
-            'com.endlessm.HackSoundServer', '/com/endlessm/HackSoundServer');
+        this._proxy = new SoundServerProxy(
+            Gio.DBus.session,
+            'com.endlessm.HackSoundServer',
+            '/com/endlessm/HackSoundServer',
+            (proxy, err) => {
+                if (err)
+                    logError(err, 'Could not create sound server proxy');
+            });
     }
 
     // Most common use case, fire and forget, no return value
