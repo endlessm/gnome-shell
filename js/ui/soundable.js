@@ -15,6 +15,13 @@ var Button = new Lang.Class({
             GObject.ParamFlags.READWRITE,
             ''
         ),
+        'enter-sound-event-id': GObject.ParamSpec.string(
+            'enter-sound-event-id',
+            '',
+            '',
+            GObject.ParamFlags.READWRITE,
+            ''
+        ),
         'hover-sound-event-id': GObject.ParamSpec.string(
             'hover-sound-event-id',
             '',
@@ -38,6 +45,7 @@ var Button = new Lang.Class({
 
         this.connect('clicked', this._onClicked.bind(this));
         this.connect('notify::hover', this._onHoverChanged.bind(this));
+        this.connect('notify::visible', this._onVisibleChanged.bind(this));
     },
 
     set hover_sound_event_id(value) {
@@ -72,7 +80,14 @@ var Button = new Lang.Class({
             this._stopHoverSound();
     },
 
+    _onVisibleChanged: function() {
+        if (!this.visible)
+            this._stopHoverSound();
+    },
+
     _startHoverSound() {
+        if (this.enter_sound_event_id)
+            SoundServer.getDefault().play(this.enter_sound_event_id);
         if (this._hoverSoundItem)
             this._hoverSoundItem.play();
     },
