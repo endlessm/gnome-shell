@@ -245,7 +245,7 @@ var WindowTrackingButton = new Lang.Class({
 
         this.parent(params);
 
-        this._updateHoverSound();
+        this._updateSounds();
     },
 
     vfunc_allocate: function(box, flags) {
@@ -310,24 +310,13 @@ var WindowTrackingButton = new Lang.Class({
     set state(value) {
         this._flipped = value == STATE_TOOLBOX;
         _setFlippedState(this, this._flipped);
-        this._updateHoverSound();
+        this._updateSounds();
     },
 
-    _updateHoverSound: function() {
+    _updateSounds: function() {
         const id = this._flipped ? 'flip-inverse' : 'flip';
+        this.enter_sound_event_id = `shell/tracking-button/${id}/enter`;
         this.hover_sound_event_id = `shell/tracking-button/${id}/hover`;
-    },
-
-    _onHoverChanged: function() {
-        this.parent();
-
-        if (this.hover) {
-            if (!this._flipped) {
-                SoundServer.getDefault().play('shell/tracking-button/flip/enter');
-            } else {
-                SoundServer.getDefault().play('shell/tracking-button/flip-inverse/enter');
-            }
-        }
     }
 });
 

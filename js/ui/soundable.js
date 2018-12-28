@@ -15,6 +15,13 @@ var Button = new Lang.Class({
             GObject.ParamFlags.READWRITE,
             ''
         ),
+        'enter-sound-event-id': GObject.ParamSpec.string(
+            'enter-sound-event-id',
+            '',
+            '',
+            GObject.ParamFlags.READWRITE,
+            ''
+        ),
         'hover-sound-event-id': GObject.ParamSpec.string(
             'hover-sound-event-id',
             '',
@@ -73,6 +80,8 @@ var Button = new Lang.Class({
     },
 
     _startHoverSound() {
+        if (this.enter_sound_event_id)
+            SoundServer.getDefault().play(this.enter_sound_event_id);
         if (this._hoverSoundItem)
             this._hoverSoundItem.play();
     },
