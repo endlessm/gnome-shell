@@ -53,16 +53,9 @@ var IconGridLayout = new Lang.Class({
     Name: 'IconGridLayout',
 
     _init: function(params) {
-        this._iconTree = {};
         this._parentalControlsManager = ParentalControlsManager.getDefault();
 
-        if (this._parentalControlsManager.initialized)
-            this._updateIconTree();
-        else
-            this._parentalControlsManager.connect('initialized', () => {
-                this._updateIconTree();
-                this.emit('changed');
-            });
+        this._updateIconTree();
 
         this._removeUndone = false;
 
