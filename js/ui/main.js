@@ -45,6 +45,7 @@ const WindowManager = imports.ui.windowManager;
 const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const Util = imports.misc.util;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const PaygManager = imports.misc.paygManager;
 const CustomerSupport = imports.misc.customerSupport;
 const Watermark = imports.ui.watermark;
@@ -136,6 +137,10 @@ function start() {
     Gtk.Settings.get_default().connect('notify::gtk-theme-name',
                                        _loadDefaultStylesheet);
     Gtk.IconTheme.get_default().add_resource_path('/org/gnome/shell/theme/icons');
+
+    // Initialize ParentalControlsManager before the UI
+    ParentalControlsManager.getDefault();
+
     _initializeUI();
 
     shellAccessDialogDBusService = new AccessDialog.AccessDialogDBus();
