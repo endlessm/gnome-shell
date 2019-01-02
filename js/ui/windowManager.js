@@ -2224,11 +2224,6 @@ var WindowManager = new Lang.Class({
                 let parent = window.get_transient_for();
                 if (parent)
                     this._checkDimming(parent);
-
-                if (actor._animatableSurface) {
-                    this._animationsServer.unregister_surface(actor._animatableSurface);
-                    actor._animatableSurface = null;
-                }
         }));
 
         // Endless libanimation extension
@@ -2392,6 +2387,10 @@ var WindowManager = new Lang.Class({
         if (actor._notifyWindowTypeSignalId) {
             window.disconnect(actor._notifyWindowTypeSignalId);
             actor._notifyWindowTypeSignalId = 0;
+        }
+        if (actor._animatableSurface) {
+            this._animationsServer.unregister_surface(actor._animatableSurface);
+            actor._animatableSurface = null;
         }
         if (window._dimmed) {
             this._dimmedWindows = this._dimmedWindows.filter(function(win) {
