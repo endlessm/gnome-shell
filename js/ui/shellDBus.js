@@ -42,6 +42,8 @@ var GnomeShell = class {
                               this._checkOverviewVisibleChanged.bind(this));
         Main.overview.connect('hidden',
                               this._checkOverviewVisibleChanged.bind(this));
+        Shell.WindowTracker.get_default().connect('notify::focus-app',
+                                                  this._checkFocusAppChanged.bind(this));
     }
 
     _sessionModeChanged() {
@@ -258,6 +260,18 @@ var GnomeShell = class {
 
     get ShellVersion() {
         return Config.PACKAGE_VERSION;
+    }
+
+    _checkFocusAppChanged() {
+        this._dbusImpl.emit_property_changed('FocusedApp', new GLib.Variant('s', this.FocusedApp));
+    }
+
+    get FocusedApp() {
+        let appId = '';
+        let tracker = Shell.WindowTracker.get_default();
+        if (tracker.focus_app)
+            appId = tracker.focus_app.get_id();
+        return appId;
     }
 };
 
