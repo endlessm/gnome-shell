@@ -62,6 +62,7 @@ const GnomeShellIface = '<node> \
 <property name="Mode" type="s" access="read" /> \
 <property name="OverviewActive" type="b" access="readwrite" /> \
 <property name="ShellVersion" type="s" access="read" /> \
+<property name="FocusedApp" type="s" access="read" /> \
 </interface> \
 </node>';
 
@@ -114,6 +115,9 @@ var GnomeShell = new Lang.Class({
                               Lang.bind(this, this._checkOverviewVisibleChanged));
         Main.overview.connect('hidden',
                               Lang.bind(this, this._checkOverviewVisibleChanged));
+
+        Shell.WindowTracker.get_default().connect('notify::focus-app',
+                                                  Lang.bind(this, this._checkFocusAppChanged));
     },
 
     _sessionModeChanged: function() {
@@ -311,7 +315,19 @@ var GnomeShell = new Lang.Class({
             Main.overview.hide();
     },
 
-    ShellVersion: Config.PACKAGE_VERSION
+    ShellVersion: Config.PACKAGE_VERSION,
+
+    _checkFocusAppChanged: function() {
+        this._dbusImpl.emit_property_changed('FocusedApp', new GLib.Variant('s', this.FocusedApp));
+    },
+
+    get FocusedApp() {
+        let appId = '';
+        let tracker = Shell.WindowTracker.get_default();
+        if (tracker.focus_app)
+            appId = tracker.focus_app.get_id();
+        return appId;
+    },
 });
 
 const GnomeShellExtensionsIface = '<node> \
