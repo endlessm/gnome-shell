@@ -572,19 +572,6 @@ var CodingSession = new Lang.Class({
         }
     },
 
-    _completeRemoveWindow: function() {
-        let actor = this._actorForCurrentState();
-
-        if (actor) {
-            actor.rotation_angle_y = 0;
-            this._setEffectsEnabled(actor, false);
-            actor.show();
-            actor.meta_window.activate(global.get_current_time());
-        } else {
-            this.destroy();
-        }
-    },
-
     _setupToolboxWindow: function() {
         this._positionChangedIdToolbox =
             this.toolbox.meta_window.connect('position-changed',
@@ -672,17 +659,27 @@ var CodingSession = new Lang.Class({
         this._appActionProxy = null;
     },
 
-    removeAppWindow: function() {
+    removeFlippedBackAppWindow: function() {
+        if (!this.appRemovedByFlipBack)
+            return false;
+
         // Save the actor, so we can complete the destroy transition later
-        if (this.appRemovedByFlipBack)
-            this._appRemovedActor = this.app;
-
-        this.appRemovedByFlipBack = false;
+        this._appRemovedActor = this.app;
         this.app = null;
+        this.appRemovedByFlipBack = false;
 
+        // We assume we have a toolbox here, or this.appRemovedByFlipBack would be false
         this._setState(STATE_TOOLBOX);
 
-        this._completeRemoveWindow();
+        let actor = this._actorForCurrentState();
+        if (actor) {
+            actor.rotation_angle_y = 0;
+            this._setEffectsEnabled(actor, false);
+            actor.show();
+            actor.meta_window.activate(global.get_current_time());
+        }
+
+        return true;
     },
 
     // Eject out of this session and remove all pairings.
@@ -1141,37 +1138,28 @@ var CodeViewManager = new Lang.Class({
         this._sessions.splice(idx, 1);
     },
 
-    _removeAppWindow: function(actor) {
-        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
-        if (!session)
-            return false;
-
-        if (session.appRemovedByFlipBack) {
-            session.removeAppWindow();
-            return true;
-        }
-
-        this._removeSession(session);
-
-        return false;
-    },
-
-    _removeToolboxWindow: function(actor) {
-        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
-        if (!session)
-            return;
-
-        this._removeSession(session);
-    },
-
     handleDestroyWindow: function(actor) {
         if (this._stopped)
             return false;
 
-        let wasFlippedBack = this._removeAppWindow(actor);
-        this._removeToolboxWindow(actor);
+        // First, determine if this is an app window getting destroyed
+        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
+        if (session) {
+            // If the app window was destroyed because the toolbox flipped it back,
+            // simply disassociate it from the session, because we are expecting
+            // the new window for this app to appear soon
+            if (session.removeFlippedBackAppWindow())
+                return true;
+        } else {
+            // If not, determine if this is a toolbox window getting destroyed
+            session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
+        }
 
-        return wasFlippedBack;
+        // If this was an app or toolbox window, destroy the session
+        if (session)
+            this._removeSession(session);
+
+        return false;
     },
 
     handleMapWindow: function(actor) {
