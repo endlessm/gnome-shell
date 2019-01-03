@@ -254,7 +254,7 @@ var AppSwitcherPopup = new Lang.Class({
         if (this._currentWindow < 0) {
             appIcon.app.activate_window(appIcon.cachedWindows[0], timestamp);
             Main.overview.hide();
-        } else {
+        } else if (appIcon.cachedWindows[this._currentWindow]) {
             Main.activateWindow(appIcon.cachedWindows[this._currentWindow], timestamp);
         }
 
@@ -346,7 +346,8 @@ var AppSwitcherPopup = new Lang.Class({
                                                         })
                          });
         this._thumbnails = null;
-        this._switcherList._items[this._selectedIndex].remove_accessible_state (Atk.StateType.EXPANDED);
+        if  (this._switcherList._items[this._selectedIndex])
+            this._switcherList._items[this._selectedIndex].remove_accessible_state (Atk.StateType.EXPANDED);
     },
 
     _createThumbnails : function() {
@@ -688,6 +689,10 @@ var AppSwitcher = new Lang.Class({
     _onDestroy: function() {
         if (this._mouseTimeOutId != 0)
             Mainloop.source_remove(this._mouseTimeOutId);
+
+        this.icons.forEach(icon => {
+            icon.app.disconnect(icon._stateChangedId);
+        });
     },
 
     _setIconSize: function() {
@@ -789,7 +794,7 @@ var AppSwitcher = new Lang.Class({
     // show a dim arrow, but show a bright arrow when they are
     // highlighted.
     highlight : function(n, justOutline) {
-        if (this._curApp != -1) {
+        if (this.icons[this._curApp]) {
             if (this.icons[this._curApp].cachedWindows.length == 1)
                 this._arrows[this._curApp].hide();
             else
@@ -811,6 +816,11 @@ var AppSwitcher = new Lang.Class({
         this.icons.push(appIcon);
         let item = this.addItem(appIcon, appIcon.label);
 
+        appIcon._stateChangedId = appIcon.app.connect('notify::state', app => {
+            if (app.state != Shell.AppState.RUNNING)
+                this._removeIcon(app);
+        });
+
         let n = this._arrows.length;
         let arrow = new St.DrawingArea({ style_class: 'switcher-arrow' });
         arrow.connect('repaint', function() { SwitcherPopup.drawArrow(arrow, St.Side.BOTTOM); });
@@ -821,7 +831,25 @@ var AppSwitcher = new Lang.Class({
             arrow.hide();
         else
             item.add_accessible_state (Atk.StateType.EXPANDABLE);
-    }
+    },
+
+    _removeIcon: function(app) {
+        let index = this.icons.findIndex(icon => {
+            return icon.app == app;
+        });
+        if (index === -1)
+            return;
+
+        this.icons.splice(index, 1);
+        this.removeItem(index);
+
+        if (this._curApp == index)
+            this._curApp = SwitcherPopup.mod(index, this.icons.length);
+        if (this.icons.length > 0)
+            this.highlight(this._curApp);
+        else
+            this.destroy();
+    },
 });
 
 var ThumbnailList = new Lang.Class({
@@ -886,11 +914,29 @@ var ThumbnailList = new Lang.Class({
             let clone = _createWindowClone(mutterWindow, thumbnailSize);
             this._thumbnailBins[i].set_height(binHeight);
             this._thumbnailBins[i].add_actor(clone);
+
+            clone._destroyId = mutterWindow.connect('destroy', Lang.bind(this, this._removeThumbnail, clone));
             this._clones.push(clone);
         }
 
         // Make sure we only do this once
         this._thumbnailBins = new Array();
+    },
+
+    _removeThumbnail: function(source, clone) {
+        let index = this._clones.indexOf(clone);
+        if (index === -1)
+            return;
+
+        this._clones.splice(index, 1);
+        this._windows.splice(index, 1);
+        this._labels.splice(index, 1);
+        this.removeItem(index);
+
+        if (this._clones.length > 0)
+            this.highlight(SwitcherPopup.mod(index, this._clones.length));
+        else
+            this.destroy();
     },
 
     _onDestroy() {
