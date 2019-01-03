@@ -320,6 +320,11 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
+const SessionDestroyEvent = {
+    SESSION_DESTROY_APP_DESTROYED: 0,
+    SESSION_DESTROY_TOOLBOX_DESTROYED: 1,
+};
+
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
     Extends: GObject.Object,
@@ -572,19 +577,6 @@ var CodingSession = new Lang.Class({
         }
     },
 
-    _completeRemoveWindow: function() {
-        let actor = this._actorForCurrentState();
-
-        if (actor) {
-            actor.rotation_angle_y = 0;
-            this._setEffectsEnabled(actor, false);
-            actor.show();
-            actor.meta_window.activate(global.get_current_time());
-        } else {
-            this.destroy();
-        }
-    },
-
     _setupToolboxWindow: function() {
         this._positionChangedIdToolbox =
             this.toolbox.meta_window.connect('position-changed',
@@ -672,17 +664,27 @@ var CodingSession = new Lang.Class({
         this._appActionProxy = null;
     },
 
-    removeAppWindow: function() {
+    removeFlippedBackAppWindow: function() {
+        if (!this.appRemovedByFlipBack)
+            return false;
+
         // Save the actor, so we can complete the destroy transition later
-        if (this.appRemovedByFlipBack)
-            this._appRemovedActor = this.app;
-
-        this.appRemovedByFlipBack = false;
+        this._appRemovedActor = this.app;
         this.app = null;
+        this.appRemovedByFlipBack = false;
 
+        // We assume we have a toolbox here, or this.appRemovedByFlipBack would be false
         this._setState(STATE_TOOLBOX);
 
-        this._completeRemoveWindow();
+        let actor = this._actorForCurrentState();
+        if (actor) {
+            actor.rotation_angle_y = 0;
+            this._setEffectsEnabled(actor, false);
+            actor.show();
+            actor.meta_window.activate(global.get_current_time());
+        }
+
+        return true;
     },
 
     // Eject out of this session and remove all pairings.
@@ -690,7 +692,7 @@ var CodingSession = new Lang.Class({
     //
     // The assumption here is that the session will be removed immediately
     // after destruction.
-    destroy: function() {
+    destroy: function(eventType) {
         if (this._focusWindowId != 0) {
             global.display.disconnect(this._focusWindowId);
             this._focusWindowId = 0;
@@ -721,21 +723,27 @@ var CodingSession = new Lang.Class({
             this._hackablePropsChangedId = 0;
         }
 
-        // If we have an app window, disconnect any signals and destroy it.
+        // If we have an app window, disconnect any signals and destroy it,
+        // unless we are destroying the session because the app window was
+        // destroyed in the first place
         if (this.app) {
             let appWindow = this.app.meta_window;
             this.app = null;
             this._shellApp = null;
 
-            appWindow.delete(global.get_current_time());
+            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED)
+                appWindow.delete(global.get_current_time());
         }
 
-        // If we have a toolbox window, disconnect any signals and destroy it.
+        // If we have a toolbox window, disconnect any signals and destroy it,
+        // unless we are destroying the session because the toolbox window was
+        // destroyed in the first place
         if (this.toolbox) {
             let toolboxWindow = this.toolbox.meta_window;
             this.toolbox = null;
 
-            toolboxWindow.delete(global.get_current_time());
+            if (eventType != SessionDestroyEvent.SESSION_DESTROY_TOOLBOX_DESTROYED)
+                toolboxWindow.delete(global.get_current_time());
         }
 
         // Destroy the button too
@@ -1130,9 +1138,9 @@ var CodeViewManager = new Lang.Class({
         this._sessions.push(new CodingSession({ app: actor }));
     },
 
-    _removeSession: function(session) {
+    _removeSession: function(session, eventType) {
         // Destroy the session here and remove it from the list
-        session.destroy();
+        session.destroy(eventType);
 
         let idx = this._sessions.indexOf(session);
         if (idx === -1)
@@ -1141,37 +1149,31 @@ var CodeViewManager = new Lang.Class({
         this._sessions.splice(idx, 1);
     },
 
-    _removeAppWindow: function(actor) {
-        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
-        if (!session)
-            return false;
-
-        if (session.appRemovedByFlipBack) {
-            session.removeAppWindow();
-            return true;
-        }
-
-        this._removeSession(session);
-
-        return false;
-    },
-
-    _removeToolboxWindow: function(actor) {
-        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
-        if (!session)
-            return;
-
-        this._removeSession(session);
-    },
-
     handleDestroyWindow: function(actor) {
         if (this._stopped)
             return false;
 
-        let wasFlippedBack = this._removeAppWindow(actor);
-        this._removeToolboxWindow(actor);
+        // First, determine if this is an app window getting destroyed
+        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
+        let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
 
-        return wasFlippedBack;
+        if (session) {
+            // If the app window was destroyed because the toolbox flipped it back,
+            // simply disassociate it from the session, because we are expecting
+            // the new window for this app to appear soon
+            if (session.removeFlippedBackAppWindow())
+                return true;
+        } else {
+            // If not, determine if this is a toolbox window getting destroyed
+            session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
+            eventType = SessionDestroyEvent.SESSION_DESTROY_TOOLBOX_DESTROYED;
+        }
+
+        // If this was an app or toolbox window, destroy the session
+        if (session)
+            this._removeSession(session, eventType);
+
+        return false;
     },
 
     handleMapWindow: function(actor) {
