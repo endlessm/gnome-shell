@@ -320,6 +320,11 @@ var WindowTrackingButton = new Lang.Class({
     }
 });
 
+const SessionDestroyEvent = {
+    SESSION_DESTROY_APP_DESTROYED: 0,
+    SESSION_DESTROY_TOOLBOX_DESTROYED: 1,
+};
+
 var CodingSession = new Lang.Class({
     Name: 'CodingSession',
     Extends: GObject.Object,
@@ -687,7 +692,7 @@ var CodingSession = new Lang.Class({
     //
     // The assumption here is that the session will be removed immediately
     // after destruction.
-    destroy: function() {
+    destroy: function(eventType) {
         if (this._focusWindowId != 0) {
             global.display.disconnect(this._focusWindowId);
             this._focusWindowId = 0;
@@ -718,21 +723,27 @@ var CodingSession = new Lang.Class({
             this._hackablePropsChangedId = 0;
         }
 
-        // If we have an app window, disconnect any signals and destroy it.
+        // If we have an app window, disconnect any signals and destroy it,
+        // unless we are destroying the session because the app window was
+        // destroyed in the first place
         if (this.app) {
             let appWindow = this.app.meta_window;
             this.app = null;
             this._shellApp = null;
 
-            appWindow.delete(global.get_current_time());
+            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED)
+                appWindow.delete(global.get_current_time());
         }
 
-        // If we have a toolbox window, disconnect any signals and destroy it.
+        // If we have a toolbox window, disconnect any signals and destroy it,
+        // unless we are destroying the session because the toolbox window was
+        // destroyed in the first place
         if (this.toolbox) {
             let toolboxWindow = this.toolbox.meta_window;
             this.toolbox = null;
 
-            toolboxWindow.delete(global.get_current_time());
+            if (eventType != SessionDestroyEvent.SESSION_DESTROY_TOOLBOX_DESTROYED)
+                toolboxWindow.delete(global.get_current_time());
         }
 
         // Destroy the button too
@@ -1127,9 +1138,9 @@ var CodeViewManager = new Lang.Class({
         this._sessions.push(new CodingSession({ app: actor }));
     },
 
-    _removeSession: function(session) {
+    _removeSession: function(session, eventType) {
         // Destroy the session here and remove it from the list
-        session.destroy();
+        session.destroy(eventType);
 
         let idx = this._sessions.indexOf(session);
         if (idx === -1)
@@ -1144,6 +1155,8 @@ var CodeViewManager = new Lang.Class({
 
         // First, determine if this is an app window getting destroyed
         let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
+        let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
+
         if (session) {
             // If the app window was destroyed because the toolbox flipped it back,
             // simply disassociate it from the session, because we are expecting
@@ -1153,11 +1166,12 @@ var CodeViewManager = new Lang.Class({
         } else {
             // If not, determine if this is a toolbox window getting destroyed
             session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
+            eventType = SessionDestroyEvent.SESSION_DESTROY_TOOLBOX_DESTROYED;
         }
 
         // If this was an app or toolbox window, destroy the session
         if (session)
-            this._removeSession(session);
+            this._removeSession(session, eventType);
 
         return false;
     },
