@@ -129,6 +129,27 @@ function _isBlacklistedApp(desktop_id) {
     return blacklist.includes(app_id);
 }
 
+function _isWhitelistedApp(desktopId) {
+    const keyfile = _ensureHackDataFile();
+    if (keyfile === null)
+        return true;
+
+    const appId = desktopId.slice(0, -8);  // remove ".desktop"
+    let whitelist;
+    try {
+        [whitelist] = keyfile.get_string_list('flip-to-hack', 'whitelist');
+    } catch (err) {
+        if (!err.matches(GLib.KeyFileError, GLib.KeyFileError.KEY_NOT_FOUND) &&
+            !err.matches(GLib.KeyFileError, GLib.KeyFileError.GROUP_NOT_FOUND))
+            logError(err, 'Error with whitelist in hack data file');
+        whitelist = [];
+    }
+
+    if (whitelist.length === 0)
+        return true;
+    return whitelist.includes(appId);
+}
+
 // _synchronizeMetaWindowActorGeometries
 //
 // Synchronize geometry of MetaWindowActor src to dst by
@@ -1197,6 +1218,11 @@ var CodeViewManager = new Lang.Class({
 
         // Do not manage apps that we blacklist in com.endlessm.HackComponents
         if (_isBlacklistedApp(appInfo.get_id()))
+            return false;
+
+        // If there is a whitelist in com.endlessm.HackComponents, only manage
+        // whitelisted apps
+        if (!_isWhitelistedApp(appInfo.get_id()))
             return false;
 
         // It might be a "HackToolbox". Check that, and if so,
