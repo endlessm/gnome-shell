@@ -709,7 +709,9 @@ var ClubhouseOpenButton = new Lang.Class({
         params.stop_hover_sound_on_click = true;
         this.parent(params);
 
-        this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse')
+        this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse');
+        this._highlightLoopingSoundItem =
+            new SoundServer.SoundItem('clubhouse/entry/pulse-loop');
     },
 
     setHighlighted: function(highlighted) {
@@ -717,10 +719,12 @@ var ClubhouseOpenButton = new Lang.Class({
             this.child = this._pulseIcon;
             this._pulseAnimation.play();
             this._highlightSoundItem.play();
+            this._highlightLoopingSoundItem.play();
         } else {
             this.child = this._normalIcon;
             this._pulseAnimation.stop();
             this._highlightSoundItem.stop();
+            this._highlightLoopingSoundItem.stop();
         }
     },
 });
