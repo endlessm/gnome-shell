@@ -796,7 +796,7 @@ var ClubhouseComponent = new Lang.Class({
     Extends: SideComponent.SideComponent,
 
     _init: function() {
-        this._useClubhouse = this._imageUsesClubhouse() && this._hasClubhouse();
+        this._useClubhouse = this._imageUsesClubhouse() && !!this._getClubhouseApp();
         if (!this._useClubhouse)
             return;
 
@@ -874,7 +874,15 @@ var ClubhouseComponent = new Lang.Class({
     },
 
     callShow: function(timestamp) {
-        this.proxy.showRemote(timestamp);
+        if (this.proxy.g_name_owner) {
+            this.proxy.showRemote(timestamp);
+            return;
+        }
+
+        // We only activate the app here if it's not yet running, otherwise the cursor will turn
+        // into a spinner for a while, even after the window is shown.
+        // @todo: Call activate alone when we fix the problem mentioned above.
+        this._getClubhouseApp().activate();
     },
 
     callHide: function(timestamp) {
@@ -918,8 +926,8 @@ var ClubhouseComponent = new Lang.Class({
         this._itemBanner = null;
     },
 
-    _hasClubhouse: function() {
-        return !!Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
+    _getClubhouseApp: function() {
+        return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
     },
 
     _imageUsesClubhouse: function() {
