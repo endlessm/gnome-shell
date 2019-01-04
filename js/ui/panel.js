@@ -720,12 +720,8 @@ var AggregateMenu = new Lang.Class({
         } else {
             this._bluetooth = null;
         }
-        if (Config.HAVE_PAYG) {
-            this._payg = new imports.ui.status.payg.Indicator();
-        } else {
-            this._payg = null;
-        }
 
+        this._payg = new imports.ui.status.payg.Indicator();
         this._power = new imports.ui.status.power.Indicator();
         this._rfkill = new imports.ui.status.rfkill.Indicator();
         this._volume = new imports.ui.status.volume.Indicator();
