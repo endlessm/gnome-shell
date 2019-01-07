@@ -25,6 +25,7 @@ const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GnomeDesktop = imports.gi.GnomeDesktop;
+const Shell = imports.gi.Shell;
 
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
