@@ -602,6 +602,12 @@ var ClubhouseQuestBanner = new Lang.Class({
 
         this._closeButton.visible = Main.sessionMode.hasOverview;
 
+        // We set this empty icon while the animation is loading instead
+        // of simply hiding the icon because this way it gets styled into
+        // the right size.
+        let emptyIcon = new St.Icon();
+        this.setIcon(emptyIcon);
+
         if (imagePath) {
             animator.getAnimation(imagePath, (animation) => {
                 if (!animation)
