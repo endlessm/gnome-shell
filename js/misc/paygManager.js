@@ -21,8 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-const { Gio, GLib, GnomeDesktop, GObject } = imports.gi;
-
+const { Gio, GLib, GnomeDesktop, GObject, Shell } = imports.gi;
 const Gettext = imports.gettext;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
