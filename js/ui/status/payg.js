@@ -57,7 +57,7 @@ var Indicator = new Lang.Class({
 
         // refresh the displayed icon and "time remaining" label periodically
         this._timeoutRefreshId = Mainloop.timeout_add_seconds (REFRESH_TIME_SECS, () => {
-            this._timeoutRefresh();
+            return this._timeoutRefresh();
         });
         GLib.Source.set_name_by_id(this._timeoutRefreshId, '[gnome-shell] this._timeoutRefresh');
     },
