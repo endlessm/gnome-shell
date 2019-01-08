@@ -2401,6 +2401,9 @@ var WindowManager = new Lang.Class({
         if (window.is_attached_dialog())
             this._checkDimming(window.get_transient_for(), window);
 
+        if (this._codeViewManager.handleDestroyWindow(actor))
+            return;
+
         let types = [Meta.WindowType.NORMAL,
                      Meta.WindowType.DIALOG,
                      Meta.WindowType.MODAL_DIALOG];
@@ -2433,9 +2436,6 @@ var WindowManager = new Lang.Class({
 
         switch (actor.meta_window.window_type) {
         case Meta.WindowType.NORMAL:
-            if (this._codeViewManager.handleDestroyWindow(actor))
-                return;
-
             actor.set_pivot_point(0.5, 0.5);
             this._destroying.push(actor);
 
