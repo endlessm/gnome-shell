@@ -306,6 +306,10 @@ var ClubhouseAnimator = new Lang.Class({
         });
     },
 
+    clearCache: function() {
+        this._animations = {};
+    },
+
     getAnimation: function(path, callback) {
         this._loadAnimationByPath(path, (metadata) => {
             if (!metadata) {
@@ -814,6 +818,8 @@ var ClubhouseComponent = new Lang.Class({
         this._clubhouseSource = null;
         this._clubhouseProxyHandler = 0;
 
+        this._clubhouseAnimator = null;
+
         this._clubhouseButtonManager = new ClubhouseButtonManager();
         this._clubhouseButtonManager.connect('open-clubhouse', () => {
             this.show(global.get_current_time());
@@ -847,6 +853,12 @@ var ClubhouseComponent = new Lang.Class({
                 if (!this.proxy.g_name_owner) {
                     log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
                     this._clearQuestBanner();
+
+                    // Clear the animator cache, so we reload the metadata files the next time
+                    // an animation is used, thus accounting for an eventual Clubhouse update
+                    // in the meantime which may bring metadata changes for the animations.
+                    if (this._clubhouseAnimator != null)
+                        this._clubhouseAnimator.clearCache();
                 }
             });
 
