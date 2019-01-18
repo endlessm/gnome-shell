@@ -375,6 +375,12 @@ var AuthenticationDialog = new Lang.Class({
     },
 
     _onDialogClosed: function() {
+        if (this._user) {
+            this._user.disconnect(this._userLoadedId);
+            this._user.disconnect(this._userChangedId);
+            this._user = null;
+        }
+
         this._destroySession();
     },
 });
