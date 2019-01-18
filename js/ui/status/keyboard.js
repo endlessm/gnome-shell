@@ -874,6 +874,8 @@ var InputSourceIndicator = new Lang.Class({
     _init: function(parent, showLayout = true) {
         this.parent(0.0, _("Keyboard"));
 
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
+
         this._menuItems = {};
         this._indicatorLabels = {};
         this._showLayoutItem = null;
@@ -901,9 +903,19 @@ var InputSourceIndicator = new Lang.Class({
         this._sessionUpdated();
 
         this._inputSourceManager = getInputSourceManager();
-        this._inputSourceManager.connect('sources-changed', Lang.bind(this, this._sourcesChanged));
-        this._inputSourceManager.connect('current-source-changed', Lang.bind(this, this._currentSourceChanged));
+        this._inputSourceManagerSourcesChangedId =
+            this._inputSourceManager.connect('sources-changed', Lang.bind(this, this._sourcesChanged));
+        this._inputSourceManagerCurrentSourceChangedId =
+            this._inputSourceManager.connect('current-source-changed', Lang.bind(this, this._currentSourceChanged));
         this._inputSourceManager.reload();
+    },
+
+    _onDestroy: function() {
+        if (this._inputSourceManager) {
+            this._inputSourceManager.disconnect(this._inputSourceManagerSourcesChangedId);
+            this._inputSourceManager.disconnect(this._inputSourceManagerCurrentSourceChangedId);
+            this._inputSourceManager = null;
+        }
     },
 
     _sessionUpdated: function() {
