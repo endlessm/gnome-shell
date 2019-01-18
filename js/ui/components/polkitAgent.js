@@ -46,6 +46,8 @@ var AuthenticationDialog = new Lang.Class({
         this.userNames = userNames;
         this._wasDismissed = false;
 
+        this.connect('closed', Lang.bind(this, this._onDialogClosed));
+
         let icon = new Gio.ThemedIcon({ name: 'dialog-password-symbolic' });
         let title = _("Authentication Required");
 
@@ -195,7 +197,7 @@ var AuthenticationDialog = new Lang.Class({
     },
 
     _initiateSession: function() {
-        this.destroySession();
+        this._destroySession();
         this._session = new PolkitAgent.Session({ identity: this._identityToAuth,
                                                   cookie: this._cookie });
         this._sessionCompletedId = this._session.connect('completed', Lang.bind(this, this._onSessionCompleted));
@@ -337,7 +339,7 @@ var AuthenticationDialog = new Lang.Class({
         this._ensureOpen();
     },
 
-    destroySession: function() {
+    _destroySession: function() {
         if (this._session) {
             this._inputSourceManager.passwordModeEnabled = false;
             if (!this._completed)
@@ -370,6 +372,10 @@ var AuthenticationDialog = new Lang.Class({
         this._wasDismissed = true;
         this.close(global.get_current_time());
         this._emitDone(true);
+    },
+
+    _onDialogClosed: function() {
+        this._destroySession();
     },
 });
 Signals.addSignalMethods(AuthenticationDialog.prototype);
@@ -428,7 +434,6 @@ var AuthenticationAgent = new Lang.Class({
 
     _completeRequest: function(dismissed) {
         this._currentDialog.close();
-        this._currentDialog.destroySession();
         this._currentDialog = null;
 
         this._native.complete(dismissed);
