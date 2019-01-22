@@ -81,6 +81,22 @@ var getClubhouseWindowTracker = (function () {
     };
 }());
 
+var chainTweens = function (tweensInfo, callback) {
+    if (tweensInfo.length == 0) {
+        return callback;
+    }
+    let currentInfo = tweensInfo.shift();
+    // FIXME make callback optional
+    let tweeningParameters = Object.assign({onComplete: chainTweens(tweensInfo, callback)},
+                                           currentInfo.tweeningParameters);
+
+    return () => {
+        Tweener.addTween(currentInfo.target,
+                         tweeningParameters);
+    }
+
+};
+
 var ClubhouseWindowTracker = new Lang.Class({
     Name: 'ClubhouseWindowTracker',
     Extends: GObject.Object,
@@ -517,6 +533,113 @@ var ClubhouseNotificationBanner = new Lang.Class({
         this.actor.y = margin;
     },
 
+    blink: function() {
+        let _dummy = {t: 0};
+        let orig_x = this.actor.x;
+        let button = this._actionBin.get_child_at_index(0);
+        this.actor.set_pivot_point(0.5, 0.5);
+        button.set_pivot_point(0.5, 0.5);
+        button.scale_x = 0;
+        button.scale_y = 0;
+
+        let fade_in = {target: this.actor,
+                       tweeningParameters: { opacity: 255,
+                                             time: 0.3,
+                                             transition: 'easeOutQuad'}};
+        let fade_out = {target: this.actor,
+                        tweeningParameters: { opacity: 0,
+                                              time: 0.1,
+                                              transition: 'easeOutQuad'}};
+        let text_fade_in = {target: this._expandedLabel.actor,
+                            tweeningParameters: { opacity: 255,
+                                                  time: 0.5,
+                                                  transition: 'easeOutQuad'}};
+        let buttons_fade_in = {target: this._actionBin,
+                               tweeningParameters: { opacity: 255,
+                                                     time: 0.2,
+                                                     transition: 'easeOutQuad'}};
+
+        let boing_x = {target: this.actor,
+                       tweeningParameters: { scale_x: 1,
+                                             time: 0.5,
+                                             transition: 'easeOutElastic'}};
+        let boing_y = {target: this.actor,
+                       tweeningParameters: { scale_y: 1,
+                                             time: 0.5,
+                                             transition: 'easeOutElastic'}};
+
+        let boing2_x = {target: this.actor,
+                        tweeningParameters: { scale_x: 1,
+                                              time: 0.5,
+                                              transition: 'easeOutBounce'}};
+        let boing2_y = {target: this.actor,
+                        tweeningParameters: { scale_y: 1,
+                                              time: 0.5,
+                                              transition: 'easeOutBounce'}};
+        let pause_01 = {target: _dummy,
+                        tweeningParameters: { t: 1,
+                                              time: 0.1,
+                                              transition: 'linear'}};
+        let pause_half = {target: _dummy,
+                          tweeningParameters: { t: 1,
+                                                time: 0.5,
+                                                transition: 'linear'}};
+
+        let shake_x = {target: this.actor,
+                       tweeningParameters: { x: orig_x,
+                                             time: 0.6,
+                                             transition: 'easeOutElastic'}};
+
+        let button_scale_x = {target: button,
+                              tweeningParameters: { scale_x: 1,
+                                                    time: 0.5,
+                                                    transition: 'easeOutBack'}};
+        let button_scale_y = {target: button,
+                              tweeningParameters: { scale_y: 1,
+                                                    time: 0.5,
+                                                    transition: 'easeOutBack'}};
+
+        let onComplete = () => {
+            Tweener.addTween(buttons_fade_in.target,
+                             buttons_fade_in.tweeningParameters);
+            Tweener.addTween(button_scale_x.target,
+                             button_scale_x.tweeningParameters);
+            Tweener.addTween(button_scale_y.target,
+                             button_scale_y.tweeningParameters);
+        }
+
+        // // blink
+        // this.actor.opacity = 0;
+        // this._expandedLabel.actor.opacity = 0;
+        // this._actionBin.opacity = 0;
+        // chainTweens([fade_in, fade_out, fade_in, text_fade_in, pause_half], onComplete)();
+
+        // // shaking
+        // this.actor.opacity = 255;
+        // this.actor.x = orig_x + 150;
+        // this._expandedLabel.actor.opacity = 0;
+        // this._actionBin.opacity = 0;
+        // chainTweens([shake_x, text_fade_in, pause_half], onComplete)();
+
+        // // resize bouncing
+        // this.actor.opacity = 255;
+        // this.actor.scale_x = 0;
+        // this.actor.scale_y = 0;
+        // this._expandedLabel.actor.opacity = 0;
+        // this._actionBin.opacity = 0;
+        // chainTweens([boing2_x, text_fade_in, pause_half], onComplete)();
+        // chainTweens([boing2_y], () => {})();
+
+        // squash/stretch
+        this.actor.opacity = 255;
+        this.actor.scale_x = 0;
+        this.actor.scale_y = 0;
+        this._expandedLabel.actor.opacity = 0;
+        this._actionBin.opacity = 0;
+        chainTweens([boing_x, text_fade_in, pause_half], onComplete)();
+        chainTweens([pause_01, boing_y], () => {})();
+    },
+
     _onClicked: function() {
         // Do nothing because we don't want to activate the Clubhouse ATM
     },
@@ -603,6 +726,16 @@ var ClubhouseQuestBanner = new Lang.Class({
         this.parent(notification);
 
         this._shouldSlideIn = isFirstBanner;
+        let shouldBlink = !isFirstBanner;  // FIXME only when not replacing a previous notification
+        if (shouldBlink) {
+            // this.blink();
+            // FIXME adding a pause here
+            this.actor.opacity = 0;
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+                this.blink();
+                return GLib.SOURCE_REMOVE;
+            });
+        }
 
         this._closeButton.visible = Main.sessionMode.hasOverview;
 
