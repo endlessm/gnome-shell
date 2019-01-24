@@ -7,6 +7,7 @@ const AppDisplay = imports.ui.appDisplay;
 const IconGrid = imports.ui.iconGrid;
 const InternetSearch = imports.ui.internetSearch;
 const Main = imports.ui.main;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const RemoteSearch = imports.ui.remoteSearch;
 const Separator = imports.ui.separator;
 const Util = imports.misc.util;
@@ -412,6 +413,8 @@ var SearchResults = class {
                                             vertical: true });
         Util.blockClickEventsOnActor(this.actor);
 
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
+
         let closeIcon = new St.Icon({ icon_name: 'window-close-symbolic' });
         let closeButton = new St.Button({ name: 'searchResultsCloseButton',
                                           child: closeIcon,
@@ -507,6 +510,12 @@ var SearchResults = class {
 
     _registerProvider(provider) {
         provider.searchInProgress = false;
+
+        // Filter out unwanted providers.
+        if (provider.appInfo &&
+            !this._parentalControlsManager.shouldShowApp(provider.appInfo))
+            return;
+
         this._providers.push(provider);
         this._ensureProviderDisplay(provider);
     }
