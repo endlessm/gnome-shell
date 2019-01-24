@@ -1425,9 +1425,6 @@ var FrequentView = new Lang.Class({
         }));
 
         this._parentalControlsManager = ParentalControlsManager.getDefault();
-        this._parentalControlsManager.connect('initialized', Lang.bind(this, function() {
-            this._redisplay();
-        }));
     },
 
     hasUsefulData: function() {
@@ -1587,8 +1584,6 @@ var AppSearchProvider = new Lang.Class({
         let usage = Shell.AppUsage.get_default();
         let results = [];
         let replacementMap = {};
-        // FIXME: Technically we should yield until parentalControlsManager.initialized
-        // but in practice this works.
         let parentalControlsManager = ParentalControlsManager.getDefault();
 
         groups.forEach((group) => {
