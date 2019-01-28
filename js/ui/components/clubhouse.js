@@ -789,7 +789,8 @@ var ClubhouseButtonManager = new Lang.Class({
     },
 
     setSuggestOpen: function(suggestOpen) {
-        this._openButton.setHighlighted(suggestOpen);
+        if (this._openButton.visible)
+            this._openButton.setHighlighted(suggestOpen);
     },
 
     setVisible: function(visible) {
