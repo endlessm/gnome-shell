@@ -694,6 +694,13 @@ var ClubhouseNotificationSource = new Lang.Class({
 var ClubhouseOpenButton = new Lang.Class({
     Name: 'ClubhouseOpenButton',
     Extends: Soundable.Button,
+    Properties: {
+        'highlighted': GObject.ParamSpec.boolean(
+            'highlighted', '', '',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT,
+            false
+        )
+    },
 
     _init: function(params) {
         params = params || {};
@@ -716,21 +723,48 @@ var ClubhouseOpenButton = new Lang.Class({
         this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse');
         this._highlightLoopingSoundItem =
             new SoundServer.SoundItem('clubhouse/entry/pulse-loop');
+
+        this.connect('notify::visible',
+                     this._play_stop_highlighted_sound.bind(this));
+        this.connect('notify::highlighted',
+                     this._play_stop_highlighted_sound.bind(this));
     },
 
-    setHighlighted: function(highlighted) {
+    set highlighted(highlighted) {
         if (highlighted) {
             this.child = this._pulseIcon;
             this._pulseAnimation.play();
-            this._highlightSoundItem.play();
-            this._highlightLoopingSoundItem.play();
         } else {
             this.child = this._normalIcon;
             this._pulseAnimation.stop();
+        }
+        this._highlighted = highlighted;
+        this.notify('highlighted');
+    },
+
+    get highlighted() {
+        return this._highlighted;
+    },
+
+    _play_stop_highlighted_sound() {
+        const states = [
+            SoundServer.SoundItemStatusEnum.NONE,
+            SoundServer.SoundItemStatusEnum.PENDING,
+            SoundServer.SoundItemStatusEnum.CANCELLING
+        ];
+
+        if (this.visible && this.highlighted) {
+            // If the sound item has already an UUID assigned, then do not
+            // "play it again" which implies to not increase its refcount.
+            if (!(this._highlightSoundItem.Status in states))
+                this._highlightSoundItem.play();
+            if (!(this._highlightLoopingSoundItem.Status in states))
+                this._highlightLoopingSoundItem.play();
+        } else {
             this._highlightSoundItem.stop();
             this._highlightLoopingSoundItem.stop();
         }
-    },
+    }
 });
 
 var ClubhouseButtonManager = new Lang.Class({
@@ -789,7 +823,7 @@ var ClubhouseButtonManager = new Lang.Class({
     },
 
     setSuggestOpen: function(suggestOpen) {
-        this._openButton.setHighlighted(suggestOpen);
+        this._openButton.highlighted = suggestOpen;
     },
 
     setVisible: function(visible) {
