@@ -450,6 +450,9 @@ var CodingSession = new Lang.Class({
 
         _ensureAfterFirstFrame(actor, () => {
             Main.layoutManager.addChrome(this._button);
+            // Position the button below the panel
+            Main.layoutManager.uiGroup.set_child_below_sibling(
+                this._button, Main.layoutManager.panelBox);
             this._synchronizeButton(actor.meta_window);
         });
     },
