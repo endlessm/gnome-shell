@@ -11,16 +11,18 @@ var MESSAGE_ANIMATION_TIME = 0.1;
 
 var DEFAULT_EXPAND_LINES = 6;
 
-function _fixMarkup(text, allowMarkup) {
+function _fixMarkup(text, allowMarkup, onlySimpleMarkup) {
     if (allowMarkup) {
         // Support &amp;, &quot;, &apos;, &lt; and &gt;, escape all other
         // occurrences of '&'.
         let _text = text.replace(/&(?!amp;|quot;|apos;|lt;|gt;)/g, '&amp;');
 
-        // Support <b>, <i>, and <u>, escape anything else
-        // so it displays as raw markup.
-        // Ref: https://developer.gnome.org/notification-spec/#markup
-        _text = _text.replace(/<(?!\/?[biu]>)/g, '&lt;');
+        if (onlySimpleMarkup) {
+            // Support <b>, <i>, and <u>, escape anything else
+            // so it displays as raw markup.
+            // Ref: https://developer.gnome.org/notification-spec/#markup
+            _text = _text.replace(/<(?!\/?[biu]>)/g, '&lt;');
+        }
 
         try {
             Pango.parse_markup(_text, -1, '');
@@ -33,7 +35,7 @@ function _fixMarkup(text, allowMarkup) {
 }
 
 var URLHighlighter = class URLHighlighter {
-    constructor(text, lineWrap, allowMarkup) {
+    constructor(text, lineWrap, allowMarkup, simpleMarkup=true) {
         if (!text)
             text = '';
         this.actor = new St.Label({ reactive: true, style_class: 'url-highlighter',
@@ -52,7 +54,7 @@ var URLHighlighter = class URLHighlighter {
         this.actor.clutter_text.line_wrap = lineWrap;
         this.actor.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
 
-        this.setMarkup(text, allowMarkup);
+        this.setMarkup(text, allowMarkup, simpleMarkup);
         this.actor.connect('button-press-event', (actor, event) => {
             // Don't try to URL highlight when invisible.
             // The MessageTray doesn't actually hide us, so
@@ -106,8 +108,8 @@ var URLHighlighter = class URLHighlighter {
         });
     }
 
-    setMarkup(text, allowMarkup) {
-        text = text ? _fixMarkup(text, allowMarkup) : '';
+    setMarkup(text, allowMarkup, onlySimpleMarkup=true) {
+        text = text ? _fixMarkup(text, allowMarkup, onlySimpleMarkup) : '';
         this._text = text;
 
         this.actor.clutter_text.set_markup(text);
@@ -289,6 +291,7 @@ var Message = class Message {
         this.expanded = false;
 
         this._useBodyMarkup = false;
+        this._bodySimpleMarkup = true;
 
         this.actor = new St.Button({ style_class: 'message',
                                      accessible_role: Atk.Role.NOTIFICATION,
@@ -341,7 +344,8 @@ var Message = class Message {
         this._bodyStack.layout_manager = new LabelExpanderLayout();
         contentBox.add_actor(this._bodyStack);
 
-        this.bodyLabel = new URLHighlighter('', false, this._useBodyMarkup);
+        this.bodyLabel = new URLHighlighter('', false, this._useBodyMarkup,
+                                            this._bodySimpleMarkup);
         this.bodyLabel.actor.add_style_class_name('message-body');
         this._bodyStack.add_actor(this.bodyLabel.actor);
         this.setBody(body);
@@ -375,15 +379,23 @@ var Message = class Message {
     setBody(text) {
         this._bodyText = text;
         this.bodyLabel.setMarkup(text ? text.replace(/\n/g, ' ') : '',
-                                 this._useBodyMarkup);
+                                 this._useBodyMarkup, this._bodySimpleMarkup);
         if (this._expandedLabel)
-            this._expandedLabel.setMarkup(text, this._useBodyMarkup);
+            this._expandedLabel.setMarkup(text, this._useBodyMarkup, this._bodySimpleMarkup);
     }
 
     setUseBodyMarkup(enable) {
         if (this._useBodyMarkup === enable)
             return;
         this._useBodyMarkup = enable;
+        if (this.bodyLabel)
+            this.setBody(this._bodyText);
+    }
+
+    setUseBodySimpleMarkup(enable) {
+        if (this._bodySimpleMarkup === enable)
+            return;
+        this._bodySimpleMarkup = enable;
         if (this.bodyLabel)
             this.setBody(this._bodyText);
     }
@@ -435,7 +447,8 @@ var Message = class Message {
 
         if (this._bodyStack.get_n_children() < 2) {
             this._expandedLabel = new URLHighlighter(this._bodyText,
-                                                     true, this._useBodyMarkup);
+                                                     true, this._useBodyMarkup,
+                                                     this._bodySimpleMarkup);
             this.setExpandedBody(this._expandedLabel.actor);
         }
 
