@@ -341,6 +341,8 @@ var ClubhouseNotificationBanner = new Lang.Class({
         notification.bannerBodyText = '';
 
         this.parent(notification);
+        this.setUseBodyMarkup(true);
+        this.setUseBodySimpleMarkup(false);
 
         // Whether it should animate when positioning it
         this._shouldSlideIn = true;
