@@ -16,7 +16,7 @@ const MessageList = imports.ui.messageList;
 function assertConverts(input, output) {
     if (!output)
         output = input;
-    let fixed = MessageList._fixMarkup(input, true);
+    let fixed = MessageList._fixMarkup(input, true, true);
     JsUnit.assertEquals(output, fixed);
 
     let parsed = false;
@@ -30,7 +30,7 @@ function assertConverts(input, output) {
 // Assert that @input, assumed to be plain text, gets escaped to @output,
 // which is valid markup.
 function assertEscapes(input, output) {
-    let fixed = MessageList._fixMarkup(input, false);
+    let fixed = MessageList._fixMarkup(input, false, true);
     JsUnit.assertEquals(output, fixed);
 
     let parsed = false;
