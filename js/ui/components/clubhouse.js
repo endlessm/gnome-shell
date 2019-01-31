@@ -739,6 +739,7 @@ var ClubhouseButtonManager = new Lang.Class({
     _init: function() {
         this._openButton = new ClubhouseOpenButton();
         this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
+        this._openButton.set_clip(0, 0, CLUBHOUSE_BUTTON_SIZE / 2, CLUBHOUSE_BUTTON_SIZE);
 
         Main.layoutManager.addChrome(this._openButton);
 
