@@ -1628,19 +1628,25 @@ var WindowManager = class {
                 duration: WINDOW_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: () => onComplete(shellwm, actor),
+                onUpdate: this._clipActor.bind(this, Clutter.ContentGravity.TOP, endY, actor),
             });
         } else {
             let endX;
-            if (actor.x <= monitor.x)
+            let origin;
+            if (actor.x <= monitor.x) {
                 endX = monitor.x - actor.width;
-            else
+                origin = Clutter.ContentGravity.LEFT;
+            } else {
                 endX = monitor.x + monitor.width;
+                origin = Clutter.ContentGravity.RIGHT;
+            }
 
             actor.ease({
                 x: endX,
                 duration: WINDOW_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: () => onComplete(shellwm, actor),
+                onUpdate: this._clipActor.bind(this, origin, endX, actor),
             });
         }
     }
@@ -2003,22 +2009,33 @@ var WindowManager = class {
                 duration: WINDOW_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: this._mapWindowDone.bind(this),
+                onUpdate: this._clipActor.bind(this,
+                                               Clutter.ContentGravity.TOP,
+                                               monitor.y - actor.height,
+                                               actor),
             });
         } else {
             let origX = actor.x;
+            let position;
+            let origin;
             if (origX == monitor.x) {
                 // the side bar will appear from the left side
-                actor.set_position(monitor.x - actor.width, actor.y);
+                position = monitor.x - actor.width;
+                origin = Clutter.ContentGravity.LEFT;
             } else {
                 // ... from the right side
-                actor.set_position(monitor.x + monitor.width, actor.y);
+                position = monitor.x + monitor.width;
+                origin = Clutter.ContentGravity.RIGHT;
             }
+
+            actor.set_position(position, actor.y);
 
             actor.ease({
                 x: origX,
                 duration: WINDOW_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: this._mapWindowDone.bind(this),
+                onComplete: this._clipActor.bind(this, origin, position, actor),
             });
         }
 
@@ -2029,7 +2046,33 @@ var WindowManager = class {
             this._hideOtherWindows(actor, animateFade);
     }
 
-    _mapWindow(shellwm, actor) {
+    _clipActor (origin, position, actor) {
+        let clipX = 0;
+        let clipY = 0;
+        let clipWidth = actor.width;
+        let clipHeight = actor.height;
+
+        switch (origin) {
+            case Clutter.ContentGravity.RIGHT:
+                clipWidth = position - actor.x;
+                break;
+            case Clutter.ContentGravity.LEFT:
+                clipX = actor.width - (actor.x - position);
+                break;
+            case Clutter.ContentGravity.TOP:
+                clipY = actor.height - (actor.y - position);
+                break;
+            case Clutter.ContentGravity.BOTTOM:
+                clipHeight = position - actor.y;
+                break;
+            default:
+                break;
+        }
+
+        actor.set_clip(clipX, clipY, clipWidth, clipHeight);
+    }
+
+    _mapWindow (shellwm, actor) {
         actor._windowType = actor.meta_window.get_window_type();
         actor._notifyWindowTypeSignalId =
             actor.meta_window.connect('notify::window-type', () => {
