@@ -739,6 +739,7 @@ var ClubhouseButtonManager = new Lang.Class({
     _init: function() {
         this._openButton = new ClubhouseOpenButton();
         this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
+        this._openButton.set_clip(0, 0, CLUBHOUSE_BUTTON_SIZE / 2, CLUBHOUSE_BUTTON_SIZE);
 
         Main.layoutManager.addChrome(this._openButton);
 
@@ -776,7 +777,7 @@ var ClubhouseButtonManager = new Lang.Class({
         let workarea = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
 
         this._openButton.x = monitor.x + monitor.width - this._openButton.width / 2;
-        this._openButton.y = Math.floor(workarea.height / 2.0 - this._openButton.height / 2.0);
+        this._openButton.y = workarea.y + Math.floor(workarea.height / 2.0 - this._openButton.height / 2.0);
 
         this._updateCloseButtonPosition();
     },
