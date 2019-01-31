@@ -1615,14 +1615,20 @@ var WindowManager = class {
                                onCompleteParams: [shellwm, actor],
                                onOverwrite: onOverwrite,
                                onOverwriteScope: this,
-                               onOverwriteParams: [shellwm, actor]
+                               onOverwriteParams: [shellwm, actor],
+                               onUpdate: this._clipActor,
+                               onUpdateParams: [Clutter.ContentGravity.TOP, endY, actor],
                              });
         } else {
             let endX;
-            if (actor.x <= monitor.x)
+            let origin;
+            if (actor.x <= monitor.x) {
                 endX = monitor.x - actor.width;
-            else
+                origin = Clutter.ContentGravity.LEFT;
+            } else {
                 endX = monitor.x + monitor.width;
+                origin = Clutter.ContentGravity.RIGHT;
+            }
 
             Tweener.addTween(actor,
                              { x: endX,
@@ -1633,7 +1639,9 @@ var WindowManager = class {
                                onCompleteParams: [shellwm, actor],
                                onOverwrite: onOverwrite,
                                onOverwriteScope: this,
-                               onOverwriteParams: [shellwm, actor]
+                               onOverwriteParams: [shellwm, actor],
+                               onUpdate: this._clipActor,
+                               onUpdateParams: [origin, endX, actor],
                              });
         }
     }
@@ -2018,18 +2026,26 @@ var WindowManager = class {
                                onCompleteParams: [shellwm, actor],
                                onOverwrite: this._mapWindowOverwrite,
                                onOverwriteScope: this,
-                               onOverwriteParams: [shellwm, actor]
+                               onOverwriteParams: [shellwm, actor],
+                               onUpdate: this._clipActor,
+                               onUpdateParams: [Clutter.ContentGravity.TOP, monitor.y - actor.height, actor],
                              });
         }
         else {
             let origX = actor.x;
+            let position;
+            let origin;
             if (origX == monitor.x) {
                 // the side bar will appear from the left side
-                actor.set_position(monitor.x - actor.width, actor.y);
+                position = monitor.x - actor.width;
+                origin = Clutter.ContentGravity.LEFT;
             } else {
                 // ... from the right side
-                actor.set_position(monitor.x + monitor.width, actor.y);
+                position = monitor.x + monitor.width;
+                origin = Clutter.ContentGravity.RIGHT;
             }
+
+            actor.set_position(position, actor.y);
 
             Tweener.addTween(actor,
                              { x: origX,
@@ -2040,7 +2056,9 @@ var WindowManager = class {
                                onCompleteParams: [shellwm, actor],
                                onOverwrite: this._mapWindowOverwrite,
                                onOverwriteScope: this,
-                               onOverwriteParams: [shellwm, actor]
+                               onOverwriteParams: [shellwm, actor],
+                               onUpdate: this._clipActor,
+                               onUpdateParams: [origin, position, actor],
                              });
         }
 
@@ -2051,7 +2069,33 @@ var WindowManager = class {
             this._hideOtherWindows(actor, animateFade);
     }
 
-    _mapWindow(shellwm, actor) {
+    _clipActor (origin, position, actor) {
+        let clipX = 0;
+        let clipY = 0;
+        let clipWidth = actor.width;
+        let clipHeight = actor.height;
+
+        switch (origin) {
+            case Clutter.ContentGravity.RIGHT:
+                clipWidth = position - actor.x;
+                break;
+            case Clutter.ContentGravity.LEFT:
+                clipX = actor.width - (actor.x - position);
+                break;
+            case Clutter.ContentGravity.TOP:
+                clipY = actor.height - (actor.y - position);
+                break;
+            case Clutter.ContentGravity.BOTTOM:
+                clipHeight = position - actor.y;
+                break;
+            default:
+                break;
+        }
+
+        actor.set_clip(clipX, clipY, clipWidth, clipHeight);
+    }
+
+    _mapWindow (shellwm, actor) {
         actor._windowType = actor.meta_window.get_window_type();
         actor._notifyWindowTypeSignalId =
             actor.meta_window.connect('notify::window-type', () => {
