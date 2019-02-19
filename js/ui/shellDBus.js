@@ -8,6 +8,7 @@ const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 
 const AppActivation = imports.ui.appActivation;
+const CodeView = imports.ui.codeView;
 const Config = imports.misc.config;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
@@ -59,10 +60,15 @@ const GnomeShellIface = '<node> \
     <arg name="action" type="u" /> \
     <arg name="parameters" type="a{sv}" /> \
 </signal> \
+<signal name="FocusedAppFlippedSignal"> \
+    <arg name="target-app-id" type="s" /> \
+    <arg name="flipped" type="b" /> \
+</signal> \
 <property name="Mode" type="s" access="read" /> \
 <property name="OverviewActive" type="b" access="readwrite" /> \
 <property name="ShellVersion" type="s" access="read" /> \
 <property name="FocusedApp" type="s" access="read" /> \
+<property name="FocusedAppFlipped" type="(sb)" access="read" /> \
 </interface> \
 </node>';
 
@@ -116,6 +122,7 @@ var GnomeShell = new Lang.Class({
         Main.overview.connect('hidden',
                               Lang.bind(this, this._checkOverviewVisibleChanged));
 
+        Main.wm._codeViewManager.connect('flipped', Lang.bind(this, this._checkAppFlipped));
         Shell.WindowTracker.get_default().connect('notify::focus-app',
                                                   Lang.bind(this, this._checkFocusAppChanged));
     },
@@ -318,7 +325,20 @@ var GnomeShell = new Lang.Class({
     ShellVersion: Config.PACKAGE_VERSION,
 
     _checkFocusAppChanged: function() {
-        this._dbusImpl.emit_property_changed('FocusedApp', new GLib.Variant('s', this.FocusedApp));
+        this._dbusImpl.emit_property_changed('FocusedApp',
+                                             new GLib.Variant('s', this.FocusedApp));
+        this._dbusImpl.emit_property_changed('FocusedAppFlipped',
+                                             new GLib.Variant('(sb)', this.FocusedAppFlipped));
+        this._dbusImpl.emit_signal('FocusedAppFlippedSignal',
+                                   GLib.Variant.new('(sb)', this.FocusedAppFlipped));
+
+    },
+
+    _checkAppFlipped: function(codeViewManager, appId, state) {
+        this._dbusImpl.emit_property_changed('FocusedAppFlipped',
+                                             new GLib.Variant('(sb)', this.FocusedAppFlipped));
+        this._dbusImpl.emit_signal('FocusedAppFlippedSignal',
+                                   GLib.Variant.new('(sb)', this.FocusedAppFlipped));
     },
 
     get FocusedApp() {
@@ -328,6 +348,16 @@ var GnomeShell = new Lang.Class({
             appId = tracker.focus_app.get_id();
         return appId;
     },
+
+    get FocusedAppFlipped() {
+        const tracker = Shell.WindowTracker.get_default();
+        if (tracker.focus_app) {
+            const flipped = tracker.focus_app.codingSession &&
+                tracker.focus_app.codingSession._state === CodeView.STATE_TOOLBOX;
+            return [tracker.focus_app.get_id(), flipped];
+        }
+        return ['', false];
+    }
 });
 
 const GnomeShellExtensionsIface = '<node> \

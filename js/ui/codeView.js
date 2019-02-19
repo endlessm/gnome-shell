@@ -10,6 +10,7 @@ const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
+const Signals = imports.signals;
 const St = imports.gi.St;
 
 const AppActivation = imports.ui.appActivation;
@@ -21,8 +22,8 @@ const SoundServer = imports.misc.soundServer;
 
 const WINDOW_ANIMATION_TIME = 0.25;
 
-const STATE_APP = 0;
-const STATE_TOOLBOX = 1;
+var STATE_APP = 0;
+var STATE_TOOLBOX = 1;
 
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
 const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
@@ -488,10 +489,16 @@ var CodingSession = new Lang.Class({
     },
 
     _setState: function(value, includeButton=true) {
+        const oldState = this._state;
         this._state = value;
         if (includeButton)
             this._button.state = value;
         this._updateWindowPairingState();
+
+        if (!this.app && oldState && oldState !== value)
+            return;
+        Main.wm._codeViewManager.emit('flipped',
+                                      this._state === STATE_TOOLBOX);
     },
 
     _setupAnimation: function(targetState, src, oldDst, newDst, direction) {
@@ -663,6 +670,7 @@ var CodingSession = new Lang.Class({
 
         let windowTracker = Shell.WindowTracker.get_default();
         this._shellApp = windowTracker.get_window_app(this.app.meta_window);
+        this._shellApp.codingSession = this;
 
         this._ensureButton();
     },
@@ -753,6 +761,7 @@ var CodingSession = new Lang.Class({
         if (this.app) {
             let appWindow = this.app.meta_window;
             this.app = null;
+            delete this._shellApp.codingSession;
             this._shellApp = null;
 
             if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED)
@@ -1140,6 +1149,11 @@ const SessionLookupFlags = {
 
 var CodeViewManager = new Lang.Class({
     Name: 'CodeViewManager',
+    Signals: {
+        'flipped' : {
+            param_types: [GObject.TYPE_BOOLEAN]
+        }
+    },
 
     _init: function() {
         this._sessions = [];
@@ -1315,3 +1329,4 @@ var CodeViewManager = new Lang.Class({
         });
     }
 });
+Signals.addSignalMethods(CodeViewManager.prototype);
