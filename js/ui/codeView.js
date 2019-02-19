@@ -930,9 +930,17 @@ var CodingSession = new Lang.Class({
             !Main.overview.visible &&
             !inFullscreen &&
             !locked &&
-            this._hackable)
+            this._hackable) {
+
+            if (!this.toolbox) {
+                this._toolboxAppActionGroup.activate_action(
+                    'init',
+                    new GLib.Variant('(ss)', [_getAppId(this.app.meta_window),
+                                              _getWindowId(this.app.meta_window)]));
+            }
+
             this._button.show();
-        else
+        } else
             this._button.hide();
     },
 
