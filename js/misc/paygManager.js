@@ -176,6 +176,7 @@ var PaygManager = GObject.registerClass({
         this._expiryTime = value;
         this._updateExpirationReminders();
 
+        this._paygNotifier.clearNotification();
         this.emit('expiry-time-changed', this._expiryTime);
     }
 
