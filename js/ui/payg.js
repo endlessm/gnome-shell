@@ -36,6 +36,7 @@ const MessageTray = imports.ui.messageTray;
 const Tweener = imports.ui.tweener;
 
 var SUCCESS_DELAY_SECONDS = 3;
+var NOTIFY_DELAY_SECONDS = 5;
 
 var SPINNER_ICON_SIZE_PIXELS = 16;
 var SPINNER_ANIMATION_DELAY_SECS = 1.0;
@@ -510,5 +511,11 @@ var PaygNotifier = new Lang.Class({
         this._notification.connect('destroy', () => {
             this._notification = null;
         });
+
+    },
+
+    clearNotification() {
+        if (this._notification != null)
+            this._notification.destroy();
     },
 });
