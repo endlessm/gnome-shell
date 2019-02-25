@@ -471,8 +471,8 @@ var PaygNotifier = new Lang.Class({
             return;
         }
 
-        if (this._notification)
-            this._notification.destroy();
+        // Clear previous notification
+        clearNotification();
 
         let source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
@@ -510,5 +510,11 @@ var PaygNotifier = new Lang.Class({
         this._notification.connect('destroy', () => {
             this._notification = null;
         });
+
+    },
+
+    clearNotification() {
+        if (this._notification)
+            this._notification.destroy();
     },
 });
