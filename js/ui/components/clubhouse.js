@@ -507,6 +507,7 @@ var ClubhouseNotificationBanner = new Lang.Class({
                              { x: endX,
                                time: CLUBHOUSE_BANNER_ANIMATION_TIME,
                                transition: 'easeOutQuad',
+                               onUpdate: this._clipActor.bind(this),
                                onComplete: () => {
                                    // Ensure it only slides in once
                                    this._shouldSlideIn = false;
@@ -564,11 +565,24 @@ var ClubhouseNotificationBanner = new Lang.Class({
                          { x: endX,
                            time: CLUBHOUSE_BANNER_ANIMATION_TIME,
                            transition: 'easeOutQuad',
+                           onUpdate: this._clipActor.bind(this),
                            onComplete: () => {
                                this.actor.destroy();
                                this.actor = null;
                            }
                          });
+    },
+
+    _clipActor: function() {
+        let monitor = Main.layoutManager.primaryMonitor;
+        if (!monitor)
+            return;
+
+        let monitorEdge = monitor.x + monitor.width;
+        let actorEdge = this.actor.x + this.actor.width;
+        let offset = Math.max(0, actorEdge - monitorEdge);
+        let clip = this.actor.width - offset;
+        this.actor.set_clip(0, 0, clip, this.actor.height);
     },
 
     dismiss: function(shouldSlideOut) {
