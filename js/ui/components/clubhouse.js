@@ -769,6 +769,18 @@ var ClubhouseButtonManager = new Lang.Class({
         let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
         if (clubhouseWindowX != -1)
             this._closeButton.x = clubhouseWindowX - this._closeButton.width / 2;
+
+        // To avoid this button appearing in a possible right monitor during
+        // the animation we need to clip it to adjust to the monitor width
+        let monitor = Main.layoutManager.primaryMonitor;
+        if (!monitor)
+            return;
+        let buttonEdge = this._closeButton.x + this._closeButton.width;
+        let monitorEdge = monitor.x + monitor.width;
+        let offset =  buttonEdge - monitorEdge;
+        offset = Math.max(offset, 0);
+        let clip = this._closeButton.width - offset;
+        this._closeButton.set_clip(0, 0, clip, this._closeButton.height);
     },
 
     _reposition: function() {
