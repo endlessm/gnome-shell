@@ -72,6 +72,21 @@ const ClubhouseIface =
   </interface> \
 </node>';
 
+function _clipToMonitor(actor) {
+    // To avoid this actor appearing in a possible right monitor during
+    // the animation we need to clip it to adjust to the monitor width
+    let monitor = Main.layoutManager.primaryMonitor;
+    if (!monitor)
+        return;
+
+    let monitorEdge = monitor.x + monitor.width;
+
+    let actorEdge = actor.x + actor.width;
+    let offset = Math.max(actorEdge - monitorEdge, 0);
+    let clip = actor.width - offset;
+    actor.set_clip(0, 0, clip, actor.height);
+}
+
 var getClubhouseWindowTracker = (function () {
     let clubhouseWindowTracker;
     return function () {
@@ -773,6 +788,8 @@ var ClubhouseButtonManager = new Lang.Class({
         let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
         if (clubhouseWindowX != -1)
             this._closeButton.x = clubhouseWindowX - this._closeButton.width / 2;
+
+        _clipToMonitor(this._closeButton);
     },
 
     _reposition: function() {
