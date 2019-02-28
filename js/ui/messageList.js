@@ -44,7 +44,7 @@ function _fixMarkup(text, allowMarkup, onlySimpleMarkup) {
 var URLHighlighter = new Lang.Class({
     Name: 'URLHighlighter',
 
-    _init: function(text, lineWrap, allowMarkup) {
+    _init: function(text, lineWrap, allowMarkup, simpleMarkup=true) {
         if (!text)
             text = '';
         this.actor = new St.Label({ reactive: true, style_class: 'url-highlighter',
@@ -63,7 +63,7 @@ var URLHighlighter = new Lang.Class({
         this.actor.clutter_text.line_wrap = lineWrap;
         this.actor.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
 
-        this.setMarkup(text, allowMarkup);
+        this.setMarkup(text, allowMarkup, simpleMarkup);
         this.actor.connect('button-press-event', Lang.bind(this, function(actor, event) {
             // Don't try to URL highlight when invisible.
             // The MessageTray doesn't actually hide us, so
@@ -360,7 +360,8 @@ var Message = new Lang.Class({
         this._bodyStack.layout_manager = new LabelExpanderLayout();
         contentBox.add_actor(this._bodyStack);
 
-        this.bodyLabel = new URLHighlighter('', false, this._useBodyMarkup);
+        this.bodyLabel = new URLHighlighter('', false, this._useBodyMarkup,
+                                            this._bodySimpleMarkup);
         this.bodyLabel.actor.add_style_class_name('message-body');
         this._bodyStack.add_actor(this.bodyLabel.actor);
         this.setBody(body);
@@ -461,7 +462,8 @@ var Message = new Lang.Class({
 
         if (this._bodyStack.get_n_children() < 2) {
             this._expandedLabel = new URLHighlighter(this._bodyText,
-                                                     true, this._useBodyMarkup);
+                                                     true, this._useBodyMarkup,
+                                                     this._bodySimpleMarkup);
             this.setExpandedBody(this._expandedLabel.actor);
         }
 
