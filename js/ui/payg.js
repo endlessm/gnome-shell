@@ -472,7 +472,7 @@ var PaygNotifier = new Lang.Class({
         }
 
         // Clear previous notification
-        clearNotification();
+        this.clearNotification();
 
         let source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
