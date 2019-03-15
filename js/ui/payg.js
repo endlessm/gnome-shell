@@ -23,6 +23,7 @@ const Gettext = imports.gettext;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
