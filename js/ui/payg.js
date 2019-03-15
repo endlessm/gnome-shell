@@ -20,7 +20,7 @@
 
 const Clutter = imports.gi.Clutter;
 const Gettext = imports.gettext;
-const { Gio, GLib, GObject, St } = imports.gi;
+const { Gio, GLib, GObject, St, Shell } = imports.gi;
 const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 
