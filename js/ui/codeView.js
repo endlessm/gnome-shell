@@ -381,6 +381,10 @@ var CodingSession = new Lang.Class({
                                             GObject.ParamFlags.READWRITE,
                                             Meta.WindowActor),
     },
+    Signals: {
+        'minimized': {},
+        'unminimized': {},
+    },
 
     _init: function(params) {
         this._app = null;
@@ -843,7 +847,7 @@ var CodingSession = new Lang.Class({
         // If we have an app window, disconnect any signals and destroy it,
         // unless we are destroying the session because the app window was
         // destroyed in the first place
-        if (this.app) {
+        if (this.app && !this.app.is_destroyed()) {
             let appWindow = this.app.meta_window;
             this.app = null;
             this._shellApp = null;
@@ -855,7 +859,7 @@ var CodingSession = new Lang.Class({
         // If we have a toolbox window, disconnect any signals and destroy it,
         // unless we are destroying the session because the toolbox window was
         // destroyed in the first place
-        if (this.toolbox) {
+        if (this.toolbox && !this.toolbox.is_destroyed()) {
             let toolboxWindow = this.toolbox.meta_window;
             this.toolbox = null;
 
@@ -976,6 +980,8 @@ var CodingSession = new Lang.Class({
         // Only want to minimize if we weren't already minimized.
         if (toMini && !toMini.meta_window.minimized)
             toMini.meta_window.minimize();
+
+        this.emit('minimized');
     },
 
     _applyWindowUnminimizationState: function(shellwm, actor) {
@@ -993,6 +999,8 @@ var CodingSession = new Lang.Class({
         // minimized.
         if (toUnMini && toUnMini.meta_window.minimized)
             toUnMini.meta_window.unminimize();
+
+        this.emit('unminimized');
     },
 
     _overviewStateChanged: function() {
@@ -1261,7 +1269,37 @@ var CodeViewManager = new Lang.Class({
     },
 
     _addSession: function(actor) {
-        this._sessions.push(new CodingSession({ app: actor }));
+        let session = new CodingSession({ app: actor });
+
+        // When the app is minimized the WM doesn't emit the destroy signal if
+        // the app is closed, for this reason we need to listen to the 'destroy'
+        // signal of the actor if it's minimized, to be able to remove from the
+        // CodingSession list and avoid possible gnome-shell crash
+        let destroyAppHandlerId = 0;
+        let destroyToolboxHandlerId = 0;
+        session.connect('minimized', (session) => {
+            if (session.app) {
+                destroyAppHandlerId = session.app.connect('destroy',
+                    this.handleDestroyWindow.bind(this));
+            }
+
+            if (session.toolbox) {
+                destroyToolboxHandlerId = session.toolbox.connect('destroy',
+                    this.handleDestroyWindow.bind(this));
+            }
+        });
+        session.connect('unminimized', (session) => {
+            if (destroyAppHandlerId) {
+                session.app.disconnect(destroyAppHandlerId);
+                destroyAppHandlerId = 0;
+            }
+            if (destroyToolboxHandlerId) {
+                session.toolbox.disconnect(destroyToolboxHandlerId);
+                destroyToolboxHandlerId = 0;
+            }
+        });
+
+        this._sessions.push(session);
     },
 
     _removeSession: function(session, eventType) {
