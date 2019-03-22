@@ -1808,6 +1808,8 @@ var WindowManager = new Lang.Class({
     },
 
     _minimizeWindow : function(shellwm, actor) {
+        this._codeViewManager.handleMinimizeWindow(actor);
+
         let types = [Meta.WindowType.NORMAL,
                      Meta.WindowType.MODAL_DIALOG,
                      Meta.WindowType.DIALOG];
@@ -1866,6 +1868,7 @@ var WindowManager = new Lang.Class({
     },
 
     _unminimizeWindow : function(shellwm, actor) {
+        this._codeViewManager.handleMapWindow(actor);
         let types = [Meta.WindowType.NORMAL,
                      Meta.WindowType.MODAL_DIALOG,
                      Meta.WindowType.DIALOG];

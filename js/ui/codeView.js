@@ -770,7 +770,7 @@ var CodingSession = new Lang.Class({
         // If we have an app window, disconnect any signals and destroy it,
         // unless we are destroying the session because the app window was
         // destroyed in the first place
-        if (this.app) {
+        if (this.app && !this.app.is_destroyed()) {
             let appWindow = this.app.meta_window;
             this.app = null;
             this._shellApp = null;
@@ -856,6 +856,22 @@ var CodingSession = new Lang.Class({
                                  this.app,
                                  null, this.toolbox,
                                  Gtk.DirectionType.LEFT);
+        }
+    },
+
+    flipBackMinimize: function() {
+        if (this._toolboxActionGroup.has_action('flip-back')) {
+            this._toolboxActionGroup.activate_action('flip-back', null);
+            this._appRemovedActor = this.app;
+            this._minimize = true;
+            this.app = null;
+        } else {
+            this._setState(STATE_APP, false);
+            this.app.meta_window.activate(global.get_current_time());
+            this.app.opacity = 255;
+            this.app.rotation_angle_y = 0;
+            this._setEffectsEnabled(this.app, false);
+            this.app.meta_window.minimize();
         }
     },
 
@@ -1201,6 +1217,24 @@ var CodeViewManager = new Lang.Class({
         this._sessions.splice(idx, 1);
     },
 
+    handleMinimizeWindow: function(actor) {
+        if (this._stopped)
+            return;
+
+        // First, determine if this is an app window getting destroyed
+        let session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_APP);
+        let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
+
+        if (session)
+            this._removeSession(session, eventType);
+        else {
+            // if we're minimizing as toolbox, we switch back
+            session = this._getSession(actor, SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
+            if (session)
+                session.flipBackMinimize();
+        }
+    },
+
     handleDestroyWindow: function(actor) {
         if (this._stopped)
             return false;
@@ -1279,9 +1313,16 @@ var CodeViewManager = new Lang.Class({
             if (!session)
                 session = this._getAvailableSessionForToolboxTarget(_getAppId(actor.meta_window));
 
-            if (session)
-                handled = session.admitAppWindowActor(actor);
-            else
+            if (session) {
+                if (session._minimize) {
+                    session.app = actor;
+                    actor.meta_window.minimize();
+                    let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
+                    this._removeSession(session, eventType);
+                    handled = true;
+                } else
+                    handled = session.admitAppWindowActor(actor);
+            } else
                 // This is simply a new application window
                 this._addSession(actor);
         }
