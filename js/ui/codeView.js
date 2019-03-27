@@ -81,6 +81,7 @@ function _getToolboxTarget(win) {
 const _ensureHackDataFile = (function () {
     let keyfile = new GLib.KeyFile();
     let initialized = false;
+    let monitors = [];
 
     const flatpakInstallationPaths = [
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
@@ -94,6 +95,25 @@ const _ensureHackDataFile = (function () {
     return function() {
         if (initialized)
             return keyfile;
+
+        // Only create file monitors the first time
+        if (monitors.length === 0) {
+            for (let path of searchPaths) {
+                path = GLib.build_filenamev([path, 'hack-data.ini']);
+                const file = Gio.file_new_for_path(path);
+                const monitor = file.monitor_file(Gio.FileMonitorFlags.NONE, null);
+                monitor.connect('changed', (_monitor, _file, _otherfile, ev, _data) => {
+                    if (ev === Gio.FileMonitorEvent.CHANGES_DONE_HINT) {
+                        // forces the keyfile reload the next time the function is called
+                        keyfile = new GLib.KeyFile();
+                        initialized = false;
+                    }
+                });
+                // we keep a reference to the monitor object to avoid destroy and
+                // signal disconnection
+                monitors.push(monitor);
+            }
+        }
 
         try {
             keyfile.load_from_dirs('hack-data.ini', searchPaths,
