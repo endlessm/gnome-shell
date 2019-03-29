@@ -405,6 +405,11 @@ var CodingSession = new Lang.Class({
         this._hackablePropsChangedId = 0;
         this._hackable = true;
 
+        this._grabbed = false;
+        this._backParent = null;
+        this._backConstraint = null;
+        this._grabTimeoutId = 0;
+
         this.parent(params);
 
         // FIXME: this should be extended to make it possible to launch
@@ -451,6 +456,69 @@ var CodingSession = new Lang.Class({
 
     get toolbox() {
         return this._toolbox;
+    },
+
+    setGrabbed: function(grabbed) {
+        if (this._grabTimeoutId > 0) {
+            Mainloop.source_remove(this._grabTimeoutId);
+            this._grabTimeoutId = 0;
+        }
+
+        if (grabbed) {
+            this._attachBackendWindow();
+            this._grabbed = true;
+            this._syncButtonVisibility();
+        } else {
+            // giving some time to finish possible window movement FXs
+            this._grabTimeoutId = Mainloop.timeout_add(500,
+                () => {
+                    Mainloop.source_remove(this._grabTimeoutId);
+                    this._grabTimeoutId = 0;
+
+                    this._detachBackendWindow();
+                    this._grabbed = false;
+                    this._syncButtonVisibility();
+                    return GLib.SOURCE_REMOVE;
+                });
+        }
+    },
+
+    _attachBackendWindow: function() {
+        const frontActor = this._actorForCurrentState();
+        const backActor = this._getOtherActor(frontActor);
+
+        if (!backActor)
+            return;
+
+        this._backParent = backActor.get_parent();
+        this._backParent.remove_child(backActor);
+        frontActor.insert_child_at_index(backActor, 0);
+
+        // Constraint to avoid inside actor movement
+        const path = new Clutter.Path();
+        path.add_move_to(0, 0);
+        this._backConstraint = new Clutter.PathConstraint({path: path, offset: 0});
+        backActor.add_constraint(this._backConstraint);
+    },
+
+    _detachBackendWindow: function() {
+        const frontActor = this._actorForCurrentState();
+        const backActor = this._getOtherActor(frontActor);
+
+        if (!this._backParent || !backActor)
+            return;
+
+        if (this._backConstraint) {
+            backActor.remove_constraint(this._backConstraint);
+            this._backConstraint = null;
+        }
+
+        const [x, y] = frontActor.get_position();
+        backActor.set_position(x, y);
+
+        frontActor.remove_child(backActor);
+        this._backParent.insert_child_below(backActor, frontActor);
+        this._backParent = null;
     },
 
     _ensureButton: function() {
@@ -767,6 +835,11 @@ var CodingSession = new Lang.Class({
             this._hackablePropsChangedId = 0;
         }
 
+        if (this._grabTimeoutId !== 0) {
+            Mainloop.source_remove(this._grabTimeoutId);
+            this._grabTimeoutId = 0;
+        }
+
         // If we have an app window, disconnect any signals and destroy it,
         // unless we are destroying the session because the app window was
         // destroyed in the first place
@@ -950,6 +1023,7 @@ var CodingSession = new Lang.Class({
             !Main.overview.visible &&
             !inFullscreen &&
             !locked &&
+            !this._grabbed &&
             this._hackable) {
 
             if (!this.toolbox) {
@@ -1226,6 +1300,16 @@ var CodeViewManager = new Lang.Class({
             this._removeSession(session, eventType);
 
         return false;
+    },
+
+    handleWindowGrab: function(actor, grabbed) {
+        let session = this._getSession(actor,
+                                       SessionLookupFlags.SESSION_LOOKUP_APP |
+                                       SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
+        if (!session)
+            return;
+
+        session.setGrabbed(grabbed);
     },
 
     handleMapWindow: function(actor) {
