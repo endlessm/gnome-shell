@@ -145,6 +145,13 @@ var UnlockUi = new Lang.Class({
         this.verificationStatus = UnlockStatus.FAILED;
     },
 
+    processReset() {
+        // If time has been removed entirely, we show the user the according message
+        // that the time has been reset to zero.
+        this.setErrorMessage(_("Remaining time cleared."));
+        this.verificationStatus = UnlockStatus.FAILED;
+    },
+
     _onDestroy() {
         if (this._clearTooManyAttemptsId > 0) {
             Mainloop.source_remove(this._clearTooManyAttemptsId);
@@ -210,6 +217,8 @@ var UnlockUi = new Lang.Class({
 
             if (error) {
                 this.processError(error);
+            } else if (Main.paygManager.lastTimeAdded >= 0) {
+                this.processReset();
             } else {
                 this.verificationStatus = UnlockStatus.SUCCEEDED;
                 this.onCodeAdded();
