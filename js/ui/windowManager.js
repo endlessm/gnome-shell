@@ -2940,6 +2940,7 @@ var WindowManager = new Lang.Class({
 
         if (attachedEffect)
             attachedEffect.activate('move', { grabbed: true });
+        this._codeViewManager.handleWindowGrab(actor, true);
     },
 
     _windowUngrabbed: function(display, op, window) {
@@ -2958,5 +2959,6 @@ var WindowManager = new Lang.Class({
 
         if (attachedEffect)
             attachedEffect.activate('move', { grabbed: false });
+        this._codeViewManager.handleWindowGrab(actor, false);
     },
 });
