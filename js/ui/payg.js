@@ -75,7 +75,7 @@ var PaygUnlockUi = GObject.registerClass({
     }
 
     updateApplyButtonSensitivity() {
-        let sensitive = this.validateCurrentCode() &&
+        let sensitive = this.validateCurrentCode(false) &&
             this.verificationStatus != UnlockStatus.VERIFYING &&
             this.verificationStatus != UnlockStatus.SUCCEEDED &&
             this.verificationStatus != UnlockStatus.TOO_MANY_ATTEMPTS;
@@ -193,12 +193,12 @@ var PaygUnlockUi = GObject.registerClass({
         this.updateSensitivity();
     }
 
-    validateCurrentCode() {
-        return Main.paygManager.validateCode(this.entryCode);
+    validateCurrentCode(partial=true) {
+        return Main.paygManager.validateCode(this.entryCode, partial);
     }
 
     startVerifyingCode() {
-        if (!this.validateCurrentCode())
+        if (!this.validateCurrentCode(false))
             return;
 
         this.verificationStatus = UnlockStatus.VERIFYING;
@@ -206,7 +206,8 @@ var PaygUnlockUi = GObject.registerClass({
         this.updateSensitivity();
         this.cancelled = false;
 
-        Main.paygManager.addCode(this.entryCode, (error) => {
+        Main.paygManager.addCode(Main.paygManager.codeFormatPrefix + this.entryCode
+                                 + Main.paygManager.codeFormatSuffix, (error) => {
             // We don't care about the result if we're closing the dialog.
             if (this.cancelled) {
                 this.verificationStatus = UnlockStatus.NOT_VERIFYING;
