@@ -43,6 +43,8 @@ const EOS_PAYG_IFACE = '<node> \
 <property name="Enabled" type="b" access="read"/> \
 <property name="RateLimitEndTime" type="t" access="read"/> \
 <property name="CodeFormat" type="s" access="read"/> \
+<property name="CodeFormatPrefix" type="s" access="read"/> \
+<property name="CodeFormatSuffix" type="s" access="read"/> \
 </interface> \
 </node>';
 
@@ -206,6 +208,7 @@ var PaygManager = GObject.registerClass({
             this._codeFormatRegex = new GLib.Regex(this._codeFormat,
                                                    GLib.RegexCompileFlags.DOLLAR_ENDONLY,
                                                    GLib.RegexMatchFlags.PARTIAL);
+
         } catch (e) {
             logError(e, 'Error compiling CodeFormat regex: %s'.format(this._codeFormat));
             this._codeFormatRegex = null;
@@ -309,13 +312,28 @@ var PaygManager = GObject.registerClass({
             log("Unable to validate PAYG code: no regex")
             return false;
         }
+        
+        let is_match, match_info;
 
-        let [is_match, match_info] = this._codeFormatRegex.match(code, 0);
+        if (partial)
+            [is_match, match_info] = this._codeFormatRegex.match(this.codeFormatPrefix + code, 0);
+        else
+            [is_match, match_info] = this._codeFormatRegex.match(this.codeFormatPrefix + code +
+                                                                 this.codeFormatSuffix, 0);
+
         return is_match || (partial && match_info.is_partial_match());
     }
 
     get initialized() {
         return this._initialized;
+    }
+
+    get codeFormatPrefix() {
+        return this._proxy.CodeFormatPrefix;
+    }
+
+    get codeFormatSuffix() {
+        return this._proxy.CodeFormatSuffix;
     }
 
     get enabled() {
