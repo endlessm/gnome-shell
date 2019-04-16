@@ -522,6 +522,7 @@ var ClubhouseNotificationBanner = new Lang.Class({
                              { x: endX,
                                time: CLUBHOUSE_BANNER_ANIMATION_TIME,
                                transition: 'easeOutQuad',
+                               onUpdate: () => _clipToMonitor(this.actor),
                                onComplete: () => {
                                    // Ensure it only slides in once
                                    this._shouldSlideIn = false;
@@ -579,6 +580,7 @@ var ClubhouseNotificationBanner = new Lang.Class({
                          { x: endX,
                            time: CLUBHOUSE_BANNER_ANIMATION_TIME,
                            transition: 'easeOutQuad',
+                           onUpdate: () => _clipToMonitor(this.actor),
                            onComplete: () => {
                                this.actor.destroy();
                                this.actor = null;
