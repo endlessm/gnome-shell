@@ -1,15 +1,13 @@
 #!/usr/bin/make -f
--include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs  -Wl,--as-needed
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs -Wl,--as-needed
 
 %:
-	dh $@ --with gir,gnome --buildsystem=meson
+	dh $@
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
 CONFFLAGS = \
-	-Denable-browser-plugin=false \
 	-Denable-networkmanager=yes \
 	-Denable-systemd=yes
 endif
@@ -19,10 +17,6 @@ override_dh_auto_configure:
 		--libdir=/usr/lib \
 		--libexecdir=/usr/lib/gnome-shell \
 		$(CONFFLAGS)
-
-override_dh_install:
-	find debian/tmp -name '*.la' -delete
-	dh_install
 
 override_dh_missing:
 	dh_missing --fail-missing
@@ -37,15 +31,17 @@ override_dh_shlibdeps:
 override_dh_strip:
 	dh_strip --dbgsym-migration='gnome-shell-dbg (<< 3.20.2-2~)'
 
-override_dh_translations:
-	ninja -C obj-$(DEB_HOST_GNU_TYPE) gnome-shell-pot
-	dh_translations
-
 override_dh_auto_test:
-ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))
-ifeq (yes,$(shell dpkg-vendor --derives-from Ubuntu && echo yes))
-	xvfb-run dh_auto_test
-else	
-	-xvfb-run dh_auto_test
-endif
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	# Avoid test failures on buildd environments where HOME,
+	# XDG_RUNTIME_DIR might be invalid
+	mkdir -p -m700 $(CURDIR)/debian/home/run
+	env \
+		-u XDG_CACHE_HOME \
+		-u XDG_CONFIG_DIRS \
+		-u XDG_CONFIG_HOME \
+		-u XDG_DATA_HOME \
+		HOME=$(CURDIR)/debian/home \
+		XDG_RUNTIME_DIR=$(CURDIR)/debian/home/run \
+		xvfb-run -a dh_auto_test
 endif
