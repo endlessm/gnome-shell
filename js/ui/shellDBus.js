@@ -15,6 +15,9 @@ const { loadInterfaceXML } = imports.misc.fileUtils;
 const GnomeShellIface = loadInterfaceXML('org.gnome.Shell');
 const ScreenSaverIface = loadInterfaceXML('org.gnome.ScreenSaver');
 
+// Occurs when an application is added to the app grid.
+const SHELL_APP_ADDED_EVENT = '51640a4e-79aa-47ac-b7e2-d3106a06e129';
+
 var GnomeShell = class {
     constructor() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(GnomeShellIface, this);
