@@ -66,6 +66,7 @@ var shellAccessDialogDBusService = null;
 var shellAudioSelectionDBusService = null;
 var shellDBusService = null;
 var shellMountOpDBusService = null;
+var shellHackableAppsService = null;
 var screenSaverDBus = null;
 var screencastService = null;
 var modalCount = 0;
@@ -140,6 +141,7 @@ function start() {
     shellAudioSelectionDBusService = new AudioDeviceSelection.AudioDeviceSelectionDBus();
     shellDBusService = new ShellDBus.GnomeShell();
     shellMountOpDBusService = new ShellMountOperation.GnomeShellMountOpHandler();
+    shellHackableAppsService = new ShellDBus.HackableAppsManager();
 
     _sessionUpdated();
 }

@@ -365,6 +365,11 @@ var CodingSession = GObject.registerClass({
                                         '',
                                         GObject.ParamFlags.READWRITE,
                                         Meta.WindowActor),
+        'state': GObject.ParamSpec.int('state',
+                                       '',
+                                       '',
+                                       GObject.ParamFlags.READWRITE,
+                                       0, 3, STATE_APP),
         'toolbox': GObject.ParamSpec.object('toolbox',
                                             '',
                                             '',
@@ -435,11 +440,21 @@ var CodingSession = GObject.registerClass({
         this._app = value;
         if (this._app)
             this._setupAppWindow();
+        this.notify('app');
     }
 
     get app() {
         return this._app;
     }
+
+    set state(value) {
+        this._state = value;
+        this.notify('state');
+    },
+
+    get state() {
+        return this._state;
+    },
 
     set toolbox(value) {
         this._cleanupToolboxWindow();
@@ -570,7 +585,7 @@ var CodingSession = GObject.registerClass({
     }
 
     _setState(value, includeButton=true) {
-        this._state = value;
+        this.state = value;
         if (includeButton)
             this._button.state = value;
         this._updateWindowPairingState();
@@ -1238,8 +1253,17 @@ const SessionLookupFlags = {
     SESSION_LOOKUP_TOOLBOX: 1 << 1,
 };
 
-var CodeViewManager = class {
-    constructor() {
+
+var CodeViewManager = GObject.registerClass({
+    Name: 'CodeViewManager',
+    Signals: {
+        'session-state-changed': {},
+        'session-app-lost': { param_types: [GObject.TYPE_OBJECT] },
+    },
+}, class CodeViewManager extends GObject.Object {
+    _init: function(params) {
+        this.parent(params);
+
         this._sessions = [];
 
         global.display.connect('window-created', (display, window) => {
@@ -1285,6 +1309,13 @@ var CodeViewManager = class {
                 session.toolbox.disconnect(destroyToolboxHandlerId);
                 destroyToolboxHandlerId = 0;
             }
+        });
+        session.connect('notify::state', (session) => {
+            this.emit('session-state-changed');
+        });
+        session.connect('notify::app', (session) => {
+            if (!session.app)
+                this.emit('session-app-lost', session);
         });
 
         this._sessions.push(session);
@@ -1452,4 +1483,4 @@ var CodeViewManager = class {
                     _getToolboxTarget(session.toolbox.meta_window)[1] == windowId);
         });
     }
-};
+});

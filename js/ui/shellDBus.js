@@ -4,6 +4,7 @@ const { EosMetrics, Gio, GLib, Meta, Shell } = imports.gi;
 const Lang = imports.lang;
 
 const Config = imports.misc.config;
+const Codeview = imports.ui.codeView;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -516,3 +517,45 @@ var AppStoreService = class {
         this._dbusImpl.emit_signal('ApplicationsChanged', GLib.Variant.new('(as)', [allApps]));
     }
 };
+
+const HackableAppsManagerIface = '<node> \
+<interface name="org.gnome.Shell.HackableAppsManager"> \
+<property name="CurrentlyHackableApps" type="as" access="read" /> \
+</interface> \
+</node>';
+
+var HackableAppsManager = class {
+    Name: 'HackableAppsManagerDBus',
+
+    constructor() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppsManagerIface, this);
+        const res = this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Shell');
+
+        this._codeViewManager = Main.wm._codeViewManager;
+        this._codeViewManager.connect('session-state-changed',
+                                      Lang.bind(this, this._currentlyHackableAppsChanged));
+        this._codeViewManager.connect('session-app-lost',
+                                      Lang.bind(this, this._onSessionAppLost));
+    }
+
+    _currentlyHackableAppsChanged() {
+        const variant = new GLib.Variant('as', this.CurrentlyHackableApps);
+        this._dbusImpl.emit_property_changed('CurrentlyHackableApps', variant);
+    }
+
+    _onSessionAppLost(codeViewManager, session) {
+        if (session.state === Codeview.STATE_TOOLBOX)
+            this._currentlyHackableAppsChanged();
+    }
+
+    get CurrentlyHackableApps() {
+        let app_ids = [];
+        for (let session of this._codeViewManager._sessions) {
+            if (session.app && session.state === Codeview.STATE_TOOLBOX) {
+                const app_id = session.app.meta_window.gtk_application_id;
+                app_ids.push(app_id);
+            }
+        }
+        return app_ids;
+    }
+});
