@@ -1999,7 +1999,6 @@ var WindowManager = class {
             Tweener.removeTweens(actor);
             actor.set_scale(1.0, 1.0);
             actor.set_opacity(255);
-            actor.set_pivot_point(0, 0);
 
             shellwm.completed_minimize(actor);
         }
@@ -2066,7 +2065,6 @@ var WindowManager = class {
             Tweener.removeTweens(actor);
             actor.set_scale(1.0, 1.0);
             actor.set_opacity(255);
-            actor.set_pivot_point(0, 0);
 
             shellwm.completed_unminimize(actor);
         }
