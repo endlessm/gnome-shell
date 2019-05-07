@@ -264,7 +264,7 @@ var ClubhouseAnimator = class ClubhouseAnimator {
         return splitDir.join('/');
     }
 
-    _getClubhousePath(path) {
+    _getClubhousePath(path, retry = true) {
         // Discard the /app/ prefix
         let pathSuffix = path.replace(/^\/app\//g, '');
 
@@ -272,6 +272,12 @@ var ClubhouseAnimator = class ClubhouseAnimator {
             let completePath = GLib.build_filenamev([path, 'files', pathSuffix]);
             if (GLib.file_test(completePath, GLib.FileTest.EXISTS))
                 return completePath;
+        }
+
+        // retrying reloading clubhouse paths
+        if (retry) {
+            this._clubhousePaths = this._getClubhousePaths();
+            return this._getClubhousePath(path, false);
         }
 
         return null;
