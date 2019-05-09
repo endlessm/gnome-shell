@@ -1167,7 +1167,8 @@ var ScreenShield = class {
             this._arrowContainer.add_actor(arrow);
         }
         this._lockScreenContents.add_actor(this._arrowContainer);
-        this._arrowContainer.add_constraint(new ArrowContainerConstraint(this._lockScreenContents, this._clock.actor));
+        this._arrowContainerConstraint = new ArrowContainerConstraint(this._lockScreenContents, this._clock.actor);
+        this._arrowContainer.add_constraint(this._arrowContainerConstraint);
 
         this._hasLockScreen = true;
     }
@@ -1178,6 +1179,9 @@ var ScreenShield = class {
     }
 
     _clearLockScreen() {
+        this._arrowContainer.remove_constraint(this._arrowContainerConstraint);
+        this._arrowContainerConstraint = null;
+
         this._clock.destroy();
         this._clock = null;
 
