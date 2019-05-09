@@ -454,8 +454,14 @@ class ArrowContainerConstraint extends Clutter.Constraint {
  * This will ensure that the screen blanks at the right time when it fades out.
  * https://bugzilla.gnome.org/show_bug.cgi?id=668703 explains the dependency.
  */
-var ScreenShield = class {
-    constructor() {
+var ScreenShield = GObject.registerClass({
+    Signals: { 'active-changed' : { },
+               'lock-screen-shown' : { },
+               'locked-changed' : { },
+               'wake-up-screen' : { } },
+},class ScreenShield extends GObject.Object {
+    _init() {
+        super._init();
         this.actor = Main.layoutManager.screenShieldGroup;
 
         this._lockScreenState = MessageTray.State.HIDDEN;
@@ -1439,4 +1445,4 @@ var ScreenShield = class {
             this.lock(false);
         });
     }
-};
+});
