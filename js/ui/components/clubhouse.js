@@ -336,15 +336,7 @@ var ClubhouseAnimator = class ClubhouseAnimator {
 var ClubhouseNotificationBanner =
 class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     constructor(notification) {
-        let originalBody = notification.bannerBodyText;
-        // We will show the text differently, so have the parent set no text for now
-        notification.bannerBodyText = '';
-
         super(notification);
-
-        this._textPages = [];
-        this._textIdx = -1;
-        this._splitTextInPages(originalBody);
 
         this.setUseBodyMarkup(true);
         this.setUseBodySimpleMarkup(false);
@@ -382,6 +374,18 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         this._closeButton.connect('clicked', () => {
             SoundServer.getDefault().play('clubhouse/dialog/close');
         });
+    }
+
+    setBody(text) {
+        // if the pagination is not initialized we do the initialization here
+        // this method will be called again by _setNextPage() with the first page
+        if (!this._paginationReady) {
+            super.setBody('');
+            this._splitTextInPages(text);
+            this._paginationReady = true;
+        } else {
+            super.setBody(text);
+        }
     }
 
     _untrackClubhouse() {
@@ -482,6 +486,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     _splitTextInPages(fulltext) {
+        this._textIdx = -1;
         // @todo: Ensure that paragraphs longer than 5 lines (in the banner) is also split up
         this._textPages = fulltext.split('\n\n');
     }
@@ -539,9 +544,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     _inLastPage() {
-        if (this._textIdx === undefined || this._textPages === undefined)
-            return true;
-
         return this._textIdx == this._textPages.length - 1;
     }
 
