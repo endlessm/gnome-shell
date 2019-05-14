@@ -23,6 +23,8 @@ const PadOsd = imports.ui.padOsd;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
 const ParentalControlsManager = imports.misc.parentalControlsManager;
+const CustomerSupport = imports.misc.customerSupport;
+const PaygManager = imports.misc.paygManager;
 const RunDialog = imports.ui.runDialog;
 const Layout = imports.ui.layout;
 const LoginManager = imports.misc.loginManager;
@@ -39,6 +41,7 @@ const WindowManager = imports.ui.windowManager;
 const Magnifier = imports.ui.magnifier;
 const XdndHandler = imports.ui.xdndHandler;
 const KbdA11yDialog = imports.ui.kbdA11yDialog;
+const Util = imports.misc.util;
 const Watermark = imports.ui.watermark;
 const WorkspaceMonitor = imports.ui.workspaceMonitor;
 
@@ -80,7 +83,9 @@ var kbdA11yDialog = null;
 var inputMethod = null;
 var introspectService = null;
 var discoveryFeed = null;
+var paygManager = null;
 var trayArea = null;
+var customerSupport = null;
 var workspaceMonitor = null;
 let _startDate;
 let _defaultCssStylesheet = null;
@@ -178,6 +183,14 @@ function _initializeUI() {
     kbdA11yDialog = new KbdA11yDialog.KbdA11yDialog();
     wm = new WindowManager.WindowManager();
     magnifier = new Magnifier.Magnifier();
+
+    // The ScreenShield depends on the PaygManager, so this
+    // module needs to be initialized first.
+    paygManager = new PaygManager.PaygManager();
+
+    // Centralized handling of things specific to customer support.
+    customerSupport = new CustomerSupport.CustomerSupport();
+
     if (LoginManager.canLock())
         screenShield = new ScreenShield.ScreenShield();
 
@@ -235,7 +248,17 @@ function _initializeUI() {
 
     if (sessionMode.isGreeter && screenShield) {
         layoutManager.connect('startup-prepared', () => {
-            screenShield.showDialog();
+            // We can't show the login dialog (which is managed by the
+            // screenshield) until the PaygManager is initializd, since
+            // we need to check whether the machine is PAYG-locked first.
+            if (paygManager.initialized) {
+                screenShield.showDialog();
+            } else {
+                let paygManagerId = paygManager.connect('initialized', () => {
+                    screenShield.showDialog();
+                    paygManager.disconnect(paygManagerId);
+                });
+            }
         });
     }
 

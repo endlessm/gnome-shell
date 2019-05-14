@@ -13,9 +13,9 @@ const OVirt = imports.gdm.oVirt;
 const LoginManager = imports.misc.loginManager;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
 const Monitor = imports.ui.monitor;
 const Overview = imports.ui.overview;
-const MessageTray = imports.ui.messageTray;
 const ShellDBus = imports.ui.shellDBus;
 const SmartcardManager = imports.misc.smartcardManager;
 const Tweener = imports.ui.tweener;
@@ -454,8 +454,14 @@ class ArrowContainerConstraint extends Clutter.Constraint {
  * This will ensure that the screen blanks at the right time when it fades out.
  * https://bugzilla.gnome.org/show_bug.cgi?id=668703 explains the dependency.
  */
-var ScreenShield = class {
-    constructor() {
+var ScreenShield = GObject.registerClass({
+    Signals: { 'active-changed' : { },
+               'lock-screen-shown' : { },
+               'locked-changed' : { },
+               'wake-up-screen' : { } },
+},class ScreenShield extends GObject.Object {
+    _init() {
+        super._init();
         this.actor = Main.layoutManager.screenShieldGroup;
 
         this._lockScreenState = MessageTray.State.HIDDEN;
@@ -577,6 +583,52 @@ var ScreenShield = class {
         this._cursorTracker = Meta.CursorTracker.get_for_display(global.display);
 
         this._syncInhibitor();
+
+        Main.paygManager.connect('code-expired', () => { this.lock(true) });
+        Main.paygManager.connect('expiry-time-changed', () => {
+            let userManager = AccountsService.UserManager.get_default();
+            let user = userManager.get_user(GLib.get_user_name());
+
+            // A new valid code has been introduced but the machine is
+            // not unlocked yet -> Make sure we stay in the locked state.
+            if (Main.paygManager.isLocked) {
+                this.lock(false);
+                return;
+            }
+
+            // Take the dialog instance and wait for the success message to be shown
+            this._dialog.connect('success-message-shown', () => {
+
+                // A new valid code unlocked the machine and user has no
+                // password set -> Go straight to the user's session.
+                if (user.password_mode == AccountsService.UserPasswordMode.NONE) {
+                    this.deactivate(false);
+                    return;
+                }
+
+                let paygExpectedMode = this._isGreeter ? 'gdm-unlock-dialog-payg' : 'unlock-dialog-payg';
+                if (Main.sessionMode.currentMode == paygExpectedMode) {
+                    // This is the most common case.
+                    Main.sessionMode.popMode(paygExpectedMode);
+                } else if (Main.sessionMode.currentMode == 'lock-screen') {
+                    // There's a chance we could be in the screen shield, instead of the
+                    // unlock dialog, if the user wend back manually to it (e.g. pressed ESC)
+                    // between introducing the code and the actual verification happening.
+                    Main.sessionMode.popMode('lock-screen');
+                    Main.sessionMode.popMode(paygExpectedMode);
+                    Main.sessionMode.pushMode('lock-screen');
+                }
+
+                // The machine is unlocked but we still need to unlock the
+                // user's session with the password, so don't deactivate yet.
+                if (this._dialog) {
+                    this._dialog.destroy();
+                    this._dialog = null;
+                }
+
+                this.showDialog();
+            });
+        });
     }
 
     _setActive(active) {
@@ -635,7 +687,7 @@ var ScreenShield = class {
             return;
 
         this._dialog.cancel();
-        if (this._isGreeter) {
+        if (this._isGreeter && !Main.paygManager.isLocked) {
             // LoginDialog.cancel() will grab the key focus
             // on its own, so ensure it stays on lock screen
             // instead
@@ -914,6 +966,10 @@ var ScreenShield = class {
         this.actor.show();
         this._isGreeter = Main.sessionMode.isGreeter;
         this._isLocked = true;
+
+        if (this._isGreeter && Main.paygManager.isLocked)
+            Main.sessionMode.pushMode('gdm-unlock-dialog-payg');
+
         if (this._ensureUnlockDialog(true, true))
             this._hideLockScreen(false, 0);
     }
@@ -1225,6 +1281,10 @@ var ScreenShield = class {
 
         if (Main.sessionMode.currentMode == 'lock-screen')
             Main.sessionMode.popMode('lock-screen');
+        if (Main.sessionMode.currentMode == 'gdm-unlock-dialog-payg')
+            Main.sessionMode.popMode('gdm-unlock-dialog-payg');
+        if (Main.sessionMode.currentMode == 'unlock-dialog-payg')
+            Main.sessionMode.popMode('unlock-dialog-payg');
         if (Main.sessionMode.currentMode == 'unlock-dialog')
             Main.sessionMode.popMode('unlock-dialog');
 
@@ -1284,6 +1344,10 @@ var ScreenShield = class {
         this._isLocked = false;
         this.emit('locked-changed');
         global.set_runtime_state(LOCKED_STATE_STR, null);
+
+        // Sanity check, in case we made it this far while being locked
+        if (Main.paygManager.isLocked)
+            this.lock(false);
     }
 
     activate(animate) {
@@ -1293,10 +1357,19 @@ var ScreenShield = class {
         this.actor.show();
 
         if (Main.sessionMode.currentMode != 'unlock-dialog' &&
+            Main.sessionMode.currentMode != 'unlock-dialog-payg' &&
             Main.sessionMode.currentMode != 'lock-screen') {
             this._isGreeter = Main.sessionMode.isGreeter;
-            if (!this._isGreeter)
-                Main.sessionMode.pushMode('unlock-dialog');
+            if (!this._isGreeter) {
+                let userManager = AccountsService.UserManager.get_default();
+                let user = userManager.get_user(GLib.get_user_name());
+
+                if (user.password_mode != AccountsService.UserPasswordMode.NONE)
+                    Main.sessionMode.pushMode('unlock-dialog');
+
+                if (Main.paygManager.isLocked)
+                    Main.sessionMode.pushMode('unlock-dialog-payg');
+            }
         }
 
         this._resetLockScreen({ animateLockScreen: animate,
@@ -1319,7 +1392,11 @@ var ScreenShield = class {
     }
 
     lock(animate) {
-        if (this._lockSettings.get_boolean(DISABLE_LOCK_KEY)) {
+        // This does not make sense outside of the user's session for PAYG
+        if (Main.sessionMode.isGreeter && Main.paygManager.isLocked)
+            return;
+
+        if (this._lockSettings.get_boolean(DISABLE_LOCK_KEY) && !Main.paygManager.isLocked) {
             log('Screen lock is locked down, not locking') // lock, lock - who's there?
             return;
         }
@@ -1343,7 +1420,7 @@ var ScreenShield = class {
         if (this._isGreeter)
             this._isLocked = true;
         else
-            this._isLocked = user.password_mode != AccountsService.UserPasswordMode.NONE;
+            this._isLocked = Main.paygManager.isLocked || (user.password_mode != AccountsService.UserPasswordMode.NONE);
 
         this.activate(animate);
 
@@ -1352,14 +1429,20 @@ var ScreenShield = class {
 
     // If the previous shell crashed, and gnome-session restarted us, then re-lock
     lockIfWasLocked() {
-        if (!this._settings.get_boolean(LOCK_ENABLED_KEY))
+        // We need to add some extra checks for PAYG becasue we don't want to
+        // end up loging the screen for not regular sessions (e.g. initial-setup).
+        let shouldLockForPayg = Main.paygManager.isLocked &&
+            (Main.sessionMode.currentMode == 'user' ||
+             Main.sessionMode.currentMode == 'user-coding');
+
+        if (!this._settings.get_boolean(LOCK_ENABLED_KEY) && !shouldLockForPayg)
             return;
-        let wasLocked = global.get_runtime_state('b', LOCKED_STATE_STR);
-        if (wasLocked === null)
+
+        let wasLocked = global.get_runtime_state('b',LOCKED_STATE_STR);
+        if (wasLocked === null && !shouldLockForPayg)
             return;
         Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
             this.lock(false);
         });
     }
-};
-Signals.addSignalMethods(ScreenShield.prototype);
+});
