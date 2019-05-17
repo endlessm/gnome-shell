@@ -39,8 +39,12 @@ const _TIMED_LOGIN_IDLE_THRESHOLD = 5.0;
 const _LOGO_ICON_HEIGHT = 48;
 const _MAX_BOTTOM_MENU_ITEMS = 5;
 
-var UserListItem = class {
-    constructor(user) {
+var UserListItem = GObject.registerClass({
+    Signals: { 'activate' : { } },
+}, class UserListItem extends GObject.Object {
+    _init(user) {
+        super._init();
+
         this.user = user;
         this._userChangedId = this.user.connect('changed',
                                                  this._onUserChanged.bind(this));
@@ -132,11 +136,15 @@ var UserListItem = class {
         this._timedLoginIndicator.scale_x = 0.;
         this._timedLoginIndicator.remove_style_pseudo_class('showing');
     }
-};
-Signals.addSignalMethods(UserListItem.prototype);
+});
 
-var UserList = class {
-    constructor() {
+var UserList = GObject.registerClass({
+    Signals: { 'activate' : { param_types: [UserListItem.$gtype] },
+               'item-added' : { param_types: [UserListItem.$gtype] } },
+}, class UserList extends GObject.Object {
+    _init() {
+        super._init();
+
         this.actor = new St.ScrollView({ style_class: 'login-dialog-user-list-view'});
         this.actor.set_policy(St.PolicyType.NEVER,
                               St.PolicyType.AUTOMATIC);
@@ -276,11 +284,14 @@ var UserList = class {
     numItems() {
         return Object.keys(this._items).length;
     }
-};
-Signals.addSignalMethods(UserList.prototype);
+});
 
-var SessionMenuButton = class {
-    constructor() {
+var SessionMenuButton = GObject.registerClass({
+    Signals: { 'session-activated' : { param_types: [UserListItem.$gtype] } },
+}, class SessionMenuButton extends GObject.Object {
+    _init() {
+        super._init();
+
         let gearIcon = new St.Icon({ icon_name: 'emblem-system-symbolic' });
         this._button = new St.Button({ style_class: 'login-dialog-session-list-button',
                                        reactive: true,
@@ -374,8 +385,7 @@ var SessionMenuButton = class {
             });
         }
     }
-};
-Signals.addSignalMethods(SessionMenuButton.prototype);
+});
 
 var LoginDialog = GObject.registerClass({
     Signals: { 'failed': {} },

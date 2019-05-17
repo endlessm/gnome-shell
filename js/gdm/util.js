@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { Clutter, Gio, GLib } = imports.gi;
+const { Clutter, Gio, GLib, GObject } = imports.gi;
 const Signals = imports.signals;
 
 const Batch = imports.gdm.batch;
@@ -113,8 +113,19 @@ function cloneAndFadeOutActor(actor) {
     return hold;
 }
 
-var ShellUserVerifier = class {
-    constructor(client, params) {
+var ShellUserVerifier = GObject.registerClass({
+    Signals: { 'ask-question' : { param_types: [GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_STRING] },
+               'no-more-messages' : { },
+               'ovirt-user-authenticated' : { },
+               'reset' : { },
+               'show-message' : { param_types: [GObject.TYPE_STRING, GObject.TYPE_INT] },
+               'smartcard-status-changed' : { },
+               'verification-complete' : { },
+               'verification-failed' : { param_types: [GObject.TYPE_BOOLEAN] } },
+}, class ShellUserVerifier extends GObject.Object {
+    _init(client, params) {
+        super._init();
+
         params = Params.parse(params, { reauthenticationOnly: false });
         this._reauthOnly = params.reauthenticationOnly;
 
@@ -579,5 +590,4 @@ var ShellUserVerifier = class {
             this._verificationFailed(true);
         }
     }
-};
-Signals.addSignalMethods(ShellUserVerifier.prototype);
+});

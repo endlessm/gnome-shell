@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { AccountsService, Clutter, GLib,
+const { AccountsService, Clutter, GLib, GObject,
         Pango, Polkit, Shell, St } = imports.gi;
 const ByteArray = imports.byteArray;
 const Signals = imports.signals;
@@ -40,8 +40,16 @@ var BeginRequestType = {
     DONT_PROVIDE_USERNAME: 1
 };
 
-var AuthPrompt = class {
-    constructor(gdmClient, mode) {
+var AuthPrompt = GObject.registerClass({
+    Signals: { 'cancelled' : { },
+               'failed' : { },
+               'next' : { },
+               'prompted' : { },
+               'reset' : { param_types: [GObject.TYPE_INT] } },
+}, class AuthPrompt extends GObject.Object {
+    _init(gdmClient, mode) {
+        super._init();
+
         this.verificationStatus = AuthPromptStatus.NOT_VERIFYING;
 
         this._gdmClient = gdmClient;
@@ -724,4 +732,4 @@ var AuthPrompt = class {
         this._passwordHintButton.hide();
         this._maybeShowPasswordResetButton();
     }
-};
+});
