@@ -524,17 +524,15 @@ var HackableApp = class {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppIface, this);
 
         this._session = session;
-        this._appId = session.app.meta_window.gtk_application_id;
-        this._objectPath = null;
+        this._session.connect('notify::state', this._stateChanged.bind(this));
     }
 
-    export_object(objectId) {
+    export(objectId) {
         const objectPath = `/com/endlessm/HackableApp/${this._objectId}`;
         try {
             this._dbusImpl.export(Gio.DBus.session, objectPath);
-            this._objectPath = objectPath;
-        } catch {
-            logError('Cannot export object path ' + objectPath);
+        } catch(e) {
+            logError(e, `Cannot export HackableApp at path ${objectPath}`);
         }
     }
 
@@ -542,17 +540,17 @@ var HackableApp = class {
         this._dbusImpl.unexport();
     }
 
-    emit_state_changed(session) {
+    _stateChanged() {
         const value = new GLib.Variant('u', this.State);
         this._dbusImpl.emit_property_changed('State', value);
     }
 
     get objectPath() {
-        return this._objectPath;
+        return this._dbusImpl.get_object_path();
     }
 
     get AppId() {
-        return this._appId;
+        return this._session.appId;
     }
 
     get State() {
@@ -570,7 +568,8 @@ var HackableAppsManager = class {
 
         try {
             this._dbusImpl.export(Gio.DBus.session, '/com/endlessm/HackableAppsManager');
-        } catch {
+        } catch(e) {
+            logError(e, 'Cannot export HackableAppsManager');
             return;
         }
 
@@ -591,25 +590,19 @@ var HackableAppsManager = class {
     }
 
     _onSessionAdded(_, session) {
-        session.hackableApp.export_object(this._getNextId());
+        session.hackableApp.export(this._getNextId());
         this._emitCurrentlyHackableAppsChanged();
     }
 
     _onSessionRemoved(_, session) {
-        if (!session.hackableApp)
-            return;
-
         session.hackableApp.unexport();
         this._emitCurrentlyHackableAppsChanged();
     }
 
     get CurrentlyHackableApps() {
         const paths = [];
-        for (const session of this._codeViewManager.sessions) {
-            if (!session.hackableApp)
-                continue;
+        for (const session of this._codeViewManager.sessions)
             paths.push(session.hackableApp.objectPath);
-        }
         return paths;
     }
 }

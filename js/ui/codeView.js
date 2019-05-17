@@ -347,7 +347,6 @@ var WindowTrackingButton = GObject.registerClass({
         this._flipped = value == CodingSessionStateEnum.TOOLBOX;
         _setFlippedState(this, this._flipped);
         this._updateSounds();
-        this.hackableApp.emit_state_changed();
     }
 
     _updateSounds() {
@@ -470,16 +469,16 @@ var CodingSession = GObject.registerClass({
         this.notify('toolbox');
     }
 
-    set hackableApp(value) {
-        this._hackableApp = value;
+    get toolbox() {
+        return this._toolbox;
+    }
+
+    get appId() {
+        return _getAppId(this.app.meta_window);
     }
 
     get hackableApp() {
         return this._hackableApp;
-    }
-
-    get toolbox() {
-        return this._toolbox;
     }
 
     setGrabbed(grabbed) {
