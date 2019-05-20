@@ -725,3 +725,4 @@ var AuthPrompt = class {
         this._maybeShowPasswordResetButton();
     }
 };
+Signals.addSignalMethods(AuthPrompt.prototype);
