@@ -78,6 +78,15 @@ class SideComponent extends GObject.Object {
         this._propertiesChangedId =
             this.proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
 
+        // Clicking the background (which calls overview.showApps) hides the component,
+        // so trying to open it again will call WindowManager._mapWindow(),
+        // which will hide the overview and animate the window.
+        // Note that this is not the case when opening the window picker.
+        this._desktopShownId = Main.layoutManager.connect('background-clicked', () => {
+            if (this._visible)
+                this.hide(global.get_current_time());
+        });
+
         // Same when clicking the background from the window picker.
         this._overviewPageChangedId = Main.overview.connect('page-changed', () => {
             if (this._visible && Main.overview.visible &&

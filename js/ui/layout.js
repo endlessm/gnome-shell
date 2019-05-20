@@ -63,7 +63,8 @@ const defaultParams = {
 };
 
 var LayoutManager = GObject.registerClass({
-    Signals: { 'hot-corners-changed': {},
+    Signals: { 'background-clicked': {},
+               'hot-corners-changed': {},
                'startup-complete': {},
                'startup-prepared': {},
                'monitors-changed': {},
