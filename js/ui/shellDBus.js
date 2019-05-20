@@ -3,6 +3,7 @@
 const { EosMetrics, Gio, GLib, Meta, Shell } = imports.gi;
 const Lang = imports.lang;
 
+const Codeview = imports.ui.codeView;
 const Config = imports.misc.config;
 const ExtensionSystem = imports.ui.extensionSystem;
 const ExtensionDownloader = imports.ui.extensionDownloader;
@@ -516,3 +517,92 @@ var AppStoreService = class {
         this._dbusImpl.emit_signal('ApplicationsChanged', GLib.Variant.new('(as)', [allApps]));
     }
 };
+
+const HackableAppIface = loadInterfaceXML('com.endlessm.HackableApp');
+var HackableApp = class {
+    constructor(session) {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppIface, this);
+
+        this._session = session;
+        this._session.connect('notify::state', this._stateChanged.bind(this));
+    }
+
+    export(objectId) {
+        const objectPath = `/com/endlessm/HackableApp/${objectId}`;
+        try {
+            this._dbusImpl.export(Gio.DBus.session, objectPath);
+        } catch(e) {
+            logError(e, `Cannot export HackableApp at path ${objectPath}`);
+        }
+    }
+
+    unexport() {
+        this._dbusImpl.unexport();
+    }
+
+    _stateChanged() {
+        const value = new GLib.Variant('u', this.State);
+        this._dbusImpl.emit_property_changed('State', value);
+    }
+
+    get objectPath() {
+        return this._dbusImpl.get_object_path();
+    }
+
+    get AppId() {
+        return this._session.appId;
+    }
+
+    get State() {
+        return this._session.state;
+    }
+};
+
+const HackableAppsManagerIface = loadInterfaceXML('com.endlessm.HackableAppsManager');
+
+var HackableAppsManager = class {
+    constructor() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppsManagerIface, this);
+        Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.endlessm.HackableAppsManager',
+                                       Gio.BusNameOwnerFlags.REPLACE, null, null);
+
+        try {
+            this._dbusImpl.export(Gio.DBus.session, '/com/endlessm/HackableAppsManager');
+        } catch(e) {
+            logError(e, 'Cannot export HackableAppsManager');
+            return;
+        }
+
+        this._codeViewManager = Main.wm._codeViewManager;
+        this._codeViewManager.connect('session-added', this._onSessionAdded.bind(this));
+        this._codeViewManager.connect('session-removed', this._onSessionRemoved.bind(this));
+
+        this._nextId = 0;
+    }
+
+    _emitCurrentlyHackableAppsChanged() {
+        const value = new GLib.Variant('ao', this.CurrentlyHackableApps);
+        this._dbusImpl.emit_property_changed('CurrentlyHackableApps', value);
+    }
+
+    _getNextId() {
+        return ++this._nextId;
+    }
+
+    _onSessionAdded(_, session) {
+        session.hackableApp.export(this._getNextId());
+        this._emitCurrentlyHackableAppsChanged();
+    }
+
+    _onSessionRemoved(_, session) {
+        session.hackableApp.unexport();
+        this._emitCurrentlyHackableAppsChanged();
+    }
+
+    get CurrentlyHackableApps() {
+        const paths = [];
+        for (const session of this._codeViewManager.sessions)
+            paths.push(session.hackableApp.objectPath);
+        return paths;
+    }
+}

@@ -8,12 +8,16 @@ const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Soundable = imports.ui.soundable;
 const Tweener = imports.ui.tweener;
+const ShellDBus = imports.ui.shellDBus;
 const SoundServer = imports.misc.soundServer;
 
 const WINDOW_ANIMATION_TIME = 0.25;
 
-const STATE_APP = 0;
-const STATE_TOOLBOX = 1;
+
+var CodingSessionStateEnum = {
+    APP: 0,
+    TOOLBOX: 1
+};
 
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
 const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
@@ -327,7 +331,7 @@ var WindowTrackingButton = GObject.registerClass({
             finishAngle: 0,
             onRotationMidpoint: () => {
                 animationButton.opacity = 255;
-                _setFlippedState(animationButton, targetState == STATE_TOOLBOX);
+                _setFlippedState(animationButton, targetState == CodingSessionStateEnum.TOOLBOX);
             },
             onRotationComplete: () => {
                 animationButton.destroy();
@@ -341,7 +345,7 @@ var WindowTrackingButton = GObject.registerClass({
     }
 
     set state(value) {
-        this._flipped = value == STATE_TOOLBOX;
+        this._flipped = value == CodingSessionStateEnum.TOOLBOX;
         _setFlippedState(this, this._flipped);
         this._updateSounds();
     }
@@ -365,6 +369,12 @@ var CodingSession = GObject.registerClass({
                                         '',
                                         GObject.ParamFlags.READWRITE,
                                         Meta.WindowActor),
+        'state': GObject.ParamSpec.int('state',
+                                       '',
+                                       '',
+                                       GObject.ParamFlags.READABLE,
+                                       0, Object.keys(CodingSessionStateEnum).length,
+                                       CodingSessionStateEnum.APP),
         'toolbox': GObject.ParamSpec.object('toolbox',
                                             '',
                                             '',
@@ -392,7 +402,7 @@ var CodingSession = GObject.registerClass({
         this._notifyVisibleIdApp = 0;
         this._notifyVisibleIdToolbox = 0;
 
-        this._state = STATE_APP;
+        this._state = CodingSessionStateEnum.APP;
         this._toolboxActionGroup = null;
 
         this._hackableProxy = null;
@@ -405,6 +415,7 @@ var CodingSession = GObject.registerClass({
         this._grabTimeoutId = 0;
 
         super._init(params);
+        this._hackableApp = new ShellDBus.HackableApp(this);
 
         // FIXME: this should be extended to make it possible to launch
         // arbitrary toolboxes in the future, depending on the application
@@ -435,10 +446,20 @@ var CodingSession = GObject.registerClass({
         this._app = value;
         if (this._app)
             this._setupAppWindow();
+        this.notify('app');
     }
 
     get app() {
         return this._app;
+    }
+
+    set state(value) {
+        this._state = value;
+        this.notify('state');
+    }
+
+    get state() {
+        return this._state;
     }
 
     set toolbox(value) {
@@ -446,10 +467,21 @@ var CodingSession = GObject.registerClass({
         this._toolbox = value;
         if (this._toolbox)
             this._setupToolboxWindow();
+        this.notify('toolbox');
     }
 
     get toolbox() {
         return this._toolbox;
+    }
+
+    get appId() {
+        if (this.app)
+            return _getAppId(this.app.meta_window);
+        return null;
+    }
+
+    get hackableApp() {
+        return this._hackableApp;
     }
 
     setGrabbed(grabbed) {
@@ -570,7 +602,7 @@ var CodingSession = GObject.registerClass({
     }
 
     _setState(value, includeButton=true) {
-        this._state = value;
+        this.state = value;
         if (includeButton)
             this._button.state = value;
         this._updateWindowPairingState();
@@ -612,7 +644,7 @@ var CodingSession = GObject.registerClass({
         // geometries now.
         this.app = actor;
 
-        this._setupAnimation(STATE_APP,
+        this._setupAnimation(CodingSessionStateEnum.APP,
                              this.toolbox,
                              appRemovedActor, this.app,
                              Gtk.DirectionType.RIGHT);
@@ -634,7 +666,7 @@ var CodingSession = GObject.registerClass({
                                     this.toolbox.meta_window.gtk_window_object_path);
         this._toolboxActionGroup.list_actions();
 
-        this._setupAnimation(STATE_TOOLBOX,
+        this._setupAnimation(CodingSessionStateEnum.TOOLBOX,
                              this.app,
                              null, this.toolbox,
                              Gtk.DirectionType.LEFT);
@@ -642,7 +674,7 @@ var CodingSession = GObject.registerClass({
     }
 
     _actorForCurrentState() {
-        if (this._state == STATE_APP)
+        if (this._state == CodingSessionStateEnum.APP)
             return this.app;
         else
             return this.toolbox;
@@ -780,7 +812,7 @@ var CodingSession = GObject.registerClass({
         this.appRemovedByFlipBack = false;
 
         // We assume we have a toolbox here, or this.appRemovedByFlipBack would be false
-        this._setState(STATE_TOOLBOX);
+        this._setState(CodingSessionStateEnum.TOOLBOX);
 
         let actor = this._actorForCurrentState();
         if (actor) {
@@ -896,7 +928,7 @@ var CodingSession = GObject.registerClass({
     _switchWindows() {
         _setDimmedState(this._button, true);
         // Switch to toolbox if the app is active. Otherwise switch to the app.
-        if (this._state === STATE_APP)
+        if (this._state === CodingSessionStateEnum.APP)
             this._switchToToolbox();
         else
             this._switchToApp();
@@ -919,7 +951,7 @@ var CodingSession = GObject.registerClass({
                                           _getWindowId(this.app.meta_window)]));
             this._button.reactive = false;
         } else {
-            this._setupAnimation(STATE_TOOLBOX,
+            this._setupAnimation(CodingSessionStateEnum.TOOLBOX,
                                  this.app,
                                  null, this.toolbox,
                                  Gtk.DirectionType.LEFT);
@@ -932,7 +964,7 @@ var CodingSession = GObject.registerClass({
             this.appRemovedByFlipBack = true;
             this._button.reactive = false;
         } else {
-            this._setupAnimation(STATE_APP,
+            this._setupAnimation(CodingSessionStateEnum.APP,
                                  this.toolbox,
                                  null, this.app,
                                  Gtk.DirectionType.RIGHT);
@@ -1046,7 +1078,7 @@ var CodingSession = GObject.registerClass({
 
     _activateAppFlip() {
         // Support a 'flip' action in the app, if it exposes it
-        const flipState = (this._state == STATE_TOOLBOX);
+        const flipState = (this._state == CodingSessionStateEnum.TOOLBOX);
         if (this._appActionProxy && this._appActionProxy.has_action('flip'))
             this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
     }
@@ -1070,7 +1102,8 @@ var CodingSession = GObject.registerClass({
             // In the future, we want to change the behavior of those activation points
             // so that when a toolbox is present, it is only possible to switch side
             // when the flip button is clicked.
-            this._setState(focusedActor === this.app ? STATE_APP : STATE_TOOLBOX);
+            this._setState(focusedActor === this.app ?
+                           CodingSessionStateEnum.APP : CodingSessionStateEnum.TOOLBOX);
             this._activateAppFlip();
             focusedActor.rotation_angle_y = 0;
             actor.rotation_angle_y = 180;
@@ -1238,8 +1271,17 @@ const SessionLookupFlags = {
     SESSION_LOOKUP_TOOLBOX: 1 << 1,
 };
 
-var CodeViewManager = class {
-    constructor() {
+
+var CodeViewManager = GObject.registerClass({
+    Name: 'CodeViewManager',
+    Signals: {
+        'session-added': { param_types: [GObject.TYPE_OBJECT] },
+        'session-removed': { param_types: [GObject.TYPE_OBJECT] }
+    },
+}, class CodeViewManager extends GObject.Object {
+    _init(params) {
+        super._init(params);
+
         this._sessions = [];
 
         global.display.connect('window-created', (display, window) => {
@@ -1254,6 +1296,10 @@ var CodeViewManager = class {
         global.window_manager.connect('stop', () => {
             this._stopped = true;
         });
+    }
+
+    get sessions() {
+        return this._sessions;
     }
 
     _addSession(actor) {
@@ -1288,6 +1334,7 @@ var CodeViewManager = class {
         });
 
         this._sessions.push(session);
+        this.emit('session-added', session);
     }
 
     _removeSession(session, eventType) {
@@ -1299,6 +1346,7 @@ var CodeViewManager = class {
             return;
 
         this._sessions.splice(idx, 1);
+        this.emit('session-removed', session);
     }
 
     handleDestroyWindow(actor) {
@@ -1452,4 +1500,4 @@ var CodeViewManager = class {
                     _getToolboxTarget(session.toolbox.meta_window)[1] == windowId);
         });
     }
-};
+});
