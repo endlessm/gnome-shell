@@ -521,6 +521,7 @@ var AllView = class AllView extends BaseAppView {
 
         this._grid.currentPage = 0;
         this._eventBlocker = new St.Widget({ x_expand: true, y_expand: true });
+        this._stack.add_actor(this._eventBlocker);
 
         this._scrollView.connect('scroll-event', this._onScroll.bind(this));
 
