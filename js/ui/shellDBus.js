@@ -605,4 +605,11 @@ var HackableAppsManager = class {
             paths.push(session.hackableApp.objectPath);
         return paths;
     }
+
+    get WhitelistedAppIds() {
+        const keyfile = Codeview.ensureHackDataFile();
+        if (keyfile === null)
+            return [];
+        return Codeview.getWhitelistedAppIds(keyfile).split(',');
+    }
 }
