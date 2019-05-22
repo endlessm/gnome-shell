@@ -73,7 +73,7 @@ function _getToolboxTarget(win) {
     return [targetAppId, targetWindowId];
 };
 
-const _ensureHackDataFile = (function () {
+var ensureHackDataFile = (function () {
     let keyfile = new GLib.KeyFile();
     let initialized = false;
     let monitors = [];
@@ -125,12 +125,7 @@ const _ensureHackDataFile = (function () {
     }
 }());
 
-function _isBlacklistedApp(desktop_id) {
-    const keyfile = _ensureHackDataFile();
-    if (keyfile === null)
-        return false;
-
-    const app_id = desktop_id.slice(0, -8);  // remove ".desktop"
+function getBlacklistedAppIds(keyfile) {
     let blacklist;
     try {
         [blacklist] = keyfile.get_string_list('flip-to-hack', 'blacklist');
@@ -140,16 +135,10 @@ function _isBlacklistedApp(desktop_id) {
             logError(err, 'Error with blacklist in hack data file');
         blacklist = [];
     }
-
-    return blacklist.includes(app_id);
+    return blacklist;
 }
 
-function _isWhitelistedApp(desktopId) {
-    const keyfile = _ensureHackDataFile();
-    if (keyfile === null)
-        return true;
-
-    const appId = desktopId.slice(0, -8);  // remove ".desktop"
+function getWhitelistedAppIds(keyfile) {
     let whitelist;
     try {
         [whitelist] = keyfile.get_string_list('flip-to-hack', 'whitelist');
@@ -159,9 +148,28 @@ function _isWhitelistedApp(desktopId) {
             logError(err, 'Error with whitelist in hack data file');
         whitelist = [];
     }
+    return whitelist;
+}
 
+
+function _isBlacklistedApp(desktop_id) {
+    const keyfile = ensureHackDataFile();
+    if (keyfile === null)
+        return false;
+
+    const app_id = desktop_id.slice(0, -8);  // remove ".desktop"
+    return getBlacklistedAppIds(keyfile).includes(app_id);
+}
+
+function _isWhitelistedApp(desktopId) {
+    const keyfile = ensureHackDataFile();
+    if (keyfile === null)
+        return true;
+
+    let whitelist = getWhitelistedAppIds(keyfile);
     if (whitelist.length === 0)
         return true;
+    const appId = desktopId.slice(0, -8);  // remove ".desktop"
     return whitelist.includes(appId);
 }
 
