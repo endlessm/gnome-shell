@@ -285,7 +285,7 @@ var IconGridLayout = GObject.registerClass({
             return;
 
         if (interactive)
-            Main.overview.setMessage(_("%s has been deleted").format(info.get_name()),
+            Main.overview.setMessage(_("%s has been removed").format(info.get_name()),
                                      { forFeedback: true,
                                        destroyCallback: (info) => {
                                            this._onMessageDestroy (info);
