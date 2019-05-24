@@ -2723,7 +2723,7 @@ class AppCenterIcon extends AppIcon {
 
     handleViewDragBegin() {
         this.iconState = AppCenterIconState.EMPTY_TRASH;
-        this.replaceText(_("Delete"));
+        this.replaceText(_("Remove"));
     }
 
     setDragHoverState(state) {
