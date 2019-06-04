@@ -1400,19 +1400,24 @@ var CodeViewManager = GObject.registerClass({
         if (!appInfo)
             return false;
 
-        // Do not manage apps that are NoDisplay=true, but take into account
-        // the custom X-Endless-Hackable key to override that
-        if (!appInfo.should_show() && !appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
-            return false;
+        // The custom X-Endless-Hackable key has the last word always
+        if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
+            if (!appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
+                return false;
+        } else {
+            // Do not manage apps that are NoDisplay=true
+            if (!appInfo.should_show())
+                return false;
 
-        // Do not manage apps that we block in com.endlessm.HackComponents
-        if (_appIsBlockedFromHacking(appInfo.get_id()))
-            return false;
+            // Do not manage apps that we block in com.endlessm.HackComponents
+            if (_appIsBlockedFromHacking(appInfo.get_id()))
+                return false;
 
-        // If there is an allow-only list in com.endlessm.HackComponents, only
-        // manage apps on that list
-        if (!_appIsAllowedHacking(appInfo.get_id()))
-            return false;
+            // If there is an allow-only list in com.endlessm.HackComponents,
+            // only manage apps on that list
+            if (!_appIsAllowedHacking(appInfo.get_id()))
+                return false;
+        }
 
         // It might be a "HackToolbox". Check that, and if so,
         // add it to the window group for the window.
