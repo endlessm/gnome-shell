@@ -1155,13 +1155,13 @@ var ShellWindowManagerAnimatableSurface = GObject.registerClass({
         if (effects.length === 0) {
             throw new GLib.Error(AnimationsDbus.error_quark(),
                                  AnimationsDbus.Error.UNSUPPORTED_EVENT_FOR_ANIMATION_SURFACE,
-                                 `Surface does not support event ${event}`);
+                                 "Surface does not support event " + event);
         }
 
         if (effects.indexOf(effect.name) == -1) {
             throw new GLib.Error(AnimationsDbus.error_quark(),
                                  AnimationsDbus.Error.UNSUPPORTED_EVENT_FOR_ANIMATION_EFFECT,
-                                 `Effect ${effect.name} can't be used on event ${event}`);
+                                 "Effect " + effect.name + " can't be used on event " + event);
         }
 
         return effect.bridge.createActorPrivate(this.actor);
@@ -1213,7 +1213,7 @@ const ShellWindowManagerAnimationsFactory = GObject.registerClass({
             default:
                 throw new GLib.Error(AnimationsDbus.error_quark(),
                                      AnimationsDbus.Error.NO_SUCH_EFFECT,
-                                     `No such effect ${name}`);
+                                     "No such effect " + name);
         }
     }
 });
