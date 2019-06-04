@@ -3,12 +3,15 @@
 # This file is distributed under the same license as the gnome-shell package.
 # 
 # Translators:
+# Jesse Wakukha <jesse@endlessm.com>, 2019
+# Jesse Wakukha <jesse@endlessm.com>, 2019
+# Will Thompson <wjt@endlessm.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-07 18:08+0000\n"
-"PO-Revision-Date: 2019-01-08 11:43+0000\n"
+"POT-Creation-Date: 2019-06-04 16:16+0000\n"
+"PO-Revision-Date: 2019-06-04 16:51+0000\n"
 "Last-Translator: Will Thompson <wjt@endlessm.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/endless-os/gnome-shell/language/sw/)\n"
 "MIME-Version: 1.0\n"
@@ -17,32 +20,8 @@ msgstr ""
 "Language: sw\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: data/50-gnome-shell-system.xml:6
-msgid "System"
-msgstr ""
-
-#: data/50-gnome-shell-system.xml:9
-msgid "Show the notification list"
-msgstr ""
-
-#: data/50-gnome-shell-system.xml:12
-msgid "Focus the active notification"
-msgstr ""
-
-#: data/50-gnome-shell-system.xml:15
-msgid "Show the overview"
-msgstr ""
-
-#: data/50-gnome-shell-system.xml:18
-msgid "Show all applications"
-msgstr ""
-
-#: data/50-gnome-shell-system.xml:21
-msgid "Open the application menu"
-msgstr ""
-
 #: data/gnome-shell-extension-prefs.desktop.in.in:4
-#: js/extensionPrefs/main.js:152
+#: js/extensionPrefs/main.js:216
 msgid "Shell Extensions"
 msgstr ""
 
@@ -165,93 +144,103 @@ msgid ""
 "devices associated to it."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:114
+#: data/org.gnome.shell.gschema.xml.in:111
+msgid "Enable introspection API"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:112
+msgid ""
+"Enables a D-Bus API that allows to introspect the application state of the "
+"shell."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:122
 msgid "Whether the App Center is displayed"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:117
+#: data/org.gnome.shell.gschema.xml.in:125
 msgid "Whether the application grid displays the App Center icon."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:123
+#: data/org.gnome.shell.gschema.xml.in:131
 msgid "Whether the 'Code View' feature is enabled"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:126
+#: data/org.gnome.shell.gschema.xml.in:134
 msgid ""
 "This allows to modify and run a whitelist of applications using GNOME "
 "Builder."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:133
+#: data/org.gnome.shell.gschema.xml.in:141
 msgid "Whether the Tray Area will be enabled"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:136
+#: data/org.gnome.shell.gschema.xml.in:144
 msgid ""
 "This enables an area on the right side of the bottom panel where the icons "
 "for those applications still relying on the tray area will display their "
 "status icons (e.g. Steam, Dropbox, Skype...)."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:144
+#: data/org.gnome.shell.gschema.xml.in:152
 msgid "Enables the hot corner for the window picker"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:147
+#: data/org.gnome.shell.gschema.xml.in:155
 msgid ""
 "By default, the hot corner for the window picker is enabled. Set false to "
 "disable the hot corner."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:154
+#: data/org.gnome.shell.gschema.xml.in:162
 msgid "Set the left/right position of the hot corner for the window picker"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:157
+#: data/org.gnome.shell.gschema.xml.in:165
 msgid ""
 "Default position of the hot corner is in a right corner. Set false to move "
 "the hot corner to a left corner. The position is not affected by the RTL vs."
 " LTR text direction."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:165
+#: data/org.gnome.shell.gschema.xml.in:173
 msgid "Set the top/bottom position of the hot corner for the window picker"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:168
+#: data/org.gnome.shell.gschema.xml.in:176
 msgid ""
 "Default position of the hot corner is in a bottom corner. Set false to move "
 "the hot corner to a top corner."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:175
+#: data/org.gnome.shell.gschema.xml.in:183
 msgid "Set the size of the hot corner target"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:178
+#: data/org.gnome.shell.gschema.xml.in:186
 msgid ""
 "Number of pixels in one dimension of the square target for the hot corner. "
 "Default is for a single pixel in the very corner. For some virtual machines,"
 " this value may need to be set larger than the default."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:188
+#: data/org.gnome.shell.gschema.xml.in:196
 msgid "Prevent apps from being automatically maximized on launch"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:191
+#: data/org.gnome.shell.gschema.xml.in:199
 msgid ""
 "Makes window management more like standard Gnome. Hides application splash "
 "screens, prevents applications from being forced to open maximized, and does"
 " not automatically switch to the app selector when a window is minimized."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:200
+#: data/org.gnome.shell.gschema.xml.in:208
 msgid "Whether password reset is allowed"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:201
+#: data/org.gnome.shell.gschema.xml.in:209
 msgid ""
 "This key controls whether to show the \"Forgot Password?\" button on the "
 "login screen. 'default' tells GNOME Shell to use the vendor default setting."
@@ -261,12 +250,12 @@ msgid ""
 "effect."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:212
+#: data/org.gnome.shell.gschema.xml.in:220
 msgid ""
 "List of desktop file IDs for applications pinned to taskbar (DEPRECATED)"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:213
+#: data/org.gnome.shell.gschema.xml.in:221
 msgid ""
 "The applications corresponding to these identifiers will be displayed in the"
 " taskbar at the bottom of the Endless desktop. THIS IS DEPRECATED NOW: any "
@@ -274,322 +263,358 @@ msgid ""
 "the shell on start, and then cleared from here."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:222
+#: data/org.gnome.shell.gschema.xml.in:230
 msgid "Layout of application launcher icons in the grid"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:223
+#: data/org.gnome.shell.gschema.xml.in:231
 msgid ""
 "This key specifies the exact order of the icons shown in the applications "
 "launcher view."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:229
-msgid "Whether or not to enable the wobbly effect"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:232
-msgid "WOBBLY!"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:239
-msgid "Wobbly effect Spring Constant"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:242
-msgid "Springiness of wobbly effect"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:249
-msgid "Wobbly effect Friction"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:252
-msgid "Friction of wobbly effect"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:259
-msgid "Wobbly effect slowdown factor"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:262
-msgid "Slowdown factor of wobbly effect (1.0 being normal speed)"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:269
-msgid "Wobbly effect object movement range"
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:272
-msgid ""
-"How much objects are allowed to move in the mesh. A higher range allows for "
-"a more pronounced effect."
-msgstr ""
-
-#: data/org.gnome.shell.gschema.xml.in:279
+#: data/org.gnome.shell.gschema.xml.in:237
 msgid "Languages for which the discovery feed feature is enabled."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:282
+#: data/org.gnome.shell.gschema.xml.in:240
 msgid ""
 "If the system language matches any of these languages, the discovery feed "
 "will be enabled. You will need to restart the shell for changes to this "
 "setting to take effect."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:294
-msgid "Keybinding to open the application menu"
+#: data/org.gnome.shell.gschema.xml.in:246
+msgid "Whether or not to enable the wobbly effect"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:295
-msgid "Keybinding to open the application menu."
+#: data/org.gnome.shell.gschema.xml.in:249
+msgid "WOBBLY!"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:301
-msgid "Keybinding to open the “Show Applications” view"
+#: data/org.gnome.shell.gschema.xml.in:256
+msgid "Wobbly effect Spring Constant"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:259
+msgid "Springiness of wobbly effect"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:266
+msgid "Wobbly effect Friction"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:269
+msgid "Friction of wobbly effect"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:276
+msgid "Wobbly effect slowdown factor"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:279
+msgid "Slowdown factor of wobbly effect (1.0 being normal speed)"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:286
+msgid "Wobbly effect object movement range"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:289
+msgid ""
+"How much objects are allowed to move in the mesh. A higher range allows for "
+"a more pronounced effect."
 msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:302
+msgid "Keybinding to open the application menu"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:303
+msgid "Keybinding to open the application menu."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:309
+msgid "Keybinding to open the “Show Applications” view"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:310
 msgid ""
 "Keybinding to open the “Show Applications” view of the Activities Overview."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:309
+#: data/org.gnome.shell.gschema.xml.in:317
 msgid "Keybinding to open the overview"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:310
+#: data/org.gnome.shell.gschema.xml.in:318
 msgid "Keybinding to open the Activities Overview."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:316
+#: data/org.gnome.shell.gschema.xml.in:324
 msgid "Keybinding to toggle the visibility of the notification list"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:317
+#: data/org.gnome.shell.gschema.xml.in:325
 msgid "Keybinding to toggle the visibility of the notification list."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:323
+#: data/org.gnome.shell.gschema.xml.in:331
 msgid "Keybinding to focus the active notification"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:324
+#: data/org.gnome.shell.gschema.xml.in:332
 msgid "Keybinding to focus the active notification."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:330
+#: data/org.gnome.shell.gschema.xml.in:338
 msgid ""
 "Keybinding that pauses and resumes all running tweens, for debugging "
 "purposes"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:338
+#: data/org.gnome.shell.gschema.xml.in:343
+msgid "Switch to application 1"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:347
+msgid "Switch to application 2"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:351
+msgid "Switch to application 3"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:355
+msgid "Switch to application 4"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:359
+msgid "Switch to application 5"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:363
+msgid "Switch to application 6"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:367
+msgid "Switch to application 7"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:371
+msgid "Switch to application 8"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:375
+msgid "Switch to application 9"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:382
 msgid "Keybinding that shows the force app exit dialog"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:343
+#: data/org.gnome.shell.gschema.xml.in:387
 msgid "Keybinding to activate the first app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:344
+#: data/org.gnome.shell.gschema.xml.in:388
 msgid ""
 "Keybinding to open the first app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:350
+#: data/org.gnome.shell.gschema.xml.in:394
 msgid "Keybinding to activate the second app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:351
+#: data/org.gnome.shell.gschema.xml.in:395
 msgid ""
 "Keybinding to open the second app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:357
+#: data/org.gnome.shell.gschema.xml.in:401
 msgid "Keybinding to activate the third app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:358
+#: data/org.gnome.shell.gschema.xml.in:402
 msgid ""
 "Keybinding to open the third app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:364
+#: data/org.gnome.shell.gschema.xml.in:408
 msgid "Keybinding to activate the fourth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:365
+#: data/org.gnome.shell.gschema.xml.in:409
 msgid ""
 "Keybinding to open the fourth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:371
+#: data/org.gnome.shell.gschema.xml.in:415
 msgid "Keybinding to activate the fifth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:372
+#: data/org.gnome.shell.gschema.xml.in:416
 msgid ""
 "Keybinding to open the fifth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:378
+#: data/org.gnome.shell.gschema.xml.in:422
 msgid "Keybinding to activate the sixth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:379
+#: data/org.gnome.shell.gschema.xml.in:423
 msgid ""
 "Keybinding to open the sixth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:385
+#: data/org.gnome.shell.gschema.xml.in:429
 msgid "Keybinding to activate the seventh app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:386
+#: data/org.gnome.shell.gschema.xml.in:430
 msgid ""
 "Keybinding to open the seventh app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:392
+#: data/org.gnome.shell.gschema.xml.in:436
 msgid "Keybinding to activate the eighth app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:393
+#: data/org.gnome.shell.gschema.xml.in:437
 msgid ""
 "Keybinding to open the eighth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:399
+#: data/org.gnome.shell.gschema.xml.in:443
 msgid "Keybinding to activate the last app in the icon bar."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:400
+#: data/org.gnome.shell.gschema.xml.in:444
 msgid ""
 "Keybinding to open the last app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:410
+#: data/org.gnome.shell.gschema.xml.in:454
 msgid "Which keyboard to use"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:411
+#: data/org.gnome.shell.gschema.xml.in:455
 msgid "The type of keyboard to use."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:422
-#: data/org.gnome.shell.gschema.xml.in:449
+#: data/org.gnome.shell.gschema.xml.in:466
+#: data/org.gnome.shell.gschema.xml.in:493
 msgid "Limit switcher to current workspace."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:423
+#: data/org.gnome.shell.gschema.xml.in:467
 msgid ""
 "If true, only applications that have windows on the current workspace are "
 "shown in the switcher. Otherwise, all applications are included."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:440
+#: data/org.gnome.shell.gschema.xml.in:484
 msgid "The application icon mode."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:441
+#: data/org.gnome.shell.gschema.xml.in:485
 msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
 "are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only” "
 "(shows only the application icon) or “both”."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:450
+#: data/org.gnome.shell.gschema.xml.in:494
 msgid ""
 "If true, only windows from the current workspace are shown in the switcher. "
 "Otherwise, all windows are included."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:461
+#: data/org.gnome.shell.gschema.xml.in:506
 msgid "Attach modal dialog to the parent window"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:462
-#: data/org.gnome.shell.gschema.xml.in:471
-#: data/org.gnome.shell.gschema.xml.in:479
-#: data/org.gnome.shell.gschema.xml.in:487
-#: data/org.gnome.shell.gschema.xml.in:495
+#: data/org.gnome.shell.gschema.xml.in:507
+#: data/org.gnome.shell.gschema.xml.in:516
+#: data/org.gnome.shell.gschema.xml.in:524
+#: data/org.gnome.shell.gschema.xml.in:532
+#: data/org.gnome.shell.gschema.xml.in:540
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:470
+#: data/org.gnome.shell.gschema.xml.in:515
 msgid "Enable edge tiling when dropping windows on screen edges"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:478
+#: data/org.gnome.shell.gschema.xml.in:523
 msgid "Workspaces are managed dynamically"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:486
+#: data/org.gnome.shell.gschema.xml.in:531
 msgid "Workspaces only on primary monitor"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:494
+#: data/org.gnome.shell.gschema.xml.in:539
 msgid "Delay focus changes in mouse mode until the pointer stops moving"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:507
+#: data/org.gnome.shell.gschema.xml.in:552
 msgid "Watermark file"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:508
+#: data/org.gnome.shell.gschema.xml.in:553
 msgid "The full watermark file path"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:512
+#: data/org.gnome.shell.gschema.xml.in:557
 msgid "Watermark position"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:513
+#: data/org.gnome.shell.gschema.xml.in:558
 msgid ""
 "The position of the watermark; valid values are 'center', 'bottom-left', "
 "'bottom-center' and 'bottom-right'"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:521
+#: data/org.gnome.shell.gschema.xml.in:566
 msgid "Watermark size"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:522
+#: data/org.gnome.shell.gschema.xml.in:567
 msgid "The watermark size in percent relative to the screen width"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:527
+#: data/org.gnome.shell.gschema.xml.in:572
 msgid "Watermark border"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:528
+#: data/org.gnome.shell.gschema.xml.in:573
 msgid "The watermark around the logo"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:533
+#: data/org.gnome.shell.gschema.xml.in:578
 msgid "Watermark opacity"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:534
+#: data/org.gnome.shell.gschema.xml.in:579
 msgid "The watermark of the logo"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:538
+#: data/org.gnome.shell.gschema.xml.in:583
 msgid "Watermark always visible"
 msgstr ""
 
-#: data/org.gnome.shell.gschema.xml.in:539
+#: data/org.gnome.shell.gschema.xml.in:584
 msgid "Show the watermark even on a non default background"
 msgstr ""
 
@@ -603,298 +628,334 @@ msgstr ""
 msgid "network-workgroup"
 msgstr ""
 
-#: js/extensionPrefs/main.js:120
-#, javascript-format
-msgid "There was an error loading the preferences dialog for %s:"
+#: js/extensionPrefs/main.js:116
+msgid "Something’s gone wrong"
 msgstr ""
 
-#: js/gdm/authPrompt.js:134
+#: js/extensionPrefs/main.js:123
+msgid ""
+"We’re very sorry, but there’s been a problem: the settings for this "
+"extension can’t be displayed. We recommend that you report the issue to the "
+"extension authors."
+msgstr ""
+
+#: js/extensionPrefs/main.js:130
+msgid "Technical Details"
+msgstr ""
+
+#: js/extensionPrefs/main.js:165
+msgid "Copy Error"
+msgstr ""
+
+#: js/extensionPrefs/main.js:185
+msgid "Homepage"
+msgstr ""
+
+#: js/extensionPrefs/main.js:186
+msgid "Visit extension homepage"
+msgstr ""
+
+#: js/extensionPrefs/main.js:449
+msgid "No Extensions Installed"
+msgstr ""
+
+#: js/extensionPrefs/main.js:459
+msgid ""
+"Extensions can be installed through Software or <a "
+"href=\"https://extensions.gnome.org\">extensions.gnome.org</a>."
+msgstr ""
+
+#: js/extensionPrefs/main.js:474
+msgid "Browse in Software"
+msgstr ""
+
+#: js/gdm/authPrompt.js:124
 msgid "Show password hint"
-msgstr ""
+msgstr "Onyesha kidokezo cha nenosiri"
 
-#: js/gdm/authPrompt.js:149
+#: js/gdm/authPrompt.js:139
 msgid "Forgot password?"
-msgstr ""
+msgstr "Umesahau nywila?"
 
-#: js/gdm/authPrompt.js:199 js/ui/audioDeviceSelection.js:71
-#: js/ui/components/networkAgent.js:140 js/ui/components/polkitAgent.js:160
-#: js/ui/endSessionDialog.js:497 js/ui/extensionDownloader.js:197
-#: js/ui/forceAppExitDialog.js:78 js/ui/paygUnlockDialog.js:331
-#: js/ui/shellMountOperation.js:353 js/ui/status/network.js:925
+#: js/gdm/authPrompt.js:188 js/ui/audioDeviceSelection.js:55
+#: js/ui/components/networkAgent.js:141 js/ui/components/polkitAgent.js:148
+#: js/ui/endSessionDialog.js:444 js/ui/extensionDownloader.js:188
+#: js/ui/paygUnlockDialog.js:346 js/ui/shellMountOperation.js:334
+#: js/ui/status/network.js:888 js/ui/forceAppExitDialog.js:69
 msgid "Cancel"
-msgstr ""
+msgstr "Futa"
 
-#: js/gdm/authPrompt.js:221 js/gdm/authPrompt.js:276 js/gdm/authPrompt.js:517
+#: js/gdm/authPrompt.js:207 js/gdm/authPrompt.js:258 js/gdm/authPrompt.js:499
 msgid "Next"
-msgstr ""
+msgstr "Ifuatayo"
 
-#: js/gdm/authPrompt.js:272 js/ui/paygUnlockDialog.js:352
-#: js/ui/shellMountOperation.js:357 js/ui/unlockDialog.js:59
+#: js/gdm/authPrompt.js:254 js/ui/paygUnlockDialog.js:367
+#: js/ui/shellMountOperation.js:338 js/ui/unlockDialog.js:41
 msgid "Unlock"
-msgstr ""
+msgstr "Fungua"
 
-#: js/gdm/authPrompt.js:274
+#: js/gdm/authPrompt.js:256
 msgctxt "button"
 msgid "Sign In"
-msgstr ""
+msgstr "Ingia"
 
 #. FIXME: This string is too long. It is ellipsized, even in English.
 #. It must be shortened after the Endless 3.2 release, once there is
 #. time to translate the shortened version.
 #. Translators: During a password reset, prompt for the "secret code" provided
 #. by customer support.
-#: js/gdm/authPrompt.js:653
+#: js/gdm/authPrompt.js:635
 msgid "Enter unlock code provided by customer support:"
-msgstr ""
+msgstr "Ingiza msimbo wa kufungua unaotolewa na msaada wa wateja:"
 
 #. Translators: Password reset. The first %s is a verification code and the
 #. second is an email.
-#: js/gdm/authPrompt.js:656
+#: js/gdm/authPrompt.js:638
 #, javascript-format
 msgid ""
 "Please inform customer support of your verification code %s by emailing %s. "
 "The code will remain valid until you click Cancel or turn off your computer."
-msgstr ""
+msgstr "Tafadhali wajulishe usaidizi wa wateja wa msimbo wako wa kuthibitisha kwa barua pepe. Nambari itabaki halali mpaka bonyeza  au uzima kompyuta yako.%s %s"
 
 #. Translators: Button on login dialog, after clicking Forgot Password?
-#: js/gdm/authPrompt.js:661
+#: js/gdm/authPrompt.js:643
 msgid "Reset Password"
-msgstr ""
+msgstr "Weka upya nenosiri"
 
-#: js/gdm/authPrompt.js:734
+#: js/gdm/authPrompt.js:716
 msgid "Your unlock code was incorrect. Please try again."
-msgstr ""
+msgstr "Nambari yako ya kufungua haikuwa sahihi. Tafadhali jaribu tena."
 
-#: js/gdm/loginDialog.js:310
+#: js/gdm/loginDialog.js:289
 msgid "Choose Session"
-msgstr ""
+msgstr "Chagua Kipindi"
 
 #. translators: this message is shown below the user list on the
 #. login screen. It can be activated to reveal an entry for
 #. manually entering the username.
-#: js/gdm/loginDialog.js:462
+#: js/gdm/loginDialog.js:433
 msgid "Not listed?"
-msgstr ""
+msgstr "Haijaorodheshwa?"
 
 #. Translators: this message is shown below the username entry field
 #. to clue the user in on how to login to the local network realm
-#: js/gdm/loginDialog.js:901
+#: js/gdm/loginDialog.js:875
 #, javascript-format
 msgid "(e.g., user or %s)"
-msgstr ""
+msgstr "(k.m., mtumiaji au %s)"
 
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
 #. (and don't even care of which one)
-#: js/gdm/loginDialog.js:906 js/ui/components/networkAgent.js:409
-#: js/ui/components/networkAgent.js:427
+#: js/gdm/loginDialog.js:880 js/ui/components/networkAgent.js:411
+#: js/ui/components/networkAgent.js:431 js/ui/components/networkAgent.js:449
 msgid "Username: "
-msgstr ""
+msgstr "Jina la mtumiaji:"
 
-#: js/gdm/loginDialog.js:1249
+#: js/gdm/loginDialog.js:1218
 msgid "Login Window"
-msgstr ""
+msgstr "Ingia mfumo wa uendeshaji"
 
-#: js/gdm/util.js:346
+#: js/gdm/util.js:337
 msgid "Authentication error"
-msgstr ""
+msgstr "Hitilafu ya uthibitishaji."
 
 #. We don't show fingerprint messages directly since it's
 #. not the main auth service. Instead we use the messages
 #. as a cue to display our own message.
 #. Translators: this message is shown below the password entry field
 #. to indicate the user can swipe their finger instead
-#: js/gdm/util.js:478
+#: js/gdm/util.js:477
 msgid "(or swipe finger)"
 msgstr ""
 
 #. Translators: The name of the power-off action in search
-#: js/misc/systemActions.js:99
+#: js/misc/systemActions.js:88
 msgctxt "search-result"
-msgid "Power off"
+msgid "Power Off"
 msgstr ""
 
 #. Translators: A list of keywords that match the power-off action, separated
 #. by semicolons
-#: js/misc/systemActions.js:102
-msgid "power off;shutdown"
+#: js/misc/systemActions.js:91
+msgid "power off;shutdown;reboot;restart"
 msgstr ""
 
 #. Translators: The name of the lock screen action in search
-#: js/misc/systemActions.js:106
+#: js/misc/systemActions.js:95
 msgctxt "search-result"
-msgid "Lock screen"
+msgid "Lock Screen"
 msgstr ""
 
 #. Translators: A list of keywords that match the lock screen action,
 #. separated by semicolons
-#: js/misc/systemActions.js:109
+#: js/misc/systemActions.js:98
 msgid "lock screen"
-msgstr ""
+msgstr "Zima skrini"
 
 #. Translators: The name of the logout action in search
-#: js/misc/systemActions.js:113
+#: js/misc/systemActions.js:102
 msgctxt "search-result"
-msgid "Log out"
+msgid "Log Out"
 msgstr ""
 
 #. Translators: A list of keywords that match the logout action, separated by
 #. semicolons
-#: js/misc/systemActions.js:116
+#: js/misc/systemActions.js:105
 msgid "logout;sign off"
-msgstr ""
+msgstr "Ondoka kutumia"
 
 #. Translators: The name of the suspend action in search
-#: js/misc/systemActions.js:120
+#: js/misc/systemActions.js:109
 msgctxt "search-result"
 msgid "Suspend"
-msgstr ""
+msgstr "Simama"
 
 #. Translators: A list of keywords that match the suspend action, separated by
 #. semicolons
-#: js/misc/systemActions.js:123
+#: js/misc/systemActions.js:112
 msgid "suspend;sleep"
-msgstr ""
+msgstr "Simama"
 
 #. Translators: The name of the switch user action in search
-#: js/misc/systemActions.js:127
+#: js/misc/systemActions.js:116
 msgctxt "search-result"
-msgid "Switch user"
+msgid "Switch User"
 msgstr ""
 
 #. Translators: A list of keywords that match the switch user action,
 #. separated by semicolons
-#: js/misc/systemActions.js:130
+#: js/misc/systemActions.js:119
 msgid "switch user"
-msgstr ""
+msgstr "Badili mtumiaji"
 
 #. Translators: The name of the lock orientation action in search
-#: js/misc/systemActions.js:134
+#: js/misc/systemActions.js:123
 msgctxt "search-result"
-msgid "Lock orientation"
+msgid "Lock Orientation"
 msgstr ""
 
 #. Translators: A list of keywords that match the lock orientation action,
 #. separated by semicolons
-#: js/misc/systemActions.js:137
-msgid "lock orientation"
+#: js/misc/systemActions.js:126
+msgid "lock orientation;screen;rotation"
 msgstr ""
 
-#: js/misc/util.js:187
+#: js/misc/util.js:182
 msgid "Command not found"
-msgstr ""
+msgstr "Amri haipatikani"
 
 #. Replace "Error invoking GLib.shell_parse_argv: " with
 #. something nicer
-#: js/misc/util.js:220
+#: js/misc/util.js:215
 msgid "Could not parse command:"
-msgstr ""
+msgstr "Haikuweza kupiga amri:"
 
-#: js/misc/util.js:228
+#: js/misc/util.js:223
 #, javascript-format
 msgid "Execution of “%s” failed:"
-msgstr ""
+msgstr "Utekelezaji wa \"Dakika moja%s \" umeshindwa:"
 
-#: js/misc/util.js:245
+#: js/misc/util.js:240
 msgid "Just now"
-msgstr ""
+msgstr "Sasa hivi"
 
-#: js/misc/util.js:247
+#: js/misc/util.js:242
 #, javascript-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%dDakika zilizopita "
+msgstr[1] "Dakika zilizopita %d"
 
-#: js/misc/util.js:250
+#: js/misc/util.js:245
 #, javascript-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%dMasaa yaliyopita"
+msgstr[1] "%d  Masaa yaliyopita"
 
-#: js/misc/util.js:253
+#: js/misc/util.js:248
 msgid "Yesterday"
-msgstr ""
+msgstr "Jana"
 
-#: js/misc/util.js:255
+#: js/misc/util.js:250
 #, javascript-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d Siku Zilizopita"
+msgstr[1] "%d Siku Zilizopita."
 
-#: js/misc/util.js:258
+#: js/misc/util.js:253
 #, javascript-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d wiki iliyopita "
+msgstr[1] "%d Wiki Zilizopita"
 
-#: js/misc/util.js:261
+#: js/misc/util.js:256
 #, javascript-format
 msgid "%d month ago"
 msgid_plural "%d months ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] " %dMiezi Iliyopita"
+msgstr[1] "%d Miezi Iliyopita"
 
-#: js/misc/util.js:263
+#: js/misc/util.js:258
 #, javascript-format
 msgid "%d year ago"
 msgid_plural "%d years ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%dMiaka Iliyopita "
+msgstr[1] "%dMiaka Iliyopita "
 
 #. Translators: Time in 24h format
-#: js/misc/util.js:293
+#: js/misc/util.js:288
 msgid "%H∶%M"
-msgstr ""
+msgstr "Muda katika muundo wa 24h % Masaa : % Dakika "
 
 #. Translators: this is the word "Yesterday" followed by a
 #. time string in 24h format. i.e. "Yesterday, 14:30"
-#: js/misc/util.js:299
+#: js/misc/util.js:294
 #, no-c-format
 msgid "Yesterday, %H∶%M"
-msgstr ""
+msgstr "Jana %Masaa∶ %Dakika"
 
 #. Translators: this is the week day name followed by a time
 #. string in 24h format. i.e. "Monday, 14:30"
-#: js/misc/util.js:305
+#: js/misc/util.js:300
 #, no-c-format
 msgid "%A, %H∶%M"
-msgstr ""
+msgstr "Hii ni jina la siku ya wiki lifuatiwa na kamba ya muda katika muundo wa 24h. yaani, \"Jumatatu, %A14:30\""
 
 #. Translators: this is the month name and day number
 #. followed by a time string in 24h format.
 #. i.e. "May 25, 14:30"
-#: js/misc/util.js:311
+#: js/misc/util.js:306
 #, no-c-format
-msgid "%B %d, %H∶%M"
+msgid "%B %-d, %H∶%M"
 msgstr ""
 
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 24h format.
 #. i.e. "May 25 2012, 14:30"
-#: js/misc/util.js:317
+#: js/misc/util.js:312
 #, no-c-format
-msgid "%B %d %Y, %H∶%M"
+msgid "%B %-d %Y, %H∶%M"
 msgstr ""
 
 #. Translators: Time in 12h format
-#: js/misc/util.js:322
+#: js/misc/util.js:317
 msgid "%l∶%M %p"
-msgstr ""
+msgstr "muda katika muundo wa 12h%p"
 
 #. Translators: this is the word "Yesterday" followed by a
 #. time string in 12h format. i.e. "Yesterday, 2:30 pm"
-#: js/misc/util.js:328
+#: js/misc/util.js:323
 #, no-c-format
 msgid "Yesterday, %l∶%M %p"
 msgstr ""
 
 #. Translators: this is the week day name followed by a time
 #. string in 12h format. i.e. "Monday, 2:30 pm"
-#: js/misc/util.js:334
+#: js/misc/util.js:329
 #, no-c-format
 msgid "%A, %l∶%M %p"
 msgstr ""
@@ -902,480 +963,438 @@ msgstr ""
 #. Translators: this is the month name and day number
 #. followed by a time string in 12h format.
 #. i.e. "May 25, 2:30 pm"
-#: js/misc/util.js:340
+#: js/misc/util.js:335
 #, no-c-format
-msgid "%B %d, %l∶%M %p"
+msgid "%B %-d, %l∶%M %p"
 msgstr ""
 
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 12h format.
 #. i.e. "May 25 2012, 2:30 pm"
-#: js/misc/util.js:346
+#: js/misc/util.js:341
 #, no-c-format
-msgid "%B %d %Y, %l∶%M %p"
+msgid "%B %-d %Y, %l∶%M %p"
 msgstr ""
 
 #. * Translators: this is the name of the search engine that shows in the
 #. * Shell's desktop search entry.
-#: js/misc/util.js:540
+#: js/misc/util.js:531
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #. TRANSLATORS: this is the title of the wifi captive portal login window
-#: js/portalHelper/main.js:66
+#: js/portalHelper/main.js:40
 msgid "Hotspot Login"
-msgstr ""
+msgstr "Hotspot Ingia "
 
-#: js/portalHelper/main.js:112
+#: js/portalHelper/main.js:86
 msgid ""
 "Your connection to this hotspot login is not secure. Passwords or other "
 "information you enter on this page can be viewed by people nearby."
-msgstr ""
+msgstr "Uunganisho wako kwenye kuingia hii hotspot si salama. Nywila au habari nyingine unazoingia kwenye ukurasa huu zinaweza kutazamwa na watu wa karibu."
 
 #. No support for non-modal system dialogs, so ignore the option
 #. let modal = options['modal'] || true;
-#: js/ui/accessDialog.js:63 js/ui/status/location.js:395
+#: js/ui/accessDialog.js:37 js/ui/status/location.js:360
 msgid "Deny Access"
-msgstr ""
+msgstr "Zuia Matumizi"
 
-#: js/ui/accessDialog.js:64 js/ui/status/location.js:398
+#: js/ui/accessDialog.js:38 js/ui/status/location.js:363
 msgid "Grant Access"
-msgstr ""
+msgstr "Ruhusu matumizi"
 
-#: js/ui/appDisplay.js:1407
+#: js/ui/appDisplay.js:1250
 msgid "Frequently used applications will appear here"
-msgstr ""
+msgstr "Programu Inatumiwa mara kwa mara  itaonekana hapa"
 
-#: js/ui/appDisplay.js:1687
+#: js/ui/appDisplay.js:1516
 msgid "No apps in this folder! To add an app, drag it onto the folder."
-msgstr ""
+msgstr "Hakuna programu katika folda hii! Ili kuongeza programu, futa kwenye folda."
 
 #. Add the "Remove from desktop" menu item at the end.
-#: js/ui/appDisplay.js:1873
+#: js/ui/appDisplay.js:1699
 msgid "Remove from desktop"
-msgstr ""
+msgstr "Ondoa kwenye desktop"
 
-#: js/ui/appDisplay.js:2766
+#: js/ui/appDisplay.js:2586 js/ui/panel.js:86
 msgid "New Window"
-msgstr ""
+msgstr "Mfumo mpya wa uendeshaji"
 
-#: js/ui/appDisplay.js:2782
+#: js/ui/appDisplay.js:2602
 msgid "Launch using Dedicated Graphics Card"
+msgstr "Uzindua kwa kutumia Kadi ya Dhahabu iliyotolewa"
+
+#: js/ui/appDisplay.js:2726
+msgid "Remove"
 msgstr ""
 
-#: js/ui/appDisplay.js:2914
-msgid "Delete"
-msgstr ""
-
-#: js/ui/appIconBar.js:209
-msgid "Other workspaces"
-msgstr ""
-
-#: js/ui/appIconBar.js:218
-msgid "Current workspace"
-msgstr ""
-
-#: js/ui/appIconBar.js:293
-msgid "Pin to Taskbar"
-msgstr ""
-
-#: js/ui/appIconBar.js:297
-msgid "Unpin from Taskbar"
-msgstr ""
-
-#: js/ui/appIconBar.js:313
-#, javascript-format
-msgid "Quit %s"
-msgstr ""
-
-#: js/ui/audioDeviceSelection.js:59
+#: js/ui/audioDeviceSelection.js:42
 msgid "Select Audio Device"
-msgstr ""
+msgstr "Chagua Kifaa cha Audio /Sauti"
 
-#: js/ui/audioDeviceSelection.js:69
+#: js/ui/audioDeviceSelection.js:53
 msgid "Sound Settings"
-msgstr ""
+msgstr "Mipangilio ya sauti"
 
-#: js/ui/audioDeviceSelection.js:78
+#: js/ui/audioDeviceSelection.js:62
 msgid "Headphones"
-msgstr ""
+msgstr "kifaa cha masikioni cha sauti"
 
-#: js/ui/audioDeviceSelection.js:80
+#: js/ui/audioDeviceSelection.js:64
 msgid "Headset"
-msgstr ""
+msgstr "kifaa cha masikioni cha sauti"
 
-#: js/ui/audioDeviceSelection.js:82 js/ui/status/volume.js:221
+#: js/ui/audioDeviceSelection.js:66 js/ui/status/volume.js:247
 msgid "Microphone"
-msgstr ""
+msgstr "Kipaza sauti"
 
-#: js/ui/backgroundMenu.js:22
+#: js/ui/backgroundMenu.js:15
 msgid "Change Background…"
-msgstr ""
+msgstr "Badilisha Background "
 
-#: js/ui/backgroundMenu.js:25
+#: js/ui/backgroundMenu.js:18
 msgid "Add App"
-msgstr ""
+msgstr "Ongeza Programu"
 
-#: js/ui/backgroundMenu.js:31
+#: js/ui/backgroundMenu.js:24
 msgid "Add Website"
-msgstr ""
+msgstr "Ongeza Tovuti"
 
-#: js/ui/backgroundMenu.js:35
+#: js/ui/backgroundMenu.js:28
 msgid "Add Folder"
-msgstr ""
+msgstr "Ongeza Folda"
 
 #. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0"
 #. (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
-#: js/ui/calendar.js:47
+#: js/ui/calendar.js:40
 msgctxt "calendar-no-work"
 msgid "06"
-msgstr ""
+msgstr "06"
 
 #. Translators: Calendar grid abbreviation for Sunday.
 #. *
 #. * NOTE: These grid abbreviations are always shown together
 #. * and in order, e.g. "S M T W T F S".
-#: js/ui/calendar.js:76
+#: js/ui/calendar.js:69
 msgctxt "grid sunday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. Translators: Calendar grid abbreviation for Monday
-#: js/ui/calendar.js:78
+#: js/ui/calendar.js:71
 msgctxt "grid monday"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #. Translators: Calendar grid abbreviation for Tuesday
-#: js/ui/calendar.js:80
+#: js/ui/calendar.js:73
 msgctxt "grid tuesday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #. Translators: Calendar grid abbreviation for Wednesday
-#: js/ui/calendar.js:82
+#: js/ui/calendar.js:75
 msgctxt "grid wednesday"
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #. Translators: Calendar grid abbreviation for Thursday
-#: js/ui/calendar.js:84
+#: js/ui/calendar.js:77
 msgctxt "grid thursday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #. Translators: Calendar grid abbreviation for Friday
-#: js/ui/calendar.js:86
+#: js/ui/calendar.js:79
 msgctxt "grid friday"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. Translators: Calendar grid abbreviation for Saturday
-#: js/ui/calendar.js:88
+#: js/ui/calendar.js:81
 msgctxt "grid saturday"
 msgid "S"
+msgstr "S"
+
+#. *
+#. * Translators: The header displaying just the month name
+#. * standalone, when this is a month of the current year.
+#. * "%OB" is the new format specifier introduced in glibc 2.27,
+#. * in most cases you should not change it.
+#: js/ui/calendar.js:332
+msgid "%OB"
 msgstr ""
 
-#: js/ui/calendar.js:449
+#. *
+#. * Translators: The header displaying the month name and the year
+#. * number, when this is a month of a different year.  You can
+#. * reorder the format specifiers or add other modifications
+#. * according to the requirements of your language.
+#. * "%OB" is the new format specifier introduced in glibc 2.27,
+#. * in most cases you should not use the old "%B" here unless you
+#. * absolutely know what you are doing.
+#: js/ui/calendar.js:342
+msgid "%OB %Y"
+msgstr ""
+
+#: js/ui/calendar.js:399
 msgid "Previous month"
-msgstr ""
+msgstr "Mwezi uliopita"
 
-#: js/ui/calendar.js:459
+#: js/ui/calendar.js:410
 msgid "Next month"
-msgstr ""
+msgstr "Mwezi Ujao"
 
-#: js/ui/calendar.js:612
+#: js/ui/calendar.js:564
 #, no-javascript-format
 msgctxt "date day number format"
 msgid "%d"
-msgstr ""
+msgstr "%d"
 
-#: js/ui/calendar.js:667
+#: js/ui/calendar.js:619
 msgid "Week %V"
-msgstr ""
+msgstr "Week  five"
 
 #. Translators: Shown in calendar event list for all day events
 #. * Keep it short, best if you can use less then 10 characters
-#: js/ui/calendar.js:736
+#: js/ui/calendar.js:687
 msgctxt "event list time"
 msgid "All Day"
-msgstr ""
+msgstr "Siku nzima"
 
-#: js/ui/calendar.js:871
+#: js/ui/calendar.js:819
 msgctxt "calendar heading"
-msgid "%A, %B %d"
+msgid "%A, %B %-d"
 msgstr ""
 
-#: js/ui/calendar.js:875
+#: js/ui/calendar.js:823
 msgctxt "calendar heading"
-msgid "%A, %B %d, %Y"
+msgid "%A, %B %-d, %Y"
 msgstr ""
 
-#: js/ui/calendar.js:1095
+#: js/ui/calendar.js:1046
 msgid "No Notifications"
-msgstr ""
+msgstr "Hakuna Taarifa"
 
-#: js/ui/calendar.js:1098
+#: js/ui/calendar.js:1049
 msgid "No Events"
-msgstr ""
+msgstr "Hakuna Matukio"
 
-#: js/ui/calendar.js:1126
-msgid "Clear All"
+#: js/ui/calendar.js:1075
+msgid "Clear"
 msgstr ""
 
 #. Translators: %s is an application name
-#: js/ui/closeDialog.js:44
+#: js/ui/closeDialog.js:42
 #, javascript-format
 msgid "“%s” is not responding."
-msgstr ""
+msgstr "%s haijibu"
 
-#: js/ui/closeDialog.js:45
+#: js/ui/closeDialog.js:43
 msgid ""
 "You may choose to wait a short while for it to continue or force the "
 "application to quit entirely."
-msgstr ""
+msgstr "Unaweza kuchagua kusubiri muda mfupi ili kuendelea au kushinikiza programu kuacha kabisa."
 
-#: js/ui/closeDialog.js:61
+#: js/ui/closeDialog.js:59
 msgid "Force Quit"
-msgstr ""
+msgstr "Lazimu kuzima."
 
-#: js/ui/closeDialog.js:64
+#: js/ui/closeDialog.js:62
 msgid "Wait"
-msgstr ""
+msgstr "Subiri"
 
-#: js/ui/components/automountManager.js:91
+#: js/ui/components/automountManager.js:86
 msgid "External drive connected"
-msgstr ""
+msgstr "Hifadhi ya nje imeunganishwa"
 
-#: js/ui/components/automountManager.js:102
+#: js/ui/components/automountManager.js:98
 msgid "External drive disconnected"
-msgstr ""
+msgstr "Hifadhi ya nje imetengwa"
 
-#: js/ui/components/autorunManager.js:358
+#: js/ui/components/autorunManager.js:334
 #, javascript-format
 msgid "Open with %s"
-msgstr ""
+msgstr "Fungua na %s"
 
-#: js/ui/components/keyring.js:107 js/ui/components/polkitAgent.js:305
+#: js/ui/components/keyring.js:77 js/ui/components/polkitAgent.js:276
 msgid "Password:"
-msgstr ""
+msgstr "Nenosiri:"
 
-#: js/ui/components/keyring.js:140
+#: js/ui/components/keyring.js:108
 msgid "Type again:"
+msgstr "Andika tena:"
+
+#: js/ui/components/networkAgent.js:126
+msgid ""
+"Alternatively you can connect by pushing the “WPS” button on your router."
 msgstr ""
 
-#: js/ui/components/networkAgent.js:135 js/ui/status/network.js:245
-#: js/ui/status/network.js:338 js/ui/status/network.js:928
+#: js/ui/components/networkAgent.js:136 js/ui/status/network.js:219
+#: js/ui/status/network.js:309 js/ui/status/network.js:891
 msgid "Connect"
-msgstr ""
+msgstr "Unganisha"
 
-#: js/ui/components/networkAgent.js:163
+#: js/ui/components/networkAgent.js:164
 msgid "Limited Data"
-msgstr ""
+msgstr "Takwimu ndogo"
 
-#: js/ui/components/networkAgent.js:171
+#: js/ui/components/networkAgent.js:172
 msgid "Unlimited Data"
-msgstr ""
+msgstr "Takwimu zisizo na ukomo"
 
-#: js/ui/components/networkAgent.js:181 js/ui/components/networkAgent.js:211
+#: js/ui/components/networkAgent.js:182 js/ui/components/networkAgent.js:212
 msgid "Enable if your connection has limits on how much you can download."
-msgstr ""
+msgstr "Wezesha ikiwa uunganisho wako una mipaka kwa kiasi gani unaweza kupakua."
 
-#: js/ui/components/networkAgent.js:213
+#: js/ui/components/networkAgent.js:214
 msgid "This connection doesn't have limits on how much you can download."
-msgstr ""
+msgstr "Uunganisho huu hauna mipaka juu ya kiasi gani unaweza kupakua."
 
 #. Cisco LEAP
-#: js/ui/components/networkAgent.js:371 js/ui/components/networkAgent.js:383
-#: js/ui/components/networkAgent.js:411 js/ui/components/networkAgent.js:431
-#: js/ui/components/networkAgent.js:441
+#: js/ui/components/networkAgent.js:379 js/ui/components/networkAgent.js:391
+#: js/ui/components/networkAgent.js:414 js/ui/components/networkAgent.js:433
+#: js/ui/components/networkAgent.js:453 js/ui/components/networkAgent.js:463
 msgid "Password: "
-msgstr ""
+msgstr "Nenosiri:"
 
 #. static WEP
-#: js/ui/components/networkAgent.js:376
+#: js/ui/components/networkAgent.js:384
 msgid "Key: "
-msgstr ""
+msgstr "Muhimu:"
 
-#: js/ui/components/networkAgent.js:415
-msgid "Identity: "
-msgstr ""
-
-#: js/ui/components/networkAgent.js:417
+#: js/ui/components/networkAgent.js:417 js/ui/components/networkAgent.js:439
 msgid "Private key password: "
-msgstr ""
+msgstr "Nywila ya siri ya faragha:"
 
-#: js/ui/components/networkAgent.js:429
+#: js/ui/components/networkAgent.js:437
+msgid "Identity: "
+msgstr "Tambulisho"
+
+#: js/ui/components/networkAgent.js:451
 msgid "Service: "
-msgstr ""
+msgstr "Huduma: /Maabudu"
 
-#: js/ui/components/networkAgent.js:458
+#: js/ui/components/networkAgent.js:480
 #, javascript-format
 msgid "Enter the Wi-Fi password for “%s”"
 msgstr ""
 
-#: js/ui/components/networkAgent.js:463 js/ui/components/networkAgent.js:832
+#: js/ui/components/networkAgent.js:485 js/ui/components/networkAgent.js:865
 msgid "Wired 802.1X authentication"
-msgstr ""
+msgstr "Umeunganishwa 802.1X uthibitishaji"
 
-#: js/ui/components/networkAgent.js:465
+#: js/ui/components/networkAgent.js:487
 msgid "Network name: "
-msgstr ""
+msgstr "Jina la mtandao:"
 
-#: js/ui/components/networkAgent.js:470 js/ui/components/networkAgent.js:836
+#: js/ui/components/networkAgent.js:492 js/ui/components/networkAgent.js:869
 msgid "DSL authentication"
-msgstr ""
+msgstr "Uthibitishaji wa DSL"
 
-#: js/ui/components/networkAgent.js:477 js/ui/components/networkAgent.js:842
+#: js/ui/components/networkAgent.js:499 js/ui/components/networkAgent.js:875
 msgid "PIN code required"
-msgstr ""
+msgstr "Nambari ya PIN inahitajika"
 
-#: js/ui/components/networkAgent.js:478 js/ui/components/networkAgent.js:843
+#: js/ui/components/networkAgent.js:500 js/ui/components/networkAgent.js:876
 msgid "PIN code is needed for the mobile broadband device"
-msgstr ""
+msgstr "Nambari ya PIN inahitajika kwenye kifaa cha simu ya broadband"
 
-#: js/ui/components/networkAgent.js:479
+#: js/ui/components/networkAgent.js:501
 msgid "PIN: "
-msgstr ""
+msgstr "Nenosiri:"
 
-#: js/ui/components/networkAgent.js:486 js/ui/components/networkAgent.js:849
+#: js/ui/components/networkAgent.js:508 js/ui/components/networkAgent.js:882
 msgid "Mobile broadband network password"
-msgstr ""
+msgstr "Nenosiri la mtandao wa mtandao wa broadband"
 
-#: js/ui/components/networkAgent.js:487 js/ui/components/networkAgent.js:833
-#: js/ui/components/networkAgent.js:837 js/ui/components/networkAgent.js:850
+#: js/ui/components/networkAgent.js:509 js/ui/components/networkAgent.js:866
+#: js/ui/components/networkAgent.js:870 js/ui/components/networkAgent.js:883
 #, javascript-format
 msgid "A password is required to connect to “%s”."
-msgstr ""
+msgstr "Nenosiri linahitajika kuunganisha %s"
 
-#: js/ui/components/networkAgent.js:817 js/ui/status/network.js:1699
+#: js/ui/components/networkAgent.js:850 js/ui/status/network.js:1664
 msgid "Network Manager"
-msgstr ""
+msgstr "Meneja wa Mtandao"
 
-#: js/ui/components/networkAgent.js:828
+#: js/ui/components/networkAgent.js:861
 msgid "Authentication required by wireless network"
-msgstr ""
+msgstr "Uthibitishaji unaotakiwa na mtandao wa wireless"
 
-#: js/ui/components/networkAgent.js:829
+#: js/ui/components/networkAgent.js:862
 #, javascript-format
 msgid ""
 "Passwords or encryption keys are required to access the wireless network "
 "“%s”."
 msgstr ""
 
-#: js/ui/components/polkitAgent.js:50
+#: js/ui/components/polkitAgent.js:41
 msgid "Authentication Required"
-msgstr ""
+msgstr "Uthibitishaji Unahitajika"
 
-#: js/ui/components/polkitAgent.js:74
+#: js/ui/components/polkitAgent.js:65
 msgid "Administrator"
-msgstr ""
+msgstr "Msimamizi"
 
-#: js/ui/components/polkitAgent.js:163
+#: js/ui/components/polkitAgent.js:151
 msgid "Authenticate"
-msgstr ""
+msgstr "Thibitisha"
 
 #. Translators: "that didn't work" refers to the fact that the
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:291 js/ui/shellMountOperation.js:337
+#: js/ui/components/polkitAgent.js:262 js/ui/shellMountOperation.js:318
 msgid "Sorry, that didn’t work. Please try again."
-msgstr ""
+msgstr "Samahani, hiyo haijafanya kazi. Tafadhali jaribu tena."
 
 #. Translators: this is the other person changing their old IM name to their
 #. new
 #. IM name.
-#: js/ui/components/telepathyClient.js:799
+#: js/ui/components/telepathyClient.js:778
 #, javascript-format
 msgid "%s is now known as %s"
 msgstr ""
 
-#: js/ui/components/updaterManager.js:191
-msgid "Software Update"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:206
-msgid "Updates Available"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:207
-msgid "Software updates are available for your system"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:208
-msgid "Download Now"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:223
-msgid "Updates Ready"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:224
-msgid "Software updates are ready to be installed on your system"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:225
-msgid "Install Now"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:237
-msgid "Updates Installed"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:238
-msgid "Software updates were installed on your system"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:239
-msgid "Restart Now"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:269
-msgid "Update Failed"
-msgstr ""
-
-#: js/ui/components/updaterManager.js:270
-msgid "We could not update your system"
-msgstr ""
-
-#: js/ui/ctrlAltTab.js:29 js/ui/viewSelector.js:635
+#: js/ui/ctrlAltTab.js:21 js/ui/viewSelector.js:612
 msgid "Windows"
 msgstr ""
 
-#: js/ui/dash.js:209 js/ui/dash.js:250
+#: js/ui/dash.js:200 js/ui/dash.js:241
 msgid "Show Applications"
 msgstr ""
 
-#: js/ui/dash.js:248
+#: js/ui/dash.js:239
 msgid "Remove from Favorites"
 msgstr ""
 
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
-#: js/ui/dash.js:409
+#: js/ui/dash.js:390
 msgid "Dash"
 msgstr ""
 
 #. Translators: This is the date format to use when the calendar popup is
-#. * shown - it is shown just below the time in the shell (e.g. "Tue 9:29
-#. AM").
-#: js/ui/dateMenu.js:76
-msgid "%B %e %Y"
+#. * shown - it is shown just below the time in the top bar (e.g.,
+#. * "Tue 9:29 AM").  The string itself should become a full date, e.g.,
+#. * "February 17 2015".
+#: js/ui/dateMenu.js:62
+msgid "%B %-d %Y"
 msgstr ""
 
 #. Translators: This is the accessible name of the date button shown
 #. * below the time in the shell; it should combine the weekday and the
 #. * date, e.g. "Tuesday February 17 2015".
-#: js/ui/dateMenu.js:83
+#: js/ui/dateMenu.js:69
 msgid "%A %B %e %Y"
 msgstr ""
 
-#: js/ui/dateMenu.js:148
+#: js/ui/dateMenu.js:131
 msgid "Add world clocks…"
 msgstr ""
 
-#: js/ui/dateMenu.js:149
+#: js/ui/dateMenu.js:132
 msgid "World Clocks"
 msgstr ""
 
@@ -1383,147 +1402,102 @@ msgstr ""
 msgid "Weather"
 msgstr ""
 
-#. Translators: %s is a weather condition like "Clear sky"; see
-#. libgweather for the possible condition strings. If at all
-#. possible, the sentence should match the grammatical case etc. of
-#. the inserted conditions.
-#: js/ui/dateMenu.js:292
-#, javascript-format
-msgid "%s all day."
-msgstr ""
-
-#. Translators: %s is a weather condition like "Clear sky"; see
-#. libgweather for the possible condition strings. If at all
-#. possible, the sentence should match the grammatical case etc. of
-#. the inserted conditions.
-#: js/ui/dateMenu.js:298
-#, javascript-format
-msgid "%s, then %s later."
-msgstr ""
-
-#. Translators: %s is a weather condition like "Clear sky"; see
-#. libgweather for the possible condition strings. If at all
-#. possible, the sentence should match the grammatical case etc. of
-#. the inserted conditions.
-#: js/ui/dateMenu.js:304
-#, javascript-format
-msgid "%s, then %s, followed by %s later."
-msgstr ""
-
-#: js/ui/dateMenu.js:315
+#: js/ui/dateMenu.js:311
 msgid "Select a location…"
 msgstr ""
 
-#: js/ui/dateMenu.js:318
+#: js/ui/dateMenu.js:319
 msgid "Loading…"
 msgstr ""
 
-#. Translators: %s is a temperature with unit, e.g. "23℃"
-#: js/ui/dateMenu.js:324
-#, javascript-format
-msgid "Feels like %s."
-msgstr ""
-
-#: js/ui/dateMenu.js:327
+#: js/ui/dateMenu.js:329
 msgid "Go online for weather information"
 msgstr ""
 
-#: js/ui/dateMenu.js:329
+#: js/ui/dateMenu.js:331
 msgid "Weather information is currently unavailable"
 msgstr ""
 
-#: js/ui/endlessButton.js:17
-msgid "Endless Button"
-msgstr ""
-
-#: js/ui/endlessButton.js:56
-msgid "Show Desktop"
-msgstr ""
-
-#: js/ui/endlessButton.js:61
-msgid "Show Apps"
-msgstr ""
-
-#: js/ui/endSessionDialog.js:64
+#: js/ui/endSessionDialog.js:42
 #, javascript-format
 msgctxt "title"
 msgid "Log Out %s"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:65
+#: js/ui/endSessionDialog.js:43
 msgctxt "title"
 msgid "Log Out"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:67
+#: js/ui/endSessionDialog.js:45
 #, javascript-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/endSessionDialog.js:72
+#: js/ui/endSessionDialog.js:50
 #, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/endSessionDialog.js:78
+#: js/ui/endSessionDialog.js:56
 msgctxt "button"
 msgid "Log Out"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:84
+#: js/ui/endSessionDialog.js:62
 msgctxt "title"
 msgid "Power Off"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:85
+#: js/ui/endSessionDialog.js:63
 msgctxt "title"
 msgid "Install Updates & Power Off"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:87
+#: js/ui/endSessionDialog.js:65
 #, javascript-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/endSessionDialog.js:91
+#: js/ui/endSessionDialog.js:69
 msgctxt "checkbox"
 msgid "Install pending software updates"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:94 js/ui/endSessionDialog.js:111
+#: js/ui/endSessionDialog.js:72 js/ui/endSessionDialog.js:89
 msgctxt "button"
 msgid "Restart"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:96
+#: js/ui/endSessionDialog.js:74
 msgctxt "button"
 msgid "Power Off"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:103
+#: js/ui/endSessionDialog.js:81
 msgctxt "title"
 msgid "Restart"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:105
+#: js/ui/endSessionDialog.js:83
 #, javascript-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/endSessionDialog.js:119
+#: js/ui/endSessionDialog.js:97
 msgctxt "title"
 msgid "Restart & Install Updates"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:121
+#: js/ui/endSessionDialog.js:99
 #, javascript-format
 msgid ""
 "The system will automatically restart and install updates in %d second."
@@ -1532,22 +1506,22 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/endSessionDialog.js:127 js/ui/endSessionDialog.js:147
+#: js/ui/endSessionDialog.js:105 js/ui/endSessionDialog.js:125
 msgctxt "button"
 msgid "Restart &amp; Install"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:128
+#: js/ui/endSessionDialog.js:106
 msgctxt "button"
 msgid "Install &amp; Power Off"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:129
+#: js/ui/endSessionDialog.js:107
 msgctxt "checkbox"
 msgid "Power off after updates are installed"
 msgstr ""
 
-#: js/ui/endSessionDialog.js:137
+#: js/ui/endSessionDialog.js:115
 msgctxt "title"
 msgid "Restart & Install Upgrade"
 msgstr ""
@@ -1555,439 +1529,490 @@ msgstr ""
 #. Translators: This is the text displayed for system upgrades in the
 #. shut down dialog. First %s gets replaced with the distro name and
 #. second %s with the distro version to upgrade to
-#: js/ui/endSessionDialog.js:142
+#: js/ui/endSessionDialog.js:120
 #, javascript-format
 msgid ""
 "%s %s will be installed after restart. Upgrade installation can take a long "
 "time: ensure that you have backed up and that the computer is plugged in."
 msgstr ""
 
-#: js/ui/endSessionDialog.js:381
+#: js/ui/endSessionDialog.js:328
 msgid "Running on battery power: please plug in before installing updates."
 msgstr ""
 
-#: js/ui/endSessionDialog.js:398
+#: js/ui/endSessionDialog.js:345
 msgid "Some applications are busy or have unsaved work."
 msgstr ""
 
-#: js/ui/endSessionDialog.js:405
+#: js/ui/endSessionDialog.js:352
 msgid "Other users are logged in."
 msgstr ""
 
 #. Translators: Remote here refers to a remote session, like a ssh login
-#: js/ui/endSessionDialog.js:703
+#: js/ui/endSessionDialog.js:646
 #, javascript-format
 msgid "%s (remote)"
 msgstr ""
 
 #. Translators: Console here refers to a tty like a VT console
-#: js/ui/endSessionDialog.js:706
+#: js/ui/endSessionDialog.js:649
 #, javascript-format
 msgid "%s (console)"
 msgstr ""
 
-#: js/ui/extensionDownloader.js:201
+#: js/ui/extensionDownloader.js:192
 msgid "Install"
 msgstr ""
 
-#: js/ui/extensionDownloader.js:206
+#: js/ui/extensionDownloader.js:197
 #, javascript-format
 msgid "Download and install “%s” from extensions.gnome.org?"
 msgstr ""
 
-#: js/ui/forceAppExitDialog.js:55
-msgid "Quit applications"
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:61
-msgid ""
-"If an application doesn't respond for a while, select its name and click "
-"Quit Application."
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:84
-msgid "System Monitor"
-msgstr ""
-
-#: js/ui/forceAppExitDialog.js:88
-msgid "Quit Application"
-msgstr ""
-
-#: js/ui/hotCorner.js:19
-msgid "Hot Corner"
-msgstr ""
-
-#: js/ui/hotCorner.js:32
-msgid "Enable Hot Corner"
-msgstr ""
-
-#: js/ui/hotCorner.js:36
-msgid "Disable Hot Corner"
-msgstr ""
-
-#: js/ui/iconGridLayout.js:292
-#, javascript-format
-msgid "%s has been deleted"
-msgstr ""
-
-#: js/ui/iconGridLayout.js:481
-msgid "New Folder"
-msgstr ""
-
 #. Translators: %s is an application name like "Settings"
-#: js/ui/inhibitShortcutsDialog.js:59
+#: js/ui/inhibitShortcutsDialog.js:78
 #, javascript-format
 msgid "%s wants to inhibit shortcuts"
 msgstr ""
 
-#: js/ui/inhibitShortcutsDialog.js:60
+#: js/ui/inhibitShortcutsDialog.js:79
 msgid "Application wants to inhibit shortcuts"
 msgstr ""
 
 #. Translators: %s is a keyboard shortcut like "Super+x"
-#: js/ui/inhibitShortcutsDialog.js:69
+#: js/ui/inhibitShortcutsDialog.js:88
 #, javascript-format
 msgid "You can restore shortcuts by pressing %s."
 msgstr ""
 
-#: js/ui/inhibitShortcutsDialog.js:74
+#: js/ui/inhibitShortcutsDialog.js:93
 msgid "Deny"
 msgstr ""
 
-#: js/ui/inhibitShortcutsDialog.js:80
+#: js/ui/inhibitShortcutsDialog.js:100
 msgid "Allow"
 msgstr ""
 
-#: js/ui/internetSearch.js:73
-#, javascript-format
-msgid "Open \"%s\" in browser"
+#: js/ui/kbdA11yDialog.js:31
+msgid "Slow Keys Turned On"
 msgstr ""
 
-#. Translators: the first %s is the search engine name, and the second
-#. * is the search string. For instance, 'Search Google for "hello"'.
-#: js/ui/internetSearch.js:82
-#, javascript-format
-msgid "Search %s for \"%s\""
+#: js/ui/kbdA11yDialog.js:32
+msgid "Slow Keys Turned Off"
 msgstr ""
 
-#: js/ui/internetSearch.js:84
-#, javascript-format
-msgid "Search the internet for \"%s\""
+#: js/ui/kbdA11yDialog.js:33
+msgid ""
+"You just held down the Shift key for 8 seconds. This is the shortcut for the"
+" Slow Keys feature, which affects the way your keyboard works."
 msgstr ""
 
-#: js/ui/keyboard.js:738 js/ui/status/keyboard.js:875
-msgid "Keyboard"
+#: js/ui/kbdA11yDialog.js:40
+msgid "Sticky Keys Turned On"
 msgstr ""
 
-#: js/ui/lookingGlass.js:646
+#: js/ui/kbdA11yDialog.js:41
+msgid "Sticky Keys Turned Off"
+msgstr ""
+
+#: js/ui/kbdA11yDialog.js:43
+msgid ""
+"You just pressed the Shift key 5 times in a row. This is the shortcut for "
+"the Sticky Keys feature, which affects the way your keyboard works."
+msgstr ""
+
+#: js/ui/kbdA11yDialog.js:45
+msgid ""
+"You just pressed two keys at once, or pressed the Shift key 5 times in a "
+"row. This turns off the Sticky Keys feature, which affects the way your "
+"keyboard works."
+msgstr ""
+
+#: js/ui/kbdA11yDialog.js:57
+msgid "Leave On"
+msgstr ""
+
+#: js/ui/kbdA11yDialog.js:57 js/ui/status/automaticUpdates.js:309
+#: js/ui/status/bluetooth.js:136 js/ui/status/network.js:1263
+msgid "Turn On"
+msgstr ""
+
+#: js/ui/kbdA11yDialog.js:65 js/ui/status/automaticUpdates.js:311
+#: js/ui/status/bluetooth.js:136 js/ui/status/network.js:128
+#: js/ui/status/network.js:310 js/ui/status/network.js:1263
+#: js/ui/status/network.js:1375 js/ui/status/nightLight.js:39
+#: js/ui/status/rfkill.js:79 js/ui/status/rfkill.js:106
+msgid "Turn Off"
+msgstr ""
+
+#: js/ui/kbdA11yDialog.js:65
+msgid "Leave Off"
+msgstr ""
+
+#: js/ui/keyboard.js:200
+msgid "Region & Language Settings"
+msgstr ""
+
+#: js/ui/lookingGlass.js:615
 msgid "No extensions installed"
 msgstr ""
 
 #. Translators: argument is an extension UUID.
-#: js/ui/lookingGlass.js:700
+#: js/ui/lookingGlass.js:669
 #, javascript-format
 msgid "%s has not emitted any errors."
 msgstr ""
 
-#: js/ui/lookingGlass.js:706
+#: js/ui/lookingGlass.js:675
 msgid "Hide Errors"
 msgstr ""
 
-#: js/ui/lookingGlass.js:710 js/ui/lookingGlass.js:770
+#: js/ui/lookingGlass.js:679 js/ui/lookingGlass.js:739
 msgid "Show Errors"
 msgstr ""
 
-#: js/ui/lookingGlass.js:719
+#: js/ui/lookingGlass.js:688
 msgid "Enabled"
 msgstr ""
 
 #. translators:
 #. * The device has been disabled
-#: js/ui/lookingGlass.js:722 subprojects/gvc/gvc-mixer-control.c:1866
+#: js/ui/lookingGlass.js:691 subprojects/gvc/gvc-mixer-control.c:1864
 msgid "Disabled"
 msgstr ""
 
-#: js/ui/lookingGlass.js:724
+#: js/ui/lookingGlass.js:693
 msgid "Error"
 msgstr ""
 
-#: js/ui/lookingGlass.js:726
+#: js/ui/lookingGlass.js:695
 msgid "Out of date"
 msgstr ""
 
-#: js/ui/lookingGlass.js:728
+#: js/ui/lookingGlass.js:697
 msgid "Downloading"
 msgstr ""
 
-#: js/ui/lookingGlass.js:752
+#: js/ui/lookingGlass.js:721
 msgid "View Source"
 msgstr ""
 
-#: js/ui/lookingGlass.js:761
+#: js/ui/lookingGlass.js:730
 msgid "Web Page"
 msgstr ""
 
-#: js/ui/messageTray.js:1485
+#: js/ui/messageTray.js:1481
 msgid "System Information"
 msgstr ""
 
-#: js/ui/mpris.js:211
+#: js/ui/mpris.js:177
 msgid "Unknown artist"
-msgstr ""
+msgstr "Msanii asiyejulikana."
 
-#: js/ui/mpris.js:212
+#: js/ui/mpris.js:178
 msgid "Unknown title"
+msgstr "Kichwa haijulikani."
+
+#: js/ui/osdWindow.js:23 js/ui/status/volume.js:199
+msgid "Volume"
 msgstr ""
 
-#: js/ui/overview.js:108
+#: js/ui/overview.js:96
 msgid "Undo"
-msgstr ""
+msgstr "Futa."
 
-#: js/ui/overview.js:126
+#: js/ui/overview.js:111
 msgid "No apps are open"
-msgstr ""
+msgstr "Hakuna programu zimefunguliwa."
 
 #. Translators: This is the main view to select
 #. activities. See also note for "Activities" string.
-#: js/ui/overview.js:194
+#: js/ui/overview.js:178
 msgid "Overview"
-msgstr ""
+msgstr "Maelezo ya jumla."
 
-#: js/ui/padOsd.js:103
+#: js/ui/padOsd.js:92
 msgid "New shortcut…"
-msgstr ""
+msgstr "Njia mkato mpya ..."
 
-#: js/ui/padOsd.js:152
+#: js/ui/padOsd.js:141
 msgid "Application defined"
-msgstr ""
+msgstr " Programu inafafanuliwa."
 
-#: js/ui/padOsd.js:153
+#: js/ui/padOsd.js:142
 msgid "Show on-screen help"
-msgstr ""
+msgstr "Onyesha msaada wa skrini."
 
-#: js/ui/padOsd.js:154
+#: js/ui/padOsd.js:143
 msgid "Switch monitor"
 msgstr ""
 
-#: js/ui/padOsd.js:155
+#: js/ui/padOsd.js:144
 msgid "Assign keystroke"
-msgstr ""
+msgstr "Shirikisha keystroke."
 
-#: js/ui/padOsd.js:220
+#: js/ui/padOsd.js:209
 msgid "Done"
-msgstr ""
+msgstr "Imefanywa."
 
-#: js/ui/padOsd.js:734
+#: js/ui/padOsd.js:721
 msgid "Edit…"
-msgstr ""
+msgstr "Badilisha ..."
 
-#: js/ui/padOsd.js:774 js/ui/padOsd.js:879
+#: js/ui/padOsd.js:763 js/ui/padOsd.js:868
 msgid "None"
 msgstr ""
 
-#: js/ui/padOsd.js:833
+#: js/ui/padOsd.js:822
 msgid "Press a button to configure"
 msgstr ""
 
-#: js/ui/padOsd.js:834
+#: js/ui/padOsd.js:823
 msgid "Press Esc to exit"
 msgstr ""
 
-#: js/ui/padOsd.js:837
+#: js/ui/padOsd.js:826
 msgid "Press any key to exit"
 msgstr ""
 
-#: js/ui/panel.js:362
-msgid "Quit"
+#: js/ui/panel.js:97
+msgid "Show Details"
 msgstr ""
+
+#: js/ui/panel.js:111
+msgid "Quit"
+msgstr "Ondoa au Ondoka."
 
 #. Translators: If there is no suitable word for "Activities"
 #. in your language, you can use the word for "Overview".
-#: js/ui/panel.js:416
+#: js/ui/panel.js:473
 msgid "Activities"
-msgstr ""
+msgstr "Shughuli."
 
-#: js/ui/panel.js:697
+#: js/ui/panel.js:748
 msgctxt "System menu in the top bar"
 msgid "System"
-msgstr ""
+msgstr "Mfumo."
 
-#: js/ui/panel.js:786
+#: js/ui/panel.js:838
 msgctxt "User menu"
 msgid "User Menu"
-msgstr ""
+msgstr "Menyu ya Mtumiaji."
 
-#: js/ui/panel.js:820
+#: js/ui/panel.js:870
 msgctxt "Power menu"
 msgid "Power"
-msgstr ""
+msgstr "Washa."
 
-#: js/ui/panel.js:904
+#: js/ui/panel.js:949
 msgid "Bottom Bar"
-msgstr ""
+msgstr "Kiponyezi ya chini."
 
-#: js/ui/paygUnlockDialog.js:215
+#: js/ui/paygUnlockDialog.js:219
 msgid "Your Pay As You Go usage credit has expired."
-msgstr ""
+msgstr "Malipo yako ya kutumia kompyuta yamekamilika ."
 
-#: js/ui/paygUnlockDialog.js:234
+#: js/ui/paygUnlockDialog.js:238
 msgid "Enter a new code to unlock your computer:"
-msgstr ""
+msgstr "Ingiza msimbo mpya wa kufungua kompyuta yako:"
 
-#: js/ui/paygUnlockDialog.js:254
+#: js/ui/paygUnlockDialog.js:258
 msgid "Don’t have an unlock code? That’s OK!"
-msgstr ""
+msgstr "Hamuna msimbo wa kufungua? Hiyo ni sawa!"
 
 #. The second possible override is to use the template text below
 #. with the contact's name and phone number, if BOTH are present.
-#: js/ui/paygUnlockDialog.js:273
+#: js/ui/paygUnlockDialog.js:277
 #, javascript-format
 msgid ""
 "Talk to your sales representative to purchase a new code. Call or text %s at"
 " %s"
-msgstr ""
+msgstr "Ongea na mwakilishi wako wa mauzo kununua code mpya. Wito au maandishi %s katika %s"
 
 #. No overrides present, default to fallback text.
-#: js/ui/paygUnlockDialog.js:277
+#: js/ui/paygUnlockDialog.js:281
 msgid "Talk to your sales representative to purchase a new code."
-msgstr ""
+msgstr "Ongea na mwakilishi wako wa mauzo kununua code mpya."
 
-#: js/ui/paygUnlockDialog.js:288
+#: js/ui/paygUnlockDialog.js:292
 msgid "Unlock Machine"
+msgstr "Kufungua Mashine"
+
+#: js/ui/paygUnlockDialog.js:423
+msgid "Success!"
 msgstr ""
 
-#: js/ui/payg.js:44
+#: js/ui/paygUnlockDialog.js:445
+msgid "Remaining time cleared!"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:446
+msgid "OK!"
+msgstr ""
+
+#: js/ui/payg.js:39
 msgid "Pay As You Go"
-msgstr ""
+msgstr "Kulipa unapoenda au Unapotumia"
 
-#: js/ui/payg.js:45
+#: js/ui/payg.js:40
 msgid ""
 "Enter an unlock code to extend the time before your credit has expired."
-msgstr ""
+msgstr "Ingiza msimbo wa kufungua ili kupanua wakati kabla ya mkopo wako kufukia tamati."
 
-#: js/ui/payg.js:46
+#: js/ui/payg.js:41
 #, javascript-format
 msgid "Subscription runs out in %s."
-msgstr ""
+msgstr "Usajili unakamilika baada ya dakika %s"
 
-#: js/ui/payg.js:111
+#: js/ui/payg.js:107
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Majaribio mengi sana. Jaribu tena kwa %s dakika."
+msgstr[1] "majaribio mengi sana. Jaribu tena kwa%s dakika."
 
-#: js/ui/payg.js:115
+#: js/ui/payg.js:111
 msgid "Too many attempts. Try again in a few seconds."
-msgstr ""
+msgstr "Majaribio mengi sana. Jaribu tena baada ya sekunde chache."
+
+#: js/ui/payg.js:129
+msgid "Invalid code. Please try again."
+msgstr "Msimbo batili. Tafadhali jaribu tena."
+
+#: js/ui/payg.js:131
+msgid "Code already used. Please enter a new code."
+msgstr "Kanuni tayari imetumiwa. Tafadhali ingiza msimbo mpya."
 
 #: js/ui/payg.js:133
-msgid "Invalid code. Please try again."
-msgstr ""
-
-#: js/ui/payg.js:135
-msgid "Code already used. Please enter a new code."
-msgstr ""
-
-#: js/ui/payg.js:137
 msgid "Time exceeded while verifying the code"
-msgstr ""
+msgstr "Muda ulizidi wakati wa kuthibitisha msimbo."
 
 #. We don't consider any other error here (and we don't consider DISABLED
 #. explicitly,
 #. since that should not happen), but still we need to show something to the
 #. user.
-#: js/ui/payg.js:141
+#: js/ui/payg.js:137
 msgid "Unknown error"
-msgstr ""
+msgstr "Hitilafu isiyojulika."
 
-#: js/ui/payg.js:282
+#: js/ui/payg.js:283
 msgid "Apply Code"
-msgstr ""
+msgstr "Weka Msimbo."
 
-#: js/ui/payg.js:377
-msgid "Code applied successfully!"
-msgstr ""
-
-#: js/ui/payg.js:430
+#: js/ui/payg.js:426
 #, javascript-format
 msgid "%s second"
 msgid_plural "%s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s sekunde"
+msgstr[1] "%s masekunde"
 
-#: js/ui/payg.js:434 js/ui/payg.js:444
+#: js/ui/payg.js:430 js/ui/payg.js:440
 #, javascript-format
 msgid "%s minute"
 msgid_plural "%s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%sMadakika"
+msgstr[1] "%s Madakika"
 
-#: js/ui/payg.js:438 js/ui/payg.js:455
+#: js/ui/payg.js:434 js/ui/payg.js:451
 #, javascript-format
 msgid "%s hour"
 msgid_plural "%s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s Saa"
+msgstr[1] "%s Masaa"
 
-#: js/ui/payg.js:449
+#: js/ui/payg.js:445
 #, javascript-format
 msgid "%s day"
 msgid_plural "%s days"
+msgstr[0] "%s Siku"
+msgstr[1] "%s Siku"
+
+#: js/ui/payg.js:461
+#, javascript-format
+msgid "%s second has been added to your Pay As You Go credit."
+msgid_plural "%s seconds have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
 
-#. Translators: this MUST be either "toggle-switch-us"
-#. (for toggle switches containing the English words
-#. "ON" and "OFF") or "toggle-switch-intl" (for toggle
-#. switches containing "◯" and "|"). Other values will
-#. simply result in invisible toggle switches.
-#: js/ui/popupMenu.js:291
-msgid "toggle-switch-us"
+#: js/ui/payg.js:468
+#, javascript-format
+msgid "%s minute has been added to your Pay As You Go credit."
+msgid_plural "%s minutes have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:475
+#, javascript-format
+msgid "%s hour has been added to your Pay As You Go credit."
+msgid_plural "%s hours have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:482
+#, javascript-format
+msgid "%s day has been added to your Pay As You Go credit."
+msgid_plural "%s days have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:489
+#, javascript-format
+msgid "%s month has been added to your Pay As You Go credit."
+msgid_plural "%s months have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:496
+msgid "1 year has been added to your Pay As You Go credit."
 msgstr ""
 
-#: js/ui/runDialog.js:75
+#. Unlock permanently message
+#: js/ui/payg.js:499
+msgid "You have successfully unlocked your Endless Machine"
+msgstr ""
+
+#: js/ui/runDialog.js:64
 msgid "Enter a Command"
-msgstr ""
+msgstr "Ingiza amri"
 
-#: js/ui/runDialog.js:115 js/ui/status/automaticUpdates.js:292
-#: js/ui/windowMenu.js:160
+#: js/ui/runDialog.js:104 js/ui/status/automaticUpdates.js:281
+#: js/ui/windowMenu.js:166
 msgid "Close"
 msgstr ""
 
-#: js/ui/runDialog.js:283
+#: js/ui/runDialog.js:268
 msgid "Restart is not available on Wayland"
 msgstr ""
 
-#: js/ui/runDialog.js:288
+#: js/ui/runDialog.js:273
 msgid "Restarting…"
-msgstr ""
+msgstr "Anzisha tena ...."
 
 #. Translators: This is a time format for a date in
 #. long format
-#: js/ui/screenShield.js:88
+#: js/ui/screenShield.js:77
 msgid "%A, %B %d"
 msgstr ""
 
-#: js/ui/screenShield.js:147
+#: js/ui/screenShield.js:133
 #, javascript-format
 msgid "%d new message"
 msgid_plural "%d new messages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/screenShield.js:149
+#: js/ui/screenShield.js:135
 #, javascript-format
 msgid "%d new notification"
 msgid_plural "%d new notifications"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/screenShield.js:477 js/ui/status/system.js:347
+#: js/ui/screenShield.js:479 js/ui/status/system.js:317
 msgid "Lock"
 msgstr ""
 
-#: js/ui/screenShield.js:764
+#: js/ui/screenShield.js:771
 msgid "GNOME needs to lock the screen"
 msgstr ""
 
@@ -1997,228 +2022,219 @@ msgstr ""
 #. Just tell him to stop using this app
 #. XXX: another option is to kick the user into the gdm login
 #. screen, where we're not affected by grabs
-#: js/ui/screenShield.js:890 js/ui/screenShield.js:1403
+#: js/ui/screenShield.js:889 js/ui/screenShield.js:1406
 msgid "Unable to lock"
 msgstr ""
 
-#: js/ui/screenShield.js:891 js/ui/screenShield.js:1404
+#: js/ui/screenShield.js:890 js/ui/screenShield.js:1407
 msgid "Lock was blocked by an application"
 msgstr ""
 
-#: js/ui/search.js:755
+#: js/ui/search.js:743
 msgid "Searching…"
 msgstr ""
 
-#: js/ui/search.js:757
+#: js/ui/search.js:745
 msgid "No results."
 msgstr ""
 
-#: js/ui/shellEntry.js:38
+#: js/ui/shellEntry.js:30
 msgid "Copy"
 msgstr ""
 
-#: js/ui/shellEntry.js:43
+#: js/ui/shellEntry.js:35
 msgid "Paste"
 msgstr ""
 
-#: js/ui/shellEntry.js:110
+#: js/ui/shellEntry.js:101
 msgid "Show Text"
 msgstr ""
 
-#: js/ui/shellEntry.js:112
+#: js/ui/shellEntry.js:103
 msgid "Hide Text"
 msgstr ""
 
-#: js/ui/shellEntry.js:166
+#: js/ui/shellEntry.js:153
 #, javascript-format
 msgid "Search %s and more…"
 msgstr ""
 
-#: js/ui/shellEntry.js:168
+#: js/ui/shellEntry.js:155
 msgid "Search the internet and more…"
 msgstr ""
 
-#: js/ui/shellMountOperation.js:317
+#: js/ui/shellMountOperation.js:298
 msgid "Password"
-msgstr ""
+msgstr "Neno siri"
 
-#: js/ui/shellMountOperation.js:345
+#: js/ui/shellMountOperation.js:326
 msgid "Remember Password"
-msgstr ""
+msgstr "Kumbuka Neno siri"
 
-#: js/ui/status/accessibility.js:42
+#: js/ui/status/accessibility.js:35
 msgid "Accessibility"
 msgstr ""
 
-#: js/ui/status/accessibility.js:57
+#: js/ui/status/accessibility.js:50
 msgid "Zoom"
 msgstr ""
 
-#: js/ui/status/accessibility.js:64
+#: js/ui/status/accessibility.js:57
 msgid "Screen Reader"
 msgstr ""
 
-#: js/ui/status/accessibility.js:68
+#: js/ui/status/accessibility.js:61
 msgid "Screen Keyboard"
 msgstr ""
 
-#: js/ui/status/accessibility.js:72
+#: js/ui/status/accessibility.js:65
 msgid "Visual Alerts"
 msgstr ""
 
-#: js/ui/status/accessibility.js:75
+#: js/ui/status/accessibility.js:68
 msgid "Sticky Keys"
 msgstr ""
 
-#: js/ui/status/accessibility.js:78
+#: js/ui/status/accessibility.js:71
 msgid "Slow Keys"
 msgstr ""
 
-#: js/ui/status/accessibility.js:81
+#: js/ui/status/accessibility.js:74
 msgid "Bounce Keys"
 msgstr ""
 
-#: js/ui/status/accessibility.js:84
+#: js/ui/status/accessibility.js:77
 msgid "Mouse Keys"
 msgstr ""
 
-#: js/ui/status/accessibility.js:167
+#: js/ui/status/accessibility.js:151
 msgid "High Contrast"
 msgstr ""
 
-#: js/ui/status/accessibility.js:202
+#: js/ui/status/accessibility.js:182
 msgid "Large Text"
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:94
+#: js/ui/status/automaticUpdates.js:83
 msgid "Updates Queue"
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:114
+#: js/ui/status/automaticUpdates.js:103
 msgid "Set a Schedule"
 msgstr ""
 
 #. The status label
-#: js/ui/status/automaticUpdates.js:205
+#: js/ui/status/automaticUpdates.js:194
 msgid "Automatic Updates"
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:269
+#: js/ui/status/automaticUpdates.js:258
 msgid "Automatic updates on"
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:270
+#: js/ui/status/automaticUpdates.js:259
 msgid ""
 "You have Unlimited Data so automatic updates have been turned on for this "
 "connection."
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:273
+#: js/ui/status/automaticUpdates.js:262
 msgid "Automatic updates are turned off to save your data"
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:274
+#: js/ui/status/automaticUpdates.js:263
 msgid ""
 "You will need to choose which Endless updates to apply when on this "
 "connection."
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:296
+#: js/ui/status/automaticUpdates.js:285
 msgid "Change Settings…"
 msgstr ""
 
-#: js/ui/status/automaticUpdates.js:320 js/ui/status/bluetooth.js:146
-#: js/ui/status/network.js:1287
-msgid "Turn On"
-msgstr ""
-
-#: js/ui/status/automaticUpdates.js:322 js/ui/status/bluetooth.js:146
-#: js/ui/status/network.js:154 js/ui/status/network.js:339
-#: js/ui/status/network.js:1287 js/ui/status/network.js:1402
-#: js/ui/status/nightLight.js:47 js/ui/status/rfkill.js:90
-#: js/ui/status/rfkill.js:117
-msgid "Turn Off"
-msgstr ""
-
-#: js/ui/status/bluetooth.js:48
+#: js/ui/status/bluetooth.js:38
 msgid "Bluetooth"
 msgstr ""
 
-#: js/ui/status/bluetooth.js:57 js/ui/status/network.js:616
+#: js/ui/status/bluetooth.js:47 js/ui/status/network.js:585
 msgid "Bluetooth Settings"
 msgstr ""
 
 #. Translators: this is the number of connected bluetooth devices
-#: js/ui/status/bluetooth.js:140
+#: js/ui/status/bluetooth.js:130
 #, javascript-format
 msgid "%d Connected"
 msgid_plural "%d Connected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/status/bluetooth.js:142
+#: js/ui/status/bluetooth.js:132
 msgid "Bluetooth Off"
 msgstr ""
 
-#: js/ui/status/bluetooth.js:144
+#: js/ui/status/bluetooth.js:134
 msgid "Bluetooth On"
 msgstr ""
 
-#: js/ui/status/brightness.js:44
+#: js/ui/status/brightness.js:36
 msgid "Brightness"
 msgstr ""
 
-#: js/ui/status/keyboard.js:897
+#: js/ui/status/keyboard.js:866
+msgid "Keyboard"
+msgstr ""
+
+#: js/ui/status/keyboard.js:890
 msgid "Show Keyboard Layout"
 msgstr ""
 
-#: js/ui/status/location.js:89 js/ui/status/location.js:197
+#: js/ui/status/location.js:64 js/ui/status/location.js:172
 msgid "Location Enabled"
 msgstr ""
 
-#: js/ui/status/location.js:90 js/ui/status/location.js:198
-#: js/ui/status/orientation.js:52 js/ui/status/orientation.js:81
+#: js/ui/status/location.js:65 js/ui/status/location.js:173
+#: js/ui/status/orientation.js:47 js/ui/status/orientation.js:76
 msgid "Disable"
 msgstr ""
 
-#: js/ui/status/location.js:91
+#: js/ui/status/location.js:66
 msgid "Privacy Settings"
 msgstr ""
 
-#: js/ui/status/location.js:196
+#: js/ui/status/location.js:171
 msgid "Location In Use"
 msgstr ""
 
-#: js/ui/status/location.js:200
+#: js/ui/status/location.js:175
 msgid "Location Disabled"
 msgstr ""
 
-#: js/ui/status/location.js:201 js/ui/status/orientation.js:84
+#: js/ui/status/location.js:176 js/ui/status/orientation.js:79
 msgid "Enable"
 msgstr ""
 
 #. Translators: %s is an application name
-#: js/ui/status/location.js:388
+#: js/ui/status/location.js:353
 #, javascript-format
 msgid "Give %s access to your location?"
 msgstr ""
 
-#: js/ui/status/location.js:389
+#: js/ui/status/location.js:354
 msgid "Location access can be changed at any time from the privacy settings."
 msgstr ""
 
-#: js/ui/status/network.js:90
+#: js/ui/status/network.js:66
 msgid "<unknown>"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:443 js/ui/status/network.js:1316
+#: js/ui/status/network.js:416 js/ui/status/network.js:1292
 #, javascript-format
 msgid "%s Off"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:446
+#: js/ui/status/network.js:419
 #, javascript-format
 msgid "%s Connected"
 msgstr ""
@@ -2227,26 +2243,26 @@ msgstr ""
 #. are not
 #. under NetworkManager's control (and thus cannot be used in the menu);
 #. %s is a network identifier
-#: js/ui/status/network.js:451
+#: js/ui/status/network.js:424
 #, javascript-format
 msgid "%s Unmanaged"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:454
+#: js/ui/status/network.js:427
 #, javascript-format
 msgid "%s Disconnecting"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:461 js/ui/status/network.js:1308
+#: js/ui/status/network.js:434 js/ui/status/network.js:1284
 #, javascript-format
 msgid "%s Connecting"
 msgstr ""
 
 #. Translators: this is for network connections that require some kind of key
 #. or password; %s is a network identifier
-#: js/ui/status/network.js:464
+#: js/ui/status/network.js:437
 #, javascript-format
 msgid "%s Requires Authentication"
 msgstr ""
@@ -2254,7 +2270,7 @@ msgstr ""
 #. Translators: this is for devices that require some kind of firmware or
 #. kernel
 #. module, which is missing; %s is a network identifier
-#: js/ui/status/network.js:472
+#: js/ui/status/network.js:445
 #, javascript-format
 msgid "Firmware Missing For %s"
 msgstr ""
@@ -2262,335 +2278,355 @@ msgstr ""
 #. Translators: this is for a network device that cannot be activated (for
 #. example it
 #. is disabled by rfkill, or it has no coverage; %s is a network identifier
-#: js/ui/status/network.js:476
+#: js/ui/status/network.js:449
 #, javascript-format
 msgid "%s Unavailable"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:479
+#: js/ui/status/network.js:452
 #, javascript-format
 msgid "%s Connection Failed"
 msgstr ""
 
-#: js/ui/status/network.js:495
+#: js/ui/status/network.js:464
 msgid "Wired Settings"
 msgstr ""
 
-#: js/ui/status/network.js:537
+#: js/ui/status/network.js:506
 msgid "Mobile Broadband Settings"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:580 js/ui/status/network.js:1313
+#: js/ui/status/network.js:553 js/ui/status/network.js:1289
 #, javascript-format
 msgid "%s Hardware Disabled"
 msgstr ""
 
 #. Translators: this is for a network device that cannot be activated
 #. because it's disabled by rfkill (airplane mode); %s is a network identifier
-#: js/ui/status/network.js:584
+#: js/ui/status/network.js:557
 #, javascript-format
 msgid "%s Disabled"
 msgstr ""
 
-#: js/ui/status/network.js:624
+#: js/ui/status/network.js:597
 msgid "Connect to Internet"
 msgstr ""
 
-#: js/ui/status/network.js:822
+#: js/ui/status/network.js:786
 msgid "Airplane Mode is On"
 msgstr ""
 
-#: js/ui/status/network.js:823
+#: js/ui/status/network.js:787
 msgid "Wi-Fi is disabled when airplane mode is on."
 msgstr ""
 
-#: js/ui/status/network.js:824
+#: js/ui/status/network.js:788
 msgid "Turn Off Airplane Mode"
 msgstr ""
 
-#: js/ui/status/network.js:833
+#: js/ui/status/network.js:797
 msgid "Wi-Fi is Off"
 msgstr ""
 
-#: js/ui/status/network.js:834
+#: js/ui/status/network.js:798
 msgid "Wi-Fi needs to be turned on in order to connect to a network."
 msgstr ""
 
-#: js/ui/status/network.js:835
+#: js/ui/status/network.js:799
 msgid "Turn On Wi-Fi"
 msgstr ""
 
-#: js/ui/status/network.js:860
+#: js/ui/status/network.js:824
 msgid "Wi-Fi Networks"
 msgstr ""
 
-#: js/ui/status/network.js:862
+#: js/ui/status/network.js:826
 msgid "Select a network"
 msgstr ""
 
-#: js/ui/status/network.js:892
+#: js/ui/status/network.js:855
 msgid "No Networks"
 msgstr ""
 
-#: js/ui/status/network.js:913 js/ui/status/rfkill.js:115
+#: js/ui/status/network.js:876 js/ui/status/rfkill.js:104
 msgid "Use hardware switch to turn off"
 msgstr ""
 
-#: js/ui/status/network.js:1179
+#: js/ui/status/network.js:1152
 msgid "Select Network"
 msgstr ""
 
-#: js/ui/status/network.js:1185
+#: js/ui/status/network.js:1158
 msgid "Wi-Fi Settings"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:1304
+#: js/ui/status/network.js:1280
 #, javascript-format
 msgid "%s Hotspot Active"
 msgstr ""
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:1319
+#: js/ui/status/network.js:1295
 #, javascript-format
 msgid "%s Not Connected"
 msgstr ""
 
-#: js/ui/status/network.js:1419
+#: js/ui/status/network.js:1392
 msgid "connecting…"
 msgstr ""
 
 #. Translators: this is for network connections that require some kind of key
 #. or password
-#: js/ui/status/network.js:1422
+#: js/ui/status/network.js:1395
 msgid "authentication required"
 msgstr ""
 
-#: js/ui/status/network.js:1424
+#: js/ui/status/network.js:1397
 msgid "connection failed"
 msgstr ""
 
-#: js/ui/status/network.js:1478
+#: js/ui/status/network.js:1447
 msgid "VPN Settings"
 msgstr ""
 
-#: js/ui/status/network.js:1491
+#: js/ui/status/network.js:1464
 msgid "VPN"
 msgstr ""
 
-#: js/ui/status/network.js:1501
+#: js/ui/status/network.js:1474
 msgid "VPN Off"
 msgstr ""
 
-#: js/ui/status/network.js:1565 js/ui/status/rfkill.js:93
+#: js/ui/status/network.js:1535 js/ui/status/rfkill.js:82
 msgid "Network Settings"
 msgstr ""
 
-#: js/ui/status/network.js:1596
+#: js/ui/status/network.js:1564
 #, javascript-format
 msgid "%s Wired Connection"
 msgid_plural "%s Wired Connections"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/status/network.js:1600
+#: js/ui/status/network.js:1568
 #, javascript-format
 msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/status/network.js:1604
+#: js/ui/status/network.js:1572
 #, javascript-format
 msgid "%s Modem Connection"
 msgid_plural "%s Modem Connections"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/status/network.js:1738
+#: js/ui/status/network.js:1705
 msgid "Connection failed"
 msgstr ""
 
-#: js/ui/status/network.js:1739
+#: js/ui/status/network.js:1706
 msgid "Activation of network connection failed"
 msgstr ""
 
-#: js/ui/status/nightLight.js:51
+#: js/ui/status/nightLight.js:43
 msgid "Display Settings"
 msgstr ""
 
-#: js/ui/status/nightLight.js:68
+#: js/ui/status/nightLight.js:60
 msgid "Night Light Disabled"
 msgstr ""
 
-#: js/ui/status/nightLight.js:69
+#: js/ui/status/nightLight.js:61
 msgid "Night Light On"
 msgstr ""
 
-#: js/ui/status/nightLight.js:70
+#: js/ui/status/nightLight.js:62
 msgid "Resume"
-msgstr ""
+msgstr "Endelea au Rejea"
 
-#: js/ui/status/nightLight.js:71
+#: js/ui/status/nightLight.js:63
 msgid "Disable Until Tomorrow"
-msgstr ""
+msgstr "Imezuiliwa hadi Kesho"
 
-#: js/ui/status/orientation.js:49
-msgid "Orientation Lock"
-msgstr ""
-
-#: js/ui/status/payg.js:39
+#: js/ui/status/payg.js:32
 msgid "Enter unlock code…"
-msgstr ""
+msgstr "Ingiza msimbo wa kufungua ..."
 
-#: js/ui/status/payg.js:98
+#: js/ui/status/payg.js:91
 msgid "Getting time…"
 msgstr ""
 
-#: js/ui/status/payg.js:102
+#: js/ui/status/payg.js:95
 msgid "Less than 1 minute"
-msgstr ""
+msgstr "Chini ya Dakika 1"
 
-#: js/ui/status/power.js:61
+#: js/ui/status/power.js:45
 msgid "Power Settings"
 msgstr ""
 
-#: js/ui/status/power.js:77
+#: js/ui/status/power.js:61
 msgid "Fully Charged"
-msgstr ""
+msgstr "Imefika kiwango ."
 
-#: js/ui/status/power.js:83
+#: js/ui/status/power.js:67
 msgid "Not Charging"
 msgstr ""
 
 #. 0 is reported when UPower does not have enough data
 #. to estimate battery life
-#: js/ui/status/power.js:86 js/ui/status/power.js:92
+#: js/ui/status/power.js:70 js/ui/status/power.js:76
 msgid "Estimating…"
 msgstr ""
 
 #. Translators: this is <hours>:<minutes> Remaining (<percentage>)
-#: js/ui/status/power.js:100
+#: js/ui/status/power.js:84
 #, javascript-format
 msgid "%d∶%02d Remaining (%d %%)"
 msgstr ""
 
 #. Translators: this is <hours>:<minutes> Until Full (<percentage>)
-#: js/ui/status/power.js:105
+#: js/ui/status/power.js:89
 #, javascript-format
 msgid "%d∶%02d Until Full (%d %%)"
 msgstr ""
 
-#: js/ui/status/power.js:134 js/ui/status/power.js:136
+#: js/ui/status/power.js:118 js/ui/status/power.js:120
 #, javascript-format
 msgid "%d %%"
+msgstr ""
+
+#: js/ui/status/remoteAccess.js:42
+msgid "Screen is Being Shared"
+msgstr ""
+
+#: js/ui/status/remoteAccess.js:44
+msgid "Turn off"
 msgstr ""
 
 #. The menu only appears when airplane mode is on, so just
 #. statically build it as if it was on, rather than dynamically
 #. changing the menu contents.
-#: js/ui/status/rfkill.js:88
+#: js/ui/status/rfkill.js:77
 msgid "Airplane Mode On"
 msgstr ""
 
-#: js/ui/status/system.js:306
+#: js/ui/status/system.js:275
 msgid "Switch User"
 msgstr ""
 
-#: js/ui/status/system.js:318 js/ui/status/system.js:341
+#: js/ui/status/system.js:287 js/ui/status/system.js:311
 msgid "Log Out"
 msgstr ""
 
-#: js/ui/status/system.js:330
+#: js/ui/status/system.js:299
 msgid "Account Settings"
 msgstr ""
 
-#: js/ui/status/system.js:357
+#: js/ui/status/system.js:327
 msgid "Suspend"
-msgstr ""
+msgstr "Simama"
 
-#: js/ui/status/system.js:366
+#: js/ui/status/system.js:336
 msgid "Power Off"
 msgstr ""
 
-#: js/ui/status/volume.js:128
-msgid "Volume changed"
+#: js/ui/status/thunderbolt.js:261
+msgid "Thunderbolt"
 msgstr ""
 
-#: js/ui/status/volume.js:170
-msgid "Volume"
+#: js/ui/status/thunderbolt.js:322
+msgid "Unknown Thunderbolt device"
+msgstr ""
+
+#: js/ui/status/thunderbolt.js:323
+msgid ""
+"New device has been detected while you were away. Please disconnect and "
+"reconnect the device to start using it."
+msgstr ""
+
+#: js/ui/status/thunderbolt.js:326
+msgid "Unauthorized Thunderbolt device"
+msgstr ""
+
+#: js/ui/status/thunderbolt.js:327
+msgid ""
+"New device has been detected and needs to be authorized by an administrator."
+msgstr ""
+
+#: js/ui/status/thunderbolt.js:333
+msgid "Thunderbolt authorization error"
+msgstr ""
+
+#: js/ui/status/thunderbolt.js:334
+#, javascript-format
+msgid "Could not authorize the Thunderbolt device: %s"
+msgstr ""
+
+#: js/ui/status/volume.js:133
+msgid "Volume changed"
 msgstr ""
 
 #. Translators: this is for display mirroring i.e. cloning.
 #. * Try to keep it under around 15 characters.
-#: js/ui/switchMonitor.js:21
+#: js/ui/switchMonitor.js:16
 msgid "Mirror"
 msgstr ""
 
 #. Translators: this is for the desktop spanning displays.
 #. * Try to keep it under around 15 characters.
-#: js/ui/switchMonitor.js:26
+#: js/ui/switchMonitor.js:21
 msgid "Join Displays"
 msgstr ""
 
 #. Translators: this is for using only an external display.
 #. * Try to keep it under around 15 characters.
-#: js/ui/switchMonitor.js:31
+#: js/ui/switchMonitor.js:26
 msgid "External Only"
 msgstr ""
 
 #. Translators: this is for using only the laptop display.
 #. * Try to keep it under around 15 characters.
-#: js/ui/switchMonitor.js:36
+#: js/ui/switchMonitor.js:31
 msgid "Built-in Only"
 msgstr ""
 
-#: js/ui/unlockDialog.js:67
+#: js/ui/unlockDialog.js:49
 msgid "Log in as another user"
 msgstr ""
 
-#: js/ui/unlockDialog.js:84
+#: js/ui/unlockDialog.js:66
 msgid "Unlock Window"
 msgstr ""
 
-#: js/ui/userMenu.js:22
-msgid "Social Accounts"
-msgstr ""
-
-#: js/ui/userMenu.js:25
-msgid "Settings"
-msgstr ""
-
-#: js/ui/userMenu.js:30
-msgid "Help"
-msgstr ""
-
-#: js/ui/viewSelector.js:639
+#: js/ui/viewSelector.js:616
 msgid "Applications"
 msgstr ""
 
-#: js/ui/windowAttentionHandler.js:20
+#: js/ui/windowAttentionHandler.js:19
 #, javascript-format
 msgid "“%s” is ready"
 msgstr ""
 
-#: js/ui/windowManager.js:82
+#: js/ui/windowManager.js:59
 msgid "Do you want to keep these display settings?"
 msgstr ""
 
 #. Translators: this and the following message should be limited in lenght,
 #. to avoid ellipsizing the labels.
-#: js/ui/windowManager.js:94
+#: js/ui/windowManager.js:71
 msgid "Revert Settings"
 msgstr ""
 
-#: js/ui/windowManager.js:97
+#: js/ui/windowManager.js:74
 msgid "Keep Changes"
 msgstr ""
 
-#: js/ui/windowManager.js:115
+#: js/ui/windowManager.js:92
 #, javascript-format
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
@@ -2599,60 +2635,60 @@ msgstr[1] ""
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
-#: js/ui/windowManager.js:838
+#: js/ui/windowManager.js:850
 #, javascript-format
 msgid "%d × %d"
 msgstr ""
 
-#: js/ui/windowMenu.js:34
+#: js/ui/windowMenu.js:26
 msgid "Minimize"
 msgstr ""
 
-#: js/ui/windowMenu.js:41
+#: js/ui/windowMenu.js:33
 msgid "Unmaximize"
 msgstr ""
 
-#: js/ui/windowMenu.js:45
+#: js/ui/windowMenu.js:37
 msgid "Maximize"
 msgstr ""
 
-#: js/ui/windowMenu.js:52
+#: js/ui/windowMenu.js:44
 msgid "Move"
 msgstr ""
 
-#: js/ui/windowMenu.js:58
+#: js/ui/windowMenu.js:50
 msgid "Resize"
 msgstr ""
 
-#: js/ui/windowMenu.js:65
+#: js/ui/windowMenu.js:57
 msgid "Move Titlebar Onscreen"
 msgstr ""
 
-#: js/ui/windowMenu.js:70
+#: js/ui/windowMenu.js:62
 msgid "Always on Top"
 msgstr ""
 
-#: js/ui/windowMenu.js:89
+#: js/ui/windowMenu.js:81
 msgid "Always on Visible Workspace"
 msgstr ""
 
-#: js/ui/windowMenu.js:103
+#: js/ui/windowMenu.js:95
 msgid "Move to Workspace Left"
 msgstr ""
 
-#: js/ui/windowMenu.js:108
+#: js/ui/windowMenu.js:101
 msgid "Move to Workspace Right"
 msgstr ""
 
-#: js/ui/windowMenu.js:113
+#: js/ui/windowMenu.js:107
 msgid "Move to Workspace Up"
 msgstr ""
 
-#: js/ui/windowMenu.js:118
+#: js/ui/windowMenu.js:113
 msgid "Move to Workspace Down"
 msgstr ""
 
-#: js/ui/windowMenu.js:134
+#: js/ui/windowMenu.js:131
 msgid "Move to Monitor Up"
 msgstr ""
 
@@ -2660,11 +2696,11 @@ msgstr ""
 msgid "Move to Monitor Down"
 msgstr ""
 
-#: js/ui/windowMenu.js:146
+#: js/ui/windowMenu.js:149
 msgid "Move to Monitor Left"
 msgstr ""
 
-#: js/ui/windowMenu.js:152
+#: js/ui/windowMenu.js:158
 msgid "Move to Monitor Right"
 msgstr ""
 
@@ -2678,30 +2714,217 @@ msgstr ""
 msgid "evolution"
 msgstr ""
 
-#: src/main.c:437
+#: src/main.c:408
 msgid "Print version"
 msgstr ""
 
-#: src/main.c:443
+#: src/main.c:414
 msgid "Mode used by GDM for login screen"
 msgstr ""
 
-#: src/main.c:449
+#: src/main.c:420
 msgid "Use a specific mode, e.g. “gdm” for login screen"
 msgstr ""
 
-#: src/main.c:455
+#: src/main.c:426
 msgid "List possible modes"
 msgstr ""
 
-#: src/shell-app.c:271
+#: src/shell-app.c:265
 msgctxt "program"
 msgid "Unknown"
 msgstr ""
 
-#: src/shell-app.c:551
+#: src/shell-app.c:555
 #, c-format
 msgid "Failed to launch “%s”"
+msgstr ""
+
+#: src/shell-keyring-prompt.c:730
+msgid "Passwords do not match."
+msgstr "Nenosiri haliwezi kuwa tupu"
+
+#: src/shell-keyring-prompt.c:738
+msgid "Password cannot be blank"
+msgstr "Nenosiri haliwezi kuwa tupu"
+
+#: src/shell-polkit-authentication-agent.c:348
+msgid "Authentication dialog was dismissed by the user"
+msgstr ""
+
+#. translators:
+#. * The number of sound outputs on a particular device
+#: subprojects/gvc/gvc-mixer-control.c:1871
+#, c-format
+msgid "%u Output"
+msgid_plural "%u Outputs"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators:
+#. * The number of sound inputs on a particular device
+#: subprojects/gvc/gvc-mixer-control.c:1881
+#, c-format
+msgid "%u Input"
+msgid_plural "%u Inputs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: subprojects/gvc/gvc-mixer-control.c:2736
+msgid "System Sounds"
+msgstr ""
+
+#: js/ui/appIconBar.js:197
+msgid "Other workspaces"
+msgstr "Sehemu nyingine za kazi"
+
+#: js/ui/appIconBar.js:206
+msgid "Current workspace"
+msgstr "Sehemu ya  kazi sasa"
+
+#: js/ui/appIconBar.js:281
+msgid "Pin to Taskbar"
+msgstr "Ongeza kwa Taskbar"
+
+#: js/ui/appIconBar.js:285
+msgid "Unpin from Taskbar"
+msgstr "Ondoa kwenye Taskbar"
+
+#: js/ui/appIconBar.js:301
+#, javascript-format
+msgid "Quit %s"
+msgstr "Ondoka/Wachana%s"
+
+#: js/ui/components/updaterManager.js:184
+msgid "Software Update"
+msgstr "kuboresha Programu"
+
+#: js/ui/components/updaterManager.js:199
+msgid "Updates Available"
+msgstr "Sasisho napatikana"
+
+#: js/ui/components/updaterManager.js:200
+msgid "Software updates are available for your system"
+msgstr "Sasisho za programu zinapatikana kwa mfumo wako"
+
+#: js/ui/components/updaterManager.js:201
+msgid "Download Now"
+msgstr "Pakua sasa"
+
+#: js/ui/components/updaterManager.js:216
+msgid "Updates Ready"
+msgstr "Sasisho Tayari"
+
+#: js/ui/components/updaterManager.js:217
+msgid "Software updates are ready to be installed on your system"
+msgstr "Sasisho la programu ni tayari kuwekwa kwenye mfumo wako"
+
+#: js/ui/components/updaterManager.js:218
+msgid "Install Now"
+msgstr "Sakinisha Sasa"
+
+#: js/ui/components/updaterManager.js:230
+msgid "Updates Installed"
+msgstr "Mabadiliko yamewekwa"
+
+#: js/ui/components/updaterManager.js:231
+msgid "Software updates were installed on your system"
+msgstr "Sasisho za Programu ziliwekwa kwenye mfumo wako"
+
+#: js/ui/components/updaterManager.js:232
+msgid "Restart Now"
+msgstr "Anzisha tena sasa"
+
+#: js/ui/components/updaterManager.js:262
+msgid "Update Failed"
+msgstr "Sasisha limefali"
+
+#: js/ui/components/updaterManager.js:263
+msgid "We could not update your system"
+msgstr "Hatukuweza kusasisha mfumo wako"
+
+#: js/ui/endlessButton.js:12
+msgid "Endless Button"
+msgstr ""
+
+#: js/ui/endlessButton.js:55
+msgid "Show Desktop"
+msgstr ""
+
+#: js/ui/endlessButton.js:60
+msgid "Show Apps"
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:46
+msgid "Quit applications"
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:52
+msgid ""
+"If an application doesn't respond for a while, select its name and click "
+"Quit Application."
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:75
+msgid "System Monitor"
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:79
+msgid "Quit Application"
+msgstr ""
+
+#: js/ui/hotCorner.js:13
+msgid "Hot Corner"
+msgstr ""
+
+#: js/ui/hotCorner.js:26
+msgid "Enable Hot Corner"
+msgstr ""
+
+#: js/ui/hotCorner.js:30
+msgid "Disable Hot Corner"
+msgstr ""
+
+#: js/ui/iconGridLayout.js:288
+#, javascript-format
+msgid "%s has been removed"
+msgstr ""
+
+#: js/ui/iconGridLayout.js:481
+msgid "New Folder"
+msgstr ""
+
+#: js/ui/internetSearch.js:69
+#, javascript-format
+msgid "Open \"%s\" in browser"
+msgstr ""
+
+#. Translators: the first %s is the search engine name, and the second
+#. * is the search string. For instance, 'Search Google for "hello"'.
+#: js/ui/internetSearch.js:78
+#, javascript-format
+msgid "Search %s for \"%s\""
+msgstr ""
+
+#: js/ui/internetSearch.js:80
+#, javascript-format
+msgid "Search the internet for \"%s\""
+msgstr ""
+
+#: js/ui/status/orientation.js:44
+msgid "Orientation Lock"
+msgstr "Mlango wa Mwelekeo"
+
+#: js/ui/userMenu.js:16
+msgid "Social Accounts"
+msgstr ""
+
+#: js/ui/userMenu.js:19
+msgid "Settings"
+msgstr ""
+
+#: js/ui/userMenu.js:24
+msgid "Help"
 msgstr ""
 
 #: src/shell-desktop-dir-info.c:485
@@ -2711,38 +2934,4 @@ msgstr ""
 #: src/shell-desktop-dir-info.c:745
 #, c-format
 msgid "Custom definition for %s"
-msgstr ""
-
-#: src/shell-keyring-prompt.c:730
-msgid "Passwords do not match."
-msgstr ""
-
-#: src/shell-keyring-prompt.c:738
-msgid "Password cannot be blank"
-msgstr ""
-
-#: src/shell-polkit-authentication-agent.c:353
-msgid "Authentication dialog was dismissed by the user"
-msgstr ""
-
-#. translators:
-#. * The number of sound outputs on a particular device
-#: subprojects/gvc/gvc-mixer-control.c:1873
-#, c-format
-msgid "%u Output"
-msgid_plural "%u Outputs"
-msgstr[0] ""
-msgstr[1] ""
-
-#. translators:
-#. * The number of sound inputs on a particular device
-#: subprojects/gvc/gvc-mixer-control.c:1883
-#, c-format
-msgid "%u Input"
-msgid_plural "%u Inputs"
-msgstr[0] ""
-msgstr[1] ""
-
-#: subprojects/gvc/gvc-mixer-control.c:2738
-msgid "System Sounds"
 msgstr ""
