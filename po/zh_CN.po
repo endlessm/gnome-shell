@@ -9,6 +9,7 @@
 # chiachen L <luojiazhen@gmail.com>, 2011
 # 759b81c7bb2252a11f36c89344f31007, 2017-2018
 # David Young <dhyang555@gmail.com>, 2010
+# Dingzhong Chen <wsxy162@gmail.com>, 2018
 # e2f_cn c5 <jarvisn@ecinnovations.com>, 2017
 # e2f_cn c5 <jarvisn@ecinnovations.com>, 2017
 # 5c1f498cdfcd3e8829513039a952cd0d, 2018
@@ -16,9 +17,10 @@
 # hui <www.eternalhui@gmail.com>, 2013-2014
 # Jessica Ban <bancage@gmail.com>, 2010
 # jiero <lililjlj@gmail.com>, 2010
-# liushuyu <liushuyu_011@126.com>, 2015
+# liushuyu <liushuyu_011@126.com>, 2015-2016
 # liuxuejiao <liuxuejiao_endless@126.com>, 2016
 # Marco Mai <marco@endlessm.com>, 2015
+# Mingcong Bai <jeffbai@aosc.xyz>, 2015-2017
 # 1dot75cm <sensor.wen@gmail.com>, 2014
 # Ray Wang <raywang@gnome.org>, 2009,2011
 # Roddy Shuler <roddy@stanfordalumni.org>, 2016-2018
@@ -38,8 +40,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-06-04 16:16+0000\n"
-"PO-Revision-Date: 2019-06-04 16:51+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2019-06-04 17:08+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessm.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/endless-os/gnome-shell/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,7 +52,7 @@ msgstr ""
 #: data/gnome-shell-extension-prefs.desktop.in.in:4
 #: js/extensionPrefs/main.js:216
 msgid "Shell Extensions"
-msgstr "外壳扩展"
+msgstr "Shell 扩展"
 
 #: data/gnome-shell-extension-prefs.desktop.in.in:5
 msgid "Configure GNOME Shell Extensions"
@@ -62,7 +64,7 @@ msgstr "GNOME Shell"
 
 #: data/org.gnome.Shell.desktop.in.in:5
 msgid "Window management and application launching"
-msgstr "窗口管理和应用程序启动"
+msgstr "窗口管理与应用程序启动"
 
 #: data/org.gnome.shell.gschema.xml.in:22
 msgid "Enable internal tools useful for developers and testers from Alt-F2"
@@ -94,11 +96,11 @@ msgstr "禁用用户扩展"
 msgid ""
 "Disable all extensions the user has enabled without affecting the “enabled-"
 "extension” setting."
-msgstr "禁用用户启用的所有扩展，而不影响“启用扩展”设置。"
+msgstr "禁用所有用户启用的扩展而不影响“enabled-extension”键值的设置。"
 
 #: data/org.gnome.shell.gschema.xml.in:50
 msgid "Disables the validation of extension version compatibility"
-msgstr "禁止检查扩展版本兼容性"
+msgstr "禁用检查扩展版本兼容性"
 
 #: data/org.gnome.shell.gschema.xml.in:51
 msgid ""
@@ -109,7 +111,7 @@ msgstr "GNOME 只会加载声明支持当前运行版本的扩展。启用该选
 
 #: data/org.gnome.shell.gschema.xml.in:59
 msgid "List of desktop file IDs for favorite applications"
-msgstr "收藏夹中的应用程序的 desktop 文件 ID 的列表"
+msgstr "收藏夹中应用程序桌面文件的 ID 列表"
 
 #: data/org.gnome.shell.gschema.xml.in:60
 msgid ""
@@ -119,11 +121,11 @@ msgstr "符合这些标示的应用程序将显示在收藏区中。"
 
 #: data/org.gnome.shell.gschema.xml.in:67
 msgid "App Picker View"
-msgstr "程序选择查看器"
+msgstr "应用选择器视图"
 
 #: data/org.gnome.shell.gschema.xml.in:68
 msgid "Index of the currently selected view in the application picker."
-msgstr "应用程序选择器中当前已选取视图的索引。"
+msgstr "应用程序选择器中当前选中视图的索引。"
 
 #: data/org.gnome.shell.gschema.xml.in:74
 msgid "History for command (Alt-F2) dialog"
@@ -143,7 +145,7 @@ msgstr "总在用户菜单中显示“注销”选项。"
 msgid ""
 "This key overrides the automatic hiding of the “Log out” menu item in "
 "single-user, single-session situations."
-msgstr "单用户、单会话情形下，“注销”菜单项默认隐藏，使用这个按键会覆盖这种行为。"
+msgstr "单用户、单会话情形下，“注销”菜单项会自动隐藏，使用这个键会覆盖这种行为。"
 
 #: data/org.gnome.shell.gschema.xml.in:91
 msgid ""
@@ -156,7 +158,7 @@ msgid ""
 "filesystem is mounted. If the password can be saved for future use a "
 "“Remember Password” checkbox will be present. This key sets the default "
 "state of the checkbox."
-msgstr "安装加密设备或远程文件系统时，该使用界面需要密码。如果密码能保存，当前复选框将显示“记住密码”。此键设置复选框的默认状态。"
+msgstr "挂载加密设备或远程文件系统时 Shell 将要求输入密码。如果该密码可以记住并在今后使用，则会有“记住密码”复选框出现。这个键设置了该复选框的默认状态。"
 
 #: data/org.gnome.shell.gschema.xml.in:101
 msgid ""
@@ -363,20 +365,20 @@ msgstr "用于打开应用程序菜单的快捷键。"
 
 #: data/org.gnome.shell.gschema.xml.in:309
 msgid "Keybinding to open the “Show Applications” view"
-msgstr "用于打开显示应用视图的按键组合"
+msgstr "用于打开“显示应用程序”视图的快捷键"
 
 #: data/org.gnome.shell.gschema.xml.in:310
 msgid ""
 "Keybinding to open the “Show Applications” view of the Activities Overview."
-msgstr "用于在活动视图中打开显示应用视图的按键组合。"
+msgstr "用于打开活动概览中的“显示应用程序”视图的快捷键。"
 
 #: data/org.gnome.shell.gschema.xml.in:317
 msgid "Keybinding to open the overview"
-msgstr "用于打开概览的快捷键 "
+msgstr "用于打开概览的快捷键"
 
 #: data/org.gnome.shell.gschema.xml.in:318
 msgid "Keybinding to open the Activities Overview."
-msgstr "用于打开活动概览的快捷键。 "
+msgstr "用于打开活动概览的快捷键。"
 
 #: data/org.gnome.shell.gschema.xml.in:324
 msgid "Keybinding to toggle the visibility of the notification list"
@@ -388,17 +390,17 @@ msgstr "用来切换通知列表是否可见的快捷键。"
 
 #: data/org.gnome.shell.gschema.xml.in:331
 msgid "Keybinding to focus the active notification"
-msgstr "用于移动焦点到活动通知的快捷键"
+msgstr "用于聚焦到活动通知的快捷键"
 
 #: data/org.gnome.shell.gschema.xml.in:332
 msgid "Keybinding to focus the active notification."
-msgstr "用于移动焦点到活动通知的快捷键。"
+msgstr "用于聚焦到活动通知的快捷键。"
 
 #: data/org.gnome.shell.gschema.xml.in:338
 msgid ""
 "Keybinding that pauses and resumes all running tweens, for debugging "
 "purposes"
-msgstr "暂停和恢复所有执行中动画的快捷键，用于调试 "
+msgstr "暂停和恢复所有执行中动画的快捷键，用于调试"
 
 #: data/org.gnome.shell.gschema.xml.in:343
 msgid "Switch to application 1"
@@ -558,7 +560,7 @@ msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
 "are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only” "
 "(shows only the application icon) or “both”."
-msgstr "配置窗口如何在切换器中显示。仅“thumbnail-only”(限时窗口的缩略图)，或者“app-icon-only”（只显示应用程序图标），或二者同时出现时有效。"
+msgstr "配置窗口如何显示于切换器中。有效的值有“thumbnail-only”“app-icon-only”和“both”。"
 
 #: data/org.gnome.shell.gschema.xml.in:494
 msgid ""
@@ -577,15 +579,15 @@ msgstr "将模态对话框附到其父窗口上"
 #: data/org.gnome.shell.gschema.xml.in:540
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
-msgstr "当 GNOME Shell 运行时，此键会覆盖 org.gnome.mutter 键。"
+msgstr "当 GNOME Shell 运行时，此键会覆盖 org.gnome.mutter 中的键。"
 
 #: data/org.gnome.shell.gschema.xml.in:515
 msgid "Enable edge tiling when dropping windows on screen edges"
-msgstr "启用拖拽到屏幕边缘时平铺窗口的功能"
+msgstr "启用拖拽窗口到屏幕边缘时边缘平铺的功能"
 
 #: data/org.gnome.shell.gschema.xml.in:523
 msgid "Workspaces are managed dynamically"
-msgstr "动态管理工作区"
+msgstr "动态地管理工作区"
 
 #: data/org.gnome.shell.gschema.xml.in:531
 msgid "Workspaces only on primary monitor"
@@ -769,7 +771,7 @@ msgstr "未列出？"
 #: js/gdm/loginDialog.js:875
 #, javascript-format
 msgid "(e.g., user or %s)"
-msgstr "(如 user 或 %s)"
+msgstr "（如 user 或 %s）"
 
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
@@ -794,31 +796,31 @@ msgstr "认证出错"
 #. to indicate the user can swipe their finger instead
 #: js/gdm/util.js:477
 msgid "(or swipe finger)"
-msgstr "(或滑动手指)"
+msgstr "（或滑动手指）"
 
 #. Translators: The name of the power-off action in search
 #: js/misc/systemActions.js:88
 msgctxt "search-result"
 msgid "Power Off"
-msgstr "关闭电源"
+msgstr "关机"
 
 #. Translators: A list of keywords that match the power-off action, separated
 #. by semicolons
 #: js/misc/systemActions.js:91
 msgid "power off;shutdown;reboot;restart"
-msgstr ""
+msgstr "power off;shutdown;reboot;restart;关机;断电;重启;重新启动;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:95
 msgctxt "search-result"
 msgid "Lock Screen"
-msgstr "锁住屏幕"
+msgstr "锁屏"
 
 #. Translators: A list of keywords that match the lock screen action,
 #. separated by semicolons
 #: js/misc/systemActions.js:98
 msgid "lock screen"
-msgstr "电脑锁屏"
+msgstr "锁屏"
 
 #. Translators: The name of the logout action in search
 #: js/misc/systemActions.js:102
@@ -830,7 +832,7 @@ msgstr "注销"
 #. semicolons
 #: js/misc/systemActions.js:105
 msgid "logout;sign off"
-msgstr "注销;退出"
+msgstr "logout;sign off;登出;注销;"
 
 #. Translators: The name of the suspend action in search
 #: js/misc/systemActions.js:109
@@ -842,7 +844,7 @@ msgstr "挂起"
 #. semicolons
 #: js/misc/systemActions.js:112
 msgid "suspend;sleep"
-msgstr "暂停;休眠"
+msgstr "suspend;sleep;挂起;睡眠;"
 
 #. Translators: The name of the switch user action in search
 #: js/misc/systemActions.js:116
@@ -860,13 +862,13 @@ msgstr "切换用户"
 #: js/misc/systemActions.js:123
 msgctxt "search-result"
 msgid "Lock Orientation"
-msgstr ""
+msgstr "锁定方向"
 
 #. Translators: A list of keywords that match the lock orientation action,
 #. separated by semicolons
 #: js/misc/systemActions.js:126
 msgid "lock orientation;screen;rotation"
-msgstr ""
+msgstr "lock orientation;screen;rotation;锁定方向;屏幕;旋转;"
 
 #: js/misc/util.js:182
 msgid "Command not found"
@@ -881,7 +883,7 @@ msgstr "不能解析命令："
 #: js/misc/util.js:223
 #, javascript-format
 msgid "Execution of “%s” failed:"
-msgstr "运行“%s”失败："
+msgstr "执行“%s”失败："
 
 #: js/misc/util.js:240
 msgid "Just now"
@@ -1012,7 +1014,7 @@ msgstr "热点登录"
 msgid ""
 "Your connection to this hotspot login is not secure. Passwords or other "
 "information you enter on this page can be viewed by people nearby."
-msgstr "您与此热点登录的连接不安全。附近的人可以查看您在此页面输入的密码或其他信息。"
+msgstr "您到热点登录的连接不安全。您在此页面输入的密码或其他信息可被旁人查看。"
 
 #. No support for non-modal system dialogs, so ignore the option
 #. let modal = options['modal'] || true;
@@ -1071,7 +1073,7 @@ msgstr "麦克风"
 
 #: js/ui/backgroundMenu.js:15
 msgid "Change Background…"
-msgstr "更换壁纸..."
+msgstr "更换壁纸…"
 
 #: js/ui/backgroundMenu.js:18
 msgid "Add App"
@@ -1090,7 +1092,7 @@ msgstr "添加文件夹"
 #: js/ui/calendar.js:40
 msgctxt "calendar-no-work"
 msgid "06"
-msgstr "周日和周六"
+msgstr "06"
 
 #. Translators: Calendar grid abbreviation for Sunday.
 #. *
@@ -1144,7 +1146,7 @@ msgstr "六"
 #. * in most cases you should not change it.
 #: js/ui/calendar.js:332
 msgid "%OB"
-msgstr ""
+msgstr "%OB"
 
 #. *
 #. * Translators: The header displaying the month name and the year
@@ -1156,7 +1158,7 @@ msgstr ""
 #. * absolutely know what you are doing.
 #: js/ui/calendar.js:342
 msgid "%OB %Y"
-msgstr ""
+msgstr "%Y %OB"
 
 #: js/ui/calendar.js:399
 msgid "Previous month"
@@ -1174,7 +1176,7 @@ msgstr "%d"
 
 #: js/ui/calendar.js:619
 msgid "Week %V"
-msgstr "第 %V 星期"
+msgstr "第 %V 个星期"
 
 #. Translators: Shown in calendar event list for all day events
 #. * Keep it short, best if you can use less then 10 characters
@@ -1195,7 +1197,7 @@ msgstr ""
 
 #: js/ui/calendar.js:1046
 msgid "No Notifications"
-msgstr "无提示"
+msgstr "无通知"
 
 #: js/ui/calendar.js:1049
 msgid "No Events"
@@ -1209,13 +1211,13 @@ msgstr ""
 #: js/ui/closeDialog.js:42
 #, javascript-format
 msgid "“%s” is not responding."
-msgstr "“%s ”没有反应。"
+msgstr "“%s”无响应。"
 
 #: js/ui/closeDialog.js:43
 msgid ""
 "You may choose to wait a short while for it to continue or force the "
 "application to quit entirely."
-msgstr "您可以选择稍等片刻继续或强制完全退出应用程序。"
+msgstr "您可以尝试等待其响应或强制退出此应用程序。"
 
 #: js/ui/closeDialog.js:59
 msgid "Force Quit"
@@ -1286,7 +1288,7 @@ msgstr "密钥："
 
 #: js/ui/components/networkAgent.js:417 js/ui/components/networkAgent.js:439
 msgid "Private key password: "
-msgstr "私人密钥密码："
+msgstr "私钥密码："
 
 #: js/ui/components/networkAgent.js:437
 msgid "Identity: "
@@ -1368,7 +1370,7 @@ msgstr "认证"
 #. * for instance.
 #: js/ui/components/polkitAgent.js:262 js/ui/shellMountOperation.js:318
 msgid "Sorry, that didn’t work. Please try again."
-msgstr "抱歉，无法正常工作。请重试。"
+msgstr "抱歉，认证失败。请重试。"
 
 #. Translators: this is the other person changing their old IM name to their
 #. new
@@ -1409,11 +1411,11 @@ msgstr ""
 #. * date, e.g. "Tuesday February 17 2015".
 #: js/ui/dateMenu.js:69
 msgid "%A %B %e %Y"
-msgstr "%Y年%m月%d日%A"
+msgstr "%Y年%-m月%-d日 %A"
 
 #: js/ui/dateMenu.js:131
 msgid "Add world clocks…"
-msgstr "添加世界时钟..."
+msgstr "添加世界时钟…"
 
 #: js/ui/dateMenu.js:132
 msgid "World Clocks"
@@ -1425,19 +1427,19 @@ msgstr "天气"
 
 #: js/ui/dateMenu.js:311
 msgid "Select a location…"
-msgstr "选择位置…"
+msgstr "选择地点…"
 
 #: js/ui/dateMenu.js:319
 msgid "Loading…"
-msgstr "正在加载…"
+msgstr "正在载入…"
 
 #: js/ui/dateMenu.js:329
 msgid "Go online for weather information"
-msgstr "上线以了解天气信息"
+msgstr "通过互联网查看天气信息"
 
 #: js/ui/dateMenu.js:331
 msgid "Weather information is currently unavailable"
-msgstr "目前无可用的天气信息"
+msgstr "天气信息目前不可用"
 
 #: js/ui/endSessionDialog.js:42
 #, javascript-format
@@ -1540,7 +1542,7 @@ msgstr "安装更新后关机"
 #: js/ui/endSessionDialog.js:115
 msgctxt "title"
 msgid "Restart & Install Upgrade"
-msgstr "重启并安装更新"
+msgstr "重启并安装升级"
 
 #. Translators: This is the text displayed for system upgrades in the
 #. shut down dialog. First %s gets replaced with the distro name and
@@ -1550,7 +1552,7 @@ msgstr "重启并安装更新"
 msgid ""
 "%s %s will be installed after restart. Upgrade installation can take a long "
 "time: ensure that you have backed up and that the computer is plugged in."
-msgstr "重启后将安装 %s %s。更新可能需要较长时间：请确保已经进行了备份并且已经插入了电源。"
+msgstr "重启后将安装 %s %s。升级安装可能需要较长时间：请确保已经进行了备份并且已经插入了电源。"
 
 #: js/ui/endSessionDialog.js:328
 msgid "Running on battery power: please plug in before installing updates."
@@ -1568,13 +1570,13 @@ msgstr "有其他用户登录。"
 #: js/ui/endSessionDialog.js:646
 #, javascript-format
 msgid "%s (remote)"
-msgstr "%s (远程)"
+msgstr "%s（远程）"
 
 #. Translators: Console here refers to a tty like a VT console
 #: js/ui/endSessionDialog.js:649
 #, javascript-format
 msgid "%s (console)"
-msgstr "%s (控制台)"
+msgstr "%s（控制台）"
 
 #: js/ui/extensionDownloader.js:192
 msgid "Install"
@@ -1589,17 +1591,17 @@ msgstr "从 extensions.gnome.org 下载并安装“%s”？"
 #: js/ui/inhibitShortcutsDialog.js:78
 #, javascript-format
 msgid "%s wants to inhibit shortcuts"
-msgstr "%s想要禁止快捷方式"
+msgstr "%s 希望禁用快捷键"
 
 #: js/ui/inhibitShortcutsDialog.js:79
 msgid "Application wants to inhibit shortcuts"
-msgstr "应用程序想要禁止快捷方式"
+msgstr "应用程序希望禁用快捷键"
 
 #. Translators: %s is a keyboard shortcut like "Super+x"
 #: js/ui/inhibitShortcutsDialog.js:88
 #, javascript-format
 msgid "You can restore shortcuts by pressing %s."
-msgstr "您可以通过按%s来恢复快捷方式。"
+msgstr "按 %s 以恢复快捷键。"
 
 #: js/ui/inhibitShortcutsDialog.js:93
 msgid "Deny"
@@ -1611,21 +1613,21 @@ msgstr "允许"
 
 #: js/ui/kbdA11yDialog.js:31
 msgid "Slow Keys Turned On"
-msgstr "迟缓按键已打开"
+msgstr "慢速键已开启"
 
 #: js/ui/kbdA11yDialog.js:32
 msgid "Slow Keys Turned Off"
-msgstr "迟缓按键已关闭"
+msgstr "慢速键已关闭"
 
 #: js/ui/kbdA11yDialog.js:33
 msgid ""
 "You just held down the Shift key for 8 seconds. This is the shortcut for the"
 " Slow Keys feature, which affects the way your keyboard works."
-msgstr ""
+msgstr "您刚刚按住了 Shift 键 8 秒钟。这是启用慢速键特性的快捷方式，这会影响您键盘的使用。"
 
 #: js/ui/kbdA11yDialog.js:40
 msgid "Sticky Keys Turned On"
-msgstr "粘滞键已打开"
+msgstr "粘滞键已开启"
 
 #: js/ui/kbdA11yDialog.js:41
 msgid "Sticky Keys Turned Off"
@@ -1635,18 +1637,18 @@ msgstr "粘滞键已关闭"
 msgid ""
 "You just pressed the Shift key 5 times in a row. This is the shortcut for "
 "the Sticky Keys feature, which affects the way your keyboard works."
-msgstr ""
+msgstr "您刚刚按了 Shift 键五次。这是启用粘滞键特性的快捷方式，这会影响您键盘的使用。"
 
 #: js/ui/kbdA11yDialog.js:45
 msgid ""
 "You just pressed two keys at once, or pressed the Shift key 5 times in a "
 "row. This turns off the Sticky Keys feature, which affects the way your "
 "keyboard works."
-msgstr ""
+msgstr "您刚刚一次按了两个键或者按了 Shift 键五次。这将会关闭粘滞键特性，这会影响您使用键盘的方式。"
 
 #: js/ui/kbdA11yDialog.js:57
 msgid "Leave On"
-msgstr "保持打开"
+msgstr "保持开启"
 
 #: js/ui/kbdA11yDialog.js:57 js/ui/status/automaticUpdates.js:309
 #: js/ui/status/bluetooth.js:136 js/ui/status/network.js:1263
@@ -1699,7 +1701,7 @@ msgstr "已禁用"
 
 #: js/ui/lookingGlass.js:693
 msgid "Error"
-msgstr "错误"
+msgstr "出错"
 
 #: js/ui/lookingGlass.js:695
 msgid "Out of date"
@@ -1707,7 +1709,7 @@ msgstr "过时"
 
 #: js/ui/lookingGlass.js:697
 msgid "Downloading"
-msgstr "正在下载"
+msgstr "下载中"
 
 #: js/ui/lookingGlass.js:721
 msgid "View Source"
@@ -1735,7 +1737,7 @@ msgstr "音量"
 
 #: js/ui/overview.js:96
 msgid "Undo"
-msgstr "撤销"
+msgstr "撤消"
 
 #: js/ui/overview.js:111
 msgid "No apps are open"
@@ -1749,11 +1751,11 @@ msgstr "概览"
 
 #: js/ui/padOsd.js:92
 msgid "New shortcut…"
-msgstr "新建快捷方式…"
+msgstr "新建快捷键…"
 
 #: js/ui/padOsd.js:141
 msgid "Application defined"
-msgstr "已定义的应用"
+msgstr "应用程序定义"
 
 #: js/ui/padOsd.js:142
 msgid "Show on-screen help"
@@ -1781,11 +1783,11 @@ msgstr "无"
 
 #: js/ui/padOsd.js:822
 msgid "Press a button to configure"
-msgstr "按一下按钮进行配置"
+msgstr "按下按键以配置"
 
 #: js/ui/padOsd.js:823
 msgid "Press Esc to exit"
-msgstr "按 Esc 键退出"
+msgstr "按 Esc 以退出"
 
 #: js/ui/padOsd.js:826
 msgid "Press any key to exit"
@@ -1793,7 +1795,7 @@ msgstr "按任意键退出"
 
 #: js/ui/panel.js:97
 msgid "Show Details"
-msgstr "显示详细信息"
+msgstr "显示细节"
 
 #: js/ui/panel.js:111
 msgid "Quit"
@@ -1992,13 +1994,13 @@ msgstr "Wayland 下重启不可用"
 
 #: js/ui/runDialog.js:273
 msgid "Restarting…"
-msgstr "正在重新启动..."
+msgstr "正在重新启动…"
 
 #. Translators: This is a time format for a date in
 #. long format
 #: js/ui/screenShield.js:77
 msgid "%A, %B %d"
-msgstr "%m月%d日 %A"
+msgstr "%-m月%-d日 %A"
 
 #: js/ui/screenShield.js:133
 #, javascript-format
@@ -2036,7 +2038,7 @@ msgstr "一个应用程序阻止了锁定"
 
 #: js/ui/search.js:743
 msgid "Searching…"
-msgstr "正在搜索..."
+msgstr "正在搜索…"
 
 #: js/ui/search.js:745
 msgid "No results."
@@ -2105,7 +2107,7 @@ msgstr "慢速键"
 
 #: js/ui/status/accessibility.js:74
 msgid "Bounce Keys"
-msgstr "筛选键"
+msgstr "回弹键"
 
 #: js/ui/status/accessibility.js:77
 msgid "Mouse Keys"
@@ -2206,7 +2208,7 @@ msgstr "隐私设置"
 
 #: js/ui/status/location.js:171
 msgid "Location In Use"
-msgstr "定位服务正被使用"
+msgstr "定位服务使用中"
 
 #: js/ui/status/location.js:175
 msgid "Location Disabled"
@@ -2319,11 +2321,11 @@ msgstr "连接到互联网"
 
 #: js/ui/status/network.js:786
 msgid "Airplane Mode is On"
-msgstr "已开启飞行模式"
+msgstr "飞行模式已开启"
 
 #: js/ui/status/network.js:787
 msgid "Wi-Fi is disabled when airplane mode is on."
-msgstr "启用飞行模式时 Wi-Fi 会关闭"
+msgstr "启用飞行模式时 Wi-Fi 会关闭。"
 
 #: js/ui/status/network.js:788
 msgid "Turn Off Airplane Mode"
@@ -2331,11 +2333,11 @@ msgstr "关闭飞行模式"
 
 #: js/ui/status/network.js:797
 msgid "Wi-Fi is Off"
-msgstr "Wi-Fi 关闭"
+msgstr "Wi-Fi 已关闭"
 
 #: js/ui/status/network.js:798
 msgid "Wi-Fi needs to be turned on in order to connect to a network."
-msgstr "连接网络需要开启 Wi-Fi"
+msgstr "连接网络需要开启 Wi-Fi。"
 
 #: js/ui/status/network.js:799
 msgid "Turn On Wi-Fi"
@@ -2375,7 +2377,7 @@ msgstr "%s 热点已激活"
 #: js/ui/status/network.js:1295
 #, javascript-format
 msgid "%s Not Connected"
-msgstr "%s 无连接"
+msgstr "%s 未连接"
 
 #: js/ui/status/network.js:1392
 msgid "connecting…"
@@ -2417,7 +2419,7 @@ msgstr[0] "%s 个有线连接"
 #, javascript-format
 msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
-msgstr[0] "%s 个无线连接"
+msgstr[0] "%s 个 Wi-Fi 连接"
 
 #: js/ui/status/network.js:1572
 #, javascript-format
@@ -2431,7 +2433,7 @@ msgstr "连接失败"
 
 #: js/ui/status/network.js:1706
 msgid "Activation of network connection failed"
-msgstr "启用网络连接失败"
+msgstr "网络连接激活失败"
 
 #: js/ui/status/nightLight.js:43
 msgid "Display Settings"
@@ -2439,19 +2441,19 @@ msgstr "显示设置"
 
 #: js/ui/status/nightLight.js:60
 msgid "Night Light Disabled"
-msgstr "禁用夜灯"
+msgstr "夜间模式已禁用"
 
 #: js/ui/status/nightLight.js:61
 msgid "Night Light On"
-msgstr "夜灯开"
+msgstr "夜间模式已启用"
 
 #: js/ui/status/nightLight.js:62
 msgid "Resume"
-msgstr "恢复"
+msgstr "继续使用"
 
 #: js/ui/status/nightLight.js:63
 msgid "Disable Until Tomorrow"
-msgstr "禁用直到明天"
+msgstr "明天前禁用"
 
 #: js/ui/status/payg.js:32
 msgid "Enter unlock code…"
@@ -2481,7 +2483,7 @@ msgstr "未充电"
 #. to estimate battery life
 #: js/ui/status/power.js:70 js/ui/status/power.js:76
 msgid "Estimating…"
-msgstr "正在估计..."
+msgstr "正在估计…"
 
 #. Translators: this is <hours>:<minutes> Remaining (<percentage>)
 #: js/ui/status/power.js:84
@@ -2513,7 +2515,7 @@ msgstr ""
 #. changing the menu contents.
 #: js/ui/status/rfkill.js:77
 msgid "Airplane Mode On"
-msgstr "已开启飞行模式"
+msgstr "飞行模式已开启"
 
 #: js/ui/status/system.js:275
 msgid "Switch User"
@@ -2537,17 +2539,17 @@ msgstr "关机"
 
 #: js/ui/status/thunderbolt.js:261
 msgid "Thunderbolt"
-msgstr ""
+msgstr "Thunderbolt"
 
 #: js/ui/status/thunderbolt.js:322
 msgid "Unknown Thunderbolt device"
-msgstr ""
+msgstr "未知的 Thunderbolt 设备"
 
 #: js/ui/status/thunderbolt.js:323
 msgid ""
 "New device has been detected while you were away. Please disconnect and "
 "reconnect the device to start using it."
-msgstr ""
+msgstr "您不在的时候检测到了新设备。请断开设备连接后重连来开始使用它。"
 
 #: js/ui/status/thunderbolt.js:326
 msgid "Unauthorized Thunderbolt device"
@@ -2560,12 +2562,12 @@ msgstr ""
 
 #: js/ui/status/thunderbolt.js:333
 msgid "Thunderbolt authorization error"
-msgstr ""
+msgstr "Thunderbolt 授权错误"
 
 #: js/ui/status/thunderbolt.js:334
 #, javascript-format
 msgid "Could not authorize the Thunderbolt device: %s"
-msgstr ""
+msgstr "无法授权 Thunderbolt 设备：%s"
 
 #: js/ui/status/volume.js:133
 msgid "Volume changed"
@@ -2581,19 +2583,19 @@ msgstr "镜像"
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:21
 msgid "Join Displays"
-msgstr "连接显示器"
+msgstr "拼接显示器"
 
 #. Translators: this is for using only an external display.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:26
 msgid "External Only"
-msgstr "仅限外部"
+msgstr "只使用外部"
 
 #. Translators: this is for using only the laptop display.
 #. * Try to keep it under around 15 characters.
 #: js/ui/switchMonitor.js:31
 msgid "Built-in Only"
-msgstr "仅内置"
+msgstr "只使用内置"
 
 #: js/ui/unlockDialog.js:49
 msgid "Log in as another user"
@@ -2614,7 +2616,7 @@ msgstr "“%s”已就绪"
 
 #: js/ui/windowManager.js:59
 msgid "Do you want to keep these display settings?"
-msgstr "你想保留这些显示设置吗？"
+msgstr "您想保留这些显示设置吗？"
 
 #. Translators: this and the following message should be limited in lenght,
 #. to avoid ellipsizing the labels.
@@ -2723,7 +2725,7 @@ msgstr "GDM 用于登录屏幕的模式"
 
 #: src/main.c:420
 msgid "Use a specific mode, e.g. “gdm” for login screen"
-msgstr "使用指定模式，如 “gdm”用于登录屏幕的模式"
+msgstr "使用指定模式，如“gdm”用于登录屏幕"
 
 #: src/main.c:426
 msgid "List possible modes"
@@ -2749,7 +2751,7 @@ msgstr "密码不能为空"
 
 #: src/shell-polkit-authentication-agent.c:348
 msgid "Authentication dialog was dismissed by the user"
-msgstr "认证对话框被用户驳回"
+msgstr "认证对话框已被用户取消"
 
 #. translators:
 #. * The number of sound outputs on a particular device
