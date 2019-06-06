@@ -125,44 +125,44 @@ const _ensureHackDataFile = (function () {
     }
 }());
 
-function _isBlacklistedApp(desktop_id) {
+function _appIsBlockedFromHacking(desktop_id) {
     const keyfile = _ensureHackDataFile();
     if (keyfile === null)
         return false;
 
     const app_id = desktop_id.slice(0, -8);  // remove ".desktop"
-    let blacklist;
+    let blockList;
     try {
-        [blacklist] = keyfile.get_string_list('flip-to-hack', 'blacklist');
+        [blockList] = keyfile.get_string_list('flip-to-hack', 'blacklist');
     } catch (err) {
         if (!err.matches(GLib.KeyFileError, GLib.KeyFileError.KEY_NOT_FOUND) &&
             !err.matches(GLib.KeyFileError, GLib.KeyFileError.GROUP_NOT_FOUND))
-            logError(err, 'Error with blacklist in hack data file');
-        blacklist = [];
+            logError(err, 'Error with block list in hack data file');
+        blockList = [];
     }
 
-    return blacklist.includes(app_id);
+    return blockList.includes(app_id);
 }
 
-function _isWhitelistedApp(desktopId) {
+function _appIsAllowedHacking(desktopId) {
     const keyfile = _ensureHackDataFile();
     if (keyfile === null)
         return true;
 
     const appId = desktopId.slice(0, -8);  // remove ".desktop"
-    let whitelist;
+    let allowOnlyList;
     try {
-        [whitelist] = keyfile.get_string_list('flip-to-hack', 'whitelist');
+        [allowOnlyList] = keyfile.get_string_list('flip-to-hack', 'whitelist');
     } catch (err) {
         if (!err.matches(GLib.KeyFileError, GLib.KeyFileError.KEY_NOT_FOUND) &&
             !err.matches(GLib.KeyFileError, GLib.KeyFileError.GROUP_NOT_FOUND))
-            logError(err, 'Error with whitelist in hack data file');
-        whitelist = [];
+            logError(err, 'Error with allow-only list in hack data file');
+        allowOnlyList = [];
     }
 
-    if (whitelist.length === 0)
+    if (allowOnlyList.length === 0)
         return true;
-    return whitelist.includes(appId);
+    return allowOnlyList.includes(appId);
 }
 
 // _synchronizeMetaWindowActorGeometries
@@ -1400,19 +1400,24 @@ var CodeViewManager = GObject.registerClass({
         if (!appInfo)
             return false;
 
-        // Do not manage apps that are NoDisplay=true, but take into account
-        // the custom X-Endless-Hackable key to override that
-        if (!appInfo.should_show() && !appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
-            return false;
+        // The custom X-Endless-Hackable key has the last word always
+        if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
+            if (!appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
+                return false;
+        } else {
+            // Do not manage apps that are NoDisplay=true
+            if (!appInfo.should_show())
+                return false;
 
-        // Do not manage apps that we blacklist in com.endlessm.HackComponents
-        if (_isBlacklistedApp(appInfo.get_id()))
-            return false;
+            // Do not manage apps that we block in com.endlessm.HackComponents
+            if (_appIsBlockedFromHacking(appInfo.get_id()))
+                return false;
 
-        // If there is a whitelist in com.endlessm.HackComponents, only manage
-        // whitelisted apps
-        if (!_isWhitelistedApp(appInfo.get_id()))
-            return false;
+            // If there is an allow-only list in com.endlessm.HackComponents,
+            // only manage apps on that list
+            if (!_appIsAllowedHacking(appInfo.get_id()))
+                return false;
+        }
 
         // It might be a "HackToolbox". Check that, and if so,
         // add it to the window group for the window.
