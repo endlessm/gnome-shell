@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { Clutter, Meta, St } = imports.gi;
+const { Clutter, Meta, Shell, St } = imports.gi;
 
 const AppActivation = imports.ui.appActivation;
 const BoxPointer = imports.ui.boxpointer;
