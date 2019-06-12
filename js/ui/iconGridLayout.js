@@ -174,13 +174,19 @@ var IconGridLayout = GObject.registerClass({
     }
 
     _getDefaultIcons() {
-        let mergedJson = this._mergeJsonStrings(
-            this._loadConfigJsonString(DEFAULT_CONFIGS_DIR, DEFAULT_CONFIG_NAME_BASE),
-            this._loadConfigJsonString(OVERRIDE_CONFIGS_DIR, OVERRIDE_CONFIG_NAME_BASE),
-            this._loadConfigJsonString(OVERRIDE_CONFIGS_DIR, PREPEND_CONFIG_NAME_BASE),
-            this._loadConfigJsonString(OVERRIDE_CONFIGS_DIR, APPEND_CONFIG_NAME_BASE)
-        );
-        let iconTree = Json.gvariant_deserialize_data(mergedJson, -1, 'a{sas}');
+        let iconTree = null;
+
+        try {
+            let mergedJson = this._mergeJsonStrings(
+                this._loadConfigJsonString(DEFAULT_CONFIGS_DIR, DEFAULT_CONFIG_NAME_BASE),
+                this._loadConfigJsonString(OVERRIDE_CONFIGS_DIR, OVERRIDE_CONFIG_NAME_BASE),
+                this._loadConfigJsonString(OVERRIDE_CONFIGS_DIR, PREPEND_CONFIG_NAME_BASE),
+                this._loadConfigJsonString(OVERRIDE_CONFIGS_DIR, APPEND_CONFIG_NAME_BASE)
+            );
+            iconTree = Json.gvariant_deserialize_data(mergedJson, -1, 'a{sas}');
+        } catch (e) {
+            logError(e, 'Failed to read JSON config');
+        }
 
         if (iconTree === null || iconTree.n_children() == 0) {
             log('No icon grid defaults found!');
