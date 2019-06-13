@@ -1,9 +1,9 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 //
-// Copyright (C) 2018 Endless Mobile, Inc.
+// Copyright (C) 2018, 2019 Endless Mobile, Inc.
 //
 // This is a GNOME Shell component to wrap the interactions over
-// D-Bus with the eos-parental-controls library.
+// D-Bus with the malcontent library.
 //
 // Licensed under the GNU General Public License Version 2
 //
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-const { EosParentalControls, Gio, GLib, GObject, Shell } = imports.gi;
+const { Malcontent, Gio, GLib, GObject, Shell } = imports.gi;
 
 const Gettext = imports.gettext;
 const Signals = imports.signals;
@@ -41,19 +41,24 @@ function getDefault() {
 // user’s parental controls, the administrator themselves doesn’t have any
 // parental controls, and two users cannot be logged in at the same time (we
 // don’t allow fast user switching).
-var ParentalControlsManager = GObject.registerClass(
-class ParentalControlsManager extends GObject.Object {
-    _init() {
-        super._init();
+var ParentalControlsManager = class {
+    constructor() {
+        this._disabled = false;
+        this._appFilter = null;
 
         log('Getting parental controls for user ' + Shell.util_get_uid ());
+        let connection = Gio.bus_get_sync(Gio.BusType.SYSTEM, null);
+        this._manager = new Malcontent.Manager({connection: connection});
 
         try {
-            this._appFilter = EosParentalControls.get_app_filter(null,
-                                                                 Shell.util_get_uid (),
-                                                                 false, null);
+            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.GetAppFilterFlags.NONE, null);
         } catch (e) {
-            logError(e, 'Failed to get parental controls settings');
+            if (e.matches(Malcontent.AppFilterError, Malcontent.AppFilterError.DISABLED)) {
+                log('Parental controls globally disabled');
+                this._disabled = true;
+            } else {
+                logError(e, 'Failed to get parental controls settings');
+            }
         }
     }
 
@@ -70,6 +75,10 @@ class ParentalControlsManager extends GObject.Object {
         if (!appInfo.should_show())
             return false;
 
+        // Are parental controls disabled at runtime?
+        if (this._disabled)
+            return true;
+
         // Have we finished initialising yet?
         if (!this._appFilter) {
             log('Warning: Hiding app because parental controls not yet initialised: ' + appInfo.get_id());
@@ -78,4 +87,4 @@ class ParentalControlsManager extends GObject.Object {
 
         return this._appFilter.is_appinfo_allowed(appInfo);
     }
-});
+};
