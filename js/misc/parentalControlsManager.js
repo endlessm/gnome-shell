@@ -51,7 +51,7 @@ var ParentalControlsManager = class {
         this._manager = new Malcontent.Manager({connection: connection});
 
         try {
-            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.GetAppFilterFlags.NONE, null, null);
+            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.GetAppFilterFlags.NONE, null);
         } catch (e) {
             if (e.matches(Malcontent.AppFilterError, Malcontent.AppFilterError.DISABLED)) {
                 log('Parental controls globally disabled');
