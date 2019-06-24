@@ -1268,6 +1268,9 @@ var FrequentView = class FrequentView extends BaseAppView {
         });
 
         this._parentalControlsManager = ParentalControlsManager.getDefault();
+        this._parentalControlsManager.connect('changed', () => {
+            this._redisplay();
+        });
     }
 
     hasUsefulData() {

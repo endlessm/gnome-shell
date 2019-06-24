@@ -414,6 +414,10 @@ var SearchResults = class {
         Util.blockClickEventsOnActor(this.actor);
 
         this._parentalControlsManager = ParentalControlsManager.getDefault();
+        this._parentalControlsManager.connect('changed', () => {
+            this._reloadInternetProviders();
+            this._reloadRemoteProviders();
+        });
 
         let closeIcon = new St.Icon({ icon_name: 'window-close-symbolic' });
         let closeButton = new St.Button({ name: 'searchResultsCloseButton',
@@ -495,6 +499,18 @@ var SearchResults = class {
             this._registerProvider(this._internetProvider);
 
         this._reloadRemoteProviders();
+    }
+
+    _reloadInternetProviders() {
+        if (this._internetProvider)
+            this._unregisterProvider(this._internetProvider);
+
+        // GNOME settings will take care of parentally controlling all web-browsers(T27064).
+        // Therefore, just reload the default InternetProvider at this given moment,
+        // to decide whether the InternetProvider's search results are to be shown or not.
+        this._internetProvider = InternetSearch.getInternetSearchProvider();
+        if (this._internetProvider)
+            this._registerProvider(this._internetProvider);
     }
 
     _reloadRemoteProviders() {
