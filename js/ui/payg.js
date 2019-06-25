@@ -238,8 +238,25 @@ var PaygUnlockWidget = GObject.registerClass({
         this._spinner = this._createSpinner();
         let entrySpinnerBox = new St.BoxLayout({ style_class: 'notification-actions',
                                                  x_expand: false, });
+
+        if (Main.paygManager.codeFormatPrefix != '') {
+            let prefix = new St.Label({ style_class: 'notification-payg-code-entry',
+                                        text: Main.paygManager.codeFormatPrefix,
+                                        x_align: Clutter.ActorAlign.CENTER });
+
+            entrySpinnerBox.add_child(prefix);
+        }
+
         entrySpinnerBox.add_child(this._codeEntry);
         entrySpinnerBox.add_child(this._spinner.actor);
+
+        if (Main.paygManager.codeFormatSuffix != '') {
+            let suffix = new St.Label({ style_class: 'notification-payg-code-entry',
+                                        text: Main.paygManager.codeFormatSuffix,
+                                        x_align: Clutter.ActorAlign.CENTER });
+
+            entrySpinnerBox.add_child(suffix);
+        }
 
         this._buttonBox = new St.BoxLayout({ style_class: 'notification-actions',
                                                      x_expand: true,
