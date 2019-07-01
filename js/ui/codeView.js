@@ -900,11 +900,16 @@ var CodingSession = GObject.registerClass({
         // destroyed in the first place
         if (this.app && !this.app.is_destroyed()) {
             let appWindow = this.app.meta_window;
+
+            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED) {
+                appWindow.delete(global.get_current_time());
+            } else if (this._state === CodingSessionStateEnum.TOOLBOX &&
+                     this.toolbox && !this.toolbox.is_destroyed()) {
+                this.app.rotation_angle_y = this.toolbox.rotation_angle_y;
+            }
+
             this.app = null;
             this._shellApp = null;
-
-            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED)
-                appWindow.delete(global.get_current_time());
         }
 
         // If we have a toolbox window, disconnect any signals and destroy it,
@@ -1326,6 +1331,25 @@ var CodeViewManager = GObject.registerClass({
             });
         });
 
+        global.settings.connect('changed::hack-mode-enabled', () => {
+            let activated = global.settings.get_boolean('hack-mode-enabled');
+            if (!activated) {
+                this._sessions.forEach((session) => {
+                    let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
+                    this._removeSession(session, eventType);
+                });
+            } else {
+                // enable FtH for all windows!
+                global.get_window_actors().forEach((actor) => {
+                    this.handleMapWindow(actor);
+                });
+
+                this._sessions.forEach((session) => {
+                    session._syncButtonVisibility();
+                });
+            }
+        });
+
         this._stopped = false;
         global.window_manager.connect('stop', () => {
             this._stopped = true;
@@ -1430,6 +1454,8 @@ var CodeViewManager = GObject.registerClass({
         // Do not manage apps that don't have an associated .desktop file
         let windowTracker = Shell.WindowTracker.get_default();
         let shellApp = windowTracker.get_window_app(actor.meta_window);
+        if (!shellApp)
+            return false;
         let appInfo = shellApp.get_app_info();
         if (!appInfo)
             return false;
