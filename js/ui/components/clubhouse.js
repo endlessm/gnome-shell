@@ -877,6 +877,8 @@ var Component = GObject.registerClass({
 
         this._enabled = true;
         this._syncVisibility();
+
+        Main.clubhouse = this;
     }
 
     // Override this because we need to make sure we only call a property on the proxy once
@@ -897,6 +899,8 @@ var Component = GObject.registerClass({
 
         this._enabled = false;
         this._syncVisibility();
+
+        Main.clubhouse = null;
     }
 
     callShow(timestamp) {
