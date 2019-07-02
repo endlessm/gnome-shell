@@ -5,38 +5,16 @@ const { Clutter, Gio, GLib, GObject, St } = imports.gi;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 
-function maybeCreateInactiveButton() {
-    if (_checkIfDiscoveryFeedEnabled()) {
-        let discoveryFeed = new DiscoveryFeedButton();
-        discoveryFeed.reactive = false;
-        return discoveryFeed;
-    }
-
-    return null;
+function createInactiveButton() {
+    let discoveryFeed = new DiscoveryFeedButton();
+    discoveryFeed.reactive = false;
+    return discoveryFeed;
 }
 
 const DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD = 1024;
 
 function _primaryMonitorWidthPassesThreshold() {
     return Main.layoutManager.primaryMonitor.width >= DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD;
-}
-
-function _checkIfDiscoveryFeedEnabled() {
-    let supportedLanguages = global.settings.get_value('discovery-feed-languages').deep_unpack();
-    let systemLanguages = GLib.get_language_names();
-
-    let isEnabled = supportedLanguages.some(function(lang) {
-        return systemLanguages.indexOf(lang) !== -1;
-    });
-
-    return isEnabled;
-}
-
-function maybeCreateButton() {
-    if (_checkIfDiscoveryFeedEnabled())
-        return new DiscoveryFeedButton();
-
-    return null;
 }
 
 /** DiscoveryFeedButton:
@@ -61,6 +39,8 @@ class DiscoveryFeedButton extends St.BoxLayout {
                                x_align: St.Align.MIDDLE,
                                expand: true });
 
+        this._hasDiscoveryFeed = this._isDiscoveryFeedEnabled();
+
         this._bar.connect('clicked', () => {
             Main.discoveryFeed.show(global.get_current_time());
         });
@@ -68,12 +48,19 @@ class DiscoveryFeedButton extends St.BoxLayout {
             Main.discoveryFeed.show(global.get_current_time());
         });
 
+        global.settings.connect('changed::hack-mode-enabled', () => { this._updateVisibility(); })
+
         this._bar.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
         this._tile.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
 
         Main.layoutManager.connect('monitors-changed', () => {
-            this.visible = _primaryMonitorWidthPassesThreshold();
+            this._updateVisibility();
         });
+    }
+
+    _updateVisibility() {
+        this.visible = (this._hasDiscoveryFeed || this._isHackModeEnabled()) &&
+            _primaryMonitorWidthPassesThreshold();
     }
 
     _onHoverChanged(actor) {
@@ -84,7 +71,11 @@ class DiscoveryFeedButton extends St.BoxLayout {
             this._bar.child.remove_style_pseudo_class('highlighted');
             this._tile.child.remove_style_pseudo_class('highlighted');
         }
-     }
+    }
+
+    _isHackModeEnabled() {
+        return global.settings.get_boolean('hack-mode-enabled');
+    }
 
     changeVisbilityState(value) {
         // Helper function to ensure that visibility is set correctly,
@@ -92,6 +83,17 @@ class DiscoveryFeedButton extends St.BoxLayout {
         // to mutating 'visible' directly, since it prevents the
         // button from appearing in cases where it should not.
         this.visible = value && _primaryMonitorWidthPassesThreshold();
+    }
+
+    _isDiscoveryFeedEnabled() {
+        let supportedLanguages = global.settings.get_value('discovery-feed-languages').deep_unpack();
+        let systemLanguages = GLib.get_language_names();
+
+        let isEnabled = supportedLanguages.some(function(lang) {
+            return systemLanguages.indexOf(lang) !== -1;
+        });
+
+        return isEnabled;
     }
 });
 
