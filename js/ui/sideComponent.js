@@ -46,6 +46,17 @@ function isDiscoveryFeedWindow (metaWindow) {
     return metaWindow && (metaWindow.get_wm_class() == 'Com.endlessm.DiscoveryFeed');
 };
 
+/**
+ * isTopSlidingWindow:
+ * @metaWindow: an instance of #Meta.Window
+ * @return: whether the #Meta.Window should be slid down/up
+ */
+function isTopSlidingWindow (metaWindow) {
+    return metaWindow && (isDiscoveryFeedWindow(metaWindow) ||
+                          metaWindow.get_wm_class() == 'Eos-clubhouse');
+};
+
+
 var SideComponent = GObject.registerClass(
 class SideComponent extends GObject.Object {
     _init(proxyIface, proxyName, proxyPath) {

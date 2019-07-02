@@ -1910,7 +1910,7 @@ var WindowManager = class {
         actor.opacity = 255;
         actor.show();
 
-        if (SideComponent.isDiscoveryFeedWindow(actor.meta_window)) {
+        if (SideComponent.isTopSlidingWindow(actor.meta_window)) {
             let endY = monitor.y - actor.height;
             Tweener.addTween(actor,
                              { y: endY,
@@ -2316,8 +2316,8 @@ var WindowManager = class {
             return;
         }
 
-        if (SideComponent.isDiscoveryFeedWindow(actor.meta_window)) {
-            // the DiscoveryFeed window will appear from the top center
+        if (SideComponent.isTopSlidingWindow(actor.meta_window)) {
+            // the window will appear from the top center
             let origY = actor.y;
             actor.set_position(actor.x, monitor.y - actor.height);
 
