@@ -42,10 +42,10 @@ class DiscoveryFeedButton extends St.BoxLayout {
         this._hasDiscoveryFeed = this._isDiscoveryFeedEnabled();
 
         this._bar.connect('clicked', () => {
-            Main.discoveryFeed.show(global.get_current_time());
+            this._launchTopComponent();
         });
         this._tile.connect('clicked', () => {
-            Main.discoveryFeed.show(global.get_current_time());
+            this._launchTopComponent();
         });
 
         global.settings.connect('changed::hack-mode-enabled', () => { this._updateVisibility(); })
@@ -56,6 +56,13 @@ class DiscoveryFeedButton extends St.BoxLayout {
         Main.layoutManager.connect('monitors-changed', () => {
             this._updateVisibility();
         });
+    }
+
+    _launchTopComponent() {
+        if (this._isHackModeEnabled())
+            Main.clubhouse.show(global.get_current_time());
+        else
+            Main.discoveryFeed.show(global.get_current_time());
     }
 
     _updateVisibility() {

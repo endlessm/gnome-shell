@@ -734,6 +734,8 @@ var Component = GObject.registerClass({
 
         this._enabled = true;
         this._syncVisibility();
+
+        Main.clubhouse = this;
     }
 
     disable() {
@@ -741,6 +743,8 @@ var Component = GObject.registerClass({
 
         this._enabled = false;
         this._syncVisibility();
+
+        Main.clubhouse = null;
     }
 
     callShow(timestamp) {
