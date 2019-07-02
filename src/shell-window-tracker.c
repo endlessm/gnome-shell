@@ -371,7 +371,7 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
 
   /* If code view is disabled globally, do nothing here */
   settings = shell_global_get_settings (shell_global_get ());
-  if (!g_settings_get_boolean (settings, "enable-code-view"))
+  if (!g_settings_get_boolean (settings, "hack-mode-enabled"))
     return NULL;
 
   /* Check if there is a set application id and object path
