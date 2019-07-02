@@ -425,6 +425,8 @@ var CodingSession = GObject.registerClass({
                                     '/com/endlessm/HackToolbox');
         this._toolboxAppActionGroup.list_actions();
 
+        this._hackModeChangedId = global.settings.connect('changed::hack-mode-enabled',
+                                                           this._syncButtonVisibility.bind(this));
         this._overviewHiddenId = Main.overview.connect('hidden',
                                                        this._overviewStateChanged.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
@@ -835,6 +837,10 @@ var CodingSession = GObject.registerClass({
             global.display.disconnect(this._focusWindowId);
             this._focusWindowId = 0;
         }
+        if (this._hackModeChangedId != 0) {
+            global.settings.disconnect(this._hackModeChangedId);
+            this._hackModeChangedId = 0;
+        }
         if (this._overviewHiddenId) {
             Main.overview.disconnect(this._overviewHiddenId);
             this._overviewHiddenId = 0;
@@ -1044,6 +1050,11 @@ var CodingSession = GObject.registerClass({
 
         let primaryMonitor = Main.layoutManager.primaryMonitor;
         let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
+
+        if (!global.settings.get_boolean('hack-mode-enabled')) {
+            this._button.hide();
+            return;
+        }
 
         // Show only if either this window or the toolbox window
         // is in focus, visible and hackable
