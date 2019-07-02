@@ -750,15 +750,15 @@ var ClubhouseButtonManager = GObject.registerClass({
                                   scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2,
                                   scaleFactor * CLUBHOUSE_BUTTON_SIZE);
 
-        Main.layoutManager.addChrome(this._openButton);
-
         this._closeButton = new Soundable.Button({
             child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }),
             click_sound_event_id: 'clubhouse/entry/close'
         });
         this._closeButton.connect('clicked', () => { this.emit('close-clubhouse'); })
 
-        Main.layoutManager.addChrome(this._closeButton);
+        // @todo: The buttons are no longer being added to the Shell layout because they're not
+        // needed, but we're keeping the code around until we understand whether the
+        // DiscoveryFeed button than be used for the intented UX or not.
 
         this._clubhouseWindowActor = null;
         this._clubhouseNotifyHandler = 0;
