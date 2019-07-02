@@ -392,7 +392,7 @@ var ViewsDisplay = class {
         this._searchResults.actor.bind_property('mapped', clickAction, 'enabled', GObject.BindingFlags.SYNC_CREATE);
 
         this.actor = new ViewsDisplayContainer(this.entry,
-                                               DiscoveryFeedButton.maybeCreateButton(),
+                                               new DiscoveryFeedButton.DiscoveryFeedButton(),
                                                this._appDisplay,
                                                this._searchResults);
     }
@@ -508,7 +508,7 @@ class ViewsClone extends St.Widget {
                                                                { allowScrolling: false });
         appGridContainer.reactive = false;
 
-        let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
+        let discoveryFeedButton = DiscoveryFeedButton.createInactiveButton();
 
         let layoutManager = new ViewsDisplayLayout(entry, discoveryFeedButton, appGridContainer, null);
         super._init({ layout_manager: layoutManager,
