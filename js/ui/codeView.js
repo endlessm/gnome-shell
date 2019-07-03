@@ -3,6 +3,7 @@
 const { Clutter, Flatpak, Gio, GLib, GObject, Gtk, Meta, Shell, St } = imports.gi;
 const Mainloop = imports.mainloop;
 
+const Animation = imports.ui.animation.Animation;
 const AppActivation = imports.ui.appActivation;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
@@ -21,6 +22,10 @@ var CodingSessionStateEnum = {
 
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
 const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
+
+const FLIP_BUTTON_WIDTH = 66;
+const FLIP_BUTTON_HEIGHT = 124;
+const FLIP_BUTTON_PULSE_SPEED = 100;
 
 const _HACK_SHADER_MAP = {
     'none': null,
@@ -276,6 +281,7 @@ var WindowTrackingButton = GObject.registerClass({
     _init(params) {
         this._flipped = false;
         this._rect = null;
+        this._highlighted = false;
 
         let buttonParams = _getViewSourceButtonParams(true);
         params = Params.parse(params, buttonParams, true);
@@ -283,6 +289,33 @@ var WindowTrackingButton = GObject.registerClass({
         super._init(params);
 
         this._updateSounds();
+
+        // pulse effect
+        let gfile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/flip-glow.png');
+        this._pulseAnimation = new Animation(gfile,
+                                             FLIP_BUTTON_WIDTH,
+                                             FLIP_BUTTON_HEIGHT,
+                                             FLIP_BUTTON_PULSE_SPEED);
+        this._pulseIcon = this._pulseAnimation.actor;
+    }
+
+    get highlighted() {
+        return this._highlighted;
+    }
+
+    set highlighted(value) {
+        if (this._highlighted === value)
+            return;
+
+        if (value) {
+            this.child = this._pulseIcon;
+            this._pulseAnimation.play();
+        } else {
+            this._pulseAnimation.stop();
+            this.child = null;
+        }
+
+        this._highlighted = value;
     }
 
     vfunc_allocate(box, flags) {
