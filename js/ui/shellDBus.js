@@ -561,6 +561,18 @@ var HackableApp = class {
     get State() {
         return this._session.state;
     }
+
+    get ToolboxVisible() {
+        if (!this._session.toolbox)
+            return false;
+        return this._session.toolbox.visible;
+    }
+
+    set ToolboxVisible(value) {
+        if (!this._session.toolbox)
+            return;
+        this._session.toolbox.visible = value;
+    }
 };
 
 const HackableAppsManagerIface = loadInterfaceXML('com.endlessm.HackableAppsManager');
