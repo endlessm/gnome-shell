@@ -131,6 +131,12 @@ var GnomeShell = class {
         Main.overview.viewSelector.appDisplay.selectApp(id);
     }
 
+    MinimizeAll() {
+        global.get_window_actors().filter(actor => {
+            actor.metaWindow.minimize();
+        });
+    }
+
     ShowApplications() {
         Main.overview.showApps();
     }
