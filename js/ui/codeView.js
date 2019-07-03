@@ -1390,7 +1390,8 @@ var CodeViewManager = GObject.registerClass({
         if (this._stopped)
             return false;
 
-        if (!global.settings.get_boolean('enable-code-view'))
+        if (!global.settings.get_boolean('enable-hack') ||
+            !global.settings.get_boolean('hack-mode')
             return false;
 
         // Do not manage apps that don't have an associated .desktop file
