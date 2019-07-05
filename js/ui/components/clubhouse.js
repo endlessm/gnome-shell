@@ -367,10 +367,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         this._rearrangeElements();
 
-        this._clubhouseTrackerHandler =
-            getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
-
-        this.actor.connect('destroy', this._untrackClubhouse.bind(this));
         this._closeButton.connect('clicked', () => {
             SoundServer.getDefault().play('clubhouse/dialog/close');
         });
@@ -385,13 +381,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             this._paginationReady = true;
         } else {
             super.setBody(text);
-        }
-    }
-
-    _untrackClubhouse() {
-        if (this._clubhouseTrackerHandler > 0) {
-            getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
-            this._clubhouseTrackerHandler = 0;
         }
     }
 
@@ -498,12 +487,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         let margin = 30;
 
-        let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
-
-        if (clubhouseWindowX == -1)
-            this.actor.x = monitor.x + monitor.width;
-        else
-            this.actor.x = clubhouseWindowX;
+        this.actor.x = monitor.x + monitor.width;
 
         let endX = this.actor.x - this.actor.width - margin;
 
@@ -584,8 +568,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     dismiss(shouldSlideOut) {
-        this._untrackClubhouse();
-
         if (!this.actor)
             return;
 
