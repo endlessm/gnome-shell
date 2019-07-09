@@ -579,6 +579,10 @@ var HackableApp = class {
             return;
         this._session.toolbox.visible = value;
     }
+
+    PulseFlipToHackButton(enable) {
+        this._session._button.setHighlighted(enable);
+    }
 };
 
 const HackableAppsManagerIface = loadInterfaceXML('com.endlessm.HackableAppsManager');
