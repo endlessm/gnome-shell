@@ -142,11 +142,17 @@ const AppIconMenu = class extends PopupMenu.PopupMenu {
         this._app = app;
 
         // Chain our visibility and lifecycle to that of the source
-        parentActor.connect('notify::mapped', () => {
+        this._parentActorMappedId = parentActor.connect('notify::mapped', () => {
             if (!parentActor.mapped)
                 this.close();
         });
-        parentActor.connect('destroy', () => { this.actor.destroy(); });
+        parentActor.connect('destroy', () => {
+            if (this._parentActorMappedId > 0) {
+                parentActor.disconnect(this._parentActorMappedId);
+                this._parentActorMappedId = 0;
+            }
+            this.actor.destroy();
+        });
     }
 
     _redisplay() {
