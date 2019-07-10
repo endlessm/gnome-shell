@@ -669,14 +669,6 @@ class AppIcon extends St.BoxLayout {
     set_size(size) {
         this.icon = this.app.create_icon_texture(size);
         this._iconBin.child = this.icon;
-        this._iconBin.set_size(size, size);
-    }
-
-    vfunc_get_preferred_width(forHeight) {
-        let [minWidth, ] = super.vfunc_get_preferred_width(forHeight);
-
-        minWidth = Math.max(minWidth, forHeight);
-        return [minWidth, minWidth];
     }
 
     get cachedWindows() {
@@ -745,11 +737,12 @@ class AppSwitcher extends SwitcherPopup.SwitcherList {
                 j++;
         }
         let themeNode = this._items[j].get_theme_node();
+        this._list.ensure_style();
 
         let iconPadding = themeNode.get_horizontal_padding();
         let iconBorder = themeNode.get_border_width(St.Side.LEFT) + themeNode.get_border_width(St.Side.RIGHT);
-        let [iconMinHeight, iconNaturalHeight] = this.icons[j].label.get_preferred_height(-1);
-        let iconSpacing = iconNaturalHeight + iconPadding + iconBorder;
+        let [, labelNaturalHeight] = this.icons[j].label.get_preferred_height(-1);
+        let iconSpacing = labelNaturalHeight + iconPadding + iconBorder;
         let totalSpacing = this._list.spacing * (this._items.length - 1);
 
         // We just assume the whole screen here due to weirdness happing with the passed width

@@ -187,7 +187,7 @@ var MessageDialogContent = GObject.registerClass({
             delete params['center_title'];
         }
 
-        let textProps = { ellipsize_mode: Pango.EllipsizeMode.NONE,
+        let textProps = { ellipsize: Pango.EllipsizeMode.NONE,
                           line_wrap: true };
         Object.assign(this._subtitle.clutter_text, textProps);
         Object.assign(this._body.clutter_text, textProps);
