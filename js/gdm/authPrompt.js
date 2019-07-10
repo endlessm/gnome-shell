@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { AccountsService, Clutter, GLib,
+const { AccountsService, Clutter, GLib, Gio,
         Pango, Polkit, Shell, St } = imports.gi;
 const ByteArray = imports.byteArray;
 const Signals = imports.signals;
