@@ -661,6 +661,7 @@ var AppLauncher = class {
         }
 
         activationContext.activate(null, timestamp);
+        invocation.return_value(null);
     }
 
     LaunchViaDBusCallAsync(params, invocation) {
