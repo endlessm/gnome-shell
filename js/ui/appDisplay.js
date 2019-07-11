@@ -2805,7 +2805,8 @@ class HackAppIcon extends ViewIcon {
 
         let activated = global.settings.get_boolean('hack-mode-enabled');
         this.iconState = activated ? HackAppIconState.ACTIVATED : HackAppIconState.DEACTIVATED;
-        global.settings.connect('changed::hack-mode-enabled', () => {
+
+        this._hackModeId = global.settings.connect('changed::hack-mode-enabled', () => {
             let activated = global.settings.get_boolean('hack-mode-enabled');
             this.iconState = activated ? HackAppIconState.ACTIVATED : HackAppIconState.DEACTIVATED;
         });
@@ -2848,5 +2849,10 @@ class HackAppIcon extends ViewIcon {
 
     getId() {
         return 'com.endlessm.Hack';
+    }
+
+    _onDestroy() {
+        if (this._hackModeId)
+            global.settings.disconnect(this._hackModeId);
     }
 });
