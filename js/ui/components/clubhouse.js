@@ -707,6 +707,15 @@ var Component = GObject.registerClass({
         return this._imageUsesClubhouse() && !!this._getClubhouseApp();
     }
 
+    _onPropertiesChanged(proxy, changedProps, invalidatedProps) {
+        super._onPropertiesChanged(proxy, changedProps, invalidatedProps);
+        let propsDict = changedProps.deep_unpack();
+        if (propsDict.hasOwnProperty('SuggestingOpen')) {
+            let button = Main.overview.viewSelector._viewsDisplay.actor._discoveryFeedButton;
+            button.setHighlighted(this.proxy.SuggestingOpen);
+        }
+    }
+
     enable() {
         if (!this._useClubhouse) {
             log('Cannot enable Clubhouse in this image version');

@@ -2,6 +2,7 @@
 
 const { Clutter, Gio, GLib, GObject, St } = imports.gi;
 
+const Animation = imports.ui.animation.Animation;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 
@@ -16,6 +17,12 @@ function maybeCreateInactiveButton() {
 }
 
 const DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD = 1024;
+
+const DISCOVERY_FEED_TILE_WIDTH = 62;
+const DISCOVERY_FEED_TILE_HEIGHT = 27;
+const DISCOVERY_FEED_BAR_WIDTH = 1004;
+const DISCOVERY_FEED_BAR_HEIGHT = 18;
+const DISCOVERY_FEED_ANIMATION_SPEED = 100;
 
 function _primaryMonitorWidthPassesThreshold() {
     return Main.layoutManager.primaryMonitor.width >= DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD;
@@ -49,13 +56,15 @@ class DiscoveryFeedButton extends St.BoxLayout {
         super._init({ vertical: true,
                       visible: _primaryMonitorWidthPassesThreshold() });
 
+        this._barNormalIcon = new St.Icon({ style_class: 'discovery-feed-bar-icon' });
         this._bar = new St.Button({ name: 'discovery-feed-bar',
-                                    child: new St.Icon({ style_class: 'discovery-feed-bar-icon' }),
+                                    child: this._barNormalIcon,
                                     style_class: 'discovery-feed-bar' });
         this.add(this._bar);
 
+        this._tileNormalIcon = new St.Icon({ style_class: 'discovery-feed-tile-icon' });
         this._tile = new St.Button({ name: 'discovery-feed-tile',
-                                     child: new St.Icon({ style_class: 'discovery-feed-tile-icon' }),
+                                     child: this._tileNormalIcon,
                                      style_class: 'discovery-feed-tile' });
         this.add(this._tile, { x_fill: false,
                                x_align: St.Align.MIDDLE,
@@ -74,6 +83,20 @@ class DiscoveryFeedButton extends St.BoxLayout {
         Main.layoutManager.connect('monitors-changed', () => {
             this.visible = _primaryMonitorWidthPassesThreshold();
         });
+
+        let gfile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/discovery-feed-tile-pulse.png');
+        this._tilePulseAnimation = new Animation(gfile,
+                                                 DISCOVERY_FEED_TILE_WIDTH,
+                                                 DISCOVERY_FEED_TILE_HEIGHT,
+                                                 DISCOVERY_FEED_ANIMATION_SPEED);
+        this._tilePulseIcon = this._tilePulseAnimation.actor;
+
+        gfile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/discovery-feed-bar-pulse.png');
+        this._barPulseAnimation = new Animation(gfile,
+                                                DISCOVERY_FEED_BAR_WIDTH,
+                                                DISCOVERY_FEED_BAR_HEIGHT,
+                                                DISCOVERY_FEED_ANIMATION_SPEED);
+        this._barPulseIcon = this._barPulseAnimation.actor;
     }
 
     _onHoverChanged(actor) {
@@ -85,6 +108,20 @@ class DiscoveryFeedButton extends St.BoxLayout {
             this._tile.child.remove_style_pseudo_class('highlighted');
         }
      }
+
+    setHighlighted(highlighted) {
+        if (highlighted) {
+            this._tile.child = this._tilePulseIcon;
+            this._bar.child = this._barPulseIcon;
+            this._tilePulseAnimation.play();
+            this._barPulseAnimation.play();
+        } else {
+            this._barPulseAnimation.stop();
+            this._tilePulseAnimation.stop();
+            this._bar.child = this._barNormalIcon;
+            this._tile.child = this._tileNormalIcon;
+        }
+    }
 
     changeVisbilityState(value) {
         // Helper function to ensure that visibility is set correctly,
