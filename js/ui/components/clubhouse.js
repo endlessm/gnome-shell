@@ -57,6 +57,7 @@ const ClubhouseIface =
     </method> \
     <property name="Visible" type="b" access="read"/> \
     <property name="SuggestingOpen" type="b" access="read"/> \
+    <property name="SideComponent" type="b" access="readwrite"/> \
   </interface> \
 </node>';
 
@@ -765,6 +766,10 @@ var Component = GObject.registerClass({
 
     callHide(timestamp) {
         this.proxy.hideRemote(timestamp);
+    }
+
+    callSetSideComponent(enabled) {
+        this.proxy.SideComponent = enabled;
     }
 
     _getClubhouseSource() {

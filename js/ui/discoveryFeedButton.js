@@ -59,9 +59,10 @@ class DiscoveryFeedButton extends St.BoxLayout {
     }
 
     _launchTopComponent() {
-        if (this._isHackModeEnabled())
+        if (this._isHackModeEnabled()) {
+            Main.clubhouse.callSetSideComponent(true);
             Main.clubhouse.show(global.get_current_time());
-        else
+        } else
             Main.discoveryFeed.show(global.get_current_time());
     }
 
