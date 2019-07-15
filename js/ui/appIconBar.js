@@ -909,6 +909,12 @@ const ScrolledIconList = GObject.registerClass({
         let state = app.state;
         switch(state) {
         case Shell.AppState.STARTING:
+            if (!this._parentalControlsManager.shouldShowApp(app.get_app_info()))
+                break;
+            this._addButton(app);
+            this._ensureIsVisible(app);
+            break;
+
         case Shell.AppState.RUNNING:
             this._addButton(app);
             this._ensureIsVisible(app);
