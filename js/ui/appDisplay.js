@@ -2840,6 +2840,7 @@ class HackAppIcon extends ViewIcon {
             logError('Clubhouse component not found.');
             return;
         }
+        component.callSetSideComponent(false);
         component.callShow();
         this.icon.animateZoomOut();
     }
