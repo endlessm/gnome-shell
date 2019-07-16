@@ -75,6 +75,10 @@ function _clipToMonitor(actor) {
     actor.set_clip(0, 0, clip, actor.height);
 }
 
+function getClubhouseApp() {
+    return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
+}
+
 var getClubhouseWindowTracker = (function () {
     let clubhouseWindowTracker;
     return function () {
@@ -680,7 +684,7 @@ var Component = GObject.registerClass({
         global.settings.connect('changed::hack-mode-enabled', () => {
             let activated = global.settings.get_boolean('hack-mode-enabled');
             // Only enable if clubhouse app is installed
-            activated = activated && !!this._getClubhouseApp();
+            activated = activated && !!getClubhouseApp();
 
             if (activated)
                 this.enable();
@@ -704,7 +708,7 @@ var Component = GObject.registerClass({
     }
 
     get _useClubhouse() {
-        return this._imageUsesClubhouse() && !!this._getClubhouseApp();
+        return this._imageUsesClubhouse() && !!getClubhouseApp();
     }
 
     enable() {
@@ -752,7 +756,7 @@ var Component = GObject.registerClass({
         // We only activate the app here if it's not yet running, otherwise the cursor will turn
         // into a spinner for a while, even after the window is shown.
         // @todo: Call activate alone when we fix the problem mentioned above.
-        this._getClubhouseApp().activate();
+        getClubhouseApp().activate();
     }
 
     callHide(timestamp) {
@@ -794,10 +798,6 @@ var Component = GObject.registerClass({
 
         this._itemBanner.dismiss(true);
         this._itemBanner = null;
-    }
-
-    _getClubhouseApp() {
-        return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
     }
 
     _imageUsesClubhouse() {

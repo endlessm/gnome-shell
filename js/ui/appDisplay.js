@@ -93,11 +93,7 @@ const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
 const EOS_NEW_ICON_ANIMATION_TIME = 0.5;
 const EOS_NEW_ICON_ANIMATION_DELAY = 0.7;
 
-const {CLUBHOUSE_ID} = imports.ui.components.clubhouse;
-
-function _getClubhouse() {
-    return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
-}
+const Clubhouse = imports.ui.components.clubhouse;
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -635,7 +631,7 @@ var AllView = class AllView extends BaseAppView {
         let layoutIds = super.getLayoutIds();
 
         // Only show the hack icon if the clubhouse app is in the system
-        if (_getClubhouse())
+        if (Clubhouse.getClubhouseApp())
             layoutIds.splice(0, 0, HACK_APP_ID);
 
         if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
@@ -734,7 +730,7 @@ var AllView = class AllView extends BaseAppView {
         if (this._hackAppIcon)
             return;
 
-        if (!_getClubhouse())
+        if (!Clubhouse.getClubhouseApp())
             return;
 
         this._ensureHackAppIcon();
@@ -2839,7 +2835,12 @@ class HackAppIcon extends ViewIcon {
     activate(button) {
         // launch clubhouse, the clubhouse is reponsible to set the
         // hack-mode-enabled key to true on the first launch
-        _getClubhouse().activate();
+        const component = Main.componentManager._ensureComponent('clubhouse');
+        if (!component) {
+            logError('Clubhouse component not found.');
+            return;
+        }
+        component.callShow();
         this.icon.animateZoomOut();
     }
 
