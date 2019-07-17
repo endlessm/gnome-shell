@@ -61,6 +61,10 @@ function _ensureAfterFirstFrame(win, callback) {
 
 function _getAppId(win) {
     let app = Shell.WindowTracker.get_default().get_window_app(win);
+    let gtkId = win.get_gtk_application_id();
+    if (gtkId)
+        return gtkId;
+
     // remove .desktop suffix
     return app.get_id().slice(0, -8);
 };
@@ -87,7 +91,7 @@ const _ensureHackDataFile = (function () {
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
         '/var/lib/flatpak',
     ];
-    const flatpakPath = 'app/com.endlessm.HackComponents/current/active/files';
+    const flatpakPath = 'app/com.endlessm.Clubhouse/current/active/files';
     const fileRelPath = 'share/hack-components';
     const searchPaths = flatpakInstallationPaths.map(installation =>
         GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
@@ -1460,11 +1464,14 @@ var CodeViewManager = GObject.registerClass({
         if (!appInfo)
             return false;
 
+        let gtkId = actor.meta_window.get_gtk_application_id();
+
         // The custom X-Endless-Hackable key has the last word always
         if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
             if (!appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
                 return false;
-        } else {
+        // The hack unlock has the com.endlessm.Clubhouse id in the katamari flatpak
+        } else if (gtkId !== 'com.endlessm.HackUnlock' && gtkId !== 'com.endlessm.HackToolbox') {
             // Do not manage apps that are NoDisplay=true
             if (!appInfo.should_show())
                 return false;
