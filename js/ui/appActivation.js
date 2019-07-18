@@ -9,6 +9,7 @@ const Main = imports.ui.main;
 const Mainloop = imports.mainloop
 const Overview = imports.ui.overview;
 const Panel = imports.ui.panel;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const Tweener = imports.ui.tweener;
 const Util = imports.misc.util;
 const WindowManager = imports.ui.windowManager;
@@ -47,7 +48,8 @@ function _shouldShowSplash(app) {
         Util.getBrowserApp().state != Shell.AppState.STOPPED)
         return false;
 
-    return true;
+    let parentalControlsManager = ParentalControlsManager.getDefault();
+    return parentalControlsManager.shouldShowApp(app.get_app_info());
 }
 
 var AppActivationContext = class {
