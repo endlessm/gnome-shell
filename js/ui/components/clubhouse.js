@@ -802,7 +802,6 @@ var Component = GObject.registerClass({
     _init() {
         super._init(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
 
-        this._useClubhouse = this._imageUsesClubhouse() && !!getClubhouseApp();
         if (!this._useClubhouse)
             return;
 
@@ -827,6 +826,10 @@ var Component = GObject.registerClass({
         this.proxyConstructFlags = Gio.DBusProxyFlags.NONE;
 
         this._overrideAddNotification();
+    }
+
+    get _useClubhouse() {
+        return !!getClubhouseApp();
     }
 
     _ensureProxy() {
@@ -862,7 +865,7 @@ var Component = GObject.registerClass({
 
     enable() {
         if (!this._useClubhouse) {
-            log('Cannot enable Clubhouse in this image version');
+            log('Cannot enable Clubhouse in this image version because not installed');
             return;
         }
 
@@ -960,16 +963,6 @@ var Component = GObject.registerClass({
 
         this._itemBanner.dismiss(true);
         this._itemBanner = null;
-    }
-
-    _imageUsesClubhouse() {
-        if (GLib.getenv('CLUBHOUSE_DEBUG_ENABLED'))
-            return true;
-
-        // We are only using the Clubhouse component in Endless Hack images for now, so
-        // check if the prefix of the image version matches the mentioned flavor.
-        let eosImageVersion = Shell.util_get_eos_image_version();
-        return eosImageVersion && eosImageVersion.startsWith('hack-');
     }
 
     _overrideAddNotification() {
