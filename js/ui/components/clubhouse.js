@@ -135,9 +135,9 @@ var ClubhouseWindowTracker = GObject.registerClass({
 
         this.emit('window-changed');
 
-        // Track Clubhouse's window actor to make the closeButton always show on top of
+        // Track Clubhouse's window actor to make the closeButton always show on bottom of
         // the Clubhouse's window edge
-        this._notifyHandler = actor.connect('notify::x', () => {
+        this._notifyHandler = actor.connect('notify::y', () => {
             this.emit('window-changed');
         });
 
@@ -161,10 +161,16 @@ var ClubhouseWindowTracker = GObject.registerClass({
         this._windowActor = null;
     }
 
-    getWindowX() {
+    getWindowY() {
         if (!Main.sessionMode.hasOverview || Main.overview.visible || this._windowActor == null)
             return -1;
-        return this._windowActor.x;
+        return this._windowActor.y;
+    }
+
+    getWindowHeight() {
+        if (!Main.sessionMode.hasOverview || Main.overview.visible || this._windowActor == null)
+            return -1;
+        return this._windowActor.height;
     }
 });
 
@@ -732,9 +738,9 @@ var ClubhouseButtonManager = GObject.registerClass({
         this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
 
         let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        this._openButton.set_clip(0, 0,
-                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2,
-                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE);
+        this._openButton.set_clip(0, scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2,
+                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE,
+                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2);
 
         Main.layoutManager.addChrome(this._openButton);
 
@@ -757,11 +763,13 @@ var ClubhouseButtonManager = GObject.registerClass({
     }
 
     _updateCloseButtonPosition() {
-        this._closeButton.y = this._openButton.y;
+        let monitor = Main.layoutManager.primaryMonitor;
+        this._closeButton.x = monitor.x + Math.floor((monitor.width - this._closeButton.width) / 2);
 
-        let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
-        if (clubhouseWindowX != -1)
-            this._closeButton.x = clubhouseWindowX - this._closeButton.width / 2;
+        const clubhouseWindowY = getClubhouseWindowTracker().getWindowY();
+        const clubhouseWindowHeight = getClubhouseWindowTracker().getWindowHeight();
+        if (clubhouseWindowY != -1 && clubhouseWindowHeight != -1)
+            this._closeButton.y = clubhouseWindowY + clubhouseWindowHeight - this._closeButton.height / 2;
 
         _clipToMonitor(this._closeButton);
     }
@@ -773,14 +781,14 @@ var ClubhouseButtonManager = GObject.registerClass({
 
         let workarea = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
 
-        this._openButton.x = monitor.x + monitor.width - this._openButton.width / 2;
-        this._openButton.y = workarea.y + Math.floor(workarea.height / 2.0 - this._openButton.height / 2.0);
+        this._openButton.x = monitor.x + Math.floor((monitor.width - this._openButton.width) / 2);
+        this._openButton.y = workarea.y - Math.floor(this._openButton.height / 2.0);
 
         this._updateCloseButtonPosition();
     }
 
     _updateVisibility() {
-        this._closeButton.visible = this._visible && getClubhouseWindowTracker().getWindowX() != -1;
+        this._closeButton.visible = this._visible && getClubhouseWindowTracker().getWindowY() != -1;
         this._openButton.visible = this._visible && Main.sessionMode.hasOverview &&
                                    !this._closeButton.visible;
         this._reposition();
