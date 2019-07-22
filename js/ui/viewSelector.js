@@ -214,9 +214,7 @@ var ViewsDisplayLayout = GObject.registerClass({
 
         let discoveryFeedButtonBox = allocation.copy();
         if (this._discoveryFeedButton)
-            discoveryFeedButtonBox = DiscoveryFeedButton.determineAllocationWithinBox(this._discoveryFeedButton,
-                                                                                      allocation,
-                                                                                      availWidth);
+            discoveryFeedButtonBox = this._discoveryFeedButton.determineAllocationWithinBox(allocation, availWidth);
 
         let gridContainerBox = allocation.copy();
         // The grid container box should have the dimensions of this container but start
