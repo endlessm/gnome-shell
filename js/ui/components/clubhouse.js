@@ -742,8 +742,6 @@ var ClubhouseButtonManager = GObject.registerClass({
                                   scaleFactor * CLUBHOUSE_BUTTON_SIZE,
                                   scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2);
 
-        Main.layoutManager.addChrome(this._openButton);
-
         this._closeButton = new Soundable.Button({
             child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }),
             click_sound_event_id: 'clubhouse/entry/close'

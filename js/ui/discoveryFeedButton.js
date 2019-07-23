@@ -34,9 +34,18 @@ function _checkIfDiscoveryFeedEnabled() {
     return isEnabled && !clubhouseInstalled;
 }
 
+function _checkIfClubhouseEnabled() {
+    return !!Clubhouse.getClubhouseApp();
+}
+
 function maybeCreateButton() {
     if (_checkIfDiscoveryFeedEnabled())
         return new DiscoveryFeedButton();
+    else if (_checkIfClubhouseEnabled()) {
+        const component = Main.componentManager._ensureComponent('clubhouse');
+        if (component)
+            return new DiscoveryFeedClubhouseButton(component);
+    }
 
     return null;
 }
@@ -124,4 +133,29 @@ class DiscoveryFeedButton extends DiscoveryFeedButtonBase {
             this._tile.child.remove_style_pseudo_class('highlighted');
         }
      }
+});
+
+
+var DiscoveryFeedClubhouseButton = GObject.registerClass(
+class DiscoveryFeedClubhouseButton extends DiscoveryFeedButtonBase {
+    _init(clubhouseComponent) {
+        super._init();
+        const button = clubhouseComponent._clubhouseButtonManager._openButton;
+        this.add(button);
+    }
+
+    determineAllocationWithinBox(box, availWidth) {
+        if (!this.constructor._primaryMonitorWidthPassesThreshold())
+          return box;
+
+        let discoveryFeedButtonHeight = this.get_preferred_height(availWidth)[1];
+        let discoveryFeedButtonBox = box.copy();
+        let x1 = (availWidth - this.get_width()) * 0.5;
+        discoveryFeedButtonBox.y1 = discoveryFeedButtonBox.y1 - discoveryFeedButtonHeight / 2;
+        discoveryFeedButtonBox.y2 = discoveryFeedButtonBox.y1 + discoveryFeedButtonHeight;
+        discoveryFeedButtonBox.x1 = x1;
+        discoveryFeedButtonBox.x2 = x1 + this.get_width();
+        return discoveryFeedButtonBox;
+    }
+
 });
