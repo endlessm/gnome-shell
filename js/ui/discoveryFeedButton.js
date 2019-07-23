@@ -7,13 +7,10 @@ const Main = imports.ui.main;
 const Clubhouse = imports.ui.components.clubhouse;
 
 function maybeCreateInactiveButton() {
-    if (_checkIfDiscoveryFeedEnabled()) {
-        let discoveryFeed = new DiscoveryFeedButton();
-        discoveryFeed.reactive = false;
-        return discoveryFeed;
-    }
-
-    return null;
+    const button = maybeCreateButton(true);
+    if (button)
+        button.reactive = false;
+    return button;
 }
 
 const DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD = 1024;
@@ -38,13 +35,14 @@ function _checkIfClubhouseEnabled() {
     return !!Clubhouse.getClubhouseApp();
 }
 
-function maybeCreateButton() {
+function maybeCreateButton(inactive=false) {
     if (_checkIfDiscoveryFeedEnabled())
         return new DiscoveryFeedButton();
     else if (_checkIfClubhouseEnabled()) {
         const component = Main.componentManager._ensureComponent('clubhouse');
-        if (component)
-            return new DiscoveryFeedClubhouseButton(component);
+        if (component) {
+            return new DiscoveryFeedClubhouseButton(component, inactive);
+        }
     }
 
     return null;
@@ -138,9 +136,14 @@ class DiscoveryFeedButton extends DiscoveryFeedButtonBase {
 
 var DiscoveryFeedClubhouseButton = GObject.registerClass(
 class DiscoveryFeedClubhouseButton extends DiscoveryFeedButtonBase {
-    _init(clubhouseComponent) {
+    _init(clubhouseComponent, inactive) {
         super._init();
-        const button = clubhouseComponent._clubhouseButtonManager._openButton;
+
+        let button;
+        if (inactive)
+            button = clubhouseComponent._clubhouseButtonManager._inactiveOpenButton;
+        else
+            button = clubhouseComponent._clubhouseButtonManager._openButton;
         this.add(button);
     }
 

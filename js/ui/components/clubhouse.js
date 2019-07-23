@@ -686,11 +686,24 @@ class ClubhouseNotificationSource extends NotificationDaemon.GtkNotificationDaem
 };
 
 var ClubhouseOpenButton = GObject.registerClass({
+    Properties: {
+        'inactive': GObject.ParamSpec.boolean('inactive', '', '',
+            GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT,
+            false
+        ),
+        'highlighted': GObject.ParamSpec.boolean('highlighted', '', '',
+            GObject.ParamFlags.READWRITE,
+            false
+        )
+    },
 }, class ClubhouseOpenButton extends Soundable.Button {
     _init(params) {
         params = params || {};
         let gfile =
             Gio.File.new_for_uri('resource:///org/gnome/shell/theme/clubhouse-icon-pulse.png');
+        this._inactive = !!params.inactive;
+        this._highlighted = !!params.highlighted;
+
         this._pulseAnimation = new Animation(gfile,
                                              CLUBHOUSE_BUTTON_SIZE,
                                              CLUBHOUSE_BUTTON_SIZE,
@@ -703,25 +716,56 @@ var ClubhouseOpenButton = GObject.registerClass({
         params.click_sound_event_id = 'clubhouse/entry/open';
         params.hover_sound_event_id = 'clubhouse/entry/hover';
         params.stop_hover_sound_on_click = true;
+
+        this._highlightSoundItem = null;
+        this._highlightLoopingSoundItem = null;
+
+        // Avoid playing the inactive and active sounds at the same time.
+        if (!this.inactive) {
+            this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse');
+            this._highlightLoopingSoundItem =
+                new SoundServer.SoundItem('clubhouse/entry/pulse-loop');
+        }
+
         super._init(params);
 
-        this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse');
-        this._highlightLoopingSoundItem =
-            new SoundServer.SoundItem('clubhouse/entry/pulse-loop');
+        // Clip to half the button.
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        this.set_clip(0, scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2,
+                      scaleFactor * CLUBHOUSE_BUTTON_SIZE,
+                      scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2);
     }
 
-    setHighlighted(highlighted) {
-        if (highlighted) {
+    set highlighted(value) {
+        if (value === this._highlighted)
+            return;
+
+        if (value) {
             this.child = this._pulseIcon;
             this._pulseAnimation.play();
-            this._highlightSoundItem.play();
-            this._highlightLoopingSoundItem.play();
+            if (this._highlightSoundItem)
+                this._highlightSoundItem.play();
+            if (this._highlightLoopingSoundItem)
+                this._highlightLoopingSoundItem.play();
         } else {
             this.child = this._normalIcon;
             this._pulseAnimation.stop();
-            this._highlightSoundItem.stop();
-            this._highlightLoopingSoundItem.stop();
+            if (this._highlightSoundItem)
+                this._highlightSoundItem.stop();
+            if (this._highlightLoopingSoundItem)
+                this._highlightLoopingSoundItem.stop();
         }
+
+        this._highlighted = value;
+        this.notify('highlighted');
+    }
+
+    get highlighted() {
+        return this._highlighted;
+    }
+
+    get inactive() {
+        return this._inactive;
     }
 });
 
@@ -736,11 +780,7 @@ var ClubhouseButtonManager = GObject.registerClass({
 
         this._openButton = new ClubhouseOpenButton();
         this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
-
-        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        this._openButton.set_clip(0, scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2,
-                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE,
-                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2);
+        this._inactiveOpenButton = this._cloneOpenButton({inactive: true});
 
         this._closeButton = new Soundable.Button({
             child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }),
@@ -758,6 +798,21 @@ var ClubhouseButtonManager = GObject.registerClass({
         this._updateVisibility();
 
         getClubhouseWindowTracker().connect('window-changed', this._updateVisibility.bind(this));
+    }
+
+    _cloneOpenButton(params) {
+        const button = new ClubhouseOpenButton({inactive: true});
+        button.connect('clicked', () => {
+            this.emit('open-clubhouse');
+        });
+
+        const flags = GObject.BindingFlags.DEFAULT;
+        this._openButton.bind_property('x', button, 'x', flags);
+        this._openButton.bind_property('y', button, 'y', flags);
+        this._openButton.bind_property('visible', button, 'visible', flags);
+        this._openButton.bind_property('highlighted', button, 'highlighted', flags);
+
+        return button;
     }
 
     _updateCloseButtonPosition() {
@@ -781,7 +836,6 @@ var ClubhouseButtonManager = GObject.registerClass({
 
         this._openButton.x = monitor.x + Math.floor((monitor.width - this._openButton.width) / 2);
         this._openButton.y = workarea.y - Math.floor(this._openButton.height / 2.0);
-
         this._updateCloseButtonPosition();
     }
 
@@ -794,7 +848,7 @@ var ClubhouseButtonManager = GObject.registerClass({
 
     setSuggestOpen(suggestOpen) {
         if (this._openButton.visible)
-            this._openButton.setHighlighted(suggestOpen);
+            this._openButton.highlighted = suggestOpen;
     }
 
     setVisible(visible) {
