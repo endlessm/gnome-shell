@@ -3,6 +3,7 @@
 const { Gio, GLib, GObject, Meta } = imports.gi;
 
 const Main = imports.ui.main;
+const Clubhouse = imports.ui.components.clubhouse;
 const ViewSelector = imports.ui.viewSelector;
 
 const SIDE_COMPONENT_ROLE = 'eos-side-component';
@@ -23,7 +24,8 @@ function isSideComponentWindow (metaWindow) {
  */
 function shouldHideOtherWindows (metaWindow) {
     return isSideComponentWindow(metaWindow) &&
-        Main.discoveryFeed.launchedFromDesktop;
+        Main.discoveryFeed.launchedFromDesktop ||
+        metaWindow.gtk_application_id === Clubhouse.CLUBHOUSE_ID;
 };
 
 /**
