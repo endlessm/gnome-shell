@@ -610,6 +610,8 @@ var WindowOverlay = class {
 
         let tracker = Shell.WindowTracker.get_default();
         let app = tracker.get_window_app(metaWindow);
+        if (!app)
+            return '';
         return app.get_name();
     }
 
