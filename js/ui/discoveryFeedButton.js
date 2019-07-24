@@ -4,15 +4,13 @@ const { Clutter, Gio, GLib, GObject, St } = imports.gi;
 
 const Lang = imports.lang;
 const Main = imports.ui.main;
+const Clubhouse = imports.ui.components.clubhouse;
 
 function maybeCreateInactiveButton() {
-    if (_checkIfDiscoveryFeedEnabled()) {
-        let discoveryFeed = new DiscoveryFeedButton();
-        discoveryFeed.reactive = false;
-        return discoveryFeed;
-    }
-
-    return null;
+    const button = maybeCreateButton(true);
+    if (button)
+        button.reactive = false;
+    return button;
 }
 
 const DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD = 1024;
@@ -28,26 +26,78 @@ function _checkIfDiscoveryFeedEnabled() {
     let isEnabled = supportedLanguages.some(function(lang) {
         return systemLanguages.indexOf(lang) !== -1;
     });
+    const clubhouseInstalled = !!Clubhouse.getClubhouseApp();
 
-    return isEnabled;
+    return isEnabled && !clubhouseInstalled;
 }
 
-function maybeCreateButton() {
+function _checkIfClubhouseEnabled() {
+    return !!Clubhouse.getClubhouseApp();
+}
+
+function maybeCreateButton(inactive=false) {
     if (_checkIfDiscoveryFeedEnabled())
         return new DiscoveryFeedButton();
+    else if (_checkIfClubhouseEnabled()) {
+        const component = Main.componentManager._ensureComponent('clubhouse');
+        if (component) {
+            return new DiscoveryFeedClubhouseButton(component, inactive);
+        }
+    }
 
     return null;
 }
+
+
+var DiscoveryFeedButtonBase = GObject.registerClass(
+class DiscoveryFeedButtonBase extends St.BoxLayout {
+    _init(params={}) {
+        if (!params.visible)
+            params.visible = this.constructor._primaryMonitorWidthPassesThreshold();
+        super._init(params);
+
+        Main.layoutManager.connect('monitors-changed', () => {
+            this.visible = this.constructor._primaryMonitorWidthPassesThreshold();
+        });
+    }
+
+    static _primaryMonitorWidthPassesThreshold() {
+        return Main.layoutManager.primaryMonitor.width >= DISCOVERY_FEED_PRIMARY_MONITOR_WIDTH_THRESHOLD;
+    }
+
+    changeVisbilityState(value) {
+        // Helper function to ensure that visibility is set correctly,
+        // consumers of this button should use this function as opposed
+        // to mutating 'visible' directly, since it prevents the
+        // button from appearing in cases where it should not.
+        this.visible = value && this.constructor._primaryMonitorWidthPassesThreshold();
+    }
+
+    determineAllocationWithinBox(box, availWidth) {
+        // If we would not show the feed button because the monitor
+        // is too small, just return box directly
+        if (!this.constructor._primaryMonitorWidthPassesThreshold())
+          return box;
+
+        let discoveryFeedButtonHeight = this.get_preferred_height(availWidth)[1];
+        let discoveryFeedButtonBox = box.copy();
+        let x1 = (availWidth - this.get_width()) * 0.5;
+        discoveryFeedButtonBox.y1 = 0;
+        discoveryFeedButtonBox.y2 = discoveryFeedButtonBox.y1 + discoveryFeedButtonHeight;
+        discoveryFeedButtonBox.x1 = x1;
+        discoveryFeedButtonBox.x2 = x1 + this.get_width();
+        return discoveryFeedButtonBox;
+    }
+});
 
 /** DiscoveryFeedButton:
  *
  * This class handles the button to launch the discovery feed application
  */
 var DiscoveryFeedButton = GObject.registerClass(
-class DiscoveryFeedButton extends St.BoxLayout {
+class DiscoveryFeedButton extends DiscoveryFeedButtonBase {
     _init() {
-        super._init({ vertical: true,
-                      visible: _primaryMonitorWidthPassesThreshold() });
+        super._init({ vertical: true});
 
         this._bar = new St.Button({ name: 'discovery-feed-bar',
                                     child: new St.Icon({ style_class: 'discovery-feed-bar-icon' }),
@@ -70,10 +120,6 @@ class DiscoveryFeedButton extends St.BoxLayout {
 
         this._bar.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
         this._tile.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
-
-        Main.layoutManager.connect('monitors-changed', () => {
-            this.visible = _primaryMonitorWidthPassesThreshold();
-        });
     }
 
     _onHoverChanged(actor) {
@@ -85,28 +131,34 @@ class DiscoveryFeedButton extends St.BoxLayout {
             this._tile.child.remove_style_pseudo_class('highlighted');
         }
      }
-
-    changeVisbilityState(value) {
-        // Helper function to ensure that visibility is set correctly,
-        // consumers of this button should use this function as opposed
-        // to mutating 'visible' directly, since it prevents the
-        // button from appearing in cases where it should not.
-        this.visible = value && _primaryMonitorWidthPassesThreshold();
-    }
 });
 
-function determineAllocationWithinBox(discoveryFeedButton, box, availWidth) {
-    // If we would not show the feed button because the monitor
-    // is too small, just return box directly
-    if (!_primaryMonitorWidthPassesThreshold())
-      return box;
 
-    let discoveryFeedButtonHeight = discoveryFeedButton.get_preferred_height(availWidth)[1];
-    let discoveryFeedButtonBox = box.copy();
-    let x1 = (availWidth - discoveryFeedButton.get_width()) * 0.5;
-    discoveryFeedButtonBox.y1 = 0;
-    discoveryFeedButtonBox.y2 = discoveryFeedButtonBox.y1 + discoveryFeedButtonHeight;
-    discoveryFeedButtonBox.x1 = x1;
-    discoveryFeedButtonBox.x2 = x1 + discoveryFeedButton.get_width();
-    return discoveryFeedButtonBox;
-}
+var DiscoveryFeedClubhouseButton = GObject.registerClass(
+class DiscoveryFeedClubhouseButton extends DiscoveryFeedButtonBase {
+    _init(clubhouseComponent, inactive) {
+        super._init();
+
+        let button;
+        if (inactive)
+            button = clubhouseComponent._clubhouseButtonManager._inactiveOpenButton;
+        else
+            button = clubhouseComponent._clubhouseButtonManager._openButton;
+        this.add(button);
+    }
+
+    determineAllocationWithinBox(box, availWidth) {
+        if (!this.constructor._primaryMonitorWidthPassesThreshold())
+          return box;
+
+        let discoveryFeedButtonHeight = this.get_preferred_height(availWidth)[1];
+        let discoveryFeedButtonBox = box.copy();
+        let x1 = (availWidth - this.get_width()) * 0.5;
+        discoveryFeedButtonBox.y1 = discoveryFeedButtonBox.y1 - discoveryFeedButtonHeight / 2;
+        discoveryFeedButtonBox.y2 = discoveryFeedButtonBox.y1 + discoveryFeedButtonHeight;
+        discoveryFeedButtonBox.x1 = x1;
+        discoveryFeedButtonBox.x2 = x1 + this.get_width();
+        return discoveryFeedButtonBox;
+    }
+
+});

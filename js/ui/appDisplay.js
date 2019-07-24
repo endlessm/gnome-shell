@@ -74,7 +74,6 @@ const EOS_DESKTOP_MIN_ROWS = 2;
 const EOS_LINK_PREFIX = 'eos-link-';
 
 const EOS_ENABLE_APP_CENTER_KEY = 'enable-app-center';
-const HACK_APP_ID = 'com.endlessm.Hack.desktop';
 const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
 
 var EOS_INACTIVE_GRID_OPACITY = 96;
@@ -92,8 +91,6 @@ const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
 
 const EOS_NEW_ICON_ANIMATION_TIME = 0.5;
 const EOS_NEW_ICON_ANIMATION_DELAY = 0.7;
-
-const Clubhouse = imports.ui.components.clubhouse;
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -623,16 +620,11 @@ var AllView = class AllView extends BaseAppView {
 
     loadGrid() {
         this._maybeAddAppCenterIcon();
-        this._maybeAddHackIcon();
         super.loadGrid();
     }
 
     getLayoutIds() {
         let layoutIds = super.getLayoutIds();
-
-        // Only show the hack icon if the clubhouse app is in the system
-        if (Clubhouse.getClubhouseApp())
-            layoutIds.splice(0, 0, HACK_APP_ID);
 
         if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
             return layoutIds;
@@ -651,7 +643,6 @@ var AllView = class AllView extends BaseAppView {
     removeAll() {
         this.folderIcons = [];
         this._appCenterIcon = null;
-        this._hackAppIcon = null;
         super.removeAll();
     }
 
@@ -676,24 +667,10 @@ var AllView = class AllView extends BaseAppView {
         };
     }
 
-    _ensureHackAppIcon() {
-        if (this._hackAppIcon)
-            return;
-
-        this._hackAppIcon = new HackAppIcon(this);
-        this._hackAppItem = {
-            get_name: () => { return this._hackAppIcon.getName(); }
-        };
-    }
-
     _createItemForId(itemId) {
         if (itemId == EOS_APP_CENTER_ID) {
             this._ensureAppCenterIcon();
             return this._appCenterItem;
-        }
-        if (itemId == HACK_APP_ID) {
-            this._ensureHackAppIcon();
-            return this._hackAppItem;
         }
 
         return super._createItemForId(itemId);
@@ -702,9 +679,6 @@ var AllView = class AllView extends BaseAppView {
     _createItemIcon(item) {
         if (item == this._appCenterItem)
             return this._appCenterIcon;
-
-        if (item == this._hackAppItem)
-            return this._hackAppIcon;
 
         let itemId = item.get_id();
 
@@ -724,17 +698,6 @@ var AllView = class AllView extends BaseAppView {
         }
 
         return icon;
-    }
-
-    _maybeAddHackIcon() {
-        if (this._hackAppIcon)
-            return;
-
-        if (!Clubhouse.getClubhouseApp())
-            return;
-
-        this._ensureHackAppIcon();
-        this.addItem(this._hackAppIcon);
     }
 
     _maybeAddAppCenterIcon() {
@@ -2778,82 +2741,5 @@ class AppCenterIcon extends AppIcon {
 
         this.handleViewDragEnd();
         return true;
-    }
-});
-
-const HackAppIconState = {
-    ACTIVATED: ViewIconState.NUM_STATES + 2,
-    DEACTIVATED: ViewIconState.NUM_STATES + 3
-};
-
-var HackAppIcon = GObject.registerClass(
-class HackAppIcon extends ViewIcon {
-    _init(parentView) {
-        let viewIconParams = { isDraggable: false,
-                               showMenu: false,
-                               parentView: parentView };
-
-        let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
-        let iconParams = { createIcon: this._createIcon.bind(this) };
-
-
-        super._init(viewIconParams, buttonParams, iconParams);
-
-        let activated = global.settings.get_boolean('hack-mode-enabled');
-        this.iconState = activated ? HackAppIconState.ACTIVATED : HackAppIconState.DEACTIVATED;
-
-        this._hackModeId = global.settings.connect('changed::hack-mode-enabled', () => {
-            let activated = global.settings.get_boolean('hack-mode-enabled');
-            this.iconState = activated ? HackAppIconState.ACTIVATED : HackAppIconState.DEACTIVATED;
-        });
-
-        this.canDrop = false;
-
-        this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
-                                              x_expand: true, y_expand: true });
-        this._iconContainer.add_child(this.icon.actor);
-
-        this.actor.set_child(this._iconContainer);
-    }
-
-    _createIcon(iconSize) {
-        let iconUri = 'resource:///org/gnome/shell/theme/hack-button.svg';
-        if (this.iconState === HackAppIconState.DEACTIVATED)
-            iconUri = 'resource:///org/gnome/shell/theme/hack-button-deactivated.svg';
-
-        let iconFile = Gio.File.new_for_uri(iconUri);
-        let gicon = new Gio.FileIcon({ file: iconFile });
-
-        return new St.Icon({ gicon: gicon,
-                             icon_size: iconSize });
-    }
-
-    canBeRemoved() {
-        return false;
-    }
-
-    activate(button) {
-        // launch clubhouse, the clubhouse is reponsible to set the
-        // hack-mode-enabled key to true on the first launch
-        const component = Main.componentManager._ensureComponent('clubhouse');
-        if (!component) {
-            logError('Clubhouse component not found.');
-            return;
-        }
-        component.callShow();
-        this.icon.animateZoomOut();
-    }
-
-    getName() {
-        return 'Hack';
-    }
-
-    getId() {
-        return 'com.endlessm.Hack';
-    }
-
-    _onDestroy() {
-        if (this._hackModeId)
-            global.settings.disconnect(this._hackModeId);
     }
 });
