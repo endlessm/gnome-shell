@@ -2787,17 +2787,16 @@ const HackAppIconState = {
 };
 
 var HackAppIcon = GObject.registerClass(
-class HackAppIcon extends ViewIcon {
+class HackAppIcon extends AppIcon {
     _init(parentView) {
         let viewIconParams = { isDraggable: false,
                                showMenu: false,
                                parentView: parentView };
 
-        let buttonParams = { button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO };
         let iconParams = { createIcon: this._createIcon.bind(this) };
+        let app = Clubhouse.getClubhouseApp();
 
-
-        super._init(viewIconParams, buttonParams, iconParams);
+        super._init(app, viewIconParams, iconParams);
 
         let activated = global.settings.get_boolean('hack-mode-enabled');
         this.iconState = activated ? HackAppIconState.ACTIVATED : HackAppIconState.DEACTIVATED;
@@ -2808,12 +2807,6 @@ class HackAppIcon extends ViewIcon {
         });
 
         this.canDrop = false;
-
-        this._iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
-                                              x_expand: true, y_expand: true });
-        this._iconContainer.add_child(this.icon.actor);
-
-        this.actor.set_child(this._iconContainer);
     }
 
     _createIcon(iconSize) {
@@ -2832,28 +2825,17 @@ class HackAppIcon extends ViewIcon {
         return false;
     }
 
-    activate(button) {
-        // launch clubhouse, the clubhouse is reponsible to set the
-        // hack-mode-enabled key to true on the first launch
-        const component = Main.componentManager._ensureComponent('clubhouse');
-        if (!component) {
-            logError('Clubhouse component not found.');
-            return;
-        }
-        component.callShow();
-        this.icon.animateZoomOut();
-    }
-
     getName() {
         return 'Hack';
     }
 
     getId() {
-        return 'com.endlessm.Hack';
+        return 'com.endlessm.Clubhouse';
     }
 
     _onDestroy() {
         if (this._hackModeId)
             global.settings.disconnect(this._hackModeId);
+        super._onDestroy();
     }
 });

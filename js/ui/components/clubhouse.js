@@ -711,30 +711,6 @@ var Component = GObject.registerClass({
         return this._imageUsesClubhouse() && !!getClubhouseApp();
     }
 
-    _ensureProxy() {
-        if (this.proxy)
-            return this.proxy;
-
-        const clubhouseInstalled = !!getClubhouseApp();
-        if (!clubhouseInstalled) {
-            log('Cannot construct Clubhouse proxy because Clubhouse app was not found.');
-        } else {
-            try {
-                this.proxy = new Gio.DBusProxy({ g_connection: Gio.DBus.session,
-                                            g_interface_name: this._proxyInfo.name,
-                                            g_interface_info: this._proxyInfo,
-                                            g_name: this._proxyName,
-                                            g_object_path: this._proxyPath,
-                                            g_flags: this.proxyConstructFlags });
-                this.proxy.init(null);
-                return this.proxy;
-            } catch (e) {
-                logError(e, 'Error while constructing the DBus proxy for ' + this._proxyName);
-            }
-        }
-        return null;
-    }
-
     enable() {
         if (!this._useClubhouse) {
             log('Cannot enable Clubhouse in this image version');
@@ -772,7 +748,7 @@ var Component = GObject.registerClass({
     }
 
     callShow(timestamp) {
-        if (this._ensureProxy() && this.proxy.g_name_owner) {
+        if (this.proxy.g_name_owner) {
             this.proxy.showRemote(timestamp);
             return;
         }
