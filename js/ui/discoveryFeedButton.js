@@ -4,6 +4,7 @@ const { Clutter, Gio, GLib, GObject, St } = imports.gi;
 
 const Lang = imports.lang;
 const Main = imports.ui.main;
+const Clubhouse = imports.ui.components.clubhouse;
 
 function maybeCreateInactiveButton() {
     if (_checkIfDiscoveryFeedEnabled()) {
@@ -28,8 +29,9 @@ function _checkIfDiscoveryFeedEnabled() {
     let isEnabled = supportedLanguages.some(function(lang) {
         return systemLanguages.indexOf(lang) !== -1;
     });
+    const clubhouseInstalled = !!Clubhouse.getClubhouseApp();
 
-    return isEnabled;
+    return isEnabled && !clubhouseInstalled;
 }
 
 function maybeCreateButton() {
