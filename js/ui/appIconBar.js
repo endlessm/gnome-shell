@@ -13,6 +13,7 @@ const BoxPointer = imports.ui.boxpointer;
 const Main = imports.ui.main;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const PopupMenu = imports.ui.popupMenu;
 
 const MAX_OPACITY = 255;
@@ -605,6 +606,9 @@ const ScrolledIconList = GObject.registerClass({
         this._container.connect('style-changed', this._updateStyleConstants.bind(this));
 
         let appSys = Shell.AppSystem.get_default();
+
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
+
         this._taskbarApps = new Map();
 
         // Update for any apps running before the system started
@@ -637,6 +641,15 @@ const ScrolledIconList = GObject.registerClass({
 
         appSys.connect('installed-changed', this._onInstalledChanged.bind(this));
         appSys.connect('app-state-changed', this._onAppStateChanged.bind(this));
+
+        this._parentalControlsManager.connect('changed', () => {
+            for (let [app, appButton] of this._taskbarApps) {
+                let shouldShow = this._parentalControlsManager.shouldShowApp(app.get_app_info());
+                let stopped = (app.state == Shell.AppState.STOPPED);
+
+                appButton.visible = !stopped || shouldShow;
+            }
+        });
     }
 
     setActiveApp(app) {
@@ -650,6 +663,13 @@ const ScrolledIconList = GObject.registerClass({
 
     getNumAppButtons() {
         return this._taskbarApps.size;
+    }
+
+    getNumVisibleAppButtons() {
+        let buttons = [...this._taskbarApps.values()];
+        return buttons.reduce((counter, appButton) => {
+            return appButton.visible ? counter : counter + 1;
+        }, 0);
     }
 
     activateNthApp(index) {
@@ -669,7 +689,7 @@ const ScrolledIconList = GObject.registerClass({
 
     _updatePage() {
         // Clip the values of the iconOffset
-        let lastIconOffset = this._taskbarApps.size - 1;
+        let lastIconOffset = this.getNumVisibleAppButtons() - 1;
         let movableIconsPerPage = this._appsPerPage - 1;
         let iconOffset = Math.max(0, this._iconOffset);
         iconOffset = Math.min(lastIconOffset - movableIconsPerPage, iconOffset);
@@ -713,7 +733,7 @@ const ScrolledIconList = GObject.registerClass({
     }
 
     isForwardAllowed() {
-        return this._iconOffset < this._taskbarApps.size - this._appsPerPage;
+        return this._iconOffset < this.getNumVisibleAppButtons() - this._appsPerPage;
     }
 
     calculateNaturalSize(forWidth) {
@@ -818,6 +838,11 @@ const ScrolledIconList = GObject.registerClass({
             this._container.replace_child(oldChild, newChild);
         else
             this._container.add_actor(newChild);
+
+        if (app.state == Shell.AppState.STOPPED &&
+            !this._parentalControlsManager.shouldShowApp(app.get_app_info())) {
+            newChild.hide();
+        }
     }
 
     _addButton(app) {
@@ -874,20 +899,30 @@ const ScrolledIconList = GObject.registerClass({
         let state = app.state;
         switch(state) {
         case Shell.AppState.STARTING:
+            if (!this._parentalControlsManager.shouldShowApp(app.get_app_info()))
+                break;
+            this._addButton(app);
+            this._ensureIsVisible(app);
+            break;
+
         case Shell.AppState.RUNNING:
             this._addButton(app);
             this._ensureIsVisible(app);
             break;
 
         case Shell.AppState.STOPPED:
-            if (AppFavorites.getAppFavorites().isFavorite(app.get_id()))
+            let appButton = this._taskbarApps.get(app);
+            if (!appButton)
                 break;
 
-            let oldChild = this._taskbarApps.get(app);
-            if (oldChild) {
-                this._container.remove_actor(oldChild);
-                this._taskbarApps.delete(app);
+            if (AppFavorites.getAppFavorites().isFavorite(app.get_id())) {
+                if (!this._parentalControlsManager.shouldShowApp(app.get_app_info()))
+                    appButton.hide();
+                break;
             }
+
+            this._container.remove_actor(appButton);
+            this._taskbarApps.delete(app);
 
             break;
         }
@@ -903,7 +938,7 @@ const ScrolledIconList = GObject.registerClass({
         let iconsPerPage = Math.floor((forWidth + this._iconSpacing) / minimumIconWidth);
         iconsPerPage = Math.max(1, iconsPerPage);
 
-        let pages = Math.ceil(this._taskbarApps.size / iconsPerPage);
+        let pages = Math.ceil(this.getNumVisibleAppButtons() / iconsPerPage);
         return [pages, iconsPerPage];
     }
 });
