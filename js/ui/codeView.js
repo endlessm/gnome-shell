@@ -3,6 +3,7 @@
 const { Clutter, Flatpak, Gio, GLib, GObject, Gtk, Meta, Shell, St } = imports.gi;
 const Mainloop = imports.mainloop;
 
+const Animation = imports.ui.animation.Animation;
 const AppActivation = imports.ui.appActivation;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
@@ -21,6 +22,10 @@ var CodingSessionStateEnum = {
 
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
 const _HACK_SHADER_DESKTOP_KEY = 'X-Endless-HackShader';
+
+const FLIP_BUTTON_WIDTH = 66;
+const FLIP_BUTTON_HEIGHT = 124;
+const FLIP_BUTTON_PULSE_SPEED = 100;
 
 const _HACK_SHADER_MAP = {
     'none': null,
@@ -56,6 +61,10 @@ function _ensureAfterFirstFrame(win, callback) {
 
 function _getAppId(win) {
     let app = Shell.WindowTracker.get_default().get_window_app(win);
+    let gtkId = win.get_gtk_application_id();
+    if (gtkId)
+        return gtkId;
+
     // remove .desktop suffix
     return app.get_id().slice(0, -8);
 };
@@ -82,7 +91,7 @@ const _ensureHackDataFile = (function () {
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
         '/var/lib/flatpak',
     ];
-    const flatpakPath = 'app/com.endlessm.HackComponents/current/active/files';
+    const flatpakPath = 'app/com.endlessm.Clubhouse/current/active/files';
     const fileRelPath = 'share/hack-components';
     const searchPaths = flatpakInstallationPaths.map(installation =>
         GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
@@ -276,6 +285,7 @@ var WindowTrackingButton = GObject.registerClass({
     _init(params) {
         this._flipped = false;
         this._rect = null;
+        this._highlighted = false;
 
         let buttonParams = _getViewSourceButtonParams(true);
         params = Params.parse(params, buttonParams, true);
@@ -283,6 +293,33 @@ var WindowTrackingButton = GObject.registerClass({
         super._init(params);
 
         this._updateSounds();
+
+        // pulse effect
+        let gfile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/flip-glow.png');
+        this._pulseAnimation = new Animation(gfile,
+                                             FLIP_BUTTON_WIDTH,
+                                             FLIP_BUTTON_HEIGHT,
+                                             FLIP_BUTTON_PULSE_SPEED);
+        this._pulseIcon = this._pulseAnimation.actor;
+    }
+
+    get highlighted() {
+        return this._highlighted;
+    }
+
+    set highlighted(value) {
+        if (this._highlighted === value)
+            return;
+
+        if (value) {
+            this.child = this._pulseIcon;
+            this._pulseAnimation.play();
+        } else {
+            this._pulseAnimation.stop();
+            this.child = null;
+        }
+
+        this._highlighted = value;
     }
 
     vfunc_allocate(box, flags) {
@@ -425,6 +462,8 @@ var CodingSession = GObject.registerClass({
                                     '/com/endlessm/HackToolbox');
         this._toolboxAppActionGroup.list_actions();
 
+        this._hackModeChangedId = global.settings.connect('changed::hack-mode-enabled',
+                                                           this._syncButtonVisibility.bind(this));
         this._overviewHiddenId = Main.overview.connect('hidden',
                                                        this._overviewStateChanged.bind(this));
         this._overviewShowingId = Main.overview.connect('showing',
@@ -835,6 +874,10 @@ var CodingSession = GObject.registerClass({
             global.display.disconnect(this._focusWindowId);
             this._focusWindowId = 0;
         }
+        if (this._hackModeChangedId != 0) {
+            global.settings.disconnect(this._hackModeChangedId);
+            this._hackModeChangedId = 0;
+        }
         if (this._overviewHiddenId) {
             Main.overview.disconnect(this._overviewHiddenId);
             this._overviewHiddenId = 0;
@@ -871,11 +914,16 @@ var CodingSession = GObject.registerClass({
         // destroyed in the first place
         if (this.app && !this.app.is_destroyed()) {
             let appWindow = this.app.meta_window;
+
+            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED) {
+                appWindow.delete(global.get_current_time());
+            } else if (this._state === CodingSessionStateEnum.TOOLBOX &&
+                     this.toolbox && !this.toolbox.is_destroyed()) {
+                this.app.rotation_angle_y = this.toolbox.rotation_angle_y;
+            }
+
             this.app = null;
             this._shellApp = null;
-
-            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED)
-                appWindow.delete(global.get_current_time());
         }
 
         // If we have a toolbox window, disconnect any signals and destroy it,
@@ -1044,6 +1092,11 @@ var CodingSession = GObject.registerClass({
 
         let primaryMonitor = Main.layoutManager.primaryMonitor;
         let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
+
+        if (!global.settings.get_boolean('hack-mode-enabled')) {
+            this._button.hide();
+            return;
+        }
 
         // Show only if either this window or the toolbox window
         // is in focus, visible and hackable
@@ -1292,6 +1345,25 @@ var CodeViewManager = GObject.registerClass({
             });
         });
 
+        global.settings.connect('changed::hack-mode-enabled', () => {
+            let activated = global.settings.get_boolean('hack-mode-enabled');
+            if (!activated) {
+                this._sessions.forEach((session) => {
+                    let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
+                    this._removeSession(session, eventType);
+                });
+            } else {
+                // enable FtH for all windows!
+                global.get_window_actors().forEach((actor) => {
+                    this.handleMapWindow(actor);
+                });
+
+                this._sessions.forEach((session) => {
+                    session._syncButtonVisibility();
+                });
+            }
+        });
+
         this._stopped = false;
         global.window_manager.connect('stop', () => {
             this._stopped = true;
@@ -1390,21 +1462,28 @@ var CodeViewManager = GObject.registerClass({
         if (this._stopped)
             return false;
 
-        if (!global.settings.get_boolean('enable-code-view'))
+        if (!global.settings.get_boolean('hack-mode-enabled'))
             return false;
 
         // Do not manage apps that don't have an associated .desktop file
         let windowTracker = Shell.WindowTracker.get_default();
         let shellApp = windowTracker.get_window_app(actor.meta_window);
+        if (!shellApp)
+            return false;
         let appInfo = shellApp.get_app_info();
         if (!appInfo)
             return false;
+
+        let gtkId = actor.meta_window.get_gtk_application_id();
 
         // The custom X-Endless-Hackable key has the last word always
         if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
             if (!appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
                 return false;
-        } else {
+        // HackUnlock and HackToolbox are inside the com.endlessm.Clubhouse flatpak
+        // and have the Clubhouse appInfo, so we should ignore those cases here
+        // to be able to show the HackUnlock and HackToolbox windows
+        } else if (gtkId !== 'com.endlessm.HackUnlock' && gtkId !== 'com.endlessm.HackToolbox') {
             // Do not manage apps that are NoDisplay=true
             if (!appInfo.should_show())
                 return false;

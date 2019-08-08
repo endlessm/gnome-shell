@@ -39,11 +39,8 @@ const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 const CLUBHOUSE_BANNER_TIMEOUT_MSEC = 3000;
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 0.2;
 
-const CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
+var CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
-
-const CLUBHOUSE_BUTTON_SIZE = 110
-const CLUBHOUSE_BUTTON_PULSE_SPEED = 100 // ms
 
 const ClubhouseIface =
 '<node> \
@@ -76,6 +73,10 @@ function _clipToMonitor(actor) {
     let offset = Math.max(actorEdge - monitorEdge, 0);
     let clip = actor.width - offset;
     actor.set_clip(0, 0, clip, actor.height);
+}
+
+function getClubhouseApp() {
+    return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
 }
 
 var getClubhouseWindowTracker = (function () {
@@ -367,10 +368,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         this._rearrangeElements();
 
-        this._clubhouseTrackerHandler =
-            getClubhouseWindowTracker().connect('window-changed', this.reposition.bind(this));
-
-        this.actor.connect('destroy', this._untrackClubhouse.bind(this));
         this._closeButton.connect('clicked', () => {
             SoundServer.getDefault().play('clubhouse/dialog/close');
         });
@@ -385,13 +382,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             this._paginationReady = true;
         } else {
             super.setBody(text);
-        }
-    }
-
-    _untrackClubhouse() {
-        if (this._clubhouseTrackerHandler > 0) {
-            getClubhouseWindowTracker().disconnect(this._clubhouseTrackerHandler);
-            this._clubhouseTrackerHandler = 0;
         }
     }
 
@@ -498,12 +488,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         let margin = 30;
 
-        let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
-
-        if (clubhouseWindowX == -1)
-            this.actor.x = monitor.x + monitor.width;
-        else
-            this.actor.x = clubhouseWindowX;
+        this.actor.x = monitor.x + monitor.width;
 
         let endX = this.actor.x - this.actor.width - margin;
 
@@ -584,8 +569,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     dismiss(shouldSlideOut) {
-        this._untrackClubhouse();
-
         if (!this.actor)
             return;
 
@@ -693,132 +676,21 @@ class ClubhouseNotificationSource extends NotificationDaemon.GtkNotificationDaem
     }
 };
 
-var ClubhouseOpenButton = GObject.registerClass({
-}, class ClubhouseOpenButton extends Soundable.Button {
-    _init(params) {
-        params = params || {};
-        let gfile =
-            Gio.File.new_for_uri('resource:///org/gnome/shell/theme/clubhouse-icon-pulse.png');
-        this._pulseAnimation = new Animation(gfile,
-                                             CLUBHOUSE_BUTTON_SIZE,
-                                             CLUBHOUSE_BUTTON_SIZE,
-                                             CLUBHOUSE_BUTTON_PULSE_SPEED);
-        this._pulseIcon = this._pulseAnimation.actor;
-
-        this._normalIcon = new St.Icon({ style_class: 'clubhouse-open-button-icon' });
-
-        params.child = this._normalIcon;
-        params.click_sound_event_id = 'clubhouse/entry/open';
-        params.hover_sound_event_id = 'clubhouse/entry/hover';
-        params.stop_hover_sound_on_click = true;
-        super._init(params);
-
-        this._highlightSoundItem = new SoundServer.SoundItem('clubhouse/entry/pulse');
-        this._highlightLoopingSoundItem =
-            new SoundServer.SoundItem('clubhouse/entry/pulse-loop');
-    }
-
-    setHighlighted(highlighted) {
-        if (highlighted) {
-            this.child = this._pulseIcon;
-            this._pulseAnimation.play();
-            this._highlightSoundItem.play();
-            this._highlightLoopingSoundItem.play();
-        } else {
-            this.child = this._normalIcon;
-            this._pulseAnimation.stop();
-            this._highlightSoundItem.stop();
-            this._highlightLoopingSoundItem.stop();
-        }
-    }
-});
-
-var ClubhouseButtonManager = GObject.registerClass({
-    Signals: {
-        'open-clubhouse': {},
-        'close-clubhouse': {},
-    },
-}, class ClubhouseButtonManager extends GObject.Object {
-    _init() {
-        super._init();
-
-        this._openButton = new ClubhouseOpenButton();
-        this._openButton.connect('clicked', () => { this.emit('open-clubhouse'); })
-
-        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        this._openButton.set_clip(0, 0,
-                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE / 2,
-                                  scaleFactor * CLUBHOUSE_BUTTON_SIZE);
-
-        Main.layoutManager.addChrome(this._openButton);
-
-        this._closeButton = new Soundable.Button({
-            child: new St.Icon({ style_class: 'clubhouse-close-button-icon' }),
-            click_sound_event_id: 'clubhouse/entry/close'
-        });
-        this._closeButton.connect('clicked', () => { this.emit('close-clubhouse'); })
-
-        Main.layoutManager.addChrome(this._closeButton);
-
-        this._clubhouseWindowActor = null;
-        this._clubhouseNotifyHandler = 0;
-
-        this._visible = true;
-
-        this._updateVisibility();
-
-        getClubhouseWindowTracker().connect('window-changed', this._updateVisibility.bind(this));
-    }
-
-    _updateCloseButtonPosition() {
-        this._closeButton.y = this._openButton.y;
-
-        let clubhouseWindowX = getClubhouseWindowTracker().getWindowX();
-        if (clubhouseWindowX != -1)
-            this._closeButton.x = clubhouseWindowX - this._closeButton.width / 2;
-
-        _clipToMonitor(this._closeButton);
-    }
-
-    _reposition() {
-        let monitor = Main.layoutManager.primaryMonitor;
-        if (!monitor)
-            return;
-
-        let workarea = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
-
-        this._openButton.x = monitor.x + monitor.width - this._openButton.width / 2;
-        this._openButton.y = workarea.y + Math.floor(workarea.height / 2.0 - this._openButton.height / 2.0);
-
-        this._updateCloseButtonPosition();
-    }
-
-    _updateVisibility() {
-        this._closeButton.visible = this._visible && getClubhouseWindowTracker().getWindowX() != -1;
-        this._openButton.visible = this._visible && Main.sessionMode.hasOverview &&
-                                   !this._closeButton.visible;
-        this._reposition();
-    }
-
-    setSuggestOpen(suggestOpen) {
-        if (this._openButton.visible)
-            this._openButton.setHighlighted(suggestOpen);
-    }
-
-    setVisible(visible) {
-        this._visible = visible;
-        this._updateVisibility();
-    }
-});
-
 var Component = GObject.registerClass({
 }, class ClubhouseComponent extends SideComponent.SideComponent {
     _init() {
         super._init(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
 
-        this._useClubhouse = this._imageUsesClubhouse() && !!this._getClubhouseApp();
-        if (!this._useClubhouse)
-            return;
+        global.settings.connect('changed::hack-mode-enabled', () => {
+            let activated = global.settings.get_boolean('hack-mode-enabled');
+            // Only enable if clubhouse app is installed
+            activated = activated && !!getClubhouseApp();
+
+            if (activated)
+                this.enable();
+            else
+                this.disable();
+        });
 
         this._enabled = false;
         this._hasForegroundQuest = false;
@@ -830,24 +702,39 @@ var Component = GObject.registerClass({
 
         this._clubhouseAnimator = null;
 
-        this._clubhouseButtonManager = new ClubhouseButtonManager();
-        this._clubhouseButtonManager.connect('open-clubhouse', () => {
-            this.show(global.get_current_time());
-        });
-        this._clubhouseButtonManager.connect('close-clubhouse', () => {
-            this.hide(global.get_current_time());
-        });
-
         this.proxyConstructFlags = Gio.DBusProxyFlags.NONE;
 
         this._overrideAddNotification();
     }
 
-    _onPropertiesChanged(proxy, changedProps, invalidatedProps) {
-        super._onPropertiesChanged(proxy, changedProps, invalidatedProps);
-        let propsDict = changedProps.deep_unpack();
-        if (propsDict.hasOwnProperty('SuggestingOpen'))
-            this._clubhouseButtonManager.setSuggestOpen(this.proxy.SuggestingOpen);
+    get _useClubhouse() {
+        return this._imageUsesClubhouse() && !!getClubhouseApp();
+    }
+
+    _ensureProxy() {
+        if (this.proxy)
+            return this.proxy;
+
+        const clubhouseInstalled = !!getClubhouseApp();
+        if (!clubhouseInstalled) {
+            log('Cannot construct Clubhouse proxy because Clubhouse app was not found.');
+        } else {
+            try {
+                this.proxy = new Gio.DBusProxy({
+                    g_connection: Gio.DBus.session,
+                    g_interface_name: this._proxyInfo.name,
+                    g_interface_info: this._proxyInfo,
+                    g_name: this._proxyName,
+                    g_object_path: this._proxyPath,
+                    g_flags: this.proxyConstructFlags,
+                });
+                this.proxy.init(null);
+                return this.proxy;
+            } catch (e) {
+                logError(e, 'Error while constructing the DBus proxy for ' + this._proxyName);
+            }
+        }
+        return null;
     }
 
     enable() {
@@ -879,20 +766,7 @@ var Component = GObject.registerClass({
         this._syncVisibility();
     }
 
-    // Override this because we need to make sure we only call a property on the proxy once
-    // it's initialized.
-    _onProxyConstructed(object, res) {
-        super._onProxyConstructed(object, res);
-
-        // Make sure the proxy didn't fail to initialize
-        if (this.proxy.SuggestingOpen !== undefined)
-            this._clubhouseButtonManager.setSuggestOpen(!!this.proxy.SuggestingOpen);
-    }
-
     disable() {
-        if (!this._useClubhouse)
-            return;
-
         super.disable();
 
         this._enabled = false;
@@ -900,7 +774,7 @@ var Component = GObject.registerClass({
     }
 
     callShow(timestamp) {
-        if (this.proxy.g_name_owner) {
+        if (this._ensureProxy() && this.proxy.g_name_owner) {
             this.proxy.showRemote(timestamp);
             return;
         }
@@ -908,7 +782,7 @@ var Component = GObject.registerClass({
         // We only activate the app here if it's not yet running, otherwise the cursor will turn
         // into a spinner for a while, even after the window is shown.
         // @todo: Call activate alone when we fix the problem mentioned above.
-        this._getClubhouseApp().activate();
+        getClubhouseApp().activate();
     }
 
     callHide(timestamp) {
@@ -952,18 +826,8 @@ var Component = GObject.registerClass({
         this._itemBanner = null;
     }
 
-    _getClubhouseApp() {
-        return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
-    }
-
     _imageUsesClubhouse() {
-        if (GLib.getenv('CLUBHOUSE_DEBUG_ENABLED'))
-            return true;
-
-        // We are only using the Clubhouse component in Endless Hack images for now, so
-        // check if the prefix of the image version matches the mentioned flavor.
-        let eosImageVersion = Shell.util_get_eos_image_version();
-        return eosImageVersion && eosImageVersion.startsWith('hack-');
+        return global.settings.get_boolean('hack-mode-enabled');
     }
 
     _overrideAddNotification() {
@@ -1048,8 +912,6 @@ var Component = GObject.registerClass({
     }
 
     _syncVisibility() {
-        this._clubhouseButtonManager.setVisible(this._enabled);
-
         if (this._questBanner)
             this._questBanner.actor.visible = this._enabled;
 

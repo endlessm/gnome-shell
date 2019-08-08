@@ -131,6 +131,12 @@ var GnomeShell = class {
         Main.overview.viewSelector.appDisplay.selectApp(id);
     }
 
+    MinimizeAll() {
+        global.get_window_actors().forEach(actor => {
+            actor.metaWindow.minimize();
+        });
+    }
+
     ShowApplications() {
         Main.overview.showApps();
     }
@@ -560,6 +566,26 @@ var HackableApp = class {
 
     get State() {
         return this._session.state;
+    }
+
+    get ToolboxVisible() {
+        if (!this._session.toolbox)
+            return false;
+        return this._session.toolbox.visible;
+    }
+
+    set ToolboxVisible(value) {
+        if (!this._session.toolbox)
+            return;
+        this._session.toolbox.visible = value;
+    }
+
+    get PulseFlipToHackButton() {
+        return this._session._button.highlighted;
+    }
+
+    set PulseFlipToHackButton(value) {
+        this._session._button.highlighted = value;
     }
 };
 

@@ -74,6 +74,7 @@ const EOS_DESKTOP_MIN_ROWS = 2;
 const EOS_LINK_PREFIX = 'eos-link-';
 
 const EOS_ENABLE_APP_CENTER_KEY = 'enable-app-center';
+const HACK_APP_ID = 'com.endlessm.Hack.desktop';
 const EOS_APP_CENTER_ID = 'org.gnome.Software.desktop';
 
 var EOS_INACTIVE_GRID_OPACITY = 96;
@@ -91,6 +92,8 @@ const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
 
 const EOS_NEW_ICON_ANIMATION_TIME = 0.5;
 const EOS_NEW_ICON_ANIMATION_DELAY = 0.7;
+
+const Clubhouse = imports.ui.components.clubhouse;
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -620,11 +623,16 @@ var AllView = class AllView extends BaseAppView {
 
     loadGrid() {
         this._maybeAddAppCenterIcon();
+        this._maybeAddHackIcon();
         super.loadGrid();
     }
 
     getLayoutIds() {
         let layoutIds = super.getLayoutIds();
+
+        // Only show the hack icon if the clubhouse app is in the system
+        if (Clubhouse.getClubhouseApp())
+            layoutIds.unshift(HACK_APP_ID);
 
         if (!global.settings.get_boolean(EOS_ENABLE_APP_CENTER_KEY))
             return layoutIds;
@@ -643,6 +651,7 @@ var AllView = class AllView extends BaseAppView {
     removeAll() {
         this.folderIcons = [];
         this._appCenterIcon = null;
+        this._hackAppIcon = null;
         super.removeAll();
     }
 
@@ -667,10 +676,24 @@ var AllView = class AllView extends BaseAppView {
         };
     }
 
+    _ensureHackAppIcon() {
+        if (this._hackAppIcon)
+            return;
+
+        this._hackAppIcon = new HackAppIcon(this);
+        this._hackAppItem = {
+            get_name: this._hackAppIcon.getName.bind(this),
+        };
+    }
+
     _createItemForId(itemId) {
         if (itemId == EOS_APP_CENTER_ID) {
             this._ensureAppCenterIcon();
             return this._appCenterItem;
+        }
+        if (itemId == HACK_APP_ID) {
+            this._ensureHackAppIcon();
+            return this._hackAppItem;
         }
 
         return super._createItemForId(itemId);
@@ -679,6 +702,9 @@ var AllView = class AllView extends BaseAppView {
     _createItemIcon(item) {
         if (item == this._appCenterItem)
             return this._appCenterIcon;
+
+        if (item == this._hackAppItem)
+            return this._hackAppIcon;
 
         let itemId = item.get_id();
 
@@ -698,6 +724,17 @@ var AllView = class AllView extends BaseAppView {
         }
 
         return icon;
+    }
+
+    _maybeAddHackIcon() {
+        if (this._hackAppIcon)
+            return;
+
+        if (!Clubhouse.getClubhouseApp())
+            return;
+
+        this._ensureHackAppIcon();
+        this.addItem(this._hackAppIcon);
     }
 
     _maybeAddAppCenterIcon() {
@@ -2655,9 +2692,11 @@ var SystemActionIcon = class SystemActionIcon extends Search.GridSearchResult {
     }
 };
 
-const AppCenterIconState = {
+const DownstreamEndlessIconState = {
     EMPTY_TRASH: ViewIconState.NUM_STATES,
-    FULL_TRASH: ViewIconState.NUM_STATES + 1
+    FULL_TRASH: ViewIconState.NUM_STATES + 1,
+    HACK_ACTIVATED: ViewIconState.NUM_STATES + 2,
+    HACK_DEACTIVATED: ViewIconState.NUM_STATES + 3
 };
 
 var AppCenterIcon = GObject.registerClass(
@@ -2676,10 +2715,10 @@ class AppCenterIcon extends AppIcon {
         this.canDrop = true;
     }
     _setStyleClass(state) {
-        if (state == AppCenterIconState.EMPTY_TRASH) {
+        if (state == DownstreamEndlessIconState.EMPTY_TRASH) {
             this.actor.remove_style_class_name('trash-icon-full');
             this.actor.add_style_class_name('trash-icon-empty');
-        } else if (state == AppCenterIconState.FULL_TRASH) {
+        } else if (state == DownstreamEndlessIconState.FULL_TRASH) {
             this.actor.remove_style_class_name('trash-icon-empty');
             this.actor.add_style_class_name('trash-icon-full');
         } else {
@@ -2700,9 +2739,9 @@ class AppCenterIcon extends AppIcon {
         // Otherwise, retrieve the trash icon from the resources
         let iconUri;
 
-        if (this.iconState == AppCenterIconState.EMPTY_TRASH)
+        if (this.iconState == DownstreamEndlessIconState.EMPTY_TRASH)
             iconUri = 'resource:///org/gnome/shell/theme/trash-icon-empty.png';
-        else if (this.iconState == AppCenterIconState.FULL_TRASH)
+        else if (this.iconState == DownstreamEndlessIconState.FULL_TRASH)
             iconUri = 'resource:///org/gnome/shell/theme/trash-icon-full.png';
 
         let iconFile = Gio.File.new_for_uri(iconUri);
@@ -2725,13 +2764,13 @@ class AppCenterIcon extends AppIcon {
     }
 
     handleViewDragBegin() {
-        this.iconState = AppCenterIconState.EMPTY_TRASH;
+        this.iconState = DownstreamEndlessIconState .EMPTY_TRASH;
         this.replaceText(_("Remove"));
     }
 
     setDragHoverState(state) {
         let appCenterIconState = state ?
-            AppCenterIconState.FULL_TRASH : AppCenterIconState.EMPTY_TRASH;
+            DownstreamEndlessIconState.FULL_TRASH : DownstreamEndlessIconState.EMPTY_TRASH;
         this.iconState = appCenterIconState;
     }
 
@@ -2741,5 +2780,63 @@ class AppCenterIcon extends AppIcon {
 
         this.handleViewDragEnd();
         return true;
+    }
+});
+
+var HackAppIcon = GObject.registerClass(
+class HackAppIcon extends AppIcon {
+    _init(parentView) {
+        let viewIconParams = { isDraggable: false,
+                               showMenu: false,
+                               parentView: parentView };
+
+        let iconParams = { createIcon: this._createIcon.bind(this) };
+        let app = Clubhouse.getClubhouseApp();
+
+        super._init(app, viewIconParams, iconParams);
+
+        let activated = global.settings.get_boolean('hack-mode-enabled');
+        this.iconState = activated ?
+            DownstreamEndlessIconState.HACK_ACTIVATED :
+            DownstreamEndlessIconState.HACK_DEACTIVATED;
+
+        this._hackModeId = global.settings.connect('changed::hack-mode-enabled', () => {
+            let activated = global.settings.get_boolean('hack-mode-enabled');
+            this.iconState = activated ?
+                DownstreamEndlessIconState.HACK_ACTIVATED :
+                DownstreamEndlessIconState.HACK_DEACTIVATED;
+        });
+
+        this.canDrop = false;
+    }
+
+    _createIcon(iconSize) {
+        let iconUri = 'resource:///org/gnome/shell/theme/hack-button-on.png';
+        if (this.iconState === DownstreamEndlessIconState.HACK_DEACTIVATED)
+            iconUri = 'resource:///org/gnome/shell/theme/hack-button-off.png';
+
+        let iconFile = Gio.File.new_for_uri(iconUri);
+        let gicon = new Gio.FileIcon({ file: iconFile });
+
+        return new St.Icon({ gicon: gicon,
+                             icon_size: iconSize });
+    }
+
+    canBeRemoved() {
+        return false;
+    }
+
+    getName() {
+        return 'Hack';
+    }
+
+    getId() {
+        return 'com.endlessm.Clubhouse';
+    }
+
+    _onDestroy() {
+        if (this._hackModeId)
+            global.settings.disconnect(this._hackModeId);
+        super._onDestroy();
     }
 });
