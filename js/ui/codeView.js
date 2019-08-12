@@ -5,6 +5,7 @@ const Mainloop = imports.mainloop;
 
 const Animation = imports.ui.animation.Animation;
 const AppActivation = imports.ui.appActivation;
+const Clubhouse = imports.ui.components.clubhouse;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Soundable = imports.ui.soundable;
@@ -1462,7 +1463,7 @@ var CodeViewManager = GObject.registerClass({
         if (this._stopped)
             return false;
 
-        if (!global.settings.get_boolean('hack-mode-enabled'))
+        if (!global.settings.get_boolean('hack-mode-enabled') || !Clubhouse.getClubhouseApp())
             return false;
 
         // Do not manage apps that don't have an associated .desktop file
