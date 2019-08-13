@@ -393,7 +393,7 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
                                          NULL,
                                          window_app_id,
                                          window_object_path,
-                                         "com.endlessm.HackToolbox.Toolbox",
+                                         "com.hack_computer.HackToolbox.Toolbox",
                                          NULL,
                                          &local_error);
 
