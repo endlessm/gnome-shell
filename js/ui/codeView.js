@@ -91,7 +91,7 @@ const _ensureHackDataFile = (function () {
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
         '/var/lib/flatpak',
     ];
-    const flatpakPath = 'app/com.endlessm.Clubhouse/current/active/files';
+    const flatpakPath = 'app/com.hack_computer.Clubhouse/current/active/files';
     const fileRelPath = 'share/hack-components';
     const searchPaths = flatpakInstallationPaths.map(installation =>
         GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
@@ -458,8 +458,8 @@ var CodingSession = GObject.registerClass({
         // arbitrary toolboxes in the future, depending on the application
         this._toolboxAppActionGroup =
             Gio.DBusActionGroup.get(Gio.DBus.session,
-                                    'com.endlessm.HackToolbox',
-                                    '/com/endlessm/HackToolbox');
+                                    'com.hack_computer.HackToolbox',
+                                    '/com/hack_computer/HackToolbox');
         this._toolboxAppActionGroup.list_actions();
 
         this._hackModeChangedId = global.settings.connect('changed::hack-mode-enabled',
@@ -1480,10 +1480,10 @@ var CodeViewManager = GObject.registerClass({
         if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
             if (!appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
                 return false;
-        // HackUnlock and HackToolbox are inside the com.endlessm.Clubhouse flatpak
+        // HackUnlock and HackToolbox are inside the com.hack_computer.Clubhouse flatpak
         // and have the Clubhouse appInfo, so we should ignore those cases here
         // to be able to show the HackUnlock and HackToolbox windows
-        } else if (gtkId !== 'com.endlessm.HackUnlock' && gtkId !== 'com.endlessm.HackToolbox') {
+        } else if (gtkId !== 'com.hack_computer.HackUnlock' && gtkId !== 'com.hack_computer.HackToolbox') {
             // Do not manage apps that are NoDisplay=true
             if (!appInfo.should_show())
                 return false;

@@ -39,12 +39,12 @@ const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 const CLUBHOUSE_BANNER_TIMEOUT_MSEC = 3000;
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 0.2;
 
-var CLUBHOUSE_ID = 'com.endlessm.Clubhouse';
-const CLUBHOUSE_DBUS_OBJ_PATH = '/com/endlessm/Clubhouse';
+var CLUBHOUSE_ID = 'com.hack_computer.Clubhouse';
+const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
 
 const ClubhouseIface =
 '<node> \
-  <interface name="com.endlessm.Clubhouse"> \
+  <interface name="com.hack_computer.Clubhouse"> \
     <method name="show"> \
       <arg type="u" direction="in" name="timestamp"/> \
     </method> \

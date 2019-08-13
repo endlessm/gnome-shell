@@ -4,7 +4,7 @@ const {Gio} = imports.gi;
 
 const SoundServerIface = `
 <node>
-  <interface name='com.endlessm.HackSoundServer'>
+  <interface name='com.hack_computer.HackSoundServer'>
     <method name='PlaySound'>
       <arg type='s' name='sound_event' direction='in'/>
       <arg type='s' name='uuid' direction='out'/>
@@ -85,7 +85,7 @@ var SoundItem = class {
 class SoundServer {
     constructor() {
         this._proxy = new SoundServerProxy(Gio.DBus.session,
-            'com.endlessm.HackSoundServer', '/com/endlessm/HackSoundServer');
+            'com.hack_computer.HackSoundServer', '/com/hack_computer/HackSoundServer');
     }
 
     // Most common use case, fire and forget, no return value
