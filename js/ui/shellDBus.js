@@ -529,7 +529,7 @@ var AppStoreService = class {
     }
 };
 
-const HackableAppIface = loadInterfaceXML('com.endlessm.HackableApp');
+const HackableAppIface = loadInterfaceXML('com.hack_computer.HackableApp');
 var HackableApp = class {
     constructor(session) {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppIface, this);
@@ -539,7 +539,7 @@ var HackableApp = class {
     }
 
     export(objectId) {
-        const objectPath = `/com/endlessm/HackableApp/${objectId}`;
+        const objectPath = `/com/hack_computer/HackableApp/${objectId}`;
         try {
             this._dbusImpl.export(Gio.DBus.session, objectPath);
         } catch(e) {
@@ -589,16 +589,16 @@ var HackableApp = class {
     }
 };
 
-const HackableAppsManagerIface = loadInterfaceXML('com.endlessm.HackableAppsManager');
+const HackableAppsManagerIface = loadInterfaceXML('com.hack_computer.HackableAppsManager');
 
 var HackableAppsManager = class {
     constructor() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppsManagerIface, this);
-        Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.endlessm.HackableAppsManager',
+        Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.hack_computer.HackableAppsManager',
                                        Gio.BusNameOwnerFlags.REPLACE, null, null);
 
         try {
-            this._dbusImpl.export(Gio.DBus.session, '/com/endlessm/HackableAppsManager');
+            this._dbusImpl.export(Gio.DBus.session, '/com/hack_computer/HackableAppsManager');
         } catch(e) {
             logError(e, 'Cannot export HackableAppsManager');
             return;
