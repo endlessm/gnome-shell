@@ -730,7 +730,11 @@ var GtkNotificationDaemon = class GtkNotificationDaemon {
     constructor() {
         this._sources = {};
 
-        this._loadNotifications();
+        try {
+            this._loadNotifications();
+        } catch (e) {
+            logError(e, "Failed to load saved notifications");
+        }
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(GtkNotificationsIface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gtk/Notifications');
@@ -757,29 +761,31 @@ var GtkNotificationDaemon = class GtkNotificationDaemon {
     _loadNotifications() {
         this._isLoading = true;
 
-        let value = global.get_persistent_state('a(sa(sv))', 'notifications');
-        if (value) {
-            let sources = value.deep_unpack();
-            sources.forEach(([appId, notifications]) => {
-                if (notifications.length == 0)
-                    return;
-
-                let source;
-                try {
-                    source = this._ensureAppSource(appId);
-                } catch(e) {
-                    if (e instanceof InvalidAppError)
+        try {
+            let value = global.get_persistent_state('a(sa(sv))', 'notifications');
+            if (value) {
+                let sources = value.deep_unpack();
+                sources.forEach(([appId, notifications]) => {
+                    if (notifications.length == 0)
                         return;
-                    throw e;
-                }
 
-                notifications.forEach(([notificationId, notification]) => {
-                    source.addNotification(notificationId, notification.deep_unpack(), false);
+                    let source;
+                    try {
+                        source = this._ensureAppSource(appId);
+                    } catch(e) {
+                        if (e instanceof InvalidAppError)
+                            return;
+                        throw e;
+                    }
+
+                    notifications.forEach(([notificationId, notification]) => {
+                        source.addNotification(notificationId, notification.deep_unpack(), false);
+                    });
                 });
-            });
+            }
+        } finally {
+            this._isLoading = false;
         }
-
-        this._isLoading = false;
     }
 
     _saveNotifications() {
