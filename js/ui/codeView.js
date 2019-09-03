@@ -442,6 +442,7 @@ var CodingSession = GObject.registerClass({
 
         this._state = CodingSessionStateEnum.APP;
         this._toolboxActionGroup = null;
+        this._toolboxAppActionGroup = null;
 
         this._hackableProxy = null;
         this._hackablePropsChangedId = 0;
@@ -455,13 +456,7 @@ var CodingSession = GObject.registerClass({
         super._init(params);
         this._hackableApp = new ShellDBus.HackableApp(this);
 
-        // FIXME: this should be extended to make it possible to launch
-        // arbitrary toolboxes in the future, depending on the application
-        this._toolboxAppActionGroup =
-            Gio.DBusActionGroup.get(Gio.DBus.session,
-                                    'com.hack_computer.HackToolbox',
-                                    '/com/hack_computer/HackToolbox');
-        this._toolboxAppActionGroup.list_actions();
+        this._initToolboxAppActionGroup();
 
         this._hackModeChangedId = global.settings.connect('changed::hack-mode-enabled',
                                                            this._syncButtonVisibility.bind(this));
@@ -512,6 +507,17 @@ var CodingSession = GObject.registerClass({
 
     get toolbox() {
         return this._toolbox;
+    }
+
+    get toolboxId() {
+        // FIXME: this should be extended to make it possible to launch
+        // arbitrary toolboxes in the future, depending on the application
+        let prefix = 'com.hack_computer';
+
+        if (this.appId.startsWith('com.endlessm.'))
+            prefix = 'com.endlessm';
+
+        return `${prefix}.HackToolbox`;
     }
 
     get appId() {
@@ -753,6 +759,15 @@ var CodingSession = GObject.registerClass({
                 actor.add_effect_with_name('codeview-effect', effect);
             }
         }
+    }
+
+    _initToolboxAppActionGroup() {
+        let toolboxId = this.toolboxId;
+        let toolboxPath = '/' + toolboxId.replace(/\./g, '/');
+
+        this._toolboxAppActionGroup =
+            Gio.DBusActionGroup.get(Gio.DBus.session, toolboxId, toolboxPath);
+        this._toolboxAppActionGroup.list_actions();
     }
 
     _setupToolboxWindow() {
@@ -1484,7 +1499,9 @@ var CodeViewManager = GObject.registerClass({
         // HackUnlock and HackToolbox are inside the com.hack_computer.Clubhouse flatpak
         // and have the Clubhouse appInfo, so we should ignore those cases here
         // to be able to show the HackUnlock and HackToolbox windows
-        } else if (gtkId !== 'com.hack_computer.HackUnlock' && gtkId !== 'com.hack_computer.HackToolbox') {
+        } else if (gtkId !== 'com.hack_computer.HackUnlock' &&
+                   gtkId !== 'com.hack_computer.HackToolbox' &&
+                   gtkId !== 'com.endlessm.HackToolbox') {
             // Do not manage apps that are NoDisplay=true
             if (!appInfo.should_show())
                 return false;
