@@ -27,6 +27,9 @@
 #define SIDE_COMPONENT_ROLE "eos-side-component"
 #define SPEEDWAGON_ROLE "eos-speedwagon"
 
+#define OLD_HACK_TOOLBOX_ID "com.endlessm.HackToolbox.Toolbox"
+#define HACK_TOOLBOX_ID "com.hack_computer.HackToolbox.Toolbox"
+
 /**
  * SECTION:shell-window-tracker
  * @short_description: Associate windows with applications
@@ -368,6 +371,8 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
   const gchar *window_object_path = NULL;
   const gchar *target_app_id = NULL;
   const gchar *target_window_id = NULL;
+  g_autofree gchar *app_id_prefix = NULL;
+  const gchar *hack_toolbox_id = HACK_TOOLBOX_ID;
 
   /* If code view is disabled globally, do nothing here */
   settings = shell_global_get_settings (shell_global_get ());
@@ -387,13 +392,20 @@ maybe_find_target_app_for_toolbox (ShellWindowTracker  *tracker,
   if (!g_dbus_is_name (window_app_id))
     return NULL;
 
+  /* Check if the app starts with com.endlessm for old hack apps and in that
+   * case we will use the old toolbox, in other case we'll use the
+   * com.hack_computer.HackToolbox */
+  app_id_prefix = g_strndup (window_app_id, 12);
+  if (g_strcmp0 (app_id_prefix, "com.endlessm") == 0)
+    hack_toolbox_id = OLD_HACK_TOOLBOX_ID;
+
   proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
                                          G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                          NULL,
                                          window_app_id,
                                          window_object_path,
-                                         "com.hack_computer.HackToolbox.Toolbox",
+                                         hack_toolbox_id,
                                          NULL,
                                          &local_error);
 
