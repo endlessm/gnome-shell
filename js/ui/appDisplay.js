@@ -557,6 +557,7 @@ var AllView = class AllView extends BaseAppView {
                                  GObject.BindingFlags.SYNC_CREATE);
 
         this._appCenterIcon = null;
+        this._hackAppIcon = null;
 
         this._displayingPopup = false;
 
@@ -2794,6 +2795,8 @@ class HackAppIcon extends AppIcon {
         let app = Clubhouse.getClubhouseApp();
 
         super._init(app, viewIconParams, iconParams);
+        this._pulse = global.settings.get_boolean('hack-icon-pulse');
+        this._pulseWaitId = 0;
 
         let activated = global.settings.get_boolean('hack-mode-enabled');
         this.iconState = activated ?
@@ -2807,7 +2810,44 @@ class HackAppIcon extends AppIcon {
                 DownstreamEndlessIconState.HACK_DEACTIVATED;
         });
 
+        this._hackPulseId = global.settings.connect('changed::hack-icon-pulse', () => {
+            this._pulse = global.settings.get_boolean('hack-icon-pulse');
+            if (this._pulseWaitId) {
+                GLib.source_remove(this._pulseWaitId);
+                this._pulseWaitId = 0;
+            }
+            if (this._pulse)
+                this._startPulse();
+        });
+
         this.canDrop = false;
+
+        if (this._pulse)
+            this._startPulse();
+    }
+
+    _startPulse() {
+        const params = { time: 0.1, transition: 'easeOutQuad' };
+        this._tweenIcon({...params, scale_x: 1.1, scale_y: 1.1})
+            .then(this._tweenIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
+            .then(this._tweenIcon.bind(this, {...params, scale_x: 1.1, scale_y: 1.1}))
+            .then(this._tweenIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
+            .then(this._tweenIcon.bind(this, {...params, scale_x: 1.0, scale_y: 1.0}))
+            .then(() => {
+                this._pulseWaitId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
+                    this._pulseWaitId = 0;
+                    if (this._pulse)
+                        this._startPulse();
+                    return GLib.SOURCE_REMOVE;
+                });
+            });
+    }
+
+    _tweenIcon(tweenParams) {
+        return new Promise((resolve) => {
+            const params = {...tweenParams, onComplete: () => resolve(this) };
+            Tweener.addTween(this.icon.icon, params);
+        });
     }
 
     _createIcon(iconSize) {
@@ -2818,8 +2858,16 @@ class HackAppIcon extends AppIcon {
         let iconFile = Gio.File.new_for_uri(iconUri);
         let gicon = new Gio.FileIcon({ file: iconFile });
 
-        return new St.Icon({ gicon: gicon,
-                             icon_size: iconSize });
+        return new St.Icon({
+            gicon: gicon,
+            icon_size: iconSize,
+            pivot_point: new Clutter.Point({ x: 0.5, y: 0.5 }),
+        });
+    }
+
+    activate(button) {
+        global.settings.set_boolean('hack-icon-pulse', false);
+        super.activate(button);
     }
 
     canBeRemoved() {
@@ -2837,6 +2885,10 @@ class HackAppIcon extends AppIcon {
     _onDestroy() {
         if (this._hackModeId)
             global.settings.disconnect(this._hackModeId);
+        if (this._hackPulseId)
+            global.settings.disconnect(this._hackPulseId);
+        if (this._pulseWaitId)
+            GLib.source_remove(this._pulseWaitId);
         super._onDestroy();
     }
 });
