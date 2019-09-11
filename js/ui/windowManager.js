@@ -2483,6 +2483,7 @@ var WindowManager = class {
             // splash were already special-cased before reaching here.
             if (isSplashWindow) {
                 let monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+
                 actor.x = monitor.x;
                 actor.y = monitor.y + monitor.height;
                 actor.show();
@@ -2490,10 +2491,7 @@ var WindowManager = class {
 
                 Tweener.addTween(actor,
                                  { opacity: 255,
-                                   x: monitor.x,
-                                   y: monitor.y,
-                                   scale_x: 1,
-                                   scale_y: 1,
+                                   y: (monitor.height - actor.height) / 2,
                                    time: SHOW_SPEEDWAGON_ANIMATION_TIME,
                                    transition: 'linear',
                                    onComplete: this._mapWindowDone,
