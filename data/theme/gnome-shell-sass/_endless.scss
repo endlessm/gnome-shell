@@ -853,6 +853,7 @@ popup-separator-menu-item {
 $clubhouse-notification-width: 444px;
 $clubhouse-image-width: 175px;
 $clubhouse-image-height: 187px;
+$clubhouse_button_color:  #37DCB1;
 
 .clubhouse-notification {
   background-color: transparent;
@@ -870,7 +871,7 @@ $clubhouse-image-height: 187px;
   }
   .notification-button {
     color: white;
-    background-color: #CE5611;
+    background-color: $clubhouse_button_color;
     border-radius: 17.5px;
     border: none;
     padding: 10px;
@@ -892,10 +893,10 @@ $clubhouse-image-height: 187px;
         }
     }
     &:hover {
-        background-color: #D56F34;
+        background-color: lighten($clubhouse_button_color, 10%);
     }
     &:active {
-        background-color: #AF490E;
+        background-color: darken($clubhouse_button_color, 10%);
     }
   }
   .clubhouse-content-box {
