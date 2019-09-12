@@ -798,6 +798,10 @@ popup-separator-menu-item {
 $clubhouse-notification-width: 444px;
 $clubhouse-image-width: 175px;
 $clubhouse-image-height: 187px;
+$clubhouse_button_color_a: #76EECF;
+$clubhouse_button_color_b: #37DCB1;
+$clubhouse_button_color_c: #32BBA4;
+$clubhouse_button_color_d: #2D9B98;
 
 .clubhouse-notification {
   background-color: transparent;
@@ -816,7 +820,10 @@ $clubhouse-image-height: 187px;
   }
   .notification-button {
     color: white;
-    background-color: #CE5611;
+
+    // This is the default for buttons after the 3rd one (unlikely).
+    background-color: $clubhouse_button_color_d;
+
     border-radius: 17.5px;
     border: none;
     padding: 10px;
@@ -838,10 +845,49 @@ $clubhouse-image-height: 187px;
         }
     }
     &:hover {
-        background-color: #D56F34;
+        background-color: lighten($clubhouse_button_color_d, 10%);
     }
     &:active {
-        background-color: #AF490E;
+        background-color: darken($clubhouse_button_color_d, 10%);
+    }
+    &.child-1 {
+        background-gradient-start: $clubhouse_button_color_a;
+        background-gradient-end: $clubhouse_button_color_b;
+        background-gradient-direction: horizontal;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_a, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_b, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_a, 10%);
+            background-gradient-end: darken($clubhouse_button_color_b, 10%);
+        }
+    }
+    &.child-2 {
+        background-gradient-start: $clubhouse_button_color_b;
+        background-gradient-end: $clubhouse_button_color_c;
+        background-gradient-direction: horizontal;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_b, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_c, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_b, 10%);
+            background-gradient-end: darken($clubhouse_button_color_c, 10%);
+        }
+    }
+    &.child-3 {
+        background-gradient-start: $clubhouse_button_color_c;
+        background-gradient-end: $clubhouse_button_color_d;
+        background-gradient-direction: horizontal;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_c, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_d, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_c, 10%);
+            background-gradient-end: darken($clubhouse_button_color_d, 10%);
+        }
     }
   }
   .clubhouse-content-box {
@@ -850,13 +896,15 @@ $clubhouse-image-height: 187px;
     border: 1px solid #8A6A45;
     box-shadow: 0 2px 8px 8px rgba(0, 0, 0, .2);
     padding: 0;
-    min-height: ($clubhouse-image-height - 52px);
+    margin-left: 25px;
     margin-bottom: 33px;
   }
   .clubhouse-notification-label {
     color: black;
-    margin: 0 $clubhouse-image-width 25px 30px;
-    font: 15px "Metropolis Medium, Sans-Serif";
+    margin-left: 30px;
+    margin-bottom: 30px;
+    width: ($clubhouse-notification-width - $clubhouse-image-width - 30px);
+    font: 18px "Metropolis Medium, Sans-Serif";
   }
   .clubhouse-notification-icon-bin {
     padding: 0;
