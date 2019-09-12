@@ -853,6 +853,10 @@ popup-separator-menu-item {
 $clubhouse-notification-width: 444px;
 $clubhouse-image-width: 175px;
 $clubhouse-image-height: 187px;
+$clubhouse_button_color_a: #76EECF;
+$clubhouse_button_color_b: #37DCB1;
+$clubhouse_button_color_c: #32BBA4;
+$clubhouse_button_color_d: #2D9B98;
 
 .clubhouse-notification {
   background-color: transparent;
@@ -870,7 +874,12 @@ $clubhouse-image-height: 187px;
   }
   .notification-button {
     color: white;
-    background-color: #CE5611;
+
+    // This is the default for buttons after the 3rd one (unlikely).
+    background-gradient-start: $clubhouse_button_color_d;
+    background-gradient-end: $clubhouse_button_color_d;
+    background-gradient-direction: horizontal;
+
     border-radius: 17.5px;
     border: none;
     padding: 10px;
@@ -892,10 +901,48 @@ $clubhouse-image-height: 187px;
         }
     }
     &:hover {
-        background-color: #D56F34;
+        background-gradient-start: lighten($clubhouse_button_color_d, 10%);
+        background-gradient-end: lighten($clubhouse_button_color_d, 10%);
     }
     &:active {
-        background-color: #AF490E;
+        background-gradient-start: darken($clubhouse_button_color_d, 10%);
+        background-gradient-end: darken($clubhouse_button_color_d, 10%);
+    }
+    &.child-1 {
+        background-gradient-start: $clubhouse_button_color_a;
+        background-gradient-end: $clubhouse_button_color_b;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_a, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_b, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_a, 10%);
+            background-gradient-end: darken($clubhouse_button_color_b, 10%);
+        }
+    }
+    &.child-2 {
+        background-gradient-start: $clubhouse_button_color_b;
+        background-gradient-end: $clubhouse_button_color_c;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_b, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_c, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_b, 10%);
+            background-gradient-end: darken($clubhouse_button_color_c, 10%);
+        }
+    }
+    &.child-3 {
+        background-gradient-start: $clubhouse_button_color_c;
+        background-gradient-end: $clubhouse_button_color_d;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_c, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_d, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_c, 10%);
+            background-gradient-end: darken($clubhouse_button_color_d, 10%);
+        }
     }
   }
   .clubhouse-content-box {

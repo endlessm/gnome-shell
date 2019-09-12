@@ -473,6 +473,9 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         button.set_x_expand(false);
         super.addButton(button, callback);
+
+        // @todo: This is a workaround for the missing CSS selector, :nth-child
+        button.add_style_class_name('child-' + this._buttonBox.get_n_children());
     }
 
     _splitTextInPages(fulltext) {
