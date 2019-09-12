@@ -345,12 +345,26 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         this._closeButton.opacity = 255;
     }
 
+    _updateButtonsCss() {
+        // @todo: This is a workaround for the missing CSS selector, :nth-child
+        // Upstream issue: https://gitlab.gnome.org/GNOME/gnome-shell/issues/1800
+        this._buttonBox.get_children().forEach((button, index) => {
+            const nth_class = 'child-' + (index + 1);
+            const class_list = button.get_style_class_name();
+            if (class_list.match(/child-[0-9]*/))
+                button.set_style_class_name(class_list.replace(/child-[0-9]*/, nth_class));
+            else
+                button.set_style_class_name(class_list + ' ' + nth_class);
+        });
+    }
+
     _addActions() {
         // Only set up the actions if we're showing the last page of text
         if (!this._inLastPage())
             return;
 
         super._addActions();
+        this._updateButtonsCss();
     }
 
     // Override this method because we don't want the button
@@ -444,12 +458,16 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             click_sound_event_id: 'clubhouse/dialog/next',
         });
 
-        return this.addButton(button, () => {
+        this.addButton(button, () => {
             this._setNextPage();
 
-            if (this._inLastPage())
+            if (this._inLastPage()) {
                 button.destroy();
+                this._updateButtonsCss();
+            }
         });
+
+        this._updateButtonsCss();
     }
 
     _slideOut() {
