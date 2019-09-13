@@ -102,7 +102,9 @@ const _ensureHackDataFile = (function () {
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
         '/var/lib/flatpak',
     ];
-    const flatpakPath = 'app/com.hack_computer.Clubhouse/current/active/files';
+
+    const componentsId = Clubhouse.getClubhouseApp() ? 'com.hack_computer.Clubhouse' : 'com.endlessm.HackComponents';
+    const flatpakPath = `app/${componentsId}/current/active/files`;
     const fileRelPath = 'share/hack-components';
     const searchPaths = flatpakInstallationPaths.map(installation =>
         GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
