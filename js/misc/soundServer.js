@@ -1,29 +1,37 @@
 /* exported getDefault */
 
-const {Gio} = imports.gi;
+const {Gio, Shell} = imports.gi;
 
-const SoundServerIface = `
-<node>
-  <interface name='com.hack_computer.HackSoundServer'>
-    <method name='PlaySound'>
-      <arg type='s' name='sound_event' direction='in'/>
-      <arg type='s' name='uuid' direction='out'/>
-    </method>
-    <method name='StopSound'>
-      <arg type='s' name='uuid' direction='in'/>
-    </method>
-    <signal name='Error'>
-      <arg type='s' name='uuid'/>
-      <arg type='s' name='error_message'/>
-      <arg type='s' name='error_domain'/>
-      <arg type='i' name='error_code'/>
-      <arg type='s' name='debug'/>
-    </signal>
-  </interface>
-</node>
-`;
+function _soundServerIface(id) {
+    return `
+        <node>
+          <interface name='${id}'>
+            <method name='PlaySound'>
+              <arg type='s' name='sound_event' direction='in'/>
+              <arg type='s' name='uuid' direction='out'/>
+            </method>
+            <method name='StopSound'>
+              <arg type='s' name='uuid' direction='in'/>
+            </method>
+            <signal name='Error'>
+              <arg type='s' name='uuid'/>
+              <arg type='s' name='error_message'/>
+              <arg type='s' name='error_domain'/>
+              <arg type='i' name='error_code'/>
+              <arg type='s' name='debug'/>
+            </signal>
+          </interface>
+        </node>`;
+}
 
-const SoundServerProxy = Gio.DBusProxy.makeProxyWrapper(SoundServerIface);
+const DEFAULT_ID = 'com.hack_computer.HackSoundServer';
+const DEFAULT_PATH = '/com/hack_computer/HackSoundServer';
+const DEFAULT_IFACE = _soundServerIface(DEFAULT_ID);
+
+const OLD_ID = 'com.endlessm.HackSoundServer';
+const OLD_PATH = '/com/endlessm/HackSoundServer';
+const OLD_IFACE = _soundServerIface(OLD_ID);
+
 
 var SoundItemStatusEnum = {
     NONE: 0,
@@ -54,9 +62,9 @@ var SoundItem = class {
             return;
         }
 
-	// If we are already playing a sound, do nothing (we want to avoid overlapped sounds)
-	if (this._id !== this.Status.NONE)
-	    return;
+    // If we are already playing a sound, do nothing (we want to avoid overlapped sounds)
+    if (this._id !== this.Status.NONE)
+        return;
 
         this._id = this.Status.PENDING;
         getDefault().playAsync(this.name).then(uuid => {
@@ -84,8 +92,19 @@ var SoundItem = class {
 
 class SoundServer {
     constructor() {
-        this._proxy = new SoundServerProxy(Gio.DBus.session,
-            'com.hack_computer.HackSoundServer', '/com/hack_computer/HackSoundServer');
+        this._id = DEFAULT_ID;
+        this._path = DEFAULT_PATH;
+        this._iface = DEFAULT_IFACE;
+
+        const clubhouse = Shell.AppSystem.get_default().lookup_app('com.hack_computer.Clubhouse.desktop');
+        if (!clubhouse) {
+            this._id = OLD_ID;
+            this._path = OLD_PATH;
+            this._iface = OLD_IFACE;
+        }
+
+        const SoundServerProxy = Gio.DBusProxy.makeProxyWrapper(this._iface);
+        this._proxy = new SoundServerProxy(Gio.DBus.session, this._id, this._path);
     }
 
     // Most common use case, fire and forget, no return value
