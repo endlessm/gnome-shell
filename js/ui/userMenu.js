@@ -125,12 +125,7 @@ var UserMenu = class {
         // Control Center
         let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
         this._settingsItem = menuItemsSection.addAction(SETTINGS_TEXT, () => {
-            this.menu.close(BoxPointer.PopupAnimation.NONE);
-            Main.overview.hide();
-
-            let app = Shell.AppSystem.get_default().lookup_app(SETTINGS_LAUNCHER);
-            let context = new AppActivation.AppActivationContext(app);
-            context.activate();
+            this._launchApplication(SETTINGS_LAUNCHER);
         }, gicon);
 
         // Social
