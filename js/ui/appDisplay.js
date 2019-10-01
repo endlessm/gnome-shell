@@ -169,6 +169,7 @@ class BaseAppView {
             this._grid = new IconGrid.PaginatedIconGrid(gridParams);
         else
             this._grid = new IconGrid.IconGrid(gridParams);
+        this._grid._delegate = this;
 
         this._grid.connect('child-focused', (grid, actor) => {
             this._childFocused(actor);
@@ -326,6 +327,54 @@ class BaseAppView {
         this._grid.ease(params);
     }
 
+    _canAccept(source) {
+        if (!(source instanceof AppIcon))
+            return false;
+
+        return true;
+    }
+
+    handleDragOver(source, _actor, x, y) {
+        if (!this._canAccept(source)) {
+            this._grid.removeNudges();
+            return DND.DragMotionResult.NO_DROP;
+        }
+
+        // Ask grid can we drop here
+        let [index, dragLocation] = this.canDropAt(x, y);
+
+        let onIcon = dragLocation == IconGrid.DragLocation.ON_ICON;
+        let sourceIndex = this._allItems.filter(c => c.actor.visible).indexOf(source);
+        let onItself = sourceIndex != -1 && (sourceIndex == index || sourceIndex == index - 1);
+        let isNewPosition =
+            ((!onIcon && index != this._lastIndex) ||
+             (dragLocation != this._lastDragLocation));
+
+        if (isNewPosition || onItself)
+            this._grid.removeNudges();
+
+        if (!onItself)
+            this._grid.nudgeItemsAtIndex(index, dragLocation);
+
+        this._lastDragLocation = dragLocation;
+        this._lastIndex = index;
+
+        return DND.DragMotionResult.CONTINUE;
+    }
+
+    acceptDrop(source, _actor, x, y) {
+        this._grid.removeNudges();
+
+        if (!this._canAccept(source))
+            return false;
+
+        let [index] = this.canDropAt(x, y);
+
+        this.moveItem(source, index);
+
+        return true;
+    }
+
     get gridActor() {
         return this._grid;
     }
@@ -399,7 +448,6 @@ var AllView = class AllView extends BaseAppView {
         this._scrollView = this.actor.scrollView;
         this._stack = this.actor.stack;
         this._stackBox = this.actor.stackBox;
-        this._grid._delegate = this;
 
         this._id = IconGridLayout.DESKTOP_GRID_ID;
 
@@ -820,6 +868,7 @@ var AllView = class AllView extends BaseAppView {
         // Within the grid boundaries, or already animating
         if (dragEvent.y > gridY && dragEvent.y < gridBottom ||
             this._adjustment.get_transition('value') != null) {
+            this._grid.removeNudges();
             return;
         }
 
@@ -866,30 +915,9 @@ var AllView = class AllView extends BaseAppView {
         }
     }
 
-    _canAccept(source) {
-        if (!(source instanceof AppIcon))
+    acceptDrop(source, actor, x, y) {
+        if (!super.acceptDrop(source, actor, x, y))
             return false;
-
-        let view = _getViewFromIcon(source);
-        if (!(view instanceof FolderView))
-            return false;
-
-        return true;
-    }
-
-    handleDragOver(source) {
-        if (!this._canAccept(source))
-            return DND.DragMotionResult.NO_DROP;
-
-        return DND.DragMotionResult.MOVE_DROP;
-    }
-
-    acceptDrop(source) {
-        if (!this._canAccept(source))
-            return false;
-
-        IconGridLayout.layout.appendIcon(
-            source.app.id, IconGridLayout.DESKTOP_GRID_ID);
 
         if (this._currentPopup)
             this._currentPopup.popdown();
@@ -1356,6 +1384,11 @@ class ViewIcon extends GObject.Object {
         });
     }
 
+    _betweenLeeways(x, y) {
+        return x >= IconGrid.LEFT_DIVIDER_LEEWAY &&
+               x <= this.actor.width - IconGrid.RIGHT_DIVIDER_LEEWAY;
+    }
+
     _onLabelUpdate() {
         // Do nothing by default
     }
@@ -1511,9 +1544,12 @@ var FolderIcon = GObject.registerClass({
         return true;
     }
 
-    handleDragOver(source) {
+    handleDragOver(source, _actor, x, y) {
         if (!this._canAccept(source))
             return DND.DragMotionResult.NO_DROP;
+
+        if (!this._betweenLeeways(x, y))
+            return DND.DragMotionResult.CONTINUE;
 
         return DND.DragMotionResult.MOVE_DROP;
     }
@@ -2293,11 +2329,14 @@ var AppIcon = GObject.registerClass({
         DND.removeDragMonitor(this._dragMonitor);
     }
 
-    handleDragOver(source) {
+    handleDragOver(source, _actor, x, y) {
         if (source == this)
             return DND.DragMotionResult.NO_DROP;
 
         if (!this._canAccept(source))
+            return DND.DragMotionResult.CONTINUE;
+
+        if (!this._betweenLeeways(x, y))
             return DND.DragMotionResult.CONTINUE;
 
         return DND.DragMotionResult.MOVE_DROP;
