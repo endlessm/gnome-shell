@@ -226,23 +226,26 @@ class BaseAppView {
     }
 
     moveItem(item, newPosition) {
-        let itemIndex = this._allItems.indexOf(item);
-
-        if (itemIndex == -1) {
-            log('Trying to move item %s that is not in this app view'.format(item.id));
-            return;
-        }
-
         let visibleItems = this._allItems.filter(item => item.actor.visible);
+        let targetId = visibleItems[newPosition].id;
+
         let visibleIndex = visibleItems.indexOf(item);
         if (newPosition > visibleIndex)
             newPosition -= 1;
 
         // Remove from the old position
-        this._allItems.splice(itemIndex, 1);
+        let itemIndex = this._allItems.indexOf(item);
 
-        let realPosition = this._grid.moveItem(item, newPosition);
-        this._allItems.splice(realPosition, 0, item);
+        let realPosition = -1;
+        if (itemIndex != -1) {
+            this._allItems.splice(itemIndex, 1);
+            realPosition = this._grid.moveItem(item, newPosition);
+            this._allItems.splice(realPosition, 0, item);
+        } else {
+            realPosition = this._allItems.indexOf(targetId);
+        }
+
+        IconGridLayout.layout.repositionIcon(item.id, targetId, this.id);
 
         return realPosition;
     }
