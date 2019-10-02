@@ -505,6 +505,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
                                onUpdate: () => _clipToMonitor(this.actor),
                                onComplete: () => {
                                    // Ensure it only slides in once
+                                   this.actor.remove_clip();
                                    this._shouldSlideIn = false;
                                }
                              });
