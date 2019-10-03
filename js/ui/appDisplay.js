@@ -328,9 +328,6 @@ class BaseAppView {
     }
 
     _canAccept(source) {
-        if (!(source instanceof AppIcon))
-            return false;
-
         return true;
     }
 
@@ -894,15 +891,12 @@ var AllView = class AllView extends BaseAppView {
     }
 
     _onDragMotion(dragEvent) {
-        if (!(dragEvent.source instanceof AppIcon))
-            return DND.DragMotionResult.CONTINUE;
-
-        let appIcon = dragEvent.source;
+        let icon = dragEvent.source;
 
         // Handle the drag overshoot. When dragging to above the
         // icon grid, move to the page above; when dragging below,
         // move to the page below.
-        if (this._grid.contains(appIcon.actor))
+        if (this._grid.contains(icon.actor))
             this._handleDragOvershoot(dragEvent);
 
         return DND.DragMotionResult.CONTINUE;
@@ -1194,6 +1188,13 @@ var FolderView = class FolderView extends BaseAppView {
         return icon;
     }
 
+    _canAccept(source) {
+        if (!(source instanceof AppIcon))
+            return false;
+
+        return true;
+    }
+
     _onPan(action) {
         let [dist_, dx_, dy] = action.get_motion_delta(0);
         let adjustment = this.actor.vscroll.adjustment;
@@ -1445,7 +1446,7 @@ var FolderIcon = GObject.registerClass({
             toggle_mode: true,
         };
         let iconParams = {
-            isDraggable: false,
+            isDraggable: true,
             createIcon: this._createIcon.bind(this),
             setSizeManually: false,
         };
@@ -1548,7 +1549,7 @@ var FolderIcon = GObject.registerClass({
 
     handleDragOver(source, _actor, x, y) {
         if (!this._canAccept(source))
-            return DND.DragMotionResult.NO_DROP;
+            return DND.DragMotionResult.CONTINUE;
 
         if (!this._betweenLeeways(x, y))
             return DND.DragMotionResult.CONTINUE;
