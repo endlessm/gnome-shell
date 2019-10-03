@@ -1552,6 +1552,7 @@ var FolderIcon = GObject.registerClass({
         this.actor.remove_style_pseudo_class('drop');
         this._parentView.uninhibitEventBlocker();
         DND.removeDragMonitor(this._dragMonitor);
+        this._dragMonitor = null;
     }
 
     _canAccept(source) {
@@ -2352,6 +2353,7 @@ var AppIcon = GObject.registerClass({
     _onDragEnd() {
         this.actor.remove_style_pseudo_class('drop');
         DND.removeDragMonitor(this._dragMonitor);
+        this._dragMonitor = null;
     }
 
     handleDragOver(source, _actor, x, y) {
