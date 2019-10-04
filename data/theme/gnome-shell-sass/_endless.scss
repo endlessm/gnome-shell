@@ -805,7 +805,7 @@ $clubhouse_button_color_d: #2D9B98;
 
 .clubhouse-notification {
   background-color: transparent;
-  width: $clubhouse-notification-width;
+  width: $clubhouse-notification-width + 25px;
   border: none;
   &:hover, &:focus {
     background-color: transparent;
@@ -816,7 +816,7 @@ $clubhouse_button_color_d: #2D9B98;
   }
   .notification-actions {
     padding: 0;
-    margin: 0 0 10px 30px;
+    margin: 0 0 10px 0;
   }
   .notification-button {
     color: white;
@@ -834,13 +834,16 @@ $clubhouse_button_color_d: #2D9B98;
     box-shadow: 0 2px 4px 4px rgba(0, 0, 0, .2);
     text-shadow: 0 0.5px 2px rgba(0, 0, 0, .4);
     min-width: 115px;
-    &.next {
+    &.text-button.child-1 {
+        margin-left: 55px;
+    }
+    &.icon-button {
         min-width: 50px;
         width: 50px;
         height: 50px;
         border-radius: 25px;
         padding: 0;
-        margin: 0;
+        margin: 0 12px 0 0;
         & > StIcon {
             icon-size: 24px;
             icon-shadow: 0 0.5px 2px rgba(0, 0, 0, .2);
