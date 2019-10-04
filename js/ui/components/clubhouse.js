@@ -42,6 +42,15 @@ const CLUBHOUSE_BANNER_ANIMATION_TIME = 200;
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
 const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
 
+// Some button labels are replaced by customized icons if they match a
+// unicode emoji character, as per Design request.
+const CLUBHOUSE_ICONS_FOR_EMOJI = {
+    '❯': 'clubhouse-notification-button-next-symbolic.svg',
+    '❮': 'clubhouse-notification-button-previous-symbolic.svg',
+    '👍': 'clubhouse-thumbsup-symbolic.svg',
+    '👎': 'clubhouse-thumbsdown-symbolic.svg',
+};
+
 function getClubhouseApp(clubhouseId = 'com.hack_computer.Clubhouse') {
     return Shell.AppSystem.get_default().lookup_app(`${clubhouseId}.desktop`);
 }
@@ -383,13 +392,17 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     // Override this method because we don't want the button
     // horizontally expanded:
     addButton(button, callback) {
-        if (button.label === '>') {
+        if (Object.keys(CLUBHOUSE_ICONS_FOR_EMOJI).includes(button.label)) {
+            let icon = CLUBHOUSE_ICONS_FOR_EMOJI[button.label];
+            let iconUrl = `resource:///org/gnome/shell/theme/${icon}`;
             button.label = '';
-            button.add_style_class_name('next');
 
-            let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/clubhouse-notification-button-next-symbolic.svg');
+            button.add_style_class_name('icon-button');
+            let iconFile = Gio.File.new_for_uri(iconUrl);
             let gicon = new Gio.FileIcon({ file: iconFile });
             button.child = new St.Icon({ gicon: gicon });
+        } else {
+            button.add_style_class_name('text-button');
         }
 
         button.set_x_expand(false);
@@ -466,7 +479,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     _setupNextPageButton() {
         let button = new Soundable.Button({
             style_class: 'notification-button',
-            label: '>',
+            label: '❯',
             can_focus: true,
             click_sound_event_id: 'clubhouse/dialog/next',
         });
