@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-04 10:55+0100\n"
+"POT-Creation-Date: 2019-10-04 11:10+0100\n"
 "PO-Revision-Date: 2019-02-09 23:26+0300\n"
 "Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
@@ -232,6 +232,9 @@ msgid ""
 "for those applications still relying on the tray area will display their "
 "status icons (e.g. Steam, Dropbox, Skype...)."
 msgstr ""
+"Bu, alt panelin sağ tarafında, tepsi alanına hala bağlı olan uygulamaların "
+"simgelerinin durum simgelerini (ör. Steam, Dropbox, Skype...) göstereceği "
+"bir alanı etkinleştirir."
 
 #: data/org.gnome.shell.gschema.xml.in:142
 #, fuzzy
@@ -302,10 +305,13 @@ msgid ""
 "screens, prevents applications from being forced to open maximized, and does "
 "not automatically switch to the app selector when a window is minimized."
 msgstr ""
+"Pencere yönetimini standart Gnome gibi yapar. Uygulama açılış ekranlarını "
+"gizler, uygulamaların maksimuma açılmaya zorlanmasını önler ve bir pencere "
+"küçültüldüğünde otomatik olarak uygulama seçicisine geçmez."
 
 #: data/org.gnome.shell.gschema.xml.in:208
 msgid "Whether password reset is allowed"
-msgstr ""
+msgstr "Parola sıfırlamaya izin verilip verilmeyeceği"
 
 #: data/org.gnome.shell.gschema.xml.in:209
 msgid ""
@@ -357,7 +363,7 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:249
 msgid "WOBBLY!"
-msgstr ""
+msgstr "SALLANAN!"
 
 #: data/org.gnome.shell.gschema.xml.in:256
 msgid "Wobbly effect Spring Constant"
@@ -663,33 +669,35 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:552
 msgid "Watermark file"
-msgstr ""
+msgstr "Filigran dosyası"
 
 #: data/org.gnome.shell.gschema.xml.in:553
 msgid "The full watermark file path"
-msgstr ""
+msgstr "Filigran dosyasının tam yolu"
 
 #: data/org.gnome.shell.gschema.xml.in:557
 msgid "Watermark position"
-msgstr ""
+msgstr "Filigran konumu"
 
 #: data/org.gnome.shell.gschema.xml.in:558
 msgid ""
 "The position of the watermark; valid values are 'center', 'bottom-left', "
 "'bottom-center' and 'bottom-right'"
 msgstr ""
+"Filigranın konumu; geçerli değerler 'merkez', 'sol alt', 'alt orta' ve 'alt "
+"sağ'"
 
 #: data/org.gnome.shell.gschema.xml.in:566
 msgid "Watermark size"
-msgstr ""
+msgstr "Filigran boyutu"
 
 #: data/org.gnome.shell.gschema.xml.in:567
 msgid "The watermark size in percent relative to the screen width"
-msgstr ""
+msgstr "Filigran boyutu, ekran genişliğine göre yüzdelik olarak"
 
 #: data/org.gnome.shell.gschema.xml.in:572
 msgid "Watermark border"
-msgstr ""
+msgstr "Filigran çerçeve çizgileri"
 
 #: data/org.gnome.shell.gschema.xml.in:573
 msgid "The watermark around the logo"
@@ -697,7 +705,7 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:578
 msgid "Watermark opacity"
-msgstr ""
+msgstr "Filigran saydamlığı"
 
 #: data/org.gnome.shell.gschema.xml.in:579
 msgid "The watermark of the logo"
@@ -705,11 +713,11 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:583
 msgid "Watermark always visible"
-msgstr ""
+msgstr "Filigran her zaman görsün"
 
 #: data/org.gnome.shell.gschema.xml.in:584
 msgid "Show the watermark even on a non default background"
-msgstr ""
+msgstr "Filigranı varsayılan olmayan bir arka plan üzerinde bile göster"
 
 #: data/org.gnome.Shell.PortalHelper.desktop.in.in:3
 msgid "Network Login"
@@ -767,11 +775,11 @@ msgstr "Yazılımlara Göz Atın"
 
 #: js/gdm/authPrompt.js:124
 msgid "Show password hint"
-msgstr ""
+msgstr "Şifre ipucunu göster"
 
 #: js/gdm/authPrompt.js:139
 msgid "Forgot password?"
-msgstr ""
+msgstr "Şifrenizi mi unuttunuz?"
 
 #: js/gdm/authPrompt.js:188 js/ui/audioDeviceSelection.js:55
 #: js/ui/components/networkAgent.js:141 js/ui/components/polkitAgent.js:148
@@ -801,7 +809,7 @@ msgstr "Giriş"
 #. Translators: During a password reset, prompt for the "secret code" provided by customer support.
 #: js/gdm/authPrompt.js:635
 msgid "Enter unlock code provided by customer support:"
-msgstr ""
+msgstr "Müşteri hizmetleri tarafından verilen kilit açma kodunu giriniz:"
 
 #. Translators: Password reset. The first %s is a verification code and the second is an email.
 #: js/gdm/authPrompt.js:638
@@ -810,17 +818,18 @@ msgid ""
 "Please inform customer support of your verification code %s by emailing %s. "
 "The code will remain valid until you click Cancel or turn off your computer."
 msgstr ""
+"Lütfen %s doğrulama kodunuzu %s adresine e-posta göndererek müşteri "
+"desteğine bildirin. Kod, İptal'i tıklatana veya bilgisayarınızı kapatana "
+"kadar geçerli kalır."
 
 #. Translators: Button on login dialog, after clicking Forgot Password?
 #: js/gdm/authPrompt.js:643
-#, fuzzy
 msgid "Reset Password"
-msgstr "Parolayı Anımsa"
+msgstr "Şifre Sıfırla"
 
 #: js/gdm/authPrompt.js:716
-#, fuzzy
 msgid "Your unlock code was incorrect. Please try again."
-msgstr "Üzgünüm ama işe yaramadı. Lütfen yeniden deneyin."
+msgstr "Kilit açma kodunuz hatalı. Lütfen tekrar deneyin."
 
 #: js/gdm/loginDialog.js:289
 msgid "Choose Session"
@@ -955,12 +964,14 @@ msgstr "Şimdi"
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d dakika önce"
+msgstr[1] "%d dakika önce"
 
 #: js/misc/util.js:245
 #, javascript-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
-msgstr[0] "%d saat önce"
+msgstr[0] "%d saat önce "
+msgstr[1] "%d saat önce "
 
 #: js/misc/util.js:248
 msgid "Yesterday"
@@ -971,24 +982,28 @@ msgstr "Dün"
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "%d gün önce"
+msgstr[1] "%d gün önce"
 
 #: js/misc/util.js:253
 #, javascript-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "%d hafta önce"
+msgstr[1] "%d hafta önce"
 
 #: js/misc/util.js:256
 #, javascript-format
 msgid "%d month ago"
 msgid_plural "%d months ago"
 msgstr[0] "%d ay önce"
+msgstr[1] "%d ay önce"
 
 #: js/misc/util.js:258
 #, javascript-format
 msgid "%d year ago"
 msgid_plural "%d years ago"
 msgstr[0] "%d yıl önce"
+msgstr[1] "%d yıl önce"
 
 #. Translators: Time in 24h format
 #: js/misc/util.js:288
@@ -1066,7 +1081,7 @@ msgstr "%-d %B %Y, %l∶%M %p"
 #.
 #: js/misc/util.js:531
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #. TRANSLATORS: this is the title of the wifi captive portal login window
 #: js/portalHelper/main.js:40
@@ -1099,12 +1114,12 @@ msgstr "Sık kullanılan uygulamalar burada yer alacak"
 #: js/ui/appDisplay.js:1557
 msgid "No apps in this folder! To add an app, drag it onto the folder."
 msgstr ""
+"Bu klasörde uygulama yok! Bir uygulama eklemek için onu klasöre sürükleyin."
 
 #. Add the "Remove from desktop" menu item at the end.
 #: js/ui/appDisplay.js:1740
-#, fuzzy
 msgid "Remove from desktop"
-msgstr "Sık Kullanılanlardan Çıkar"
+msgstr "Masaüstünden kaldır"
 
 #: js/ui/appDisplay.js:2627 js/ui/panel.js:86
 msgid "New Window"
@@ -1116,7 +1131,7 @@ msgstr "Adanmış Ekran Kartıyla Başlat"
 
 #: js/ui/appDisplay.js:2769
 msgid "Remove"
-msgstr "Sil"
+msgstr "Kaldır"
 
 #: js/ui/audioDeviceSelection.js:42
 msgid "Select Audio Device"
@@ -1144,15 +1159,15 @@ msgstr "Arka Planı Değiştir…"
 
 #: js/ui/backgroundMenu.js:18
 msgid "Add App"
-msgstr ""
+msgstr "Uygulama Ekle"
 
 #: js/ui/backgroundMenu.js:24
 msgid "Add Website"
-msgstr ""
+msgstr "Websitesi Ekle"
 
 #: js/ui/backgroundMenu.js:28
 msgid "Add Folder"
-msgstr ""
+msgstr "Klasör Ekle"
 
 #. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0" (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
 #: js/ui/calendar.js:40
@@ -1334,19 +1349,21 @@ msgstr "Bağlan"
 
 #: js/ui/components/networkAgent.js:164
 msgid "Limited Data"
-msgstr ""
+msgstr "Sınırlı Veri"
 
 #: js/ui/components/networkAgent.js:172
 msgid "Unlimited Data"
-msgstr ""
+msgstr "Sınırsız Veri"
 
 #: js/ui/components/networkAgent.js:182 js/ui/components/networkAgent.js:212
 msgid "Enable if your connection has limits on how much you can download."
 msgstr ""
+"Bağlantınızın ne kadarını indirebileceğiniz konusunda bir sınırı varsa "
+"etkinleştirin."
 
 #: js/ui/components/networkAgent.js:214
 msgid "This connection doesn't have limits on how much you can download."
-msgstr ""
+msgstr "Bu bağlantının ne kadarını indirebileceğinizi sınırlamaz."
 
 #. Cisco LEAP
 #: js/ui/components/networkAgent.js:379 js/ui/components/networkAgent.js:391
@@ -1375,7 +1392,7 @@ msgstr "Hizmet: "
 #: js/ui/components/networkAgent.js:480
 #, javascript-format
 msgid "Enter the Wi-Fi password for “%s”"
-msgstr ""
+msgstr "%s için Wi-Fi parolasını girin"
 
 #: js/ui/components/networkAgent.js:485 js/ui/components/networkAgent.js:865
 msgid "Wired 802.1X authentication"
@@ -1532,13 +1549,15 @@ msgstr "Oturumu Kapat"
 #, javascript-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
-msgstr[0] "%s oturumu %d saniye içinde kendiliğinden kapatılacak."
+msgstr[0] "%s hesabından %d saniye içerisinde çıkış yapılacaktır."
+msgstr[1] "%s hesabından %d saniye içerisinde çıkış yapılacaktır."
 
 #: js/ui/endSessionDialog.js:50
 #, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
-msgstr[0] "%d saniye içinde oturumunuz kendiliğinden kapatılacak."
+msgstr[0] "%d saniye içerisinde çıkış yapmış olacaksınız."
+msgstr[1] "%d saniye içerisinde çıkış yapmış olacaksınız."
 
 #: js/ui/endSessionDialog.js:56
 msgctxt "button"
@@ -1559,7 +1578,8 @@ msgstr "Güncelleştirmeleri Kur ve Kapat"
 #, javascript-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
-msgstr[0] "Sistem %d saniye içinde kendiliğinden kapanacak."
+msgstr[0] "Sisteminiz %d saniye içerisinde kapatılacak."
+msgstr[1] "Sistem %d saniye içerisinde kapatılacak."
 
 #: js/ui/endSessionDialog.js:69
 msgctxt "checkbox"
@@ -1585,7 +1605,8 @@ msgstr "Bilgisayarı Yeniden Başlat"
 #, javascript-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
-msgstr[0] "Sistem %d saniye içinde kendiliğinden yeniden başlayacak."
+msgstr[0] "Sisteminiz %d saniye içerisinde yeniden başlayacak."
+msgstr[1] "Sistem %d saniye içerisinde yeniden başlayacak."
 
 #: js/ui/endSessionDialog.js:97
 msgctxt "title"
@@ -1598,8 +1619,11 @@ msgid "The system will automatically restart and install updates in %d second."
 msgid_plural ""
 "The system will automatically restart and install updates in %d seconds."
 msgstr[0] ""
-"Sistem %d saniye içinde kendiliğinden yeniden başlayacak ve "
-"güncelleştirmeleri kuracak."
+"Sistem otomatik olarak yeniden başlatılacak ve güncellemeleri %d saniye "
+"içerisinde yükleyecek."
+msgstr[1] ""
+"Sistem otomatik olarak yeniden başlatılacak ve güncellemeleri %d saniye "
+"içerisinde yükleyecek."
 
 #: js/ui/endSessionDialog.js:105 js/ui/endSessionDialog.js:125
 msgctxt "button"
@@ -1828,7 +1852,7 @@ msgstr "Geri Al"
 
 #: js/ui/overview.js:111
 msgid "No apps are open"
-msgstr ""
+msgstr "Hiçbir uygulama açık değil"
 
 #. Translators: This is the main view to select
 #. activities. See also note for "Activities" string.
@@ -1900,32 +1924,30 @@ msgid "System"
 msgstr "Sistem"
 
 #: js/ui/panel.js:838
-#, fuzzy
 msgctxt "User menu"
 msgid "User Menu"
-msgstr "Tepsi Menüsü"
+msgstr "Kullanıcı menüsü"
 
 #: js/ui/panel.js:870
-#, fuzzy
 msgctxt "Power menu"
 msgid "Power"
-msgstr "Kapat"
+msgstr "Güç"
 
 #: js/ui/panel.js:949
 msgid "Bottom Bar"
-msgstr ""
+msgstr "Alt çubuk"
 
 #: js/ui/paygUnlockDialog.js:84
 msgid "Your Pay As You Go usage credit has expired."
-msgstr ""
+msgstr "Kullandıkça Öde kullanım kredinizin süresi doldu."
 
 #: js/ui/paygUnlockDialog.js:103
 msgid "Enter a new code to unlock your computer:"
-msgstr ""
+msgstr "Bilgisayarınızın kilidini açmak için yeni bir kod girin:"
 
 #: js/ui/paygUnlockDialog.js:123
 msgid "Don’t have an unlock code? That’s OK!"
-msgstr ""
+msgstr "Kilit açma kodunuz yok mu? Sorun değil!"
 
 #. The second possible override is to use the template text below
 #. with the contact's name and phone number, if BOTH are present.
@@ -1939,7 +1961,7 @@ msgstr ""
 #. No overrides present, default to fallback text.
 #: js/ui/paygUnlockDialog.js:146
 msgid "Talk to your sales representative to purchase a new code."
-msgstr ""
+msgstr "Yeni bir kod satın almak için satış temsilcinizle görüşün."
 
 #: js/ui/paygUnlockDialog.js:157
 #, fuzzy
@@ -1948,19 +1970,19 @@ msgstr "Kilit Açma Penceresi"
 
 #: js/ui/paygUnlockDialog.js:322
 msgid "Success!"
-msgstr ""
+msgstr "Başarılı!"
 
 #: js/ui/paygUnlockDialog.js:344
 msgid "Remaining time cleared!"
-msgstr ""
+msgstr "Kalan süre temizlendi!"
 
 #: js/ui/paygUnlockDialog.js:345
 msgid "OK!"
-msgstr ""
+msgstr "Tamam!"
 
 #: js/ui/payg.js:39
 msgid "Pay As You Go"
-msgstr ""
+msgstr "Kullandığın Kadar Öde"
 
 #: js/ui/payg.js:40
 msgid "Enter an unlock code to extend the time before your credit has expired."
@@ -1969,105 +1991,112 @@ msgstr ""
 #: js/ui/payg.js:41
 #, javascript-format
 msgid "Subscription runs out in %s."
-msgstr ""
+msgstr "Abonelik %s sona eriyor."
 
 #: js/ui/payg.js:228
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
-msgstr[0] ""
+msgstr[0] "Çok fazla denendi. %s dakika sonra tekrar deneyin."
+msgstr[1] "Çok fazla denendi. %s dakika sonra tekrar deneyin."
 
 #: js/ui/payg.js:232
 msgid "Too many attempts. Try again in a few seconds."
-msgstr ""
+msgstr "Çok fazla denendi. Birkaç saniye sonra tekrar deneyin."
 
 #: js/ui/payg.js:250
-#, fuzzy
 msgid "Invalid code. Please try again."
-msgstr "Üzgünüm ama işe yaramadı. Lütfen yeniden deneyin."
+msgstr "Geçersiz kod. Lütfen tekrar deneyin."
 
 #: js/ui/payg.js:252
 msgid "Code already used. Please enter a new code."
-msgstr ""
+msgstr "Kod zaten kullanılmış. Lütfen yeni bir kod girin."
 
 #: js/ui/payg.js:254
 msgid "Time exceeded while verifying the code"
-msgstr ""
+msgstr "Kodu doğrularken zaman aşıldı"
 
 #. We don't consider any other error here (and we don't consider DISABLED explicitly,
 #. since that should not happen), but still we need to show something to the user.
 #: js/ui/payg.js:258
-#, fuzzy
 msgid "Unknown error"
-msgstr "Bilinmeyen"
+msgstr "Bilinmeyen hata"
 
 #: js/ui/payg.js:422
 msgid "Apply Code"
-msgstr ""
+msgstr "Kodu uygula"
 
 #: js/ui/payg.js:565
 #, javascript-format
 msgid "%s second"
 msgid_plural "%s seconds"
-msgstr[0] ""
+msgstr[0] "%s saniye"
+msgstr[1] "%s saniye"
 
 #: js/ui/payg.js:569 js/ui/payg.js:579
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s minute"
 msgid_plural "%s minutes"
-msgstr[0] "%d dakika önce"
+msgstr[0] "%s dakika"
+msgstr[1] "%s dakika"
 
 #: js/ui/payg.js:573 js/ui/payg.js:590
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s hour"
 msgid_plural "%s hours"
-msgstr[0] "%d saat önce"
+msgstr[0] "%s saat"
+msgstr[1] "%s saat"
 
 #: js/ui/payg.js:584
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s day"
 msgid_plural "%s days"
-msgstr[0] "Gün boyu %s."
+msgstr[0] "%s gün"
+msgstr[1] "%s gün"
 
 #: js/ui/payg.js:600
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s second has been added to your Pay As You Go credit."
 msgid_plural "%s seconds have been added to your Pay As You Go credit."
-msgstr[0] "%s sık kullanılanlarınıza eklendi."
+msgstr[0] "Kullandıkça Öde kredinize %s saniye eklendi."
+msgstr[1] "Kullandıkça Öde kredinize %s saniye eklendi."
 
 #: js/ui/payg.js:607
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s minute has been added to your Pay As You Go credit."
 msgid_plural "%s minutes have been added to your Pay As You Go credit."
-msgstr[0] "%s sık kullanılanlarınıza eklendi."
+msgstr[0] "Kullandıkça Öde kredinize %s dakika eklendi."
+msgstr[1] "Kullandıkça Öde kredinize %s dakika eklendi."
 
 #: js/ui/payg.js:614
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s hour has been added to your Pay As You Go credit."
 msgid_plural "%s hours have been added to your Pay As You Go credit."
-msgstr[0] "%s sık kullanılanlarınıza eklendi."
+msgstr[0] "Kullandıkça Öde kredinize %s saat eklendi."
+msgstr[1] "Kullandıkça Öde kredinize %s saat eklendi."
 
 #: js/ui/payg.js:621
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s day has been added to your Pay As You Go credit."
 msgid_plural "%s days have been added to your Pay As You Go credit."
-msgstr[0] "%s sık kullanılanlarınıza eklendi."
+msgstr[0] "Kullandıkça Öde kredinize %s gün eklendi."
+msgstr[1] "Kullandıkça Öde kredinize %s gün eklendi."
 
 #: js/ui/payg.js:628
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s month has been added to your Pay As You Go credit."
 msgid_plural "%s months have been added to your Pay As You Go credit."
-msgstr[0] "%s sık kullanılanlarınıza eklendi."
+msgstr[0] "Kullandıkça Öde kredinize %s ay eklendi."
+msgstr[1] "Kullandıkça Öde kredinize %s ay eklendi."
 
 #: js/ui/payg.js:635
-#, fuzzy
 msgid "1 year has been added to your Pay As You Go credit."
-msgstr "%s sık kullanılanlarınıza eklendi."
+msgstr "Kullandıkça Öde kredinize 1 yıl eklendi."
 
 #. Unlock permanently message
 #: js/ui/payg.js:638
 msgid "You have successfully unlocked your Endless Machine"
-msgstr ""
+msgstr "Endless Makine'inizin kilidini başarıyla açtınız"
 
 #: js/ui/runDialog.js:64
 msgid "Enter a Command"
@@ -2096,13 +2125,15 @@ msgstr "%d %B %A"
 #, javascript-format
 msgid "%d new message"
 msgid_plural "%d new messages"
-msgstr[0] "%d yeni ileti"
+msgstr[0] "%d yeni mesaj"
+msgstr[1] "%d yeni mesaj"
 
 #: js/ui/screenShield.js:135
 #, javascript-format
 msgid "%d new notification"
 msgid_plural "%d new notifications"
 msgstr[0] "%d yeni bildirim"
+msgstr[1] "%d yeni bildirim"
 
 #: js/ui/screenShield.js:479 js/ui/status/system.js:317
 msgid "Lock"
@@ -2152,18 +2183,17 @@ msgid "Hide Text"
 msgstr "Metni Gizle"
 
 #: js/ui/shellEntry.js:198
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "Search %s and more…"
-msgstr "Aranıyor…"
+msgstr "1%s araması ve dahası..."
 
 #: js/ui/shellEntry.js:200
 msgid "Search the internet and more…"
-msgstr ""
+msgstr "İnternette ara"
 
 #: js/ui/shellEntry.js:202
-#, fuzzy
 msgid "Search…"
-msgstr "Aranıyor…"
+msgstr "Ara..."
 
 #: js/ui/shellMountOperation.js:298
 msgid "Password"
@@ -2219,27 +2249,28 @@ msgstr "Büyük Yazı"
 
 #: js/ui/status/automaticUpdates.js:83
 msgid "Updates Queue"
-msgstr ""
+msgstr "Güncellemeler Kuyruğu"
 
 #: js/ui/status/automaticUpdates.js:103
-#, fuzzy
 msgid "Set a Schedule"
-msgstr "Planınız Boş"
+msgstr "Bir Program Ayarla"
 
 #. The status label
 #: js/ui/status/automaticUpdates.js:194
 msgid "Automatic Updates"
-msgstr ""
+msgstr "Otomatik Güncellemeler"
 
 #: js/ui/status/automaticUpdates.js:258
 msgid "Automatic updates on"
-msgstr ""
+msgstr "Otomatik güncellemeler aktif"
 
 #: js/ui/status/automaticUpdates.js:259
 msgid ""
 "You have Unlimited Data so automatic updates have been turned on for this "
 "connection."
 msgstr ""
+"Sınırsız veri bağlantısına sahipsiniz, bu yüzden bu bağlantı için otomatik "
+"güncellemeler açıldı."
 
 #: js/ui/status/automaticUpdates.js:262
 msgid "Automatic updates are turned off to save your data"
@@ -2250,11 +2281,12 @@ msgid ""
 "You will need to choose which Endless updates to apply when on this "
 "connection."
 msgstr ""
+"Bu bağlantıdayken hangi Endless güncellemelerinin uygulanacağını seçmeniz "
+"gerekir."
 
 #: js/ui/status/automaticUpdates.js:285
-#, fuzzy
 msgid "Change Settings…"
-msgstr "Ses Ayarları"
+msgstr "Ayarları değiştir…"
 
 #: js/ui/status/bluetooth.js:38
 msgid "Bluetooth"
@@ -2269,17 +2301,16 @@ msgstr "Bluetooth Ayarları"
 #, javascript-format
 msgid "%d Connected"
 msgid_plural "%d Connected"
-msgstr[0] "%d Aygıt Bağlandı"
+msgstr[0] "%d bağlı"
+msgstr[1] "%d bağlı"
 
 #: js/ui/status/bluetooth.js:132
-#, fuzzy
 msgid "Bluetooth Off"
-msgstr "Bluetooth"
+msgstr "Bluetooth Kapalı"
 
 #: js/ui/status/bluetooth.js:134
-#, fuzzy
 msgid "Bluetooth On"
-msgstr "Bluetooth"
+msgstr "Bluetooth Açık"
 
 #: js/ui/status/brightness.js:36
 msgid "Brightness"
@@ -2509,18 +2540,21 @@ msgstr "Ağ Ayarları"
 msgid "%s Wired Connection"
 msgid_plural "%s Wired Connections"
 msgstr[0] "%s Kablolu Bağlantı"
+msgstr[1] "%s Kablolu Bağlantı"
 
 #: js/ui/status/network.js:1568
 #, javascript-format
 msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
-msgstr[0] "%s Kablosuz Ağ Bağlantısı"
+msgstr[0] "%s Wi-Fi Bağlantısı"
+msgstr[1] "%s Wi-Fi Bağlantısı"
 
 #: js/ui/status/network.js:1572
 #, javascript-format
 msgid "%s Modem Connection"
 msgid_plural "%s Modem Connections"
 msgstr[0] "%s Modem Bağlantısı"
+msgstr[1] "%s Modem Bağlantısı"
 
 #: js/ui/status/network.js:1705
 msgid "Connection failed"
@@ -2552,7 +2586,7 @@ msgstr "Yarına Dek Devre Dışı Bırak"
 
 #: js/ui/status/payg.js:32
 msgid "Enter unlock code…"
-msgstr ""
+msgstr "Kilit açma kodunu girin…"
 
 #: js/ui/status/payg.js:91
 #, fuzzy
@@ -2561,7 +2595,7 @@ msgstr "Yeniden başlatılıyor…"
 
 #: js/ui/status/payg.js:95
 msgid "Less than 1 minute"
-msgstr ""
+msgstr "1 dakikadan az"
 
 #: js/ui/status/power.js:45
 msgid "Power Settings"
@@ -2736,7 +2770,8 @@ msgstr "Değişiklikleri Sakla"
 #, javascript-format
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
-msgstr[0] "Ayarlardaki değişiklikler %d saniye içinde eski haline döndürülecek"
+msgstr[0] "Ayar değişiklikleri %d saniye içerisinde geri alınacak"
+msgstr[1] "Ayar değişiklikleri %d saniye sonra geri alınacak"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
@@ -2863,6 +2898,7 @@ msgstr "Kimlik doğrulama penceresi kullanıcı tarafından kapatıldı"
 msgid "%u Output"
 msgid_plural "%u Outputs"
 msgstr[0] "%u Çıktı"
+msgstr[1] "%u Çıkış"
 
 #. translators:
 #. * The number of sound inputs on a particular device
@@ -2871,6 +2907,7 @@ msgstr[0] "%u Çıktı"
 msgid "%u Input"
 msgid_plural "%u Inputs"
 msgstr[0] "%u Girdi"
+msgstr[1] "%u Giriş"
 
 #: subprojects/gvc/gvc-mixer-control.c:2736
 msgid "System Sounds"
@@ -2878,141 +2915,130 @@ msgstr "Sistem Sesleri"
 
 #: js/ui/appIconBar.js:204
 msgid "Other workspaces"
-msgstr ""
+msgstr "Diğer çalışma alanları"
 
 #: js/ui/appIconBar.js:213
-#, fuzzy
 msgid "Current workspace"
-msgstr "Geçiş menüsünü geçerli çalışma alanıyla sınırla."
+msgstr "Aktif çalışma alanı"
 
 #: js/ui/appIconBar.js:288
 msgid "Pin to Taskbar"
-msgstr ""
+msgstr "Görev çubuğuna sabitle"
 
 #: js/ui/appIconBar.js:292
 msgid "Unpin from Taskbar"
-msgstr ""
+msgstr "Görev çubuğundan kaldır"
 
 #: js/ui/appIconBar.js:308
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "Quit %s"
-msgstr "Kapat"
+msgstr "Kapat: %s"
 
 #: js/ui/components/updaterManager.js:184
 msgid "Software Update"
-msgstr ""
+msgstr "Yazılım Güncelleme"
 
 #: js/ui/components/updaterManager.js:199
-#, fuzzy
 msgid "Updates Available"
-msgstr "%s Kullanılamaz"
+msgstr "Güncellemeler mevcut"
 
 #: js/ui/components/updaterManager.js:200
 msgid "Software updates are available for your system"
-msgstr ""
+msgstr "Sisteminiz için yazılım güncellemeleri mevcut"
 
 #: js/ui/components/updaterManager.js:201
-#, fuzzy
 msgid "Download Now"
-msgstr "İndiriliyor"
+msgstr "İndir"
 
 #: js/ui/components/updaterManager.js:216
 msgid "Updates Ready"
-msgstr ""
+msgstr "Güncellemeler hazır"
 
 #: js/ui/components/updaterManager.js:217
 msgid "Software updates are ready to be installed on your system"
-msgstr ""
+msgstr "Yazılım güncellemeleri kurulmak üzere hazır"
 
 #: js/ui/components/updaterManager.js:218
-#, fuzzy
 msgid "Install Now"
-msgstr "Kur"
+msgstr "Şimdi kur"
 
 #: js/ui/components/updaterManager.js:230
-#, fuzzy
 msgid "Updates Installed"
-msgstr "Kurulu Uzantı Yok"
+msgstr "Güncellemeler kuruldu"
 
 #: js/ui/components/updaterManager.js:231
-#, fuzzy
 msgid "Software updates were installed on your system"
-msgstr "Güncelleştirmeler kurulduktan sonra kapat"
+msgstr "Sisteminize yazılım güncellemeleri kuruldu"
 
 #: js/ui/components/updaterManager.js:232
-#, fuzzy
 msgid "Restart Now"
 msgstr "Yeniden Başlat"
 
 #: js/ui/components/updaterManager.js:262
 msgid "Update Failed"
-msgstr ""
+msgstr "Güncelleme başarısız"
 
 #: js/ui/components/updaterManager.js:263
 msgid "We could not update your system"
-msgstr ""
+msgstr "Sisteminizi güncelleştiremedik"
 
 #: js/ui/endlessButton.js:12
 msgid "Endless Button"
-msgstr ""
+msgstr "Endless Düğme"
 
 #: js/ui/endlessButton.js:55
-#, fuzzy
 msgid "Show Desktop"
-msgstr "Ayrıntıları Göster"
+msgstr "Masaüstünü Göster"
 
 #: js/ui/endlessButton.js:60
-#, fuzzy
 msgid "Show Apps"
 msgstr "Uygulamaları Göster"
 
 #: js/ui/forceAppExitDialog.js:46
-#, fuzzy
 msgid "Quit applications"
-msgstr "Uygulamalar"
+msgstr "Uygulamalardan çık"
 
 #: js/ui/forceAppExitDialog.js:52
 msgid ""
 "If an application doesn't respond for a while, select its name and click "
 "Quit Application."
 msgstr ""
+"Eğer bir uygulama bir süredir yanıt vermiyorsa adını seçip Uygulamadan Çık'a "
+"tıklayın."
 
 #: js/ui/forceAppExitDialog.js:75
-#, fuzzy
 msgid "System Monitor"
-msgstr "Sistem Sesleri"
+msgstr "Sistem Monitörü"
 
 #: js/ui/forceAppExitDialog.js:79
-#, fuzzy
 msgid "Quit Application"
-msgstr "Uygulamalar"
+msgstr "Uygulamadan Çık"
 
 #: js/ui/hotCorner.js:13
 msgid "Hot Corner"
-msgstr ""
+msgstr "Etikn Köşeler"
 
 #: js/ui/hotCorner.js:26
 msgid "Enable Hot Corner"
-msgstr ""
+msgstr "Sihirli Köşeleri Etkinleştir"
 
 #: js/ui/hotCorner.js:30
-#, fuzzy
 msgid "Disable Hot Corner"
-msgstr "Yarına Dek Devre Dışı Bırak"
+msgstr "Sihirli Köşeleri Kapat"
 
 #: js/ui/iconGridLayout.js:299
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s has been removed"
-msgstr "%s sık kullanılanlarınızdan çıkarıldı."
+msgstr "%s kaldırıldı"
 
 #: js/ui/iconGridLayout.js:492
 msgid "New Folder"
-msgstr ""
+msgstr "Yeni Klasör"
 
 #: js/ui/internetSearch.js:69
 #, javascript-format
 msgid "Open \"%s\" in browser"
-msgstr ""
+msgstr "%s dosyasını tarayıcı ile aç."
 
 #. Translators: the first %s is the search engine name, and the second
 #. * is the search string. For instance, 'Search Google for "hello"'.
@@ -3020,12 +3046,12 @@ msgstr ""
 #: js/ui/internetSearch.js:78
 #, javascript-format
 msgid "Search %s for \"%s\""
-msgstr ""
+msgstr "%s üzerinde \"%s\" ara."
 
 #: js/ui/internetSearch.js:80
 #, javascript-format
 msgid "Search the internet for \"%s\""
-msgstr ""
+msgstr "İnternette \"%s\" araması yap"
 
 #: js/ui/status/orientation.js:44
 msgid "Orientation Lock"
@@ -3033,7 +3059,7 @@ msgstr "Yönelim Kilidi"
 
 #: js/ui/userMenu.js:16
 msgid "Social Accounts"
-msgstr ""
+msgstr "Sosyal Medya Hesapları"
 
 #: js/ui/userMenu.js:19
 msgid "Settings"
@@ -3041,16 +3067,16 @@ msgstr "Ayarlar"
 
 #: js/ui/userMenu.js:24
 msgid "Help"
-msgstr ""
+msgstr "Yardım"
 
 #: src/shell-desktop-dir-info.c:485
 msgid "Unnamed"
-msgstr ""
+msgstr "İsimsiz"
 
 #: src/shell-desktop-dir-info.c:745
 #, c-format
 msgid "Custom definition for %s"
-msgstr ""
+msgstr "%s için özel tanımlama"
 
 #~ msgid "Frequent"
 #~ msgstr "Sık Sık"
@@ -3095,17 +3121,14 @@ msgstr ""
 #~ msgid "There was an error loading the preferences dialog for %s:"
 #~ msgstr "%s için tercihler iletişim penceresi yüklenirken hata oluştu:"
 
-#~| msgid "Power Off"
 #~ msgctxt "search-result"
 #~ msgid "Power off"
 #~ msgstr "Bilgisayarı kapat"
 
-#~| msgid "Log Out"
 #~ msgctxt "search-result"
 #~ msgid "Log out"
 #~ msgstr "Oturumu kapat"
 
-#~| msgid "Switch User"
 #~ msgctxt "search-result"
 #~ msgid "Switch user"
 #~ msgstr "Kullanıcı değiştir"
@@ -3168,7 +3191,6 @@ msgstr ""
 #~ msgid "Airplane Mode"
 #~ msgstr "Uçak Kipi"
 
-#~| msgid "Show the message tray"
 #~ msgid "Show the message list"
 #~ msgstr "İleti listesini göster"
 
