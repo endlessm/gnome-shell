@@ -22,11 +22,9 @@
 //
 
 const { Clutter, Flatpak, Gio, GLib, GObject, Json, Pango, Shell, St } = imports.gi;
-const Signals = imports.signals;
 
 const Animation = imports.ui.animation.Animation;
 const Main = imports.ui.main;
-const Mainloop = imports.mainloop;
 const MessageTray = imports.ui.messageTray;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
@@ -34,33 +32,17 @@ const Soundable = imports.ui.soundable;
 const SoundServer = imports.misc.soundServer;
 const Tweener = imports.ui.tweener;
 
+const { loadInterfaceXML } = imports.misc.fileUtils;
+
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
-const CLUBHOUSE_BANNER_TIMEOUT_MSEC = 3000;
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 0.2;
 
 var CLUBHOUSE_ID = 'com.hack_computer.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
+const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
 
-const ClubhouseIface =
-'<node> \
-  <interface name="com.hack_computer.Clubhouse"> \
-    <method name="show"> \
-      <arg type="u" direction="in" name="timestamp"/> \
-    </method> \
-    <method name="hide"> \
-      <arg type="u" direction="in" name="timestamp"/> \
-    </method> \
-    <method name="getAnimationMetadata"> \
-      <arg type="s" direction="in" name="path"/> \
-      <arg type="v" direction="out" name="metadata"/> \
-    </method> \
-    <property name="Visible" type="b" access="read"/> \
-    <property name="SuggestingOpen" type="b" access="read"/> \
-  </interface> \
-</node>';
-
-function _clipToMonitor(actor) {
+function clipToMonitor(actor) {
     // To avoid this actor appearing in a possible right monitor during
     // the animation we need to clip it to adjust to the monitor width
     let monitor = Main.layoutManager.primaryMonitor;
@@ -75,95 +57,9 @@ function _clipToMonitor(actor) {
     actor.set_clip(0, 0, clip, actor.height);
 }
 
-function getClubhouseApp() {
-    return Shell.AppSystem.get_default().lookup_app(CLUBHOUSE_ID + '.desktop');
+function getClubhouseApp(clubhouseId = CLUBHOUSE_ID) {
+    return Shell.AppSystem.get_default().lookup_app(clubhouseId + '.desktop');
 }
-
-var getClubhouseWindowTracker = (function () {
-    let clubhouseWindowTracker;
-    return function () {
-        if (!clubhouseWindowTracker)
-            clubhouseWindowTracker = new ClubhouseWindowTracker();
-        return clubhouseWindowTracker;
-    };
-}());
-
-var ClubhouseWindowTracker = GObject.registerClass({
-    Signals: {
-        'window-changed': {},
-    },
-}, class ClubhouseWindowTracker extends GObject.Object {
-    _init() {
-        super._init();
-
-        this._windowActor = null;
-
-        // If the Clubhouse is open and the Shell is restarted, then global.get_window_actors()
-        // will still not have any contents when components are initialized, and there's no "map"
-        // signal emitted from the Window Manager either. So instead of relying on the map signal
-        // (which would allow us to track windows individually instead of always having to check the
-        // current list of windows) we connect to the screen's "restacked" signal.
-        global.display.connect('restacked', this._trackWindowActor.bind(this));
-
-        Main.overview.connect('showing', () => { this.emit('window-changed'); });
-        Main.overview.connect('hidden', () => { this.emit('window-changed'); });
-        Main.sessionMode.connect('updated', () => { this.emit('window-changed'); });
-    }
-
-    _getClubhouseActorFromWM() {
-        return global.get_window_actors().find((actor) => {
-            return (actor.meta_window.get_gtk_application_id() === CLUBHOUSE_ID &&
-                    actor.meta_window.get_role() === 'eos-side-component');
-        });
-    }
-
-    _trackWindowActor() {
-        let actor = this._getClubhouseActorFromWM();
-        if (!actor)
-            return;
-
-        if (this._windowActor == actor)
-            return;
-
-        // Reset the current window actor
-        this._untrackWindowActor();
-
-        this._windowActor = actor;
-
-        this.emit('window-changed');
-
-        // Track Clubhouse's window actor to make the closeButton always show on top of
-        // the Clubhouse's window edge
-        this._notifyHandler = actor.connect('notify::x', () => {
-            this.emit('window-changed');
-        });
-
-        this._destroyHandler = actor.connect('destroy', () => {
-            this._untrackWindowActor();
-            this.emit('window-changed');
-        });
-    }
-
-    _untrackWindowActor() {
-        if (!this._windowActor)
-            return;
-
-        // Reset the current window actor
-        this._windowActor.disconnect(this._notifyHandler);
-        this._notifyHandler = 0;
-
-        this._windowActor.disconnect(this._destroyHandler);
-        this._destroyHandler = 0;
-
-        this._windowActor = null;
-    }
-
-    getWindowX() {
-        if (!Main.sessionMode.hasOverview || Main.overview.visible || this._windowActor == null)
-            return -1;
-        return this._windowActor.x;
-    }
-});
 
 var ClubhouseAnimation = class ClubhouseAnimation extends Animation {
     constructor(file, width, height, defaultDelay, frames) {
@@ -207,9 +103,10 @@ var ClubhouseAnimation = class ClubhouseAnimation extends Animation {
 };
 
 var ClubhouseAnimator = class ClubhouseAnimator {
-    constructor(proxy) {
+    constructor(proxy, clubhouseId) {
         this._proxy = proxy;
         this._animations = {};
+        this._clubhouseId = clubhouseId;
         this._clubhousePaths = this._getClubhousePaths();
     }
 
@@ -236,10 +133,10 @@ var ClubhouseAnimator = class ClubhouseAnimator {
         for (let installation of installations) {
             let app = null;
             try {
-                app = installation.get_current_installed_app(CLUBHOUSE_ID, null);
+                app = installation.get_current_installed_app(this._clubhouseId, null);
             } catch (err) {
                 if (!err.matches(Flatpak.Error, Flatpak.Error.NOT_INSTALLED))
-                    logError(err, 'Error while getting installed %s'.format(CLUBHOUSE_ID));
+                    logError(err, 'Error while getting installed %s'.format(this._clubhouseId));
 
                 continue;
             }
@@ -502,7 +399,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
                              { x: endX,
                                time: CLUBHOUSE_BANNER_ANIMATION_TIME,
                                transition: 'easeOutQuad',
-                               onUpdate: () => _clipToMonitor(this.actor),
+                               onUpdate: () => clipToMonitor(this.actor),
                                onComplete: () => {
                                    // Ensure it only slides in once
                                    this.actor.remove_clip();
@@ -561,7 +458,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
                          { x: endX,
                            time: CLUBHOUSE_BANNER_ANIMATION_TIME,
                            transition: 'easeOutQuad',
-                           onUpdate: () => _clipToMonitor(this.actor),
+                           onUpdate: () => clipToMonitor(this.actor),
                            onComplete: () => {
                                this.actor.destroy();
                                this.actor = null;
@@ -679,13 +576,17 @@ class ClubhouseNotificationSource extends NotificationDaemon.GtkNotificationDaem
 
 var Component = GObject.registerClass({
 }, class ClubhouseComponent extends SideComponent.SideComponent {
-    _init() {
-        super._init(ClubhouseIface, CLUBHOUSE_ID, CLUBHOUSE_DBUS_OBJ_PATH);
+    _init(clubhouseIface, clubhouseId, clubhousePath) {
+        this._clubhouseId = clubhouseId || CLUBHOUSE_ID;
+        this._clubhouseIface = clubhouseIface || ClubhouseIface;
+        this._clubhousePath = clubhousePath || CLUBHOUSE_DBUS_OBJ_PATH;
+
+        super._init(this._clubhouseIface, this._clubhouseId, this._clubhousePath);
 
         global.settings.connect('changed::hack-mode-enabled', () => {
             let activated = global.settings.get_boolean('hack-mode-enabled');
             // Only enable if clubhouse app is installed
-            activated = activated && !!getClubhouseApp();
+            activated = activated && !!this.getClubhouseApp();
 
             if (activated)
                 this.enable();
@@ -709,14 +610,18 @@ var Component = GObject.registerClass({
     }
 
     get _useClubhouse() {
-        return this._imageUsesClubhouse() && !!getClubhouseApp();
+        return this._imageUsesClubhouse() && !!this.getClubhouseApp();
+    }
+
+    getClubhouseApp() {
+        return getClubhouseApp(this._clubhouseId);
     }
 
     _ensureProxy() {
         if (this.proxy)
             return this.proxy;
 
-        const clubhouseInstalled = !!getClubhouseApp();
+        const clubhouseInstalled = !!this.getClubhouseApp();
         if (!clubhouseInstalled) {
             log('Cannot construct Clubhouse proxy because Clubhouse app was not found.');
         } else {
@@ -749,7 +654,7 @@ var Component = GObject.registerClass({
         if (this._clubhouseProxyHandler == 0) {
             this._clubhouseProxyHandler = this.proxy.connect('notify::g-name-owner', () => {
                 if (!this.proxy.g_name_owner) {
-                    log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(CLUBHOUSE_ID));
+                    log('Nothing owning D-Bus name %s, so dismiss the Clubhouse banner'.format(this._clubhouseId));
                     this._clearQuestBanner();
 
                     // Clear the animator cache, so we reload the metadata files the next time
@@ -760,7 +665,7 @@ var Component = GObject.registerClass({
                 }
             });
 
-            this._clubhouseAnimator = new ClubhouseAnimator(this.proxy);
+            this._clubhouseAnimator = new ClubhouseAnimator(this.proxy, this._clubhouseId);
         }
 
         this._enabled = true;
@@ -783,7 +688,7 @@ var Component = GObject.registerClass({
         // We only activate the app here if it's not yet running, otherwise the cursor will turn
         // into a spinner for a while, even after the window is shown.
         // @todo: Call activate alone when we fix the problem mentioned above.
-        getClubhouseApp().activate();
+        this.getClubhouseApp().activate();
     }
 
     callHide(timestamp) {
@@ -794,7 +699,7 @@ var Component = GObject.registerClass({
         if (this._clubhouseSource != null)
             return this._clubhouseSource;
 
-        this._clubhouseSource = new ClubhouseNotificationSource(CLUBHOUSE_ID);
+        this._clubhouseSource = new ClubhouseNotificationSource(this._clubhouseId);
         this._clubhouseSource.connect('notify', this._onNotify.bind(this));
         this._clubhouseSource.connect('destroy', () => {
             this._clubhouseSource = null;
@@ -837,7 +742,7 @@ var Component = GObject.registerClass({
             let [appId, notificationId, notification] = params;
 
             // If the app sending the notification is the Clubhouse, then use our own source
-            if (appId == CLUBHOUSE_ID) {
+            if (appId === this._clubhouseId) {
                 notification['notificationId'] = new GLib.Variant('s', notificationId);
                 this._getClubhouseSource().addNotification(notificationId, notification, true);
                 invocation.return_value(null);
@@ -853,7 +758,7 @@ var Component = GObject.registerClass({
             let [appId, notificationId] = params;
 
             // If the app sending the notification is the Clubhouse, then use our own source
-            if (appId == CLUBHOUSE_ID) {
+            if (appId === this._clubhouseId) {
                 this._getClubhouseSource().removeNotification(notificationId);
                 invocation.return_value(null);
                 return;

@@ -8,6 +8,7 @@ const AppActivation = imports.ui.appActivation;
 const AppFavorites = imports.ui.appFavorites;
 const BackgroundMenu = imports.ui.backgroundMenu;
 const BoxPointer = imports.ui.boxpointer;
+const Clubhouse = imports.ui.components.clubhouse;
 const DND = imports.ui.dnd;
 const GrabHelper = imports.ui.grabHelper;
 const EditableLabelMode = imports.ui.editableLabel.EditableLabelMode;
@@ -92,8 +93,6 @@ const EOS_REPLACED_BY_KEY = 'X-Endless-Replaced-By';
 
 const EOS_NEW_ICON_ANIMATION_TIME = 0.5;
 const EOS_NEW_ICON_ANIMATION_DELAY = 0.7;
-
-const Clubhouse = imports.ui.components.clubhouse;
 
 function _getCategories(info) {
     let categoriesStr = info.get_categories();
@@ -2879,7 +2878,7 @@ class HackAppIcon extends AppIcon {
     }
 
     getId() {
-        return 'com.hack_computer.Clubhouse';
+        return Clubhouse.CLUBHOUSE_ID;
     }
 
     _onDestroy() {

@@ -41,12 +41,19 @@ const _HACK_DEFAULT_SHADER = 'desaturate';
 
 const HackableIface = `
 <node>
+  <interface name='com.hack_computer.Hackable'>
+    <property name="Hackable" type="b" access="read"/>
+  </interface>
+</node>`;
+const HackableProxy = Gio.DBusProxy.makeProxyWrapper(HackableIface);
+
+const OldHackableIface = `
+<node>
   <interface name='com.endlessm.Hackable'>
     <property name="Hackable" type="b" access="read"/>
   </interface>
-</node>
-`;
-const HackableProxy = Gio.DBusProxy.makeProxyWrapper(HackableIface);
+</node>`;
+const OldHackableProxy = Gio.DBusProxy.makeProxyWrapper(OldHackableIface);
 
 function _ensureAfterFirstFrame(win, callback) {
     if (win._drawnFirstFrame) {
@@ -92,7 +99,9 @@ const _ensureHackDataFile = (function () {
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
         '/var/lib/flatpak',
     ];
-    const flatpakPath = 'app/com.hack_computer.Clubhouse/current/active/files';
+
+    const componentsId = Clubhouse.getClubhouseApp() ? Clubhouse.CLUBHOUSE_ID : 'com.endlessm.HackComponents';
+    const flatpakPath = `app/${componentsId}/current/active/files`;
     const fileRelPath = 'share/hack-components';
     const searchPaths = flatpakInstallationPaths.map(installation =>
         GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
@@ -621,10 +630,15 @@ var CodingSession = GObject.registerClass({
         if (!this.app.meta_window.gtk_application_id)
             return;
 
+        // Old hack apps should use the old Hackable proxy
+        let appHackProxy = HackableProxy;
+        if (this.appId.startsWith('com.endlessm.'))
+            appHackProxy = OldHackableProxy;
+
         this._hackableProxy =
-            new HackableProxy(Gio.DBus.session,
-                              this.app.meta_window.gtk_application_id,
-                              this.app.meta_window.gtk_application_object_path);
+            new appHackProxy(Gio.DBus.session,
+                             this.app.meta_window.gtk_application_id,
+                             this.app.meta_window.gtk_application_object_path);
         this._hackablePropsChangedId =
             this._hackableProxy.connect('g-properties-changed',
                                         this._onHackablePropsChanged.bind(this));
@@ -1474,11 +1488,15 @@ var CodeViewManager = GObject.registerClass({
         session.setGrabbed(grabbed);
     }
 
+    _isClubhouseInstalled() {
+        return Clubhouse.getClubhouseApp() || Clubhouse.getClubhouseApp('com.endlessm.Clubhouse');
+    }
+
     handleMapWindow(actor) {
         if (this._stopped)
             return false;
 
-        if (!global.settings.get_boolean('hack-mode-enabled') || !Clubhouse.getClubhouseApp())
+        if (!global.settings.get_boolean('hack-mode-enabled') || !this._isClubhouseInstalled())
             return false;
 
         // Do not manage apps that don't have an associated .desktop file

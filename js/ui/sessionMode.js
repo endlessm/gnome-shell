@@ -111,11 +111,11 @@ const _modes = {
                     ['networkAgent', 'polkitAgent', 'telepathyClient',
                      'keyring', 'autorunManager', 'automountManager',
                      'appStore', 'discoveryFeed', 'trayArea',
-                     'updaterManager', 'clubhouse'] :
+                     'updaterManager', 'clubhouse', 'oldClubhouse'] :
                     ['polkitAgent', 'telepathyClient',
                      'keyring', 'autorunManager', 'automountManager',
                      'appStore', 'discoveryFeed', 'trayArea',
-                     'updaterManager', 'clubhouse'],
+                     'updaterManager', 'clubhouse', 'oldClubhouse'],
 
         panel: {
             left: ['endlessButton', 'appIcons'],
