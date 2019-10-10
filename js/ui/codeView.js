@@ -100,7 +100,7 @@ const _ensureHackDataFile = (function () {
         '/var/lib/flatpak',
     ];
 
-    const componentsId = Clubhouse.getClubhouseApp() ? Clubhouse.CLUBHOUSE_ID : 'com.endlessm.HackComponents';
+    const componentsId = Clubhouse.getClubhouseApp() ? 'com.hack_computer.Clubhouse' : 'com.endlessm.HackComponents';
     const flatpakPath = `app/${componentsId}/current/active/files`;
     const fileRelPath = 'share/hack-components';
     const searchPaths = flatpakInstallationPaths.map(installation =>

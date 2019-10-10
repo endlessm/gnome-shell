@@ -38,7 +38,6 @@ const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 0.2;
 
-var CLUBHOUSE_ID = 'com.hack_computer.Clubhouse';
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
 const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
 
@@ -57,7 +56,7 @@ function clipToMonitor(actor) {
     actor.set_clip(0, 0, clip, actor.height);
 }
 
-function getClubhouseApp(clubhouseId = CLUBHOUSE_ID) {
+function getClubhouseApp(clubhouseId = 'com.hack_computer.Clubhouse') {
     return Shell.AppSystem.get_default().lookup_app(clubhouseId + '.desktop');
 }
 
@@ -577,7 +576,7 @@ class ClubhouseNotificationSource extends NotificationDaemon.GtkNotificationDaem
 var Component = GObject.registerClass({
 }, class ClubhouseComponent extends SideComponent.SideComponent {
     _init(clubhouseIface, clubhouseId, clubhousePath) {
-        this._clubhouseId = clubhouseId || CLUBHOUSE_ID;
+        this._clubhouseId = clubhouseId || 'com.hack_computer.Clubhouse';
         this._clubhouseIface = clubhouseIface || ClubhouseIface;
         this._clubhousePath = clubhousePath || CLUBHOUSE_DBUS_OBJ_PATH;
 
