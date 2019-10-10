@@ -2878,7 +2878,7 @@ class HackAppIcon extends AppIcon {
     }
 
     getId() {
-        return Clubhouse.CLUBHOUSE_ID;
+        return 'com.hack_computer.Clubhouse';
     }
 
     _onDestroy() {
