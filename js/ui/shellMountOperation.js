@@ -377,7 +377,7 @@ var ShellMountPasswordDialog = GObject.registerClass({
         this._inputSourceManager = Keyboard.getInputSourceManager();
         this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
         this._passwordBox.add(this._inputSourceIndicator.container);
-        let manager = new PopupMenu.PopupMenuManager({ actor: this._inputSourceIndicator.container });
+        let manager = new PopupMenu.PopupMenuManager(this._inputSourceIndicator.container);
         manager.addMenu(this._inputSourceIndicator.menu);
         this._inputSourceManager.passwordModeEnabled = true;
 
