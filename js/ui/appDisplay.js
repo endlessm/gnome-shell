@@ -2596,7 +2596,7 @@ class AppCenterIcon extends AppIcon {
     _onDragBegin() {
         super._onDragBegin();
 
-        this.icon.label.text = _("Delete");
+        this.icon.label.text = _("Remove");
         this.icon.update();
     }
 
