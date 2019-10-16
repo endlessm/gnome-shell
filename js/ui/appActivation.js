@@ -126,7 +126,7 @@ var AppActivationContext = class {
         // splash before the animation is completed.
         this._timeoutId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
-            SPLASH_SCREEN_TIMEOUT * St.get_slow_down_factor(),
+            SPLASH_SCREEN_TIMEOUT * St.Settings.get().slow_down_factor,
             this._splashTimeout.bind(this));
 
         // We can't fully trust windows-changed to be emitted with the
