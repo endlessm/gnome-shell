@@ -10,6 +10,7 @@ const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
+const PopupMenu = imports.ui.popupMenu;
 const ShellEntry = imports.ui.shellEntry;
 
 const NM_SETTING_ALLOW_DOWNLOADS = 'connection.allow-downloads';
