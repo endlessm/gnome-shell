@@ -273,6 +273,10 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     _rearrangeElements() {
+        // This overrides the custom layout manager that provokes
+        // size/allocation issues:
+        this._bodyStack.layout_manager = new Clutter.FixedLayout();
+
         let contentBox = this._bodyStack.get_parent();
         contentBox.add_style_class_name('clubhouse-content-box');
         let hbox = contentBox.get_parent();
@@ -297,6 +301,13 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         });
         wrapBin.set_child(wrapWidget);
 
+        let bodyStackParams = {
+            y_expand: true,
+            y_fill: true,
+            y_align: Clutter.ActorAlign.FILL,
+        };
+        Object.assign(this._bodyStack, bodyStackParams);
+
         let iconBinParams = {
             x_fill: false,
             y_fill: false,
@@ -309,7 +320,8 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         let contentBoxParams = {
             x_expand: true,
-            y_expand: false,
+            y_expand: true,
+            y_fill: true,
             x_align: Clutter.ActorAlign.FILL,
             y_align: Clutter.ActorAlign.END,
         };
@@ -325,7 +337,8 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         let expandedLabelActorParams = {
             y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
+            y_fill: true,
+            y_align: Clutter.ActorAlign.FILL
         };
         Object.assign(this._expandedLabel.actor, expandedLabelActorParams);
         this._expandedLabel.actor.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
