@@ -156,6 +156,12 @@ function _findBestFolderName(apps) {
     return null;
 }
 
+function _shouldShowHackLauncher() {
+    // Only show the hack icon if the clubhouse app is in the system
+    const show = global.settings.get_boolean('show-hack-launcher');
+    return show && Clubhouse.getClubhouseApp();
+}
+
 class BaseAppView {
     constructor(params, gridParams) {
         if (this.constructor === BaseAppView)
@@ -355,6 +361,10 @@ class BaseAppView {
     }
 
     _canAccept(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
         return true;
     }
 
@@ -632,7 +642,7 @@ var AllView = class AllView extends BaseAppView {
     }
 
     _maybeAddHackIcon(apps) {
-        if (!Clubhouse.getClubhouseApp())
+        if (!_shouldShowHackLauncher())
             return;
 
         if (!this._hackAppIcon)
@@ -2544,7 +2554,10 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
         // Add the "Remove from desktop" menu item at the end.
         let item = this._appendMenuItem(_("Remove from desktop"));
         item.connect('activate', () => {
-            this._iconGridLayout.removeIcon(this._source.id, true);
+            if (this._source instanceof HackAppIcon)
+                this._source.remove();
+            else
+                this._iconGridLayout.removeIcon(this._source.id, true);
         });
     }
 
@@ -2645,6 +2658,9 @@ class AppCenterIcon extends AppIcon {
         if (!this._canAccept(source))
             return false;
 
+        if (source instanceof HackAppIcon)
+            source.remove();
+
         this._iconGridLayout.removeIcon(source.id, true);
         return true;
     }
@@ -2654,8 +2670,8 @@ var HackAppIcon = GObject.registerClass(
 class HackAppIcon extends AppIcon {
     _init() {
         let viewIconParams = {
-            isDraggable: false,
-            showMenu: false,
+            isDraggable: true,
+            showMenu: true,
         };
 
         let iconParams = {
@@ -2686,8 +2702,6 @@ class HackAppIcon extends AppIcon {
             if (this._pulse)
                 this._startPulse();
         });
-
-        this.canDrop = false;
 
         if (this._pulse)
             this._startPulse();
@@ -2740,8 +2754,17 @@ class HackAppIcon extends AppIcon {
         super.activate(button);
     }
 
-    canBeRemoved() {
+    _canAccept(source) {
         return false;
+    }
+
+    // Override to avoid animation on launch
+    animateLaunch() {
+    }
+
+    remove() {
+        global.settings.set_boolean('show-hack-launcher', false);
+        this._iconGridLayout.emit('changed');
     }
 
     get name() {
