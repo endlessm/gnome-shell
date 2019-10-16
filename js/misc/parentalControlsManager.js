@@ -51,7 +51,7 @@ var ParentalControlsManager = class {
         this._manager = new Malcontent.Manager({connection: connection});
 
         try {
-            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.GetAppFilterFlags.NONE, null, null);
+            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.GetAppFilterFlags.NONE, null);
         } catch (e) {
             if (e.matches(Malcontent.AppFilterError, Malcontent.AppFilterError.DISABLED)) {
                 log('Parental controls globally disabled');
@@ -60,8 +60,24 @@ var ParentalControlsManager = class {
                 logError(e, 'Failed to get parental controls settings');
             }
         }
+
+        this._manager.connect('app-filter-changed', (manager, uid) => {
+            let current_uid = Shell.util_get_uid();
+            // Emit 'changed' signal only if app-filter is changed for currently logged-in user.
+            if (current_uid == uid)
+                this._manager.get_app_filter_async(current_uid, Malcontent.GetAppFilterFlags.NONE,
+                                                   null, this._onAppFilterChanged.bind(this));
+        });
     }
 
+    _onAppFilterChanged(object, res) {
+        try {
+            this._appFilter = this._manager.get_app_filter_finish(res);
+            this.emit('changed');
+        } catch (e) {
+            logError(e, 'Failed to get new MctAppFilter for uid ' + Shell.util_get_uid() + ' on app-filter-changed');
+        }
+    }
     // Calculate whether the given app (a Gio.DesktopAppInfo) should be shown
     // on the desktop, in search results, etc. The app should be shown if:
     //  - The .desktop file doesn’t say it should be hidden.
@@ -88,3 +104,4 @@ var ParentalControlsManager = class {
         return this._appFilter.is_appinfo_allowed(appInfo);
     }
 };
+Signals.addSignalMethods(ParentalControlsManager.prototype);
