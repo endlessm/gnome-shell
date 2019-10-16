@@ -1221,7 +1221,7 @@ var PaginatedIconGrid = GObject.registerClass({
         // status + emit the space-closed signal only once at that point.
         GLib.timeout_add_seconds(
             GLib.PRIORITY_DEFAULT,
-            EXTRA_SPACE_ANIMATION_TIME * St.get_slow_down_factor(),
+            EXTRA_SPACE_ANIMATION_TIME * St.Settings.get().slow_down_factor,
             () => {
                 this._extraSpaceData = null;
                 this.emit('space-closed');
