@@ -156,6 +156,12 @@ function _findBestFolderName(apps) {
     return null;
 }
 
+function _shouldShowHackLauncher() {
+    // Only show the hack icon if the clubhouse app is in the system
+    const show = global.settings.get_boolean('show-hack-launcher');
+    return show && Clubhouse.getClubhouseApp();
+}
+
 class BaseAppView {
     constructor(params, gridParams) {
         if (this.constructor === BaseAppView)
@@ -632,7 +638,7 @@ var AllView = class AllView extends BaseAppView {
     }
 
     _maybeAddHackIcon(apps) {
-        if (!Clubhouse.getClubhouseApp())
+        if (!_shouldShowHackLauncher())
             return;
 
         if (!this._hackAppIcon)
@@ -2652,8 +2658,8 @@ var HackAppIcon = GObject.registerClass(
 class HackAppIcon extends AppIcon {
     _init() {
         let viewIconParams = {
-            isDraggable: false,
-            showMenu: false,
+            isDraggable: true,
+            showMenu: true,
         };
 
         let iconParams = {
@@ -2739,7 +2745,16 @@ class HackAppIcon extends AppIcon {
     }
 
     canBeRemoved() {
-        return false;
+        return true;
+    }
+
+    // Override to avoid animation on launch
+    animateLaunch() {
+    }
+
+    remove() {
+        super.remove();
+        global.settings.set_boolean('show-hack-launcher', false);
     }
 
     get name() {
