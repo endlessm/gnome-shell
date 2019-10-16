@@ -25,6 +25,8 @@ const SystemActions = imports.misc.systemActions;
 
 const { loadInterfaceXML } = imports.misc.fileUtils;
 
+const Clubhouse = imports.ui.components.clubhouse;
+
 var MENU_POPUP_TIMEOUT = 600;
 var MAX_COLUMNS = 7;
 var MIN_COLUMNS = 4;
@@ -520,6 +522,7 @@ var AllView = class AllView extends BaseAppView {
                                  GObject.BindingFlags.SYNC_CREATE);
 
         this._appCenterIcon = null;
+        this._hackAppIcon = null;
 
         this._displayingPopup = false;
         this._currentPopupDestroyId = 0;
@@ -622,8 +625,20 @@ var AllView = class AllView extends BaseAppView {
 
         // Add the App Center icon if it is enabled (and installed)
         this._maybeAddAppCenterIcon(newApps);
+        // Add the Hack icon if it is enabled (and installed)
+        this._maybeAddHackIcon(newApps);
 
         return newApps;
+    }
+
+    _maybeAddHackIcon(apps) {
+        if (!Clubhouse.getClubhouseApp())
+            return;
+
+        if (!this._hackAppIcon)
+            this._hackAppIcon = new HackAppIcon();
+
+        apps.unshift(this._hackAppIcon);
     }
 
     _maybeAddAppCenterIcon(apps) {
@@ -2630,5 +2645,114 @@ class AppCenterIcon extends AppIcon {
 
         this._iconGridLayout.removeIcon(source.id, true);
         return true;
+    }
+});
+
+var HackAppIcon = GObject.registerClass(
+class HackAppIcon extends AppIcon {
+    _init() {
+        let viewIconParams = {
+            isDraggable: false,
+            showMenu: false,
+        };
+
+        let iconParams = {
+            createIcon: this._createIcon.bind(this),
+        };
+
+        let app = Clubhouse.getClubhouseApp();
+        this._activated = false;
+
+        super._init(app, viewIconParams, iconParams);
+        this._pulse = global.settings.get_boolean('hack-icon-pulse');
+        this._pulseWaitId = 0;
+
+        this._activated = global.settings.get_boolean('hack-mode-enabled');
+        this.icon.update();
+
+        this._hackModeId = global.settings.connect('changed::hack-mode-enabled', () => {
+            this._activated = global.settings.get_boolean('hack-mode-enabled');
+            this.icon.update();
+        });
+
+        this._hackPulseId = global.settings.connect('changed::hack-icon-pulse', () => {
+            this._pulse = global.settings.get_boolean('hack-icon-pulse');
+            if (this._pulseWaitId) {
+                GLib.source_remove(this._pulseWaitId);
+                this._pulseWaitId = 0;
+            }
+            if (this._pulse)
+                this._startPulse();
+        });
+
+        this.canDrop = false;
+
+        if (this._pulse)
+            this._startPulse();
+    }
+
+    _startPulse() {
+        const params = {
+            duration: 100,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        };
+        this._easeIcon({...params, scale_x: 1.1, scale_y: 1.1})
+            .then(this._easeIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
+            .then(this._easeIcon.bind(this, {...params, scale_x: 1.1, scale_y: 1.1}))
+            .then(this._easeIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
+            .then(this._easeIcon.bind(this, {...params, scale_x: 1.0, scale_y: 1.0}))
+            .then(() => {
+                this._pulseWaitId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
+                    this._pulseWaitId = 0;
+                    if (this._pulse)
+                        this._startPulse();
+                    return GLib.SOURCE_REMOVE;
+                });
+            });
+    }
+
+    _easeIcon(easeParams) {
+        return new Promise((resolve) => {
+            const params = {...easeParams, onComplete: () => resolve(this) };
+            this.icon.icon.ease(params);
+        });
+    }
+
+    _createIcon(iconSize) {
+        let iconUri = 'resource:///org/gnome/shell/theme/hack-button-off.png';
+        if (this._activated)
+            iconUri = 'resource:///org/gnome/shell/theme/hack-button-on.png';
+
+        let iconFile = Gio.File.new_for_uri(iconUri);
+        let gicon = new Gio.FileIcon({ file: iconFile });
+
+        return new St.Icon({
+            gicon: gicon,
+            icon_size: iconSize,
+            pivot_point: new Clutter.Point({ x: 0.5, y: 0.5 }),
+        });
+    }
+
+    activate(button) {
+        global.settings.set_boolean('hack-icon-pulse', false);
+        super.activate(button);
+    }
+
+    canBeRemoved() {
+        return false;
+    }
+
+    get name() {
+        return 'Hack';
+    }
+
+    _onDestroy() {
+        if (this._hackModeId)
+            global.settings.disconnect(this._hackModeId);
+        if (this._hackPulseId)
+            global.settings.disconnect(this._hackPulseId);
+        if (this._pulseWaitId)
+            GLib.source_remove(this._pulseWaitId);
+        super._onDestroy();
     }
 });

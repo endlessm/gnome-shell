@@ -3,6 +3,7 @@
 
 const { EosMetrics, Gio, GLib, Meta, Shell } = imports.gi;
 
+const Codeview = imports.ui.codeView;
 const Config = imports.misc.config;
 const ExtensionDownloader = imports.ui.extensionDownloader;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -44,6 +45,8 @@ var GnomeShell = class {
                               this._checkOverviewVisibleChanged.bind(this));
         Main.overview.connect('hidden',
                               this._checkOverviewVisibleChanged.bind(this));
+        Shell.WindowTracker.get_default().connect('notify::focus-app',
+                                                  this._checkFocusAppChanged.bind(this));
     }
 
     _sessionModeChanged() {
@@ -120,6 +123,12 @@ var GnomeShell = class {
     FocusApp(id) {
         this.ShowApplications();
         Main.overview.viewSelector.appDisplay.selectApp(id);
+    }
+
+    MinimizeAll() {
+        global.get_window_actors().forEach(actor => {
+            actor.metaWindow.minimize();
+        });
     }
 
     ShowApplications() {
@@ -265,6 +274,18 @@ var GnomeShell = class {
 
     get ShellVersion() {
         return Config.PACKAGE_VERSION;
+    }
+
+    _checkFocusAppChanged() {
+        this._dbusImpl.emit_property_changed('FocusedApp', new GLib.Variant('s', this.FocusedApp));
+    }
+
+    get FocusedApp() {
+        let appId = '';
+        let tracker = Shell.WindowTracker.get_default();
+        if (tracker.focus_app)
+            appId = tracker.focus_app.get_id();
+        return appId;
     }
 };
 
@@ -485,3 +506,112 @@ var AppStoreService = class {
         this._dbusImpl.emit_signal('ApplicationsChanged', GLib.Variant.new('(as)', [allApps]));
     }
 };
+
+const HackableAppIface = loadInterfaceXML('com.hack_computer.HackableApp');
+var HackableApp = class {
+    constructor(session) {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppIface, this);
+
+        this._session = session;
+        this._session.connect('notify::state', this._stateChanged.bind(this));
+    }
+
+    export(objectId) {
+        const objectPath = `/com/hack_computer/HackableApp/${objectId}`;
+        try {
+            this._dbusImpl.export(Gio.DBus.session, objectPath);
+        } catch(e) {
+            logError(e, `Cannot export HackableApp at path ${objectPath}`);
+        }
+    }
+
+    unexport() {
+        this._dbusImpl.unexport();
+    }
+
+    _stateChanged() {
+        const value = new GLib.Variant('u', this.State);
+        this._dbusImpl.emit_property_changed('State', value);
+    }
+
+    get objectPath() {
+        return this._dbusImpl.get_object_path();
+    }
+
+    get AppId() {
+        return this._session.appId;
+    }
+
+    get State() {
+        return this._session.state;
+    }
+
+    get ToolboxVisible() {
+        if (!this._session.toolbox)
+            return false;
+        return this._session.toolbox.visible;
+    }
+
+    set ToolboxVisible(value) {
+        if (!this._session.toolbox)
+            return;
+        this._session.toolbox.visible = value;
+    }
+
+    get PulseFlipToHackButton() {
+        return this._session._button.highlighted;
+    }
+
+    set PulseFlipToHackButton(value) {
+        this._session._button.highlighted = value;
+    }
+};
+
+const HackableAppsManagerIface = loadInterfaceXML('com.hack_computer.HackableAppsManager');
+
+var HackableAppsManager = class {
+    constructor() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppsManagerIface, this);
+        Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.hack_computer.HackableAppsManager',
+                                       Gio.BusNameOwnerFlags.REPLACE, null, null);
+
+        try {
+            this._dbusImpl.export(Gio.DBus.session, '/com/hack_computer/HackableAppsManager');
+        } catch(e) {
+            logError(e, 'Cannot export HackableAppsManager');
+            return;
+        }
+
+        this._codeViewManager = Main.wm._codeViewManager;
+        this._codeViewManager.connect('session-added', this._onSessionAdded.bind(this));
+        this._codeViewManager.connect('session-removed', this._onSessionRemoved.bind(this));
+
+        this._nextId = 0;
+    }
+
+    _emitCurrentlyHackableAppsChanged() {
+        const value = new GLib.Variant('ao', this.CurrentlyHackableApps);
+        this._dbusImpl.emit_property_changed('CurrentlyHackableApps', value);
+    }
+
+    _getNextId() {
+        return ++this._nextId;
+    }
+
+    _onSessionAdded(_, session) {
+        session.hackableApp.export(this._getNextId());
+        this._emitCurrentlyHackableAppsChanged();
+    }
+
+    _onSessionRemoved(_, session) {
+        session.hackableApp.unexport();
+        this._emitCurrentlyHackableAppsChanged();
+    }
+
+    get CurrentlyHackableApps() {
+        const paths = [];
+        for (const session of this._codeViewManager.sessions)
+            paths.push(session.hackableApp.objectPath);
+        return paths;
+    }
+}
