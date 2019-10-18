@@ -38,16 +38,15 @@ const ForceAppExitDialogItem = GObject.registerClass({
     }
 });
 
-var ForceAppExitDialog = class extends ModalDialog.ModalDialog {
-    constructor() {
-        super({ styleClass: 'force-app-exit-dialog' });
+var ForceAppExitDialog = GObject.registerClass(
+class ForceAppExitDialog extends ModalDialog.ModalDialog {
+    _init() {
+        super._init({ styleClass: 'force-app-exit-dialog' });
 
         let title = new St.Label({
             style_class: 'force-app-exit-dialog-header',
             text: _("Quit applications"),
         });
-
-        this.contentLayout.style_class = 'force-app-exit-dialog-content';
         this.contentLayout.add(title);
 
         let subtitle = new St.Label({
@@ -139,4 +138,4 @@ var ForceAppExitDialog = class extends ModalDialog.ModalDialog {
         if (this._selectedAppItem)
             this._selectedAppItem.add_style_pseudo_class('selected');
     }
-};
+});
