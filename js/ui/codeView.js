@@ -103,15 +103,15 @@ const _ensureHackDataFile = (function () {
         '/var/lib/flatpak',
     ];
 
-    const componentsId = Clubhouse.getClubhouseApp() ? 'com.hack_computer.Clubhouse' : 'com.endlessm.HackComponents';
-    const flatpakPath = `app/${componentsId}/current/active/files`;
-    const fileRelPath = 'share/hack-components';
-    const searchPaths = flatpakInstallationPaths.map(installation =>
-        GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
-
     return function() {
         if (initialized)
             return keyfile;
+
+        const componentsId = Clubhouse.getClubhouseApp() ? 'com.hack_computer.Clubhouse' : 'com.endlessm.HackComponents';
+        const flatpakPath = `app/${componentsId}/current/active/files`;
+        const fileRelPath = 'share/hack-components';
+        const searchPaths = flatpakInstallationPaths.map(installation =>
+            GLib.build_filenamev([installation, flatpakPath, fileRelPath]));
 
         // Only create file monitors the first time
         if (monitors.length === 0) {
