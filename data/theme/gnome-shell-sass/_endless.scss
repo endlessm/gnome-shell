@@ -66,7 +66,10 @@
                 spacing: 16px;
                 border-bottom-width: 1px;
                 &:hover { background-color: rgba(255,255,255,0.1); }
-                &:selected { background-color: #333; }
+                &:selected {
+                    background-color: $selected_bg_color;
+                    color: $selected_fg_color;
+                }
             }
         }
     }
