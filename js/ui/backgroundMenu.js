@@ -25,10 +25,6 @@ var BackgroundMenu = class BackgroundMenu extends PopupMenu.PopupMenu {
             Main.appStore.showPage(global.get_current_time(), 'web');
         });
 
-        this.addAction(_("Add Folder"), () => {
-            Main.appStore.showPage(global.get_current_time(), 'folders');
-        });
-
         this.actor.add_style_class_name('background-menu');
 
         layoutManager.uiGroup.add_actor(this.actor);
