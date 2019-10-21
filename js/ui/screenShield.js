@@ -430,7 +430,7 @@ class ArrowContainerConstraint extends Clutter.Constraint {
         let [clockActorPosX, clockActorPosY] = this._clockActor.get_transformed_position();
         let [clockActorWidth, clockActorHeight] = this._clockActor.get_transformed_size();
 
-        let availableHeight = this._contentsActor.get_height() - Main.panel.actor.get_height();
+        let availableHeight = this._contentsActor.get_height() - Main.panel.get_height();
         let clockActorBottom = clockActorPosY + clockActorHeight;
         let arrowsContainerHeight = availableHeight - clockActorBottom;
         let verticalPadding = Math.max(0, arrowsContainerHeight - actorBox.get_height()) / 2.0;
@@ -1166,7 +1166,9 @@ var ScreenShield = class {
             this._arrowContainer.add_actor(arrow);
         }
         this._lockScreenContents.add_actor(this._arrowContainer);
-        this._arrowContainer.add_constraint(new ArrowContainerConstraint(this._lockScreenContents, this._clock.actor));
+
+        this._arrowConstraint = new ArrowContainerConstraint(this._lockScreenContents, this._clock.actor);
+        this._arrowContainer.add_constraint(this._arrowConstraint);
 
         this._hasLockScreen = true;
     }
@@ -1187,6 +1189,9 @@ var ScreenShield = class {
         }
 
         this._stopArrowAnimation();
+
+        this._arrowContainer.remove_constraint(this._arrowConstraint);
+        this._arrowConstraint = null;
 
         this._lockScreenContentsBox.destroy();
 
