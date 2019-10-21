@@ -19,6 +19,8 @@ const ScreenSaverIface = loadInterfaceXML('org.gnome.ScreenSaver');
 // Occurs when an application is added to the app grid.
 const SHELL_APP_ADDED_EVENT = '51640a4e-79aa-47ac-b7e2-d3106a06e129';
 
+const CLUBHOUSE_ID = 'com.hack_computer.Clubhouse.desktop';
+
 var GnomeShell = class {
     constructor() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(GnomeShellIface, this);
@@ -449,6 +451,12 @@ var AppStoreService = class {
         let appId = new GLib.Variant('s', id);
         eventRecorder.record_event(SHELL_APP_ADDED_EVENT, appId);
 
+        if (id === CLUBHOUSE_ID) {
+            global.settings.set_boolean('show-hack-launcher', true);
+            this._iconGridLayout.emit('changed');
+            return;
+        }
+
         if (!this._iconGridLayout.iconIsFolder(id))
             this._iconGridLayout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
     }
@@ -456,6 +464,13 @@ var AppStoreService = class {
     AddAppIfNotVisible(id) {
         if (this._iconGridLayout.iconIsFolder(id))
             return;
+
+        if (id === CLUBHOUSE_ID) {
+            global.settings.set_boolean('show-hack-launcher', true);
+            this._iconGridLayout.emit('changed');
+            _reportAppAddedMetric(id);
+            return;
+        }
 
         if (!_iconIsVisibleOnDesktop(id)) {
             this._iconGridLayout.appendIcon(id, IconGridLayout.DESKTOP_GRID_ID);
@@ -479,6 +494,12 @@ var AppStoreService = class {
     }
 
     RemoveApplication(id) {
+        if (id === CLUBHOUSE_ID) {
+            global.settings.set_boolean('show-hack-launcher', false);
+            this._iconGridLayout.emit('changed');
+            return;
+        }
+
         if (!this._iconGridLayout.iconIsFolder(id))
             this._iconGridLayout.removeIcon(id, false);
     }
