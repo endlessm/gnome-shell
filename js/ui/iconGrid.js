@@ -90,7 +90,10 @@ class BaseIcon extends St.Bin {
         this._layeredIcon.add_actor(shadow);
 
         if (params.showLabel) {
-            this.label = new St.Label({ text: label });
+            this.label = new St.Label({
+                text: label,
+                style_class: 'overview-icon-label',
+            });
             this.label.clutter_text.set({
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.CENTER,
