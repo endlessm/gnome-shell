@@ -42,6 +42,15 @@ const CLUBHOUSE_BANNER_ANIMATION_TIME = 200;
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
 const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
 
+// Some button labels are replaced by customized icons if they match a
+// unicode emoji character, as per Design request.
+const CLUBHOUSE_ICONS_FOR_EMOJI = {
+    '❯': 'clubhouse-notification-button-next-symbolic.svg',
+    '❮': 'clubhouse-notification-button-previous-symbolic.svg',
+    '👍': 'clubhouse-thumbsup-symbolic.svg',
+    '👎': 'clubhouse-thumbsdown-symbolic.svg',
+};
+
 function getClubhouseApp(clubhouseId = 'com.hack_computer.Clubhouse') {
     return Shell.AppSystem.get_default().lookup_app(`${clubhouseId}.desktop`);
 }
@@ -273,6 +282,10 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     _rearrangeElements() {
+        // This overrides the custom layout manager that provokes
+        // size/allocation issues:
+        this._bodyStack.layout_manager = new Clutter.FixedLayout();
+
         let contentBox = this._bodyStack.get_parent();
         contentBox.add_style_class_name('clubhouse-content-box');
         let hbox = contentBox.get_parent();
@@ -297,6 +310,13 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         });
         wrapBin.set_child(wrapWidget);
 
+        let bodyStackParams = {
+            y_expand: true,
+            y_fill: true,
+            y_align: Clutter.ActorAlign.FILL,
+        };
+        Object.assign(this._bodyStack, bodyStackParams);
+
         let iconBinParams = {
             x_fill: false,
             y_fill: false,
@@ -309,7 +329,8 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         let contentBoxParams = {
             x_expand: true,
-            y_expand: false,
+            y_expand: true,
+            y_fill: true,
             x_align: Clutter.ActorAlign.FILL,
             y_align: Clutter.ActorAlign.END,
         };
@@ -325,7 +346,8 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
         let expandedLabelActorParams = {
             y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
+            y_fill: true,
+            y_align: Clutter.ActorAlign.FILL
         };
         Object.assign(this._expandedLabel.actor, expandedLabelActorParams);
         this._expandedLabel.actor.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
@@ -345,24 +367,42 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         this._closeButton.opacity = 255;
     }
 
+    _updateButtonsCss() {
+        // @todo: This is a workaround for the missing CSS selector, :nth-child
+        // Upstream issue: https://gitlab.gnome.org/GNOME/gnome-shell/issues/1800
+        this._buttonBox.get_children().forEach((button, index) => {
+            const nth_class = 'child-' + (index + 1);
+            const class_list = button.get_style_class_name();
+            if (class_list.match(/child-[0-9]*/))
+                button.set_style_class_name(class_list.replace(/child-[0-9]*/, nth_class));
+            else
+                button.set_style_class_name(class_list + ' ' + nth_class);
+        });
+    }
+
     _addActions() {
         // Only set up the actions if we're showing the last page of text
         if (!this._inLastPage())
             return;
 
         super._addActions();
+        this._updateButtonsCss();
     }
 
     // Override this method because we don't want the button
     // horizontally expanded:
     addButton(button, callback) {
-        if (button.label === '>') {
+        if (Object.keys(CLUBHOUSE_ICONS_FOR_EMOJI).includes(button.label)) {
+            let icon = CLUBHOUSE_ICONS_FOR_EMOJI[button.label];
+            let iconUrl = `resource:///org/gnome/shell/theme/${icon}`;
             button.label = '';
-            button.add_style_class_name('next');
 
-            let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/clubhouse-notification-button-next-symbolic.svg');
+            button.add_style_class_name('icon-button');
+            let iconFile = Gio.File.new_for_uri(iconUrl);
             let gicon = new Gio.FileIcon({ file: iconFile });
             button.child = new St.Icon({ gicon: gicon });
+        } else {
+            button.add_style_class_name('text-button');
         }
 
         button.set_x_expand(false);
@@ -439,17 +479,21 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     _setupNextPageButton() {
         let button = new Soundable.Button({
             style_class: 'notification-button',
-            label: '>',
+            label: '❯',
             can_focus: true,
             click_sound_event_id: 'clubhouse/dialog/next',
         });
 
-        return this.addButton(button, () => {
+        this.addButton(button, () => {
             this._setNextPage();
 
-            if (this._inLastPage())
+            if (this._inLastPage()) {
                 button.destroy();
+                this._updateButtonsCss();
+            }
         });
+
+        this._updateButtonsCss();
     }
 
     _slideOut() {
