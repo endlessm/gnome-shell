@@ -43,7 +43,7 @@ const UserAccountSection = class extends PopupMenu.PopupMenuSection {
 
         iconButton.connect('clicked', () => {
             if (Main.sessionMode.allowSettings)
-                this.userIconItem.activate();
+                this.userIconItem.activate(null);
         });
 
         this.userIconItem.connect('notify::sensitive', () => {
