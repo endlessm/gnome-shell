@@ -21,6 +21,9 @@ const SETTINGS_LAUNCHER = "gnome-control-center.desktop";
 
 const USER_ACCOUNTS_PANEL_LAUNCHER = 'gnome-user-accounts-panel.desktop';
 
+const FEEDBACK_TEXT = _("Give Us Feedback");
+const FEEDBACK_LAUNCHER = "eos-link-feedback.desktop";
+
 const HELP_CENTER_TEXT = _("Help");
 const HELP_CENTER_LAUNCHER = 'org.gnome.Yelp.desktop';
 
@@ -125,20 +128,23 @@ var UserMenu = class {
         // Control Center
         let gicon = new Gio.ThemedIcon({ name: 'applications-system-symbolic' });
         this._settingsItem = menuItemsSection.addAction(SETTINGS_TEXT, () => {
-            this.menu.close(BoxPointer.PopupAnimation.NONE);
-            Main.overview.hide();
-
-            let app = Shell.AppSystem.get_default().lookup_app(SETTINGS_LAUNCHER);
-            let context = new AppActivation.AppActivationContext(app);
-            context.activate();
+            this._launchApplication(SETTINGS_LAUNCHER);
         }, gicon);
 
         // Social
         gicon = new Gio.ThemedIcon({ name: 'user-available-symbolic' });
         menuItemsSection.addSettingsAction(ONLINE_ACCOUNTS_TEXT, ONLINE_ACCOUNTS_PANEL_LAUNCHER, gicon);
 
+        // Feedback
+        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/feedback-symbolic.svg')
+        gicon = new Gio.FileIcon({ file: iconFile });
+        menuItemsSection.addAction(FEEDBACK_TEXT, () => {
+            this._launchApplication(FEEDBACK_LAUNCHER);
+        }, gicon);
+        this.menu.addMenuItem(menuItemsSection);
+
         // Help center
-        let iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/endless-help-symbolic.svg')
+        iconFile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/endless-help-symbolic.svg')
         gicon = new Gio.FileIcon({ file: iconFile });
         menuItemsSection.addAction(HELP_CENTER_TEXT, () => {
             this._launchApplication(HELP_CENTER_LAUNCHER);
