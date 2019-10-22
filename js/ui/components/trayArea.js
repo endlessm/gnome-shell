@@ -37,7 +37,6 @@ const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
 const Main = imports.ui.main;
 const System = imports.system;
 const PanelMenu = imports.ui.panelMenu;
-const ExtensionUtils = imports.misc.extensionUtils;
 
 // The original TopIcons Plus extension allowed configuring these values via a
 // GSettings schema, but we don't need that for now, let's hardcode those values.
@@ -143,8 +142,8 @@ var TrayArea = class TrayArea {
         // enabled and corresponding application is running
         let iconWmClass = icon.wm_class ? icon.wm_class.toLowerCase() : '';
         for (let [wmClass, uuid] of EXTENSIONS_BLACKLIST) {
-            if (ExtensionUtils.extensions[uuid] !== undefined &&
-                ExtensionUtils.extensions[uuid].state === 1 &&
+            if (Main.extensionManager.lookup(uuid) !== undefined &&
+                Main.extensionManager.lookup(uuid).state === 1 &&
                 iconWmClass === wmClass)
                 return;
         }
