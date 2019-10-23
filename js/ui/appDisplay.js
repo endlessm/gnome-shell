@@ -1001,11 +1001,12 @@ var AllView = class AllView extends BaseAppView {
         this._eventBlocker.visible = this._nEventBlockerInhibits == 0;
     }
 
-    createFolder(apps) {
+    createFolder(apps, iconAtPosition) {
         let appItems = apps.map(id => this._items[id].app);
         let folderName = _findBestFolderName(appItems);
 
-        let newFolderId = this._iconGridLayout.addFolder(folderName);
+        let newFolderId = this._iconGridLayout.addFolder(folderName,
+            iconAtPosition);
         if (!newFolderId)
             return false;
 
@@ -2447,7 +2448,7 @@ var AppIcon = GObject.registerClass({
         let view = _getViewFromIcon(this);
         let apps = [this.id, source.id];
 
-        return view.createFolder(apps);
+        return view.createFolder(apps, this.id);
     }
 });
 
