@@ -368,6 +368,9 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     _updateButtonsCss() {
+        if (!this._buttonBox)
+            return;
+
         // @todo: This is a workaround for the missing CSS selector, :nth-child
         // Upstream issue: https://gitlab.gnome.org/GNOME/gnome-shell/issues/1800
         this._buttonBox.get_children().forEach((button, index) => {
