@@ -875,7 +875,7 @@ var IconGrid = GObject.registerClass({
         // If we're past the last visible element in the grid,
         // we might be allowed to drop there.
         if (childIndex >= children.length)
-            return [children.length, DragLocation.EMPTY_AREA];
+            return [children.length - 1, DragLocation.EMPTY_AREA];
 
         let child = children[childIndex];
         let [childMinWidth, childMinHeight, childNaturalWidth, childNaturalHeight] = child.get_preferred_size();
