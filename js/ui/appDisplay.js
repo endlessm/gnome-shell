@@ -2724,9 +2724,9 @@ class HackAppIcon extends AppIcon {
     }
 
     _createIcon(iconSize) {
-        let iconUri = 'resource:///org/gnome/shell/theme/hack-button-off.png';
+        let iconUri = 'resource:///org/gnome/shell/theme/hack-button-off.svg';
         if (this._activated)
-            iconUri = 'resource:///org/gnome/shell/theme/hack-button-on.png';
+            iconUri = 'resource:///org/gnome/shell/theme/hack-button-on.svg';
 
         let iconFile = Gio.File.new_for_uri(iconUri);
         let gicon = new Gio.FileIcon({ file: iconFile });
