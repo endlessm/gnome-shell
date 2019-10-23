@@ -892,7 +892,7 @@ var IconGrid = GObject.registerClass({
             childX = column * columnWidth;
 
         let iconLeftX = childX + LEFT_DIVIDER_LEEWAY;
-        let iconRightX = childX + childIconWidth - RIGHT_DIVIDER_LEEWAY
+        let iconRightX = childX + childIconWidth - RIGHT_DIVIDER_LEEWAY;
 
         let dropIndex;
         let dragLocation;
