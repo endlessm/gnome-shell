@@ -147,11 +147,17 @@ const AppIconMenu = class extends PopupMenu.PopupMenu {
         this._app = app;
 
         // Chain our visibility and lifecycle to that of the source
-        parentActor.connect('notify::mapped', () => {
+        this._parentActorMappedId = parentActor.connect('notify::mapped', () => {
             if (!parentActor.mapped)
                 this.close();
         });
-        parentActor.connect('destroy', () => this.actor.destroy.bind(this));
+        parentActor.connect('destroy', () => {
+            if (this._parentActorMappedId > 0) {
+                parentActor.disconnect(this._parentActorMappedId);
+                this._parentActorMappedId = 0;
+            }
+            this.actor.destroy();
+        });
     }
 
     _redisplay() {
@@ -906,6 +912,12 @@ const ScrolledIconList = GObject.registerClass({
         let state = app.state;
         switch(state) {
         case Shell.AppState.STARTING:
+            if (!this._parentalControlsManager.shouldShowApp(app.get_app_info()))
+                break;
+            this._addButton(app);
+            this._ensureIsVisible(app);
+            break;
+
         case Shell.AppState.RUNNING:
             this._addButton(app);
             this._ensureIsVisible(app);

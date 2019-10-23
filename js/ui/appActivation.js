@@ -10,6 +10,7 @@ const GrabHelper = imports.ui.grabHelper;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
 const Panel = imports.ui.panel;
+const ParentalControlsManager = imports.misc.parentalControlsManager;
 const Tweener = imports.ui.tweener;
 const Util = imports.misc.util;
 const WindowManager = imports.ui.windowManager;
@@ -48,7 +49,8 @@ function _shouldShowSplash(app) {
         Util.getBrowserApp().state != Shell.AppState.STOPPED)
         return false;
 
-    return true;
+    let parentalControlsManager = ParentalControlsManager.getDefault();
+    return parentalControlsManager.shouldShowApp(app.get_app_info());
 }
 
 var AppActivationContext = class {
@@ -84,6 +86,41 @@ var AppActivationContext = class {
 
         if (showSplash)
             this.showSplash();
+    }
+
+    // Activate an app via a D-Bus call and keep track of its splash screen
+    // if we had to open a new window for it. Otherwise, if there were
+    // windows already open, just do the D-Bus call
+    activateViaDBusCall(busName, path, interfaceName, method, args, done) {
+        Gio.bus_get(Gio.BusType.SESSION, null, (source, result) => {
+            let bus = null;
+            try {
+                bus = Gio.bus_get_finish(result);
+            } catch (error) {
+                done(error, null);
+                return;
+            }
+
+            let proxy = new Gio.DBusProxy({
+                g_bus_type: Gio.BusType.SESSION,
+                g_connection: bus,
+                g_default_timeout: GLib.MAXINT32,
+                g_flags: Gio.DBusProxyFlags.NONE,
+                g_interface_name: interfaceName,
+                g_name: busName,
+                g_object_path: path,
+            });
+
+            this.showSplash();
+
+            proxy.call(method, args, Gio.DBusCallFlags.NONE, -1, null, (source, result) => {
+                try {
+                    done(null, proxy.call_finish(result));
+                } catch (error) {
+                    done(error, null);
+                }
+            });
+        });
     }
 
     activate(event, timestamp) {

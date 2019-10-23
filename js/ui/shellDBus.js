@@ -661,6 +661,33 @@ var AppLauncher = class {
         }
 
         activationContext.activate(null, timestamp);
+        invocation.return_value(null);
+    }
+
+    LaunchViaDBusCallAsync(params, invocation) {
+        let [appName, busName, path, interfaceName, method, args] = params;
+
+        let activationContext = this._activationContextForAppName(appName);
+        if (!activationContext) {
+            invocation.return_error_literal(Gio.IOErrorEnum,
+                                            Gio.IOErrorEnum.NOT_FOUND,
+                                            'Unable to launch app ' + appName + ': Not installed');
+            return;
+        }
+
+        activationContext.activateViaDBusCall(busName, path, interfaceName, method, args, (error, result) => {
+            if (error) {
+                logError(error);
+                invocation.return_error_literal(Gio.IOErrorEnum,
+                                                Gio.IOErrorEnum.FAILED,
+                                                'Unable to launch app ' + appName +
+                                                ' through DBus call on ' + busName +
+                                                ' ' + path + ' ' + interfaceName + ' ' +
+                                                method + ': ' + String(error));
+            } else {
+                invocation.return_value(result);
+            }
+        });
     }
 
     _activationContextForAppName(appName) {
