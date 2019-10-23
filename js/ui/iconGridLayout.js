@@ -517,7 +517,7 @@ var IconGridLayout = GObject.registerClass({
         return filename;
     }
 
-    addFolder(folderName) {
+    addFolder(folderName, positionId=null) {
         if (!folderName)
             folderName = _("New Folder");
 
@@ -525,7 +525,7 @@ var IconGridLayout = GObject.registerClass({
         if (!id)
             return null;
 
-        this.appendIcon(id, DESKTOP_GRID_ID);
+        this.repositionIcon(id, positionId, DESKTOP_GRID_ID);
 
         return id;
     }
