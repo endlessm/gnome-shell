@@ -4,7 +4,6 @@ const { Clutter, Gdk, Gio, GObject,
         Gtk, Meta, Shell, St } = imports.gi;
 
 const Signals = imports.signals;
-const Tweener = imports.ui.tweener;
 
 const AppActivation = imports.ui.appActivation;
 const AppFavorites = imports.ui.appFavorites;
@@ -21,13 +20,13 @@ const MAX_ANGLE = 360;
 const ICON_SIZE = 24;
 const NAV_BUTTON_SIZE = 15;
 
-const ICON_SCROLL_ANIMATION_TIME = 0.3;
-const ICON_SCROLL_ANIMATION_TYPE = 'linear';
+const ICON_SCROLL_ANIMATION_TIME = 300;
+const ICON_SCROLL_ANIMATION_TYPE = Clutter.AnimationMode.LINEAR;
 
 const ICON_BOUNCE_MAX_SCALE = 0.4;
-const ICON_BOUNCE_ANIMATION_TIME = 0.4;
-const ICON_BOUNCE_ANIMATION_TYPE_1 = 'easeOutSine';
-const ICON_BOUNCE_ANIMATION_TYPE_2 = 'easeOutBounce';
+const ICON_BOUNCE_ANIMATION_TIME = 400;
+const ICON_BOUNCE_ANIMATION_TYPE_1 = Clutter.AnimationMode.EASE_OUT_SINE;
+const ICON_BOUNCE_ANIMATION_TYPE_2 = Clutter.AnimationMode.EASE_OUT_BOUNCE;
 
 const PANEL_WINDOW_MENU_THUMBNAIL_SIZE = 128;
 
@@ -262,6 +261,7 @@ const AppIconButton = GObject.registerClass({
             reactive: true,
         });
 
+        this._isBouncing = false;
         this._menuManager = menuManager;
 
         this._label = new St.Label({ text: this._app.get_name(),
@@ -466,7 +466,7 @@ const AppIconButton = GObject.registerClass({
 
         // Calculate location of the label only if we're not tweening as the
         // values will be inaccurate
-        if (!Tweener.isTweening(this)) {
+        if (!this._isBouncing) {
             let iconMidpoint = this.get_transformed_position()[0] + this.width / 2;
             this._label.translation_x = Math.floor(iconMidpoint - this._label.width / 2);
             this._label.translation_y = Math.floor(this.get_transformed_position()[1] - this._labelOffsetY);
@@ -477,25 +477,30 @@ const AppIconButton = GObject.registerClass({
     }
 
     _animateBounce() {
-        if (!Tweener.isTweening(this)) {
-            Tweener.addTween(this, {
-                scale_y: 1 - ICON_BOUNCE_MAX_SCALE,
-                scale_x: 1 + ICON_BOUNCE_MAX_SCALE,
-                translation_y: this.height * ICON_BOUNCE_MAX_SCALE,
-                translation_x: -this.width * ICON_BOUNCE_MAX_SCALE / 2,
-                time: ICON_BOUNCE_ANIMATION_TIME * 0.25,
-                transition: ICON_BOUNCE_ANIMATION_TYPE_1
-            });
-            Tweener.addTween(this, {
-                scale_y: 1,
-                scale_x: 1,
-                translation_y: 0,
-                translation_x: 0,
-                time: ICON_BOUNCE_ANIMATION_TIME * 0.75,
-                transition: ICON_BOUNCE_ANIMATION_TYPE_2,
-                delay: ICON_BOUNCE_ANIMATION_TIME * 0.25
-            });
-        }
+        if (this._isBouncing)
+            return;
+
+        this._isBouncing = true;
+
+        this.ease({
+            scale_y: 1 - ICON_BOUNCE_MAX_SCALE,
+            scale_x: 1 + ICON_BOUNCE_MAX_SCALE,
+            translation_y: this.height * ICON_BOUNCE_MAX_SCALE,
+            translation_x: -this.width * ICON_BOUNCE_MAX_SCALE / 2,
+            duration: ICON_BOUNCE_ANIMATION_TIME * 0.25,
+            mode: ICON_BOUNCE_ANIMATION_TYPE_1,
+            onComplete: () => {
+                this.ease({
+                    scale_y: 1,
+                    scale_x: 1,
+                    translation_y: 0,
+                    translation_x: 0,
+                    duration: ICON_BOUNCE_ANIMATION_TIME * 0.75,
+                    mode: ICON_BOUNCE_ANIMATION_TYPE_2,
+                    onComplete: () => this._isBouncing = false,
+                });
+            },
+        });
     }
 
     setIconSize(iconSize) {
@@ -657,6 +662,8 @@ const ScrolledIconList = GObject.registerClass({
                 appButton.add_style_pseudo_class('highlighted');
             else
                 appButton.remove_style_pseudo_class('highlighted');
+
+            appButton.queue_redraw();
         });
     }
 
@@ -711,9 +718,10 @@ const ScrolledIconList = GObject.registerClass({
         if (distanceToTravel < pageSize)
             relativeAnimationTime = relativeAnimationTime * distanceToTravel / pageSize;
 
-        Tweener.addTween(hadjustment, { value: targetOffset,
-                                        time: relativeAnimationTime,
-                                        transition: ICON_SCROLL_ANIMATION_TYPE });
+        hadjustment.ease(targetOffset, {
+            duration: relativeAnimationTime,
+            mode: ICON_SCROLL_ANIMATION_TYPE,
+        })
         this.emit('icons-scrolled');
     }
 
