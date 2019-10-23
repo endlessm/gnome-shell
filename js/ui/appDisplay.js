@@ -1066,7 +1066,7 @@ var AppDisplay = class AppDisplay {
 
     selectApp(id) {
         this._showView();
-        this._allView.view.selectApp(id);
+        this._allView.selectApp(id);
     }
 
     adaptToSize(width, height) {
