@@ -59,7 +59,10 @@ class WindowMenuItem extends PopupMenu.PopupBaseMenuItem {
         let maxH = (ratio > 1) ?
             PANEL_WINDOW_MENU_THUMBNAIL_SIZE / ratio : PANEL_WINDOW_MENU_THUMBNAIL_SIZE;
 
-        let clone = new Clutter.Clone({ source: windowActor.get_texture() });
+        let clone = new Clutter.Actor({
+            content: windowActor.get_texture(),
+            request_mode: Clutter.RequestMode.CONTENT_SIZE,
+        });
         let cloneW = clone.width;
         let cloneH = clone.height;
 
