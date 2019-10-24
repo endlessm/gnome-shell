@@ -938,3 +938,118 @@ $clubhouse_button_color_d: #2D9B98;
   height: 110px;
   background-image: url('resource:///org/gnome/shell/theme/clubhouse-close-button-normal.png');
 }
+
+// Pay As You Go unlock screen (based on .login-dialog)
+
+$success_time_payg_color: #02b842;
+
+.unlock-dialog-payg {
+  border: none;
+  background-color: transparent;
+
+  .modal-dialog-button-box { spacing: 3px; }
+  .modal-dialog-button {
+    padding: 3px 18px;
+    &:default {
+      @include button(normal,$c:$selected_bg_color);
+      &:hover,&:focus { @include button(hover,$c:$selected_bg_color); }
+      &:active { @include button(active,$c:$selected_bg_color); }
+      &:insensitive { @include button(insensitive); }
+    }
+  }
+
+  .unlock-dialog-payg-layout {
+      padding-top: 24px;
+      padding-bottom: 12px;
+      spacing: 8px;
+
+      .unlock-dialog-payg-title {
+          color: $osd_fg_color;
+          font-size: 24px;
+          font-weight: bold;
+          text-align: left;
+          margin: 24px;
+      }
+
+      .unlock-dialog-payg-promptbox {
+          spacing: 6px;
+          min-width: 400px;
+          max-width: 400px;
+      }
+
+      .unlock-dialog-payg-label {
+          color: darken($osd_fg_color, 20%);
+          font-size: 110%; // Consistent with .login-dialog-prompt-label
+          padding-top: 1em;
+      }
+
+      .unlock-dialog-payg-code-entry {
+          color: darken($osd_fg_color, 20%);
+          font-size: 24px; // Consistent with .login-dialog-prompt-label
+          padding-left: 3px;
+          padding-right: 3px;
+          padding-top: 0.3em;
+      }
+
+      .unlock-dialog-payg-entry {
+          font-size: 24px;
+          padding-left: 12px;
+          padding-right: 12px;
+          letter-spacing: 6px;
+      }
+
+      .unlock-dialog-payg-session-list-button {
+          color: darken($osd_fg_color,30%);
+          &:hover,&:focus { color: $osd_fg_color; }
+          &:active { color: darken($osd_fg_color, 50%); }
+      }
+
+      .unlock-dialog-payg-message {
+          color: $warning_color;
+      }
+
+      .unlock-dialog-payg-button-box {
+          spacing: 5px;
+      }
+
+      .unlock-dialog-payg-help-main {
+          color: $osd_fg_color;
+          font-weight: bold;
+          text-align: left;
+          margin-top: 36px;
+      }
+
+      .unlock-dialog-payg-help-sub {
+          color: $osd_fg_color;
+          font-size: 100%;
+          text-align: left;
+      }
+
+      .unlock-dialog-payg-success {
+          color: $success_time_payg_color;
+          font-size: 24px;
+          font-weight: bold;
+          text-align: left;
+          margin: 24px;
+      }
+  }
+}
+
+// Pay As You Go notifications
+
+.notification-payg-entry {
+  text-align: center;
+  padding-left: 12px;
+  padding-right: 12px;
+  letter-spacing: 6px;
+  margin: 5px;
+}
+
+.notification-payg-code-entry {
+  text-align: center;
+  font-size: 20px;
+  color: darken($osd_fg_color, 20%);
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-top: 6px;
+}

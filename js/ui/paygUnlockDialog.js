@@ -1,0 +1,480 @@
+// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+//
+// Copyright (C) 2018 Endless Mobile, Inc.
+//
+// Licensed under the GNU General Public License Version 2
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+const { Atk, Clutter, Gio, GLib,
+        GObject, Meta, Pango, Shell, St }  = imports.gi;
+const Gettext = imports.gettext;
+const Signals = imports.signals;
+
+const PaygManager = imports.misc.paygManager;
+const Payg = imports.ui.payg;
+
+const Animation = imports.ui.animation;
+const Main = imports.ui.main;
+const Monitor = imports.ui.monitor;
+const ShellEntry = imports.ui.shellEntry;
+
+const MSEC_PER_SEC = 1000
+
+// The timeout before going back automatically to the lock screen
+const IDLE_TIMEOUT_SECS = 2 * 60;
+
+const SPINNER_ICON_SIZE_PIXELS = 16;
+const SPINNER_ANIMATION_DELAY_SECS = 1.0;
+const SPINNER_ANIMATION_TIME_SECS = 0.3;
+
+var PaygUnlockDialog = GObject.registerClass({
+    Signals: { 'code-added' : { },
+               'failed' : { },
+               'success-message-shown' : { } },
+}, class PaygUnlockDialog extends Payg.PaygUnlockUi {
+
+    _init(parentActor) {
+        super._init();
+
+        this._parentActor = parentActor;
+        this._entry = null;
+        this._errorMessage = null;
+        this._cancelButton = null;
+        this._nextButton = null;
+        this._spinner = null;
+        this._cancelled = false;
+
+        this._verificationStatus = Payg.UnlockStatus.NOT_VERIFYING;
+
+        // Clear the clipboard to make sure nothing can be copied into the entry.
+        St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, '');
+        St.Clipboard.get_default().set_text(St.ClipboardType.PRIMARY, '');
+
+        this.actor = new St.Widget({ accessible_role: Atk.Role.WINDOW,
+                                     style_class: 'unlock-dialog-payg',
+                                     layout_manager: new Clutter.BoxLayout(),
+                                     visible: false });
+        this.actor.add_constraint(new Monitor.MonitorConstraint({ primary: true }));
+
+        this._parentActor.add_child(this.actor);
+
+        let mainBox = new St.BoxLayout({ vertical: true,
+                                         x_align: Clutter.ActorAlign.FILL,
+                                         y_align: Clutter.ActorAlign.CENTER,
+                                         x_expand: true,
+                                         y_expand: true,
+                                         style_class: 'unlock-dialog-payg-layout'});
+        this.actor.add_child(mainBox)
+
+        let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
+                                        text: _("Your Pay As You Go usage credit has expired."),
+                                        x_align: Clutter.ActorAlign.CENTER });
+        mainBox.add_child(titleLabel);
+
+        let promptBox = new St.BoxLayout({ vertical: true,
+                                           x_align: Clutter.ActorAlign.CENTER,
+                                           y_align: Clutter.ActorAlign.CENTER,
+                                           x_expand: true,
+                                           y_expand: true,
+                                           style_class: 'unlock-dialog-payg-promptbox'});
+        promptBox.connect('key-press-event', (actor, event) => {
+            if (event.get_key_symbol() == Clutter.KEY_Escape)
+                this._onCancelled();
+
+            return Clutter.EVENT_PROPAGATE;
+        });
+        mainBox.add_child(promptBox);
+
+        let promptLabel = new St.Label({ style_class: 'unlock-dialog-payg-label',
+                                         text: _("Enter a new code to unlock your computer:"),
+                                         x_align: Clutter.ActorAlign.START });
+        promptLabel.clutter_text.line_wrap = true;
+        promptLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        promptBox.add_child(promptLabel);
+
+        let entryBox = this._createEntryArea();
+        promptBox.add_child(entryBox);
+
+        this._errorMessage = new St.Label({ opacity: 0,
+                                            styleClass: 'unlock-dialog-payg-message' });
+        this._errorMessage.clutter_text.line_wrap = true;
+        this._errorMessage.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        promptBox.add_child(this._errorMessage);
+
+        this._buttonBox = this._createButtonsArea();
+        promptBox.add_child(this._buttonBox);
+
+        // Use image-specific instructions if present, or the fallback text otherwise.
+        let instructionsLine1 = Main.customerSupport.paygInstructionsLine1 ?
+            Main.customerSupport.paygInstructionsLine1 : _("Don’t have an unlock code? That’s OK!");
+
+        let helpLineMain = new St.Label({ style_class: 'unlock-dialog-payg-help-main',
+                                          text: instructionsLine1,
+                                          x_align: Clutter.ActorAlign.START });
+        helpLineMain.clutter_text.line_wrap = true;
+        helpLineMain.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
+        promptBox.add_child(helpLineMain);
+
+        // Default to the fallback text, before figuring out whether
+        // we can show something more image-specific to the user.
+        let instructionsLine2;
+        if (Main.customerSupport.paygInstructionsLine2) {
+            // Overrides for the entire line take priority over everything else.
+            instructionsLine2 = Main.customerSupport.paygInstructionsLine2;
+        } else if (Main.customerSupport.paygContactName && Main.customerSupport.paygContactNumber) {
+            // The second possible override is to use the template text below
+            // with the contact's name and phone number, if BOTH are present.
+            instructionsLine2 = _("Talk to your sales representative to purchase a new code. Call or text %s at %s")
+                .format(Main.customerSupport.paygContactName, Main.customerSupport.paygContactNumber);
+        } else {
+            // No overrides present, default to fallback text.
+            instructionsLine2 = _("Talk to your sales representative to purchase a new code.");
+        }
+
+        let helpLineSub = new St.Label({ style_class: 'unlock-dialog-payg-help-sub',
+                                         text: instructionsLine2,
+                                         x_align: Clutter.ActorAlign.START });
+        helpLineSub.clutter_text.line_wrap = true;
+        helpLineSub.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+
+        promptBox.add_child(helpLineSub);
+
+        Main.ctrlAltTabManager.addGroup(promptBox, _("Unlock Machine"), 'dialog-password-symbolic');
+
+        this._cancelButton.connect('clicked', () => {
+            this._onCancelled();
+        });
+        this._nextButton.connect('clicked', () => {
+            this.startVerifyingCode();
+        });
+
+        this._entry.connect('code-changed', () => {
+            this.updateApplyButtonSensitivity();
+        });
+
+        this._entry.clutter_text.connect('activate', () => {
+            this.startVerifyingCode();
+        });
+
+        this.connect('code-added', () => {
+            this.actor.remove_child(mainBox);
+            this._successScreen();
+        });
+
+        this.connect('code-reset', () => {
+            this._paygUnlockDialog = mainBox;
+            this.actor.remove_child(mainBox);
+            this._resetScreen();
+        });
+
+        this._idleMonitor = Meta.IdleMonitor.get_core();
+        this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, this._onCancelled.bind(this));
+
+        this.updateSensitivity();
+        this._entry.grab_key_focus();
+    }
+
+    _onDestroy() {
+        if (this._clearTooManyAttemptsId > 0) {
+            GLib.source_remove(this._clearTooManyAttemptsId);
+            this._clearTooManyAttemptsId = 0;
+        }
+    }
+
+    _createButtonsArea() {
+        let buttonsBox = new St.BoxLayout({ style_class: 'unlock-dialog-payg-button-box',
+                                            vertical: false,
+                                            x_expand: true,
+                                            x_align: Clutter.ActorAlign.FILL,
+                                            y_expand: true,
+                                            y_align: Clutter.ActorAlign.END });
+
+        this._cancelButton = new St.Button({ style_class: 'modal-dialog-button button',
+                                             button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+                                             reactive: true,
+                                             can_focus: true,
+                                             label: _("Cancel"),
+                                             x_align: St.Align.START,
+                                             y_align: St.Align.END });
+        buttonsBox.add_child(this._cancelButton);
+
+        let buttonSpacer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
+                                           x_expand: true,
+                                           x_align: Clutter.ActorAlign.END });
+        buttonsBox.add_child(buttonSpacer);
+
+        // We make the most of the spacer to show the spinner while verifying the code.
+        let spinnerIcon = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/process-working.svg');
+        this._spinner = new Animation.AnimatedIcon(spinnerIcon, Payg.SPINNER_ICON_SIZE_PIXELS);
+        this._spinner.actor.opacity = 0;
+        this._spinner.actor.show();
+        buttonSpacer.add_child(this._spinner.actor);
+
+        this._nextButton = new St.Button({ style_class: 'modal-dialog-button button',
+                                           button_mask: St.ButtonMask.ONE | St.ButtonMask.THREE,
+                                           reactive: true,
+                                           can_focus: true,
+                                           label: _("Unlock"),
+                                           x_align: St.Align.END,
+                                           y_align: St.Align.END });
+        this._nextButton.add_style_pseudo_class('default');
+        buttonsBox.add_child(this._nextButton);
+
+        return buttonsBox;
+    }
+
+    _createEntryArea() {
+        let entryBox = new St.BoxLayout({ vertical: false,
+                                          x_expand: true,
+                                          x_align: Clutter.ActorAlign.FILL});
+
+        if (Main.paygManager.codeFormatPrefix != '') {
+            let prefix = new St.Label({ style_class: 'unlock-dialog-payg-code-entry',
+                                      text: Main.paygManager.codeFormatPrefix,
+                                      x_align: Clutter.ActorAlign.CENTER });
+
+            entryBox.add_child(prefix);
+        }
+
+        this._entry = new Payg.PaygUnlockCodeEntry({ style_class: 'unlock-dialog-payg-entry',
+                                                     reactive: true,
+                                                     can_focus: true,
+                                                     x_align: Clutter.ActorAlign.FILL,
+                                                     x_expand: true,
+                                                     y_expand: false });
+        this._entry.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._entry.clutter_text.x_align = Clutter.ActorAlign.CENTER;
+
+        entryBox.add_child(this._entry);
+
+        if (Main.paygManager.codeFormatSuffix != '') {
+            let suffix = new St.Label({ style_class: 'unlock-dialog-payg-code-entry',
+                                      text: Main.paygManager.codeFormatSuffix,
+                                      x_align: Clutter.ActorAlign.CENTER });
+            entryBox.add_child(suffix);
+        }
+
+        return entryBox;
+    }
+
+    _createMessageBox() {
+        let messageBox = new St.BoxLayout({ vertical: true,
+                                            x_align: Clutter.ActorAlign.FILL,
+                                            y_align: Clutter.ActorAlign.CENTER,
+                                            x_expand: true,
+                                            y_expand: true,
+                                            style_class: 'unlock-dialog-payg-layout'});
+
+        return messageBox;
+    }
+
+    _createMessageButtonArea(buttonLabel) {
+        let messageButtonBox = new St.BoxLayout({ style_class: 'unlock-dialog-payg-button-box',
+                                                  vertical: false,
+                                                  x_expand: true,
+                                                  x_align: Clutter.ActorAlign.CENTER,
+                                                  y_expand: true,
+                                                  y_align: Clutter.ActorAlign.END });
+
+        this._messageButton = new St.Button({ style_class: 'modal-dialog-button button',
+                                              button_mask: St.ButtonMask.THREE,
+                                              reactive: true,
+                                              can_focus: true,
+                                              label: buttonLabel,
+                                              x_align: St.Align.MIDDLE,
+                                              y_align: St.Align.END });
+
+        this._messageButton.add_style_pseudo_class('default');
+        messageButtonBox.add_child(this._messageButton);
+
+        return messageButtonBox;
+    }
+
+    _createMessageString(string) {
+        let messageString = new St.Label({ style_class: 'unlock-dialog-payg-success',
+                                    text: string,
+                                    x_align: Clutter.ActorAlign.CENTER });
+
+        return messageString;
+    }
+
+    _successScreen() {
+        let messageBox = this._createMessageBox()
+        this.actor.add_child(messageBox);
+
+        // successMessage will handle the formatting of the string
+        messageBox.add_child(this._createMessageString(Payg.successMessage()));
+        messageBox.add_child(this._createMessageButtonArea(_("Success!")));
+        this._messageButton.grab_key_focus();
+
+        this._timeoutId = GLib.timeout_add_seconds(
+            GLib.PRIORITY_DEFAULT,
+            3,
+            () => {
+                this.emit('success-message-shown');
+
+                return GLib.SOURCE_REMOVE;
+            }
+        );
+        this._messageButton.connect('button-press-event', () => {
+            GLib.source_remove(this._timeoutId);
+            this.emit('success-message-shown');
+        });
+        this._messageButton.connect('key-press-event', () => {
+            GLib.source_remove(this._timeoutId);
+            this.emit('success-message-shown');
+        });
+    }
+
+    _resetScreen() {
+        let messageBox = this._createMessageBox()
+        this.actor.add_child(messageBox);
+
+        messageBox.add_child(this._createMessageString(_("Remaining time cleared!")));
+        messageBox.add_child(this._createMessageButtonArea(_("OK!")));
+        this._messageButton.grab_key_focus();
+
+        this._timeoutId = GLib.timeout_add_seconds(
+            GLib.PRIORITY_DEFAULT,
+            3,
+            () => {
+                this.actor.add_child(this._paygUnlockDialog);
+                this.actor.remove_child(messageBox)
+
+                return GLib.SOURCE_REMOVE;
+            }
+        );
+        this._messageButton.connect('button-press-event', () => {
+            this._restorePaygUnlockCodeEntry();
+            this.actor.remove_child(messageBox);
+        });
+        this._messageButton.connect('key-press-event', () => {
+            this._restorePaygUnlockCodeEntry();
+            this.actor.remove_child(messageBox);
+        });
+    }
+
+    _restorePaygUnlockCodeEntry() {
+        GLib.source_remove(this._timeoutId);
+        this.actor.add_child(this._paygUnlockDialog);
+        this.updateSensitivity();
+        this._entry.grab_key_focus();
+    }
+
+    _onCancelled() {
+        this._cancelled = true;
+        this.reset();
+
+        // The ScreenShield will connect to the 'failed' signal
+        // to know when to cancel the unlock dialog.
+        if (this.verificationStatus != Payg.UnlockStatus.SUCCEEDED)
+            this.emit('failed');
+    }
+
+    entrySetEnabled(enabled) {
+        this._entry.setEnabled(enabled);
+    }
+
+    entryReset() {
+        this._entry.reset();
+    }
+
+    onCodeAdded() {
+        this.emit('code-added');
+        this.clearError();
+    }
+
+    get entryCode () {
+        return this._entry.code;
+    }
+
+    get verificationStatus () {
+        return this._verificationStatus;
+    }
+
+    set verificationStatus (value) {
+        this._verificationStatus = value;
+    }
+
+    get cancelled () {
+        return this._cancelled;
+    }
+
+    set cancelled (value) {
+        this._cancelled = value;
+    }
+
+    get errorLabel () {
+        return this._errorMessage;
+    }
+
+    get spinner () {
+        return this._spinner;
+    }
+
+    get applyButton () {
+        return this._nextButton;
+    }
+
+    addCharacter(unichar) {
+        this._entry.addCharacter(unichar);
+    }
+
+    cancel() {
+        this.entryReset();
+        this.destroy();
+    }
+
+    finish(onComplete) {
+        // Nothing to do other than calling the callback.
+        if (onComplete)
+            onComplete();
+    }
+
+    open(timestamp) {
+        this.actor.show();
+
+        if (this._isModal)
+            return true;
+
+        if (!Main.pushModal(this.actor, { timestamp: timestamp,
+                                          actionMode: Shell.ActionMode.UNLOCK_SCREEN }))
+            return false;
+
+        this._isModal = true;
+
+        return true;
+    }
+
+    popModal(timestamp) {
+        if (this._isModal) {
+            Main.popModal(this.actor, timestamp);
+            this._isModal = false;
+        }
+    }
+
+    destroy() {
+        this.popModal();
+        this._parentActor.remove_child(this.actor);
+        this.actor.destroy();
+
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
+    }
+});
