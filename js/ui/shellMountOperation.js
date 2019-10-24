@@ -364,19 +364,21 @@ var ShellMountPasswordDialog = GObject.registerClass({
         this._workSpinner = new Animation.Spinner(WORK_SPINNER_ICON_SIZE, true);
         this._passwordEntry.secondary_icon = this._workSpinner.actor;
 
+        this._inputSourceManager = Keyboard.getInputSourceManager();
+        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
+
         if (rtl) {
             layout.attach(this._passwordEntry, 0, 1, 1, 1);
             layout.attach(this._passwordLabel, 1, 1, 1, 1);
+            layout.attach(this._inputSourceIndicator.container, 2, 1, 1, 1);
         } else {
-            layout.attach(this._passwordLabel, 0, 1, 1, 1);
-            layout.attach(this._passwordEntry, 1, 1, 1, 1);
+            layout.attach(this._inputSourceIndicator.container, 0, 1, 1, 1);
+            layout.attach(this._passwordLabel, 1, 1, 1, 1);
+            layout.attach(this._passwordEntry, 2, 1, 1, 1);
         }
 
         content.messageBox.add(grid);
 
-        this._inputSourceManager = Keyboard.getInputSourceManager();
-        this._inputSourceIndicator = new Keyboard.InputSourceIndicator(this, false);
-        this._passwordBox.add(this._inputSourceIndicator.container);
         let manager = new PopupMenu.PopupMenuManager(this._inputSourceIndicator.container);
         manager.addMenu(this._inputSourceIndicator.menu);
         this._inputSourceManager.passwordModeEnabled = true;
