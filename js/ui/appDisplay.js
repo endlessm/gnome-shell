@@ -361,6 +361,10 @@ class BaseAppView {
     }
 
     _canAccept(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
         return true;
     }
 
@@ -2548,7 +2552,10 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
         // Add the "Remove from desktop" menu item at the end.
         let item = this._appendMenuItem(_("Remove from desktop"));
         item.connect('activate', () => {
-            this._iconGridLayout.removeIcon(this._source.id, true);
+            if (this._source instanceof HackAppIcon)
+                this._source.remove();
+            else
+                this._iconGridLayout.removeIcon(this._source.id, true);
         });
     }
 
@@ -2649,6 +2656,9 @@ class AppCenterIcon extends AppIcon {
         if (!this._canAccept(source))
             return false;
 
+        if (source instanceof HackAppIcon)
+            source.remove();
+
         this._iconGridLayout.removeIcon(source.id, true);
         return true;
     }
@@ -2690,8 +2700,6 @@ class HackAppIcon extends AppIcon {
             if (this._pulse)
                 this._startPulse();
         });
-
-        this.canDrop = false;
 
         if (this._pulse)
             this._startPulse();
@@ -2744,8 +2752,8 @@ class HackAppIcon extends AppIcon {
         super.activate(button);
     }
 
-    canBeRemoved() {
-        return true;
+    _canAccept(source) {
+        return false;
     }
 
     // Override to avoid animation on launch
@@ -2753,8 +2761,8 @@ class HackAppIcon extends AppIcon {
     }
 
     remove() {
-        super.remove();
         global.settings.set_boolean('show-hack-launcher', false);
+        this._iconGridLayout.emit('changed');
     }
 
     get name() {
