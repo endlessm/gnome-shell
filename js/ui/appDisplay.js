@@ -2748,6 +2748,10 @@ class HackAppIcon extends AppIcon {
         });
     }
 
+    getDragActor() {
+        return this._createIcon(this._iconSize);
+    }
+
     activate(button) {
         global.settings.set_boolean('hack-icon-pulse', false);
         super.activate(button);
