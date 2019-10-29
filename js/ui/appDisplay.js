@@ -256,6 +256,11 @@ class BaseAppView {
 
     moveItem(item, newPosition) {
         let visibleItems = this._allItems.filter(item => item.actor.visible);
+
+        // Avoid overflow
+        if (newPosition >= visibleItems.length)
+            return -1;
+
         let targetId = visibleItems[newPosition].id;
 
         let visibleIndex = visibleItems.indexOf(item);
