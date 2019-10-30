@@ -2791,4 +2791,8 @@ class HackAppIcon extends AppIcon {
             GLib.source_remove(this._pulseWaitId);
         super._onDestroy();
     }
+
+    handleDragOver() {
+        return DND.DragMotionResult.NO_DROP;
+    }
 });
