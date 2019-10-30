@@ -582,6 +582,7 @@ var ClubhouseItemBanner =
 class ClubhouseItemBanner extends ClubhouseNotificationBanner {
     constructor(notification) {
         super(notification);
+        this.actor.add_style_class_name('clubhouse-item-notification');
         this._topBanner = null;
     }
 

@@ -805,6 +805,7 @@ popup-separator-menu-item {
 $clubhouse-notification-width: 536px;
 $clubhouse-image-width: 175px;
 $clubhouse-image-height: 187px;
+$clubhouse-item-size: 128px;
 $clubhouse_button_color_a: #76EECF;
 $clubhouse_button_color_b: #37DCB1;
 $clubhouse_button_color_c: #32BBA4;
@@ -925,6 +926,16 @@ $clubhouse_button_color_d: #2D9B98;
     icon-size: $clubhouse-image-width;
     min-width: $clubhouse-image-width;
     min-height: $clubhouse-image-height;
+  }
+  &.clubhouse-item-notification {
+      .clubhouse-notification-icon-bin {
+          margin-right: 25px;
+      }
+      .clubhouse-notification-image {
+          icon-size: $clubhouse-item-size;
+          min-width: $clubhouse-item-size;
+          min-height: $clubhouse-item-size;
+      }
   }
 }
 
