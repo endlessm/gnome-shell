@@ -517,26 +517,20 @@ class ViewsClone extends St.Widget {
         entry.reactive = false;
         entry.clutter_text.reactive = false;
 
-        let iconGridClone = new Clutter.Clone({
-            source: appDisplay.gridActor,
-            x_expand: true,
-            y_expand: true,
-            reactive: false,
-        });
-
-        let appGridContainer =
-            new AppDisplay.AllViewContainer(iconGridClone, {
-                allowScrolling: false
-        });
-        appGridContainer.reactive = false;
+        this._allViewClone = new AppDisplay.AllView({ allowScrolling: false });
+        this._allViewClone._eventBlocker.visible = true;
 
         let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
         let layoutManager = new ViewsDisplayLayout(
             entry,
             discoveryFeedButton,
-            appGridContainer,
+            this._allViewClone.actor,
             null
         );
+
+        layoutManager.connect('grid-available-size-changed',
+            this._onGridAvailableSizeChanged.bind(this));
+
         super._init({
             layout_manager: layoutManager,
             x_expand: true,
@@ -545,16 +539,18 @@ class ViewsClone extends St.Widget {
             opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
         });
 
+        Shell.util_set_hidden_from_pick(this, true);
+
         // Ensure the cloned grid is scrolled to the same page as the original one
         let originalGridContainer = appDisplay.gridContainer;
         let originalAdjustment = originalGridContainer.scrollView.vscroll.adjustment;
-        let cloneAdjustment = appGridContainer.scrollView.vscroll.adjustment;
+        let cloneAdjustment = this._allViewClone.actor.scrollView.vscroll.adjustment;
         originalAdjustment.bind_property('value', cloneAdjustment, 'value', GObject.BindingFlags.SYNC_CREATE);
 
         if (discoveryFeedButton)
             this.add_child(discoveryFeedButton);
         this.add_child(entry);
-        this.add_child(appGridContainer);
+        this.add_child(this._allViewClone.actor);
 
         this._saturation = new Clutter.DesaturateEffect({
             name: 'saturation',
@@ -617,6 +613,18 @@ class ViewsClone extends St.Widget {
             Main.layoutManager.overviewGroup.visible = overviewVisible;
             this._saturation.enabled = saturationEnabled;
         });
+    }
+
+    _onGridAvailableSizeChanged(actor, width, height) {
+        let box = new Clutter.ActorBox();
+        box.x1 = box.y1 = 0;
+        box.x2 = width;
+        box.y2 = height;
+        box = this._allViewClone.actor.get_theme_node().get_content_box(box);
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        this._allViewClone.adaptToSize(availWidth, availHeight);
     }
 
     set saturation(factor) {
