@@ -564,7 +564,7 @@ class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
         super(notification);
         this._shouldSlideIn = isFirstBanner;
 
-        this._closeButton.visible = Main.sessionMode.hasOverview;
+        this._closeButton.visible = notification.urgency !== MessageTray.Urgency.CRITICAL;
 
         if (imagePath) {
             animator.getAnimation(imagePath, (animation) => {
