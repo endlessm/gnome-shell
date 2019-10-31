@@ -528,6 +528,8 @@ class ViewsClone extends St.Widget {
             null
         );
 
+        this._firstRelayout = false;
+
         layoutManager.connect('grid-available-size-changed',
             this._onGridAvailableSizeChanged.bind(this));
 
@@ -536,7 +538,8 @@ class ViewsClone extends St.Widget {
             x_expand: true,
             y_expand: true,
             reactive: false,
-            opacity: AppDisplay.EOS_ACTIVE_GRID_OPACITY,
+            visible: false,
+            opacity: 0,
         });
 
         Shell.util_set_hidden_from_pick(this, true);
@@ -577,6 +580,7 @@ class ViewsClone extends St.Widget {
             // clone saturation and opacity in the background as an override
             if (!this._forOverview &&
                 this._viewSelector.getActivePage() == ViewPage.APPS) {
+                this.show();
                 this.opacity = AppDisplay.EOS_ACTIVE_GRID_OPACITY;
                 this.saturation = AppDisplay.EOS_ACTIVE_GRID_SATURATION;
                 this.ease({
@@ -606,6 +610,18 @@ class ViewsClone extends St.Widget {
         let availHeight = box.y2 - box.y1;
 
         this._allViewClone.adaptToSize(availWidth, availHeight);
+
+        if (!this._firstRelayout &&
+            this.visible &&
+            this.opacity != 0 &&
+            this._viewSelector.getActivePage() == ViewPage.APPS) {
+
+            GLib.idle_add(GLib.PRIORITY_LOW, () => {
+                this._allViewClone.gridActor.queue_relayout();
+                return GLib.SOURCE_REMOVE;
+            });
+            this._firstRelayout = true;
+        }
     }
 
     set saturation(factor) {

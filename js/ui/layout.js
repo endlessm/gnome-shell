@@ -357,6 +357,8 @@ var LayoutManager = GObject.registerClass({
         if (!this._viewsClone)
             return;
 
+        this._viewsClone.show();
+
         // Don't unnecessarily tween the clone's saturation & opacity.
         if (this._viewsClone.opacity == targetOpacity && this._viewsClone.saturation == targetSaturation)
             return;
