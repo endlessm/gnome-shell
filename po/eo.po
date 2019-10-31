@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-shell/issues\n"
-"POT-Creation-Date: 2019-08-21 23:18+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-31 09:50+0000\n"
 "PO-Revision-Date: 2019-09-07 01:21+0200\n"
 "Last-Translator: Kristjan SCHMIDT <kristjan.schmidt@googlemail.com>\n"
 "Language-Team: Esperanto <gnome-eo-list@gnome.org>\n"
@@ -65,11 +65,11 @@ msgstr "GNOME-ŝelo"
 msgid "Window management and application launching"
 msgstr "Fenestroadministrado kaj aplikaĵo-lanĉado"
 
-#: data/org.gnome.shell.gschema.xml.in:6
+#: data/org.gnome.shell.gschema.xml.in:22
 msgid "Enable internal tools useful for developers and testers from Alt-F2"
 msgstr "Ŝalti internajn ilojn por programistoj kaj testantoj per Alt+F2"
 
-#: data/org.gnome.shell.gschema.xml.in:9
+#: data/org.gnome.shell.gschema.xml.in:25
 msgid ""
 "Allows access to internal debugging and monitoring tools using the Alt-F2 "
 "dialog."
@@ -77,11 +77,11 @@ msgstr ""
 "Permesas aliron al interna sencimigaj kaj kontroladaj iloj uzante la Alt+F2-"
 "dialogon."
 
-#: data/org.gnome.shell.gschema.xml.in:16
+#: data/org.gnome.shell.gschema.xml.in:32
 msgid "UUIDs of extensions to enable"
 msgstr "UUID-oj de ŝaltendaj kromprogramoj"
 
-#: data/org.gnome.shell.gschema.xml.in:17
+#: data/org.gnome.shell.gschema.xml.in:33
 msgid ""
 "GNOME Shell extensions have a UUID property; this key lists extensions which "
 "should be loaded. Any extension that wants to be loaded needs to be in this "
@@ -94,19 +94,13 @@ msgstr ""
 "la ‘EnableExtension’- kaj ‘DisableExtension’ D-Bus-metodoj sur org.gnome."
 "Shell."
 
-#: data/org.gnome.shell.gschema.xml.in:26
+#: data/org.gnome.shell.gschema.xml.in:42
 #, fuzzy
-#| msgid "UUIDs of extensions to enable"
 msgid "UUIDs of extensions to force disabling"
 msgstr "UUID-oj de la etendaĵoj kiuj estu tuje ĉesigitaj"
 
-#: data/org.gnome.shell.gschema.xml.in:27
+#: data/org.gnome.shell.gschema.xml.in:43
 #, fuzzy
-#| msgid ""
-#| "GNOME Shell extensions have a UUID property; this key lists extensions "
-#| "which should be loaded. Any extension that wants to be loaded needs to be "
-#| "in this list. You can also manipulate this list with the EnableExtension "
-#| "and DisableExtension D-Bus methods on org.gnome.Shell."
 msgid ""
 "GNOME Shell extensions have a UUID property; this key lists extensions which "
 "should be disabled, even if loaded as part of the current mode. You can also "
@@ -119,11 +113,22 @@ msgstr ""
 "Vi povas ankaŭ ŝanĝi ĉi tiun liston per la ‘EnableExtension’- kaj "
 "‘DisableExtension’ D-Bus-metodoj sur org.gnome.Shell."
 
-#: data/org.gnome.shell.gschema.xml.in:45
+#: data/org.gnome.shell.gschema.xml.in:53
+#, fuzzy
+msgid "Disable user extensions"
+msgstr "Malŝalti etendaĵon"
+
+#: data/org.gnome.shell.gschema.xml.in:54
+msgid ""
+"Disable all extensions the user has enabled without affecting the “enabled-"
+"extension” setting."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:61
 msgid "Disables the validation of extension version compatibility"
 msgstr "Malŝaltas la validigadon de kromprogramversia kongrueco"
 
-#: data/org.gnome.shell.gschema.xml.in:46
+#: data/org.gnome.shell.gschema.xml.in:62
 msgid ""
 "GNOME Shell will only load extensions that claim to support the current "
 "running version. Enabling this option will disable this check and try to "
@@ -134,12 +139,12 @@ msgstr ""
 "ŝargos ĉiujn kromprogramojn, sendepende de la versioj, ke tiuj kromprogramoj "
 "asertas subteni."
 
-#: data/org.gnome.shell.gschema.xml.in:54
+#: data/org.gnome.shell.gschema.xml.in:70
 msgid "List of desktop file IDs for favorite applications"
 msgstr ""
 "Listo de la identiloj de la labortablaj dosieroj por preferataj aplikaĵoj"
 
-#: data/org.gnome.shell.gschema.xml.in:55
+#: data/org.gnome.shell.gschema.xml.in:71
 msgid ""
 "The applications corresponding to these identifiers will be displayed in the "
 "favorites area."
@@ -147,28 +152,28 @@ msgstr ""
 "La aplikaĵoj kiuj korespondas al tiuj identigiloj estos montrita en la areo "
 "de la preferataj aplikaĵoj."
 
-#: data/org.gnome.shell.gschema.xml.in:62
+#: data/org.gnome.shell.gschema.xml.in:78
 msgid "App Picker View"
 msgstr "Aplikaĵa elektila vido"
 
-#: data/org.gnome.shell.gschema.xml.in:63
+#: data/org.gnome.shell.gschema.xml.in:79
 msgid "Index of the currently selected view in the application picker."
 msgstr "Indekso de aktuala elektita vido ĉe la aplikaĵa elektilo."
 
-#: data/org.gnome.shell.gschema.xml.in:69
+#: data/org.gnome.shell.gschema.xml.in:85
 msgid "History for command (Alt-F2) dialog"
 msgstr "Historio de la komando-dialogo (Alt+F2)"
 
 #. Translators: looking glass is a debugger and inspector tool, see https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
-#: data/org.gnome.shell.gschema.xml.in:74
+#: data/org.gnome.shell.gschema.xml.in:90
 msgid "History for the looking glass dialog"
 msgstr "Historio de la dialogo de ‘looking glass’"
 
-#: data/org.gnome.shell.gschema.xml.in:78
+#: data/org.gnome.shell.gschema.xml.in:94
 msgid "Always show the “Log out” menu item in the user menu."
 msgstr "Ĉiam montri la menueron “Adiaŭi” en la uzanto-menuo."
 
-#: data/org.gnome.shell.gschema.xml.in:79
+#: data/org.gnome.shell.gschema.xml.in:95
 msgid ""
 "This key overrides the automatic hiding of the “Log out” menu item in single-"
 "user, single-session situations."
@@ -176,12 +181,12 @@ msgstr ""
 "Ĉi tiu ŝlosilo transpasas la aŭtomatan kaŝon de la menuero “Adiaŭi” por unu-"
 "uzantulaj, unu-seancaj situacioj."
 
-#: data/org.gnome.shell.gschema.xml.in:86
+#: data/org.gnome.shell.gschema.xml.in:102
 msgid ""
 "Whether to remember password for mounting encrypted or remote filesystems"
 msgstr "Ĉu memorigi pasvorton por surmeti ĉifritajn aŭ forajn dosiersistemojn"
 
-#: data/org.gnome.shell.gschema.xml.in:87
+#: data/org.gnome.shell.gschema.xml.in:103
 msgid ""
 "The shell will request a password when an encrypted device or a remote "
 "filesystem is mounted. If the password can be saved for future use a "
@@ -193,91 +198,408 @@ msgstr ""
 "markobutono montritos. Ĉi ŝlosilo agordas la implicitan staton de la "
 "markobutono."
 
-#: data/org.gnome.shell.gschema.xml.in:119
+#: data/org.gnome.shell.gschema.xml.in:112
+msgid ""
+"Whether the default Bluetooth adapter had set up devices associated to it"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:113
+msgid ""
+"The shell will only show a Bluetooth menu item if a Bluetooth adapter is "
+"powered, or if there were devices set up associated with the default "
+"adapter. This will be reset if the default adapter is ever seen not to have "
+"devices associated to it."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:122
+#, fuzzy
+msgid "Enable introspection API"
+msgstr "Ŝalti etendaĵon"
+
+#: data/org.gnome.shell.gschema.xml.in:123
+msgid ""
+"Enables a D-Bus API that allows to introspect the application state of the "
+"shell."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:133
+msgid "Whether the App Center is displayed"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:136
+msgid "Whether the application grid displays the App Center icon."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:142
+msgid "Whether the Tray Area will be enabled"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:145
+msgid ""
+"This enables an area on the right side of the bottom panel where the icons "
+"for those applications still relying on the tray area will display their "
+"status icons (e.g. Steam, Dropbox, Skype...)."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:153
+#, fuzzy
+msgid "Enable Hack mode"
+msgstr "Enŝaltita"
+
+#: data/org.gnome.shell.gschema.xml.in:154
+msgid "If true, enables the Hack experience"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:158
+msgid "Pulse Hack desktop icon"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:159
+msgid "If true, the Hack desktop icon will pulse to attract the user."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:163
+#, fuzzy
+msgid "Show the Hack launcher in the desktop"
+msgstr "Montri la semajnajntagon en la kalendaro"
+
+#: data/org.gnome.shell.gschema.xml.in:164
+msgid "If true, the Hack desktop icon will be shown."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:168
+msgid "Enables the hot corner for the window picker"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:171
+msgid ""
+"By default, the hot corner for the window picker is enabled. Set false to "
+"disable the hot corner."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:178
+msgid "Set the left/right position of the hot corner for the window picker"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:181
+msgid ""
+"Default position of the hot corner is in a right corner. Set false to move "
+"the hot corner to a left corner. The position is not affected by the RTL vs. "
+"LTR text direction."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:189
+msgid "Set the top/bottom position of the hot corner for the window picker"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:192
+msgid ""
+"Default position of the hot corner is in a bottom corner. Set false to move "
+"the hot corner to a top corner."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:199
+msgid "Set the size of the hot corner target"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:202
+msgid ""
+"Number of pixels in one dimension of the square target for the hot corner. "
+"Default is for a single pixel in the very corner. For some virtual machines, "
+"this value may need to be set larger than the default."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:212
+msgid "Prevent apps from being automatically maximized on launch"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:215
+msgid ""
+"Makes window management more like standard Gnome. Hides application splash "
+"screens, prevents applications from being forced to open maximized, and does "
+"not automatically switch to the app selector when a window is minimized."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:224
+msgid "Whether password reset is allowed"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:225
+msgid ""
+"This key controls whether to show the \"Forgot Password?\" button on the "
+"login screen. 'default' tells GNOME Shell to use the vendor default setting. "
+"'enable' and 'disable' can be used to explicitly enable or disable the reset "
+"button, respectively. Note that it only makes sense to set this key for the "
+"Debian-gdm user; changing it for your own user account will have no effect."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:236
+#, fuzzy
+msgid ""
+"List of desktop file IDs for applications pinned to taskbar (DEPRECATED)"
+msgstr ""
+"Listo de la identiloj de la labortablaj dosieroj por preferataj aplikaĵoj"
+
+#: data/org.gnome.shell.gschema.xml.in:237
+msgid ""
+"The applications corresponding to these identifiers will be displayed in the "
+"taskbar at the bottom of the Endless desktop. THIS IS DEPRECATED NOW: any "
+"value in here will be automatically copied over to the favorite-apps key by "
+"the shell on start, and then cleared from here."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:246
+msgid "Layout of application launcher icons in the grid"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:247
+msgid ""
+"This key specifies the exact order of the icons shown in the applications "
+"launcher view."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:253
+msgid "Languages for which the discovery feed feature is enabled."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:256
+msgid ""
+"If the system language matches any of these languages, the discovery feed "
+"will be enabled. You will need to restart the shell for changes to this "
+"setting to take effect."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:262
+msgid "Whether or not to enable the wobbly effect"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:265
+msgid "WOBBLY!"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:272
+msgid "Wobbly effect Spring Constant"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:275
+msgid "Springiness of wobbly effect"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:282
+msgid "Wobbly effect Friction"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:285
+msgid "Friction of wobbly effect"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:292
+msgid "Wobbly effect slowdown factor"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:295
+msgid "Slowdown factor of wobbly effect (1.0 being normal speed)"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:302
+msgid "Wobbly effect object movement range"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:305
+msgid ""
+"How much objects are allowed to move in the mesh. A higher range allows for "
+"a more pronounced effect."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:317
 msgid "Keybinding to open the application menu"
 msgstr "Klavkombino por malfermi la aplikaĵo-menuon"
 
-#: data/org.gnome.shell.gschema.xml.in:120
+#: data/org.gnome.shell.gschema.xml.in:318
 msgid "Keybinding to open the application menu."
 msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
 
-#: data/org.gnome.shell.gschema.xml.in:126
+#: data/org.gnome.shell.gschema.xml.in:324
 msgid "Keybinding to open the “Show Applications” view"
 msgstr "Klavkombino por malfermi la vidon “Montri aplikaĵojn”"
 
-#: data/org.gnome.shell.gschema.xml.in:127
+#: data/org.gnome.shell.gschema.xml.in:325
 msgid ""
 "Keybinding to open the “Show Applications” view of the Activities Overview."
 msgstr ""
 "Klavkombino por malfermi la vidon “Montri aplikaĵojn” de la Agoj-"
 "Superrigardo."
 
-#: data/org.gnome.shell.gschema.xml.in:134
+#: data/org.gnome.shell.gschema.xml.in:332
 msgid "Keybinding to open the overview"
 msgstr "Klavkombino por malfermi la superrigardon"
 
-#: data/org.gnome.shell.gschema.xml.in:135
+#: data/org.gnome.shell.gschema.xml.in:333
 msgid "Keybinding to open the Activities Overview."
 msgstr "Klavkombino por malfermi la Agoj-Superrigardon."
 
-#: data/org.gnome.shell.gschema.xml.in:141
+#: data/org.gnome.shell.gschema.xml.in:339
 msgid "Keybinding to toggle the visibility of the notification list"
 msgstr "Klavkombino por baskuligi la videblecon de la sciigolisto"
 
-#: data/org.gnome.shell.gschema.xml.in:142
+#: data/org.gnome.shell.gschema.xml.in:340
 msgid "Keybinding to toggle the visibility of the notification list."
 msgstr "Klavkombino por baskuligi la videblecon de la sciigolisto."
 
-#: data/org.gnome.shell.gschema.xml.in:148
+#: data/org.gnome.shell.gschema.xml.in:346
 msgid "Keybinding to focus the active notification"
 msgstr "Klavkombino por fokusi la aktivan sciigon"
 
-#: data/org.gnome.shell.gschema.xml.in:149
+#: data/org.gnome.shell.gschema.xml.in:347
 msgid "Keybinding to focus the active notification."
 msgstr "Klavkombino por fokusi la aktivan sciigon."
 
-#: data/org.gnome.shell.gschema.xml.in:155
+#: data/org.gnome.shell.gschema.xml.in:353
 msgid "Switch to application 1"
 msgstr "Ŝanĝi al aplikaĵo 1"
 
-#: data/org.gnome.shell.gschema.xml.in:159
+#: data/org.gnome.shell.gschema.xml.in:357
 msgid "Switch to application 2"
 msgstr "Ŝanĝi al aplikaĵo 2"
 
-#: data/org.gnome.shell.gschema.xml.in:163
+#: data/org.gnome.shell.gschema.xml.in:361
 msgid "Switch to application 3"
 msgstr "Ŝanĝi al aplikaĵo 3"
 
-#: data/org.gnome.shell.gschema.xml.in:167
+#: data/org.gnome.shell.gschema.xml.in:365
 msgid "Switch to application 4"
 msgstr "Ŝanĝi al aplikaĵo 4"
 
-#: data/org.gnome.shell.gschema.xml.in:171
+#: data/org.gnome.shell.gschema.xml.in:369
 msgid "Switch to application 5"
 msgstr "Ŝanĝi al aplikaĵo 5"
 
-#: data/org.gnome.shell.gschema.xml.in:175
+#: data/org.gnome.shell.gschema.xml.in:373
 msgid "Switch to application 6"
 msgstr "Ŝanĝi al aplikaĵo 6"
 
-#: data/org.gnome.shell.gschema.xml.in:179
+#: data/org.gnome.shell.gschema.xml.in:377
 msgid "Switch to application 7"
 msgstr "Ŝanĝi al aplikaĵo 7"
 
-#: data/org.gnome.shell.gschema.xml.in:183
+#: data/org.gnome.shell.gschema.xml.in:381
 msgid "Switch to application 8"
 msgstr "Ŝanĝi al aplikaĵo 8"
 
-#: data/org.gnome.shell.gschema.xml.in:187
+#: data/org.gnome.shell.gschema.xml.in:385
 msgid "Switch to application 9"
 msgstr "Ŝanĝi al aplikaĵo 9"
 
-#: data/org.gnome.shell.gschema.xml.in:196
-#: data/org.gnome.shell.gschema.xml.in:223
+#: data/org.gnome.shell.gschema.xml.in:392
+#, fuzzy
+msgid "Keybinding that shows the force app exit dialog"
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon"
+
+#: data/org.gnome.shell.gschema.xml.in:397
+#, fuzzy
+msgid "Keybinding to activate the first app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:398
+msgid ""
+"Keybinding to open the first app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:404
+#, fuzzy
+msgid "Keybinding to activate the second app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:405
+msgid ""
+"Keybinding to open the second app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:411
+#, fuzzy
+msgid "Keybinding to activate the third app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:412
+msgid ""
+"Keybinding to open the third app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:418
+#, fuzzy
+msgid "Keybinding to activate the fourth app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:419
+msgid ""
+"Keybinding to open the fourth app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:425
+#, fuzzy
+msgid "Keybinding to activate the fifth app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:426
+msgid ""
+"Keybinding to open the fifth app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:432
+#, fuzzy
+msgid "Keybinding to activate the sixth app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:433
+msgid ""
+"Keybinding to open the sixth app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:439
+#, fuzzy
+msgid "Keybinding to activate the seventh app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:440
+msgid ""
+"Keybinding to open the seventh app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:446
+#, fuzzy
+msgid "Keybinding to activate the eighth app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:447
+msgid ""
+"Keybinding to open the eighth app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:453
+#, fuzzy
+msgid "Keybinding to activate the last app in the icon bar."
+msgstr "Klavkombino por malfermi la aplikaĵo-menuon."
+
+#: data/org.gnome.shell.gschema.xml.in:454
+msgid ""
+"Keybinding to open the last app in the icon bar, or switch to the app if "
+"already open."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:465
+#: data/org.gnome.shell.gschema.xml.in:492
 msgid "Limit switcher to current workspace."
 msgstr "Limigi ŝaltilon al aktuala laborspaco."
 
-#: data/org.gnome.shell.gschema.xml.in:197
+#: data/org.gnome.shell.gschema.xml.in:466
 msgid ""
 "If true, only applications that have windows on the current workspace are "
 "shown in the switcher. Otherwise, all applications are included."
@@ -285,11 +607,11 @@ msgstr ""
 "Se vera, nur aplikaĵoj, kiuj havas fenestrojn en la aktuala laborspaco, "
 "estas montritaj en la ŝaltilo. Alimaniere, ĉiuj aplikaĵoj estas inkluzivitaj."
 
-#: data/org.gnome.shell.gschema.xml.in:214
+#: data/org.gnome.shell.gschema.xml.in:483
 msgid "The application icon mode."
 msgstr "La aplikaĵo bildsimbola reĝimo."
 
-#: data/org.gnome.shell.gschema.xml.in:215
+#: data/org.gnome.shell.gschema.xml.in:484
 msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
 "are “thumbnail-only” (shows a thumbnail of the window), “app-icon-"
@@ -299,7 +621,7 @@ msgstr ""
 "“thumbnail-only” (nur bildeto), “app-icon-only” (nur aplikaĵa bildsimbolo) "
 "aŭ “both” (ambaŭ)."
 
-#: data/org.gnome.shell.gschema.xml.in:224
+#: data/org.gnome.shell.gschema.xml.in:493
 msgid ""
 "If true, only windows from the current workspace are shown in the switcher. "
 "Otherwise, all windows are included."
@@ -307,53 +629,117 @@ msgstr ""
 "Se vera, nur fenestroj de la nuna laborspaco estas montrataj en la ŝaltilo. "
 "Alimaniere, ĉiuj fenestroj estas inkluzivitaj."
 
-#: data/org.gnome.shell.gschema.xml.in:234
-#| msgid "Location In Use"
+#: data/org.gnome.shell.gschema.xml.in:503
 msgid "Locations"
 msgstr "Lokoj"
 
-#: data/org.gnome.shell.gschema.xml.in:253
-#| msgid "Location In Use"
+#: data/org.gnome.shell.gschema.xml.in:504
+msgid "The locations to show in world clocks"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:514
+msgid "Automatic location"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:515
+msgid "Whether to fetch the current location or not"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:522
 msgid "Location"
 msgstr "Loko"
 
-#: data/org.gnome.shell.gschema.xml.in:266
+#: data/org.gnome.shell.gschema.xml.in:523
+msgid "The location for which to show a forecast"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:535
 msgid "Attach modal dialog to the parent window"
 msgstr "Kunligi modalan dialogon al la patra fenestro"
 
-#: data/org.gnome.shell.gschema.xml.in:267
-#: data/org.gnome.shell.gschema.xml.in:276
-#: data/org.gnome.shell.gschema.xml.in:284
-#: data/org.gnome.shell.gschema.xml.in:292
-#: data/org.gnome.shell.gschema.xml.in:300
+#: data/org.gnome.shell.gschema.xml.in:536
+#: data/org.gnome.shell.gschema.xml.in:545
+#: data/org.gnome.shell.gschema.xml.in:553
+#: data/org.gnome.shell.gschema.xml.in:561
+#: data/org.gnome.shell.gschema.xml.in:569
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
 msgstr ""
 "Ĉi ŝlosilo transpasas la ŝlosilon en org.gnome.mutter kiam uzanta GNOME-"
 "ŝelon."
 
-#: data/org.gnome.shell.gschema.xml.in:275
+#: data/org.gnome.shell.gschema.xml.in:544
 msgid "Enable edge tiling when dropping windows on screen edges"
 msgstr ""
 "Aktivigi kahelan aranĝon kiam demetante fenestrojn sur ekranaj borderoj"
 
-#: data/org.gnome.shell.gschema.xml.in:283
+#: data/org.gnome.shell.gschema.xml.in:552
 msgid "Workspaces are managed dynamically"
 msgstr "Laborspacoj administratas dinamike"
 
-#: data/org.gnome.shell.gschema.xml.in:291
+#: data/org.gnome.shell.gschema.xml.in:560
 msgid "Workspaces only on primary monitor"
 msgstr "Laborspacoj nur sur la ĉefa ekrano"
 
-#: data/org.gnome.shell.gschema.xml.in:299
+#: data/org.gnome.shell.gschema.xml.in:568
 msgid "Delay focus changes in mouse mode until the pointer stops moving"
 msgstr "En musa reĝimo, prokrasti ŝanĝi fokuson ĝis la musmontrilo haltas"
+
+#: data/org.gnome.shell.gschema.xml.in:581
+msgid "Watermark file"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:582
+msgid "The full watermark file path"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:586
+msgid "Watermark position"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:587
+msgid ""
+"The position of the watermark; valid values are 'center', 'bottom-left', "
+"'bottom-center' and 'bottom-right'"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:595
+msgid "Watermark size"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:596
+msgid "The watermark size in percent relative to the screen width"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:601
+msgid "Watermark border"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:602
+msgid "The watermark around the logo"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:607
+msgid "Watermark opacity"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:608
+msgid "The watermark of the logo"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:612
+msgid "Watermark always visible"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:613
+msgid "Show the watermark even on a non default background"
+msgstr ""
 
 #: data/org.gnome.Shell.PortalHelper.desktop.in.in:3
 msgid "Network Login"
 msgstr "Reta saluto"
 
-#: js/extensionPrefs/main.js:104 js/extensionPrefs/main.js:534
+#: js/extensionPrefs/main.js:104 js/extensionPrefs/main.js:535
 msgid "Something’s gone wrong"
 msgstr "Io fiaskis"
 
@@ -383,11 +769,11 @@ msgstr "Hejmpaĝo"
 msgid "Visit extension homepage"
 msgstr "Viziti hejmpaĝon de etendaĵo"
 
-#: js/extensionPrefs/main.js:476
+#: js/extensionPrefs/main.js:477
 msgid "No Extensions Installed"
 msgstr "Neniu etendaĵo instalita"
 
-#: js/extensionPrefs/main.js:486
+#: js/extensionPrefs/main.js:487
 msgid ""
 "Extensions can be installed through Software or <a href=\"https://extensions."
 "gnome.org\">extensions.gnome.org</a>."
@@ -395,11 +781,11 @@ msgstr ""
 "Oni povas instali etendaĵoj per Programaro aŭ <a href=\"https://extensions."
 "gnome.org\">extensions.gnome.org</a>."
 
-#: js/extensionPrefs/main.js:501
+#: js/extensionPrefs/main.js:502
 msgid "Browse in Software"
 msgstr "Foliumi en Programaro"
 
-#: js/extensionPrefs/main.js:541
+#: js/extensionPrefs/main.js:542
 msgid ""
 "We’re very sorry, but it was not possible to get the list of installed "
 "extensions. Make sure you are logged into GNOME and try again."
@@ -407,27 +793,63 @@ msgstr ""
 "Ni pardonpetas. Ŝajnas ke ne eblas akiri liston de instalitaj etendaĵoj. "
 "Certigu ke vi salutis al GNOME kaj reprovu."
 
-#: js/gdm/authPrompt.js:139 js/ui/audioDeviceSelection.js:53
-#: js/ui/components/networkAgent.js:120 js/ui/components/polkitAgent.js:138
-#: js/ui/endSessionDialog.js:445 js/ui/extensionDownloader.js:189
-#: js/ui/shellMountOperation.js:390 js/ui/shellMountOperation.js:399
-#: js/ui/status/network.js:899
+#: js/gdm/authPrompt.js:124
+msgid "Show password hint"
+msgstr ""
+
+#: js/gdm/authPrompt.js:140
+msgid "Forgot password?"
+msgstr ""
+
+#: js/gdm/authPrompt.js:189 js/ui/audioDeviceSelection.js:53
+#: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:150
+#: js/ui/endSessionDialog.js:446 js/ui/extensionDownloader.js:190
+#: js/ui/paygUnlockDialog.js:210 js/ui/shellMountOperation.js:403
+#: js/ui/shellMountOperation.js:413 js/ui/status/network.js:898
+#: js/ui/forceAppExitDialog.js:77
 msgid "Cancel"
 msgstr "Nuligi"
 
-#: js/gdm/authPrompt.js:158 js/gdm/authPrompt.js:201 js/gdm/authPrompt.js:433
+#: js/gdm/authPrompt.js:208 js/gdm/authPrompt.js:259 js/gdm/authPrompt.js:500
 msgid "Next"
 msgstr "Sekva"
 
-#: js/gdm/authPrompt.js:197 js/ui/shellMountOperation.js:394
-#: js/ui/unlockDialog.js:42
+#: js/gdm/authPrompt.js:255 js/ui/paygUnlockDialog.js:231
+#: js/ui/shellMountOperation.js:407 js/ui/unlockDialog.js:45
 msgid "Unlock"
 msgstr "Malŝlosi"
 
-#: js/gdm/authPrompt.js:199
+#: js/gdm/authPrompt.js:257
 msgctxt "button"
 msgid "Sign In"
 msgstr "Saluti"
+
+#. FIXME: This string is too long. It is ellipsized, even in English.
+#. It must be shortened after the Endless 3.2 release, once there is
+#. time to translate the shortened version.
+#. Translators: During a password reset, prompt for the "secret code" provided by customer support.
+#: js/gdm/authPrompt.js:636
+msgid "Enter unlock code provided by customer support:"
+msgstr ""
+
+#. Translators: Password reset. The first %s is a verification code and the second is an email.
+#: js/gdm/authPrompt.js:639
+#, javascript-format
+msgid ""
+"Please inform customer support of your verification code %s by emailing %s. "
+"The code will remain valid until you click Cancel or turn off your computer."
+msgstr ""
+
+#. Translators: Button on login dialog, after clicking Forgot Password?
+#: js/gdm/authPrompt.js:644
+#, fuzzy
+msgid "Reset Password"
+msgstr "Memorigi pasvorton"
+
+#: js/gdm/authPrompt.js:717
+#, fuzzy
+msgid "Your unlock code was incorrect. Please try again."
+msgstr "Pardonon, tio ne funkciis. Bonvolu provi denove."
 
 #: js/gdm/loginDialog.js:299
 msgid "Choose Session"
@@ -442,7 +864,7 @@ msgstr "Ĉu ne en listo?"
 
 #. Translators: this message is shown below the username entry field
 #. to clue the user in on how to login to the local network realm
-#: js/gdm/loginDialog.js:879
+#: js/gdm/loginDialog.js:883
 #, javascript-format
 msgid "(e.g., user or %s)"
 msgstr "(ekzemple, uzanto aŭ %s)"
@@ -450,12 +872,12 @@ msgstr "(ekzemple, uzanto aŭ %s)"
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
 #. (and don't even care of which one)
-#: js/gdm/loginDialog.js:884 js/ui/components/networkAgent.js:246
-#: js/ui/components/networkAgent.js:266 js/ui/components/networkAgent.js:284
+#: js/gdm/loginDialog.js:888 js/ui/components/networkAgent.js:428
+#: js/ui/components/networkAgent.js:448 js/ui/components/networkAgent.js:466
 msgid "Username: "
 msgstr "Uzantonomo: "
 
-#: js/gdm/loginDialog.js:1219
+#: js/gdm/loginDialog.js:1223
 msgid "Login Window"
 msgstr "Salutfenestro"
 
@@ -538,65 +960,65 @@ msgstr "Ŝlosa orientiĝo"
 msgid "lock orientation;screen;rotation"
 msgstr "ŝlosa orientiĝo;ekrano;turno;rotacio"
 
-#: js/misc/util.js:117
+#: js/misc/util.js:182
 msgid "Command not found"
 msgstr "Komando ne trovita"
 
 #. Replace "Error invoking GLib.shell_parse_argv: " with
 #. something nicer
-#: js/misc/util.js:150
+#: js/misc/util.js:215
 msgid "Could not parse command:"
 msgstr "Ne eblis analizi komandon:"
 
-#: js/misc/util.js:158
+#: js/misc/util.js:223
 #, javascript-format
 msgid "Execution of “%s” failed:"
 msgstr "Plenumo de “%s” malsukcesis:"
 
-#: js/misc/util.js:175
+#: js/misc/util.js:240
 msgid "Just now"
 msgstr "Ĵus"
 
-#: js/misc/util.js:177
+#: js/misc/util.js:242
 #, javascript-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "Antaŭ %d minuto"
 msgstr[1] "Antaŭ %d minutoj"
 
-#: js/misc/util.js:180
+#: js/misc/util.js:245
 #, javascript-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "Antaŭ %d horo"
 msgstr[1] "Antaŭ %d horoj"
 
-#: js/misc/util.js:183
+#: js/misc/util.js:248
 msgid "Yesterday"
 msgstr "Hieraŭ"
 
-#: js/misc/util.js:185
+#: js/misc/util.js:250
 #, javascript-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "Antaŭ %d tago"
 msgstr[1] "Antaŭ %d tagoj"
 
-#: js/misc/util.js:188
+#: js/misc/util.js:253
 #, javascript-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "Antau %d semajno"
 msgstr[1] "Antau %d semajnoj"
 
-#: js/misc/util.js:191
+#: js/misc/util.js:256
 #, javascript-format
 msgid "%d month ago"
 msgid_plural "%d months ago"
 msgstr[0] "Antaŭ %d monato"
 msgstr[1] "Antaŭ %d monatoj"
 
-#: js/misc/util.js:193
+#: js/misc/util.js:258
 #, javascript-format
 msgid "%d year ago"
 msgid_plural "%d years ago"
@@ -604,20 +1026,20 @@ msgstr[0] "Antaŭ %d jaro"
 msgstr[1] "Antaŭ %d jaroj"
 
 #. Translators: Time in 24h format
-#: js/misc/util.js:223
+#: js/misc/util.js:288
 msgid "%H∶%M"
 msgstr "%H∶%M"
 
 #. Translators: this is the word "Yesterday" followed by a
 #. time string in 24h format. i.e. "Yesterday, 14:30"
-#: js/misc/util.js:229
+#: js/misc/util.js:294
 #, no-c-format
 msgid "Yesterday, %H∶%M"
 msgstr "Hieraŭ, %H∶%M"
 
 #. Translators: this is the week day name followed by a time
 #. string in 24h format. i.e. "Monday, 14:30"
-#: js/misc/util.js:235
+#: js/misc/util.js:300
 #, no-c-format
 msgid "%A, %H∶%M"
 msgstr "%A, %H∶%M"
@@ -625,7 +1047,7 @@ msgstr "%A, %H∶%M"
 #. Translators: this is the month name and day number
 #. followed by a time string in 24h format.
 #. i.e. "May 25, 14:30"
-#: js/misc/util.js:241
+#: js/misc/util.js:306
 #, no-c-format
 msgid "%B %-d, %H∶%M"
 msgstr "%-d-a de %B, %H∶%M"
@@ -633,26 +1055,26 @@ msgstr "%-d-a de %B, %H∶%M"
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 24h format.
 #. i.e. "May 25 2012, 14:30"
-#: js/misc/util.js:247
+#: js/misc/util.js:312
 #, no-c-format
 msgid "%B %-d %Y, %H∶%M"
 msgstr "%-d-a de %B %Y, %H∶%M"
 
 #. Translators: Time in 12h format
-#: js/misc/util.js:252
+#: js/misc/util.js:317
 msgid "%l∶%M %p"
 msgstr "%l∶%M %p"
 
 #. Translators: this is the word "Yesterday" followed by a
 #. time string in 12h format. i.e. "Yesterday, 2:30 pm"
-#: js/misc/util.js:258
+#: js/misc/util.js:323
 #, no-c-format
 msgid "Yesterday, %l∶%M %p"
 msgstr "Hieraŭ, %l:%M %p"
 
 #. Translators: this is the week day name followed by a time
 #. string in 12h format. i.e. "Monday, 2:30 pm"
-#: js/misc/util.js:264
+#: js/misc/util.js:329
 #, no-c-format
 msgid "%A, %l∶%M %p"
 msgstr "%A, %l∶%M %p"
@@ -660,7 +1082,7 @@ msgstr "%A, %l∶%M %p"
 #. Translators: this is the month name and day number
 #. followed by a time string in 12h format.
 #. i.e. "May 25, 2:30 pm"
-#: js/misc/util.js:270
+#: js/misc/util.js:335
 #, no-c-format
 msgid "%B %-d, %l∶%M %p"
 msgstr "%-d-a de %B, %l∶%M %p"
@@ -668,10 +1090,18 @@ msgstr "%-d-a de %B, %l∶%M %p"
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 12h format.
 #. i.e. "May 25 2012, 2:30 pm"
-#: js/misc/util.js:276
+#: js/misc/util.js:341
 #, no-c-format
 msgid "%B %-d %Y, %l∶%M %p"
 msgstr "%-d-a de %B %Y, %l∶%M %p"
+
+#.
+#. * Translators: this is the name of the search engine that shows in the
+#. * Shell's desktop search entry.
+#.
+#: js/misc/util.js:532
+msgid "Google"
+msgstr ""
 
 #. TRANSLATORS: this is the title of the wifi captive portal login window
 #: js/portalHelper/main.js:40
@@ -688,65 +1118,41 @@ msgstr ""
 
 #. No support for non-modal system dialogs, so ignore the option
 #. let modal = options['modal'] || true;
-#: js/ui/accessDialog.js:39 js/ui/status/location.js:362
+#: js/ui/accessDialog.js:39 js/ui/status/location.js:363
 msgid "Deny Access"
 msgstr "Rifuzi aliron"
 
-#: js/ui/accessDialog.js:40 js/ui/status/location.js:365
+#: js/ui/accessDialog.js:40 js/ui/status/location.js:366
 msgid "Grant Access"
 msgstr "Konsenti aliron"
 
-#: js/ui/appDisplay.js:854
-msgid "Unnamed Folder"
-msgstr "Sennoma dosierujo"
+#: js/ui/appDisplay.js:1858
+#, fuzzy
+msgid "Rename"
+msgstr "Uzantonomo: "
 
-#: js/ui/appDisplay.js:874
-msgid "Frequently used applications will appear here"
-msgstr "Ofte uzataj aplikaĵoj aperos ĉi tie"
-
-# Oftaj aplikaĵoj  --Carmen
-#: js/ui/appDisplay.js:997
-msgid "Frequent"
-msgstr "Oftaj"
-
-#: js/ui/appDisplay.js:1004
-msgid "All"
-msgstr "Ĉiuj"
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:1928 js/ui/appDisplay.js:2557
+#, fuzzy
+msgid "Remove from desktop"
+msgstr "Forigi el preferataj"
 
 #. Translators: This is the heading of a list of open windows
-#: js/ui/appDisplay.js:2233 js/ui/panel.js:77
+#: js/ui/appDisplay.js:2503 js/ui/panel.js:79
 msgid "Open Windows"
 msgstr "Malfermaj fenestroj"
 
-#: js/ui/appDisplay.js:2252 js/ui/panel.js:84
+#: js/ui/appDisplay.js:2522 js/ui/panel.js:86
 msgid "New Window"
 msgstr "Nova fenestro"
 
-#: js/ui/appDisplay.js:2264
+#: js/ui/appDisplay.js:2534
 msgid "Launch using Dedicated Graphics Card"
 msgstr "Lanĉi uzante dediĉitan vidkarton"
 
-#: js/ui/appDisplay.js:2293 js/ui/dash.js:240
-msgid "Remove from Favorites"
-msgstr "Forigi el preferataj"
-
-#: js/ui/appDisplay.js:2299
-msgid "Add to Favorites"
-msgstr "Aldoni al preferataj"
-
-#: js/ui/appDisplay.js:2309 js/ui/panel.js:95
-msgid "Show Details"
-msgstr "Montri detalojn"
-
-#: js/ui/appFavorites.js:150
-#, javascript-format
-msgid "%s has been added to your favorites."
-msgstr "%s estas aldonita de via preferataj aplikaĵoj."
-
-#: js/ui/appFavorites.js:184
-#, javascript-format
-msgid "%s has been removed from your favorites."
-msgstr "%s estas forigita de via preferataj aplikaĵoj."
+#: js/ui/appDisplay.js:2616
+msgid "Remove"
+msgstr "Forigi"
 
 #: js/ui/audioDeviceSelection.js:40
 msgid "Select Audio Device"
@@ -764,21 +1170,21 @@ msgstr "Kapaŭskultilo"
 msgid "Headset"
 msgstr "Kaptelefono"
 
-#: js/ui/audioDeviceSelection.js:64 js/ui/status/volume.js:241
+#: js/ui/audioDeviceSelection.js:64 js/ui/status/volume.js:248
 msgid "Microphone"
 msgstr "Mikrofono"
 
-#: js/ui/backgroundMenu.js:14
+#: js/ui/backgroundMenu.js:15
 msgid "Change Background…"
 msgstr "Ŝanĝi ekranfonon…"
 
-#: js/ui/backgroundMenu.js:16 js/ui/status/nightLight.js:44
-msgid "Display Settings"
-msgstr "Ekran-agordoj"
+#: js/ui/backgroundMenu.js:18
+msgid "Add App"
+msgstr ""
 
-#: js/ui/backgroundMenu.js:17
-msgid "Settings"
-msgstr "Agordoj"
+#: js/ui/backgroundMenu.js:24
+msgid "Add Website"
+msgstr ""
 
 #. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0" (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
 #: js/ui/calendar.js:41
@@ -869,37 +1275,37 @@ msgctxt "date day number format"
 msgid "%d"
 msgstr "%-d"
 
-#: js/ui/calendar.js:613
+#: js/ui/calendar.js:614
 msgid "Week %V"
 msgstr "Semajno %V"
 
 #. Translators: Shown in calendar event list for all day events
 #. * Keep it short, best if you can use less then 10 characters
 #.
-#: js/ui/calendar.js:681
+#: js/ui/calendar.js:682
 msgctxt "event list time"
 msgid "All Day"
 msgstr "Tuttaga"
 
-#: js/ui/calendar.js:813
+#: js/ui/calendar.js:815
 msgctxt "calendar heading"
 msgid "%A, %B %-d"
 msgstr "%A, %-d-a de %B"
 
-#: js/ui/calendar.js:817
+#: js/ui/calendar.js:819
 msgctxt "calendar heading"
 msgid "%A, %B %-d, %Y"
 msgstr "%A, %-d-a de %B %Y"
 
-#: js/ui/calendar.js:1040
+#: js/ui/calendar.js:1042
 msgid "No Notifications"
 msgstr "Neniu sciigo"
 
-#: js/ui/calendar.js:1043
+#: js/ui/calendar.js:1045
 msgid "No Events"
 msgstr "Neniu evento"
 
-#: js/ui/calendar.js:1069
+#: js/ui/calendar.js:1071
 msgid "Clear"
 msgstr "Vakigi"
 
@@ -923,28 +1329,28 @@ msgstr "Devige ĉesigi"
 msgid "Wait"
 msgstr "Atendi"
 
-#: js/ui/components/automountManager.js:88
+#: js/ui/components/automountManager.js:87
 msgid "External drive connected"
 msgstr "Ekstera disko konektitas"
 
-#: js/ui/components/automountManager.js:100
+#: js/ui/components/automountManager.js:99
 msgid "External drive disconnected"
 msgstr "Ekstera disko malkonektitas"
 
-#: js/ui/components/automountManager.js:210
+#: js/ui/components/automountManager.js:209
 msgid "Unable to unlock volume"
 msgstr "Ne eblas malŝlosi datumportilon"
 
-#: js/ui/components/automountManager.js:211
+#: js/ui/components/automountManager.js:210
 msgid "The installed udisks version does not support the PIM setting"
 msgstr "La instalita versio de udisks ne subtenas la PIM-agordon"
 
-#: js/ui/components/autorunManager.js:330
+#: js/ui/components/autorunManager.js:328
 #, javascript-format
 msgid "Open with %s"
 msgstr "Malfermi per %s"
 
-#: js/ui/components/keyring.js:67 js/ui/components/polkitAgent.js:257
+#: js/ui/components/keyring.js:67 js/ui/components/polkitAgent.js:278
 msgid "Password:"
 msgstr "Pasvorto:"
 
@@ -952,46 +1358,105 @@ msgstr "Pasvorto:"
 msgid "Type again:"
 msgstr "Tajpu denove:"
 
-#: js/ui/components/networkAgent.js:105
+#: js/ui/components/networkAgent.js:128
 msgid ""
 "Alternatively you can connect by pushing the “WPS” button on your router."
 msgstr ""
 "Alternative vi povas konekti per premi la “WPS”-butonon de via enkursigilo."
 
-#: js/ui/components/networkAgent.js:115 js/ui/status/network.js:223
-#: js/ui/status/network.js:314 js/ui/status/network.js:902
+#: js/ui/components/networkAgent.js:139 js/ui/status/network.js:222
+#: js/ui/status/network.js:313 js/ui/status/network.js:901
 msgid "Connect"
 msgstr "Konekti"
 
+#: js/ui/components/networkAgent.js:171
+msgid "Limited Data"
+msgstr ""
+
+#: js/ui/components/networkAgent.js:181
+msgid "Unlimited Data"
+msgstr ""
+
+#: js/ui/components/networkAgent.js:193 js/ui/components/networkAgent.js:228
+msgid "Enable if your connection has limits on how much you can download."
+msgstr ""
+
+#: js/ui/components/networkAgent.js:230
+msgid "This connection doesn't have limits on how much you can download."
+msgstr ""
+
 #. Cisco LEAP
-#: js/ui/components/networkAgent.js:215 js/ui/components/networkAgent.js:227
-#: js/ui/components/networkAgent.js:249 js/ui/components/networkAgent.js:268
-#: js/ui/components/networkAgent.js:288 js/ui/components/networkAgent.js:298
+#: js/ui/components/networkAgent.js:397 js/ui/components/networkAgent.js:409
+#: js/ui/components/networkAgent.js:431 js/ui/components/networkAgent.js:450
+#: js/ui/components/networkAgent.js:470 js/ui/components/networkAgent.js:480
 msgid "Password: "
 msgstr "Pasvorto: "
 
 #. static WEP
-#: js/ui/components/networkAgent.js:220
+#: js/ui/components/networkAgent.js:402
 msgid "Key: "
 msgstr "Ŝlosilo: "
 
-#: js/ui/components/networkAgent.js:252 js/ui/components/networkAgent.js:274
+#: js/ui/components/networkAgent.js:434 js/ui/components/networkAgent.js:456
 msgid "Private key password: "
 msgstr "Pasvorto por privata ŝlosilo: "
 
-#: js/ui/components/networkAgent.js:272
+#: js/ui/components/networkAgent.js:454
 msgid "Identity: "
 msgstr "Identeco: "
 
-#: js/ui/components/networkAgent.js:286
+#: js/ui/components/networkAgent.js:468
 msgid "Service: "
 msgstr "Servo: "
 
-#: js/ui/components/networkAgent.js:315 js/ui/components/networkAgent.js:688
+#: js/ui/components/networkAgent.js:497
+#, javascript-format
+msgid "Enter the Wi-Fi password for “%s”"
+msgstr ""
+
+#: js/ui/components/networkAgent.js:502 js/ui/components/networkAgent.js:885
+msgid "Wired 802.1X authentication"
+msgstr "Dratita 802.1X aŭtentokontrolo"
+
+#: js/ui/components/networkAgent.js:504
+msgid "Network name: "
+msgstr "Reta nomo: "
+
+#: js/ui/components/networkAgent.js:509 js/ui/components/networkAgent.js:889
+msgid "DSL authentication"
+msgstr "DSL-a aŭtentokontrolo"
+
+#: js/ui/components/networkAgent.js:516 js/ui/components/networkAgent.js:894
+msgid "PIN code required"
+msgstr "PIN-kodo bezonata"
+
+#: js/ui/components/networkAgent.js:517 js/ui/components/networkAgent.js:895
+msgid "PIN code is needed for the mobile broadband device"
+msgstr "PIN-kodo necesas por la portebla larĝkapacita aparato"
+
+#: js/ui/components/networkAgent.js:518
+msgid "PIN: "
+msgstr "PIN: "
+
+#: js/ui/components/networkAgent.js:525 js/ui/components/networkAgent.js:901
+msgid "Mobile broadband network password"
+msgstr "Portebla larĝkapacita retopasvorto"
+
+#: js/ui/components/networkAgent.js:526 js/ui/components/networkAgent.js:886
+#: js/ui/components/networkAgent.js:890 js/ui/components/networkAgent.js:902
+#, javascript-format
+msgid "A password is required to connect to “%s”."
+msgstr "Pasvorto necesas por konekti al “%s”."
+
+#: js/ui/components/networkAgent.js:869 js/ui/status/network.js:1675
+msgid "Network Manager"
+msgstr "Retadministrilo"
+
+#: js/ui/components/networkAgent.js:880
 msgid "Authentication required by wireless network"
 msgstr "Sendrata reto bezonas aŭtentigon"
 
-#: js/ui/components/networkAgent.js:316 js/ui/components/networkAgent.js:689
+#: js/ui/components/networkAgent.js:881
 #, javascript-format
 msgid ""
 "Passwords or encryption keys are required to access the wireless network "
@@ -999,53 +1464,15 @@ msgid ""
 msgstr ""
 "Pasvortoj aŭ ĉifro-ŝlosiloj estas necesaj por aliro al sendrata reto “%s”."
 
-#: js/ui/components/networkAgent.js:320 js/ui/components/networkAgent.js:693
-msgid "Wired 802.1X authentication"
-msgstr "Dratita 802.1X aŭtentokontrolo"
-
-#: js/ui/components/networkAgent.js:322
-msgid "Network name: "
-msgstr "Reta nomo: "
-
-#: js/ui/components/networkAgent.js:327 js/ui/components/networkAgent.js:697
-msgid "DSL authentication"
-msgstr "DSL-a aŭtentokontrolo"
-
-#: js/ui/components/networkAgent.js:334 js/ui/components/networkAgent.js:702
-msgid "PIN code required"
-msgstr "PIN-kodo bezonata"
-
-#: js/ui/components/networkAgent.js:335 js/ui/components/networkAgent.js:703
-msgid "PIN code is needed for the mobile broadband device"
-msgstr "PIN-kodo necesas por la portebla larĝkapacita aparato"
-
-#: js/ui/components/networkAgent.js:336
-msgid "PIN: "
-msgstr "PIN: "
-
-#: js/ui/components/networkAgent.js:343 js/ui/components/networkAgent.js:709
-msgid "Mobile broadband network password"
-msgstr "Portebla larĝkapacita retopasvorto"
-
-#: js/ui/components/networkAgent.js:344 js/ui/components/networkAgent.js:694
-#: js/ui/components/networkAgent.js:698 js/ui/components/networkAgent.js:710
-#, javascript-format
-msgid "A password is required to connect to “%s”."
-msgstr "Pasvorto necesas por konekti al “%s”."
-
-#: js/ui/components/networkAgent.js:677 js/ui/status/network.js:1675
-msgid "Network Manager"
-msgstr "Retadministrilo"
-
-#: js/ui/components/polkitAgent.js:36
+#: js/ui/components/polkitAgent.js:43
 msgid "Authentication Required"
 msgstr "Aŭtentigo bezonata"
 
-#: js/ui/components/polkitAgent.js:64
+#: js/ui/components/polkitAgent.js:67
 msgid "Administrator"
 msgstr "Administranto"
 
-#: js/ui/components/polkitAgent.js:141
+#: js/ui/components/polkitAgent.js:153
 msgid "Authenticate"
 msgstr "Aŭtentigi"
 
@@ -1053,7 +1480,7 @@ msgstr "Aŭtentigi"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:243 js/ui/shellMountOperation.js:375
+#: js/ui/components/polkitAgent.js:264 js/ui/shellMountOperation.js:387
 msgid "Sorry, that didn’t work. Please try again."
 msgstr "Pardonon, tio ne funkciis. Bonvolu provi denove."
 
@@ -1064,18 +1491,22 @@ msgstr "Pardonon, tio ne funkciis. Bonvolu provi denove."
 msgid "%s is now known as %s"
 msgstr "%s estas nun konata kiel %s"
 
-#: js/ui/ctrlAltTab.js:21 js/ui/viewSelector.js:169
+#: js/ui/ctrlAltTab.js:21 js/ui/viewSelector.js:651
 msgid "Windows"
 msgstr "Fenestroj"
 
-#: js/ui/dash.js:201 js/ui/dash.js:242
+#: js/ui/dash.js:200 js/ui/dash.js:241
 msgid "Show Applications"
 msgstr "Montri aplikaĵojn"
+
+#: js/ui/dash.js:239
+msgid "Remove from Favorites"
+msgstr "Forigi el preferataj"
 
 # Kiel macOS «dock”.  --Carmen
 #. Translators: this is the name of the dock/favorites area on
 #. the left of the overview
-#: js/ui/dash.js:390
+#: js/ui/dash.js:389
 msgid "Dash"
 msgstr "Doko"
 
@@ -1085,7 +1516,7 @@ msgstr "Doko"
 #. * "Tue 9:29 AM").  The string itself should become a full date, e.g.,
 #. * "February 17 2015".
 #.
-#: js/ui/dateMenu.js:68
+#: js/ui/dateMenu.js:70
 msgid "%B %-d %Y"
 msgstr "%-d-a de %B %Y"
 
@@ -1093,118 +1524,118 @@ msgstr "%-d-a de %B %Y"
 #. * below the time in the shell; it should combine the weekday and the
 #. * date, e.g. "Tuesday February 17 2015".
 #.
-#: js/ui/dateMenu.js:75
+#: js/ui/dateMenu.js:77
 msgid "%A %B %e %Y"
 msgstr "%A, %-d-a de %B %Y"
 
-#: js/ui/dateMenu.js:149
+#: js/ui/dateMenu.js:152
 msgid "Add world clocks…"
 msgstr "Aldoni mondajn horloĝojn…"
 
-#: js/ui/dateMenu.js:150
+#: js/ui/dateMenu.js:153
 msgid "World Clocks"
 msgstr "Mondaj horloĝoj"
 
-#: js/ui/dateMenu.js:265
+#: js/ui/dateMenu.js:268
 msgid "Weather"
 msgstr "Vetero"
 
-#: js/ui/dateMenu.js:348
+#: js/ui/dateMenu.js:351
 msgid "Select a location…"
 msgstr "Elekti lokon…"
 
-#: js/ui/dateMenu.js:356
+#: js/ui/dateMenu.js:359
 msgid "Loading…"
 msgstr "Ŝargante…"
 
-#: js/ui/dateMenu.js:366
+#: js/ui/dateMenu.js:369
 msgid "Go online for weather information"
 msgstr "Enretigi por veterinformoj"
 
-#: js/ui/dateMenu.js:368
+#: js/ui/dateMenu.js:371
 msgid "Weather information is currently unavailable"
 msgstr "Veterinformoj ĉimomente nehaveblas"
 
-#: js/ui/endSessionDialog.js:39
+#: js/ui/endSessionDialog.js:37
 #, javascript-format
 msgctxt "title"
 msgid "Log Out %s"
 msgstr "Adiaŭi %s"
 
-#: js/ui/endSessionDialog.js:40
+#: js/ui/endSessionDialog.js:38
 msgctxt "title"
 msgid "Log Out"
 msgstr "Adiaŭi"
 
-#: js/ui/endSessionDialog.js:42
+#: js/ui/endSessionDialog.js:40
 #, javascript-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s aŭtomate adiaŭos post %d sekundo."
 msgstr[1] "%s aŭtomate adiaŭos post %d sekundoj."
 
-#: js/ui/endSessionDialog.js:47
+#: js/ui/endSessionDialog.js:45
 #, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
 msgstr[0] "Vi aŭtomate adiaŭos post %d sekundo."
 msgstr[1] "Vi aŭtomate adiaŭos post %d sekundoj."
 
-#: js/ui/endSessionDialog.js:53
+#: js/ui/endSessionDialog.js:51
 msgctxt "button"
 msgid "Log Out"
 msgstr "Adiaŭi"
 
-#: js/ui/endSessionDialog.js:59
+#: js/ui/endSessionDialog.js:57
 msgctxt "title"
 msgid "Power Off"
 msgstr "Malŝalti"
 
-#: js/ui/endSessionDialog.js:60
+#: js/ui/endSessionDialog.js:58
 msgctxt "title"
 msgid "Install Updates & Power Off"
 msgstr "Instali ĝisdatigojn & malŝalti"
 
-#: js/ui/endSessionDialog.js:62
+#: js/ui/endSessionDialog.js:60
 #, javascript-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] "La sistemo aŭtomate malŝaltiĝos post %d sekundo."
 msgstr[1] "La sistemo aŭtomate malŝaltiĝos post %d sekundoj."
 
-#: js/ui/endSessionDialog.js:66
+#: js/ui/endSessionDialog.js:64
 msgctxt "checkbox"
 msgid "Install pending software updates"
 msgstr "Instali okazontajn ĝisdatigojn"
 
-#: js/ui/endSessionDialog.js:69 js/ui/endSessionDialog.js:86
+#: js/ui/endSessionDialog.js:67 js/ui/endSessionDialog.js:84
 msgctxt "button"
 msgid "Restart"
 msgstr "Restartigi"
 
-#: js/ui/endSessionDialog.js:71
+#: js/ui/endSessionDialog.js:69
 msgctxt "button"
 msgid "Power Off"
 msgstr "Malŝalti"
 
-#: js/ui/endSessionDialog.js:78
+#: js/ui/endSessionDialog.js:76
 msgctxt "title"
 msgid "Restart"
 msgstr "Restartigi"
 
-#: js/ui/endSessionDialog.js:80
+#: js/ui/endSessionDialog.js:78
 #, javascript-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
 msgstr[0] "La sistemo aŭtomate restartiĝos post %d sekundo."
 msgstr[1] "La sistemo aŭtomate restartiĝos post %d sekundoj."
 
-#: js/ui/endSessionDialog.js:94
+#: js/ui/endSessionDialog.js:92
 msgctxt "title"
 msgid "Restart & Install Updates"
 msgstr "Restartigi & instali ĝisdatigojn"
 
-#: js/ui/endSessionDialog.js:96
+#: js/ui/endSessionDialog.js:94
 #, javascript-format
 msgid "The system will automatically restart and install updates in %d second."
 msgid_plural ""
@@ -1214,22 +1645,22 @@ msgstr[0] ""
 msgstr[1] ""
 "La sistemo aŭtomate restartiĝos kaj instalos ĝisdatigojn post %d sekundoj."
 
-#: js/ui/endSessionDialog.js:102 js/ui/endSessionDialog.js:122
+#: js/ui/endSessionDialog.js:100 js/ui/endSessionDialog.js:120
 msgctxt "button"
 msgid "Restart &amp; Install"
 msgstr "Restartigi &amp; instali"
 
-#: js/ui/endSessionDialog.js:103
+#: js/ui/endSessionDialog.js:101
 msgctxt "button"
 msgid "Install &amp; Power Off"
 msgstr "Instali &amp; malŝalti"
 
-#: js/ui/endSessionDialog.js:104
+#: js/ui/endSessionDialog.js:102
 msgctxt "checkbox"
 msgid "Power off after updates are installed"
 msgstr "Malŝalti post instalado de ĝisdatigoj"
 
-#: js/ui/endSessionDialog.js:112
+#: js/ui/endSessionDialog.js:110
 msgctxt "title"
 msgid "Restart & Install Upgrade"
 msgstr "Restarti & instali ĝisdatigon"
@@ -1237,7 +1668,7 @@ msgstr "Restarti & instali ĝisdatigon"
 #. Translators: This is the text displayed for system upgrades in the
 #. shut down dialog. First %s gets replaced with the distro name and
 #. second %s with the distro version to upgrade to
-#: js/ui/endSessionDialog.js:117
+#: js/ui/endSessionDialog.js:115
 #, javascript-format
 msgid ""
 "%s %s will be installed after restart. Upgrade installation can take a long "
@@ -1246,60 +1677,59 @@ msgstr ""
 "%s %s instaliĝos post restarto. Instalado de tiu ĝisdatigo povas daŭri "
 "longe: certigu, ke viaj datumoj sekurkopiiĝis kaj via komputilo konektiĝis."
 
-#: js/ui/endSessionDialog.js:306
+#: js/ui/endSessionDialog.js:304
 msgid "Running on battery power: please plug in before installing updates."
 msgstr "Uzante baterielektron: bonvolu konekti antaŭ ol instali ĝisdatigojn."
 
-#: js/ui/endSessionDialog.js:323
+#: js/ui/endSessionDialog.js:321
 msgid "Some applications are busy or have unsaved work."
 msgstr "Iuj aplikaĵoj okupitas aŭ havas nekonservitan laboron."
 
-#: js/ui/endSessionDialog.js:330
+#: js/ui/endSessionDialog.js:328
 msgid "Other users are logged in."
 msgstr "Aliaj uzantoj estas salutitaj."
 
 #. Translators: Remote here refers to a remote session, like a ssh login
-#: js/ui/endSessionDialog.js:647
+#: js/ui/endSessionDialog.js:650
 #, javascript-format
 msgid "%s (remote)"
 msgstr "%s (defora)"
 
 #. Translators: Console here refers to a tty like a VT console
-#: js/ui/endSessionDialog.js:650
+#: js/ui/endSessionDialog.js:653
 #, javascript-format
 msgid "%s (console)"
 msgstr "%s (konzolo)"
 
-#: js/ui/extensionDownloader.js:193
+#: js/ui/extensionDownloader.js:194
 msgid "Install"
 msgstr "Instali"
 
-#: js/ui/extensionDownloader.js:199
+#: js/ui/extensionDownloader.js:200
 #, javascript-format
 msgid "Download and install “%s” from extensions.gnome.org?"
 msgstr "Ĉu elŝuti kaj instali “%s” de extensions.gnome.org?"
 
-#. Translators: %s is an application name like "Settings"
-#: js/ui/inhibitShortcutsDialog.js:79
+#: js/ui/inhibitShortcutsDialog.js:80
 #, javascript-format
 msgid "%s wants to inhibit shortcuts"
 msgstr "%s volas malebligi klavkombinojn"
 
-#: js/ui/inhibitShortcutsDialog.js:80
+#: js/ui/inhibitShortcutsDialog.js:81
 msgid "Application wants to inhibit shortcuts"
 msgstr "Aplikaĵo volas malebligi klavkombinojn"
 
 #. Translators: %s is a keyboard shortcut like "Super+x"
-#: js/ui/inhibitShortcutsDialog.js:89
+#: js/ui/inhibitShortcutsDialog.js:90
 #, javascript-format
 msgid "You can restore shortcuts by pressing %s."
 msgstr "Vi povas restaŭri klavkombinojn per premi %s."
 
-#: js/ui/inhibitShortcutsDialog.js:94
+#: js/ui/inhibitShortcutsDialog.js:95
 msgid "Deny"
 msgstr "Rifuzi"
 
-#: js/ui/inhibitShortcutsDialog.js:101
+#: js/ui/inhibitShortcutsDialog.js:102
 msgid "Allow"
 msgstr "Akcepti"
 
@@ -1349,16 +1779,16 @@ msgstr ""
 msgid "Leave On"
 msgstr "Lasi ŝaltita"
 
-#: js/ui/kbdA11yDialog.js:58 js/ui/status/bluetooth.js:134
-#: js/ui/status/network.js:1274
+#: js/ui/kbdA11yDialog.js:58 js/ui/status/automaticUpdates.js:305
+#: js/ui/status/bluetooth.js:137 js/ui/status/network.js:1274
 msgid "Turn On"
 msgstr "Ŝalti"
 
-#: js/ui/kbdA11yDialog.js:66 js/ui/status/bluetooth.js:134
-#: js/ui/status/network.js:132 js/ui/status/network.js:315
-#: js/ui/status/network.js:1274 js/ui/status/network.js:1386
-#: js/ui/status/nightLight.js:40 js/ui/status/rfkill.js:80
-#: js/ui/status/rfkill.js:107
+#: js/ui/kbdA11yDialog.js:66 js/ui/status/automaticUpdates.js:307
+#: js/ui/status/bluetooth.js:137 js/ui/status/network.js:131
+#: js/ui/status/network.js:314 js/ui/status/network.js:1274
+#: js/ui/status/network.js:1386 js/ui/status/nightLight.js:40
+#: js/ui/status/rfkill.js:80 js/ui/status/rfkill.js:107
 msgid "Turn Off"
 msgstr "Malŝalti"
 
@@ -1366,88 +1796,83 @@ msgstr "Malŝalti"
 msgid "Leave Off"
 msgstr "Lasi malŝaltita"
 
-#: js/ui/keyboard.js:200
+#: js/ui/keyboard.js:201
 msgid "Region & Language Settings"
 msgstr "Regiono & lingvo agordoj"
 
-#: js/ui/lookingGlass.js:624
+#: js/ui/lookingGlass.js:629
 msgid "No extensions installed"
 msgstr "Neniu kromprogramo instalita"
 
 #. Translators: argument is an extension UUID.
-#: js/ui/lookingGlass.js:679
+#: js/ui/lookingGlass.js:684
 #, javascript-format
 msgid "%s has not emitted any errors."
 msgstr "%s ne eligintaj ajnaj eraroj."
 
-#: js/ui/lookingGlass.js:685
+#: js/ui/lookingGlass.js:690
 msgid "Hide Errors"
 msgstr "Kaŝi erarojn"
 
-#: js/ui/lookingGlass.js:689 js/ui/lookingGlass.js:748
+#: js/ui/lookingGlass.js:694 js/ui/lookingGlass.js:753
 msgid "Show Errors"
 msgstr "Montri erarojn"
 
-#: js/ui/lookingGlass.js:698
+#: js/ui/lookingGlass.js:703
 msgid "Enabled"
 msgstr "Enŝaltita"
 
 #. translators:
 #. * The device has been disabled
-#: js/ui/lookingGlass.js:701 subprojects/gvc/gvc-mixer-control.c:1864
+#: js/ui/lookingGlass.js:706 subprojects/gvc/gvc-mixer-control.c:1864
 msgid "Disabled"
 msgstr "Elŝaltita"
 
-#: js/ui/lookingGlass.js:703
+#: js/ui/lookingGlass.js:708
 msgid "Error"
 msgstr "Eraro"
 
-#: js/ui/lookingGlass.js:705
+#: js/ui/lookingGlass.js:710
 msgid "Out of date"
 msgstr "Neaktuala"
 
-#: js/ui/lookingGlass.js:707
+#: js/ui/lookingGlass.js:712
 msgid "Downloading"
 msgstr "Elŝutante"
 
-#: js/ui/lookingGlass.js:730
+#: js/ui/lookingGlass.js:735
 msgid "View Source"
 msgstr "Montri fonton"
 
-#: js/ui/lookingGlass.js:739
+#: js/ui/lookingGlass.js:744
 msgid "Web Page"
 msgstr "Retpaĝo"
 
-#: js/ui/messageTray.js:1462
+#: js/ui/messageTray.js:1466
 msgid "System Information"
 msgstr "Sisteminformoj"
 
-#: js/ui/mpris.js:178
+#: js/ui/mpris.js:179
 msgid "Unknown artist"
 msgstr "Nekonata artisto"
 
-#: js/ui/mpris.js:179
+#: js/ui/mpris.js:180
 msgid "Unknown title"
 msgstr "Nekonata titolo"
 
-#: js/ui/overview.js:73
+#: js/ui/overview.js:96
 msgid "Undo"
 msgstr "Malfari"
 
+#: js/ui/overview.js:115
+msgid "No apps are open"
+msgstr ""
+
 #. Translators: This is the main view to select
 #. activities. See also note for "Activities" string.
-#: js/ui/overview.js:100
+#: js/ui/overview.js:188
 msgid "Overview"
 msgstr "Superrigardo"
-
-# Imperativo
-#. Translators: this is the text displayed
-#. in the search entry when no search is
-#. active; it should not exceed ~30
-#. characters.
-#: js/ui/overview.js:230
-msgid "Type to search…"
-msgstr "Tajpu por serĉi…"
 
 #: js/ui/padOsd.js:93
 msgid "New shortcut…"
@@ -1493,66 +1918,248 @@ msgstr "Premu Esk-klavon por ĉesi"
 msgid "Press any key to exit"
 msgstr "Premu iun ajn klavon por ĉesi"
 
-#: js/ui/panel.js:111
+#: js/ui/panel.js:97
+msgid "Show Details"
+msgstr "Montri detalojn"
+
+#: js/ui/panel.js:113
 msgid "Quit"
 msgstr "Ĉesi"
 
 #. Translators: If there is no suitable word for "Activities"
 #. in your language, you can use the word for "Overview".
-#: js/ui/panel.js:428
+#: js/ui/panel.js:430
 msgid "Activities"
 msgstr "Agoj"
 
-#: js/ui/panel.js:701
+#: js/ui/panel.js:703
 msgctxt "System menu in the top bar"
 msgid "System"
 msgstr "Sistemo"
 
-#: js/ui/panel.js:820
-msgid "Top Bar"
-msgstr "Supra breto"
+#: js/ui/panel.js:795
+#, fuzzy
+msgctxt "User menu"
+msgid "User Menu"
+msgstr "Pleto-menuo"
+
+#: js/ui/panel.js:827
+#, fuzzy
+msgctxt "Power menu"
+msgid "Power"
+msgstr "kurento"
+
+#: js/ui/panel.js:905
+msgid "Bottom Bar"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:83
+msgid "Your Pay As You Go usage credit has expired."
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:102
+msgid "Enter a new code to unlock your computer:"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:122
+msgid "Don’t have an unlock code? That’s OK!"
+msgstr ""
+
+#. The second possible override is to use the template text below
+#. with the contact's name and phone number, if BOTH are present.
+#: js/ui/paygUnlockDialog.js:141
+#, javascript-format
+msgid ""
+"Talk to your sales representative to purchase a new code. Call or text %s at "
+"%s"
+msgstr ""
+
+#. No overrides present, default to fallback text.
+#: js/ui/paygUnlockDialog.js:145
+msgid "Talk to your sales representative to purchase a new code."
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:156
+#, fuzzy
+msgid "Unlock Machine"
+msgstr "Malŝlosi fenestron"
+
+#: js/ui/paygUnlockDialog.js:321
+msgid "Success!"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:347
+msgid "Remaining time cleared!"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:348
+#, fuzzy
+msgid "OK!"
+msgstr "Akcepti"
+
+#: js/ui/payg.js:37
+msgid "Pay As You Go"
+msgstr ""
+
+#: js/ui/payg.js:38
+msgid "Enter an unlock code to extend the time before your credit has expired."
+msgstr ""
+
+#: js/ui/payg.js:39
+#, javascript-format
+msgid "Subscription runs out in %s."
+msgstr ""
+
+#: js/ui/payg.js:226
+#, javascript-format
+msgid "Too many attempts. Try again in %s minute."
+msgid_plural "Too many attempts. Try again in %s minutes."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:230
+msgid "Too many attempts. Try again in a few seconds."
+msgstr ""
+
+#: js/ui/payg.js:252
+#, fuzzy
+msgid "Invalid code. Please try again."
+msgstr "Pardonon, tio ne funkciis. Bonvolu provi denove."
+
+#: js/ui/payg.js:254
+msgid "Code already used. Please enter a new code."
+msgstr ""
+
+#: js/ui/payg.js:256
+msgid "Time exceeded while verifying the code"
+msgstr ""
+
+#. We don't consider any other error here (and we don't consider DISABLED explicitly,
+#. since that should not happen), but still we need to show something to the user.
+#: js/ui/payg.js:260
+#, fuzzy
+msgid "Unknown error"
+msgstr "Nekonata"
+
+#: js/ui/payg.js:427
+msgid "Apply Code"
+msgstr ""
+
+#: js/ui/payg.js:574
+#, javascript-format
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:578 js/ui/payg.js:588
+#, fuzzy, javascript-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "Antaŭ %d minuto"
+msgstr[1] "Antaŭ %d minutoj"
+
+#: js/ui/payg.js:582 js/ui/payg.js:599
+#, fuzzy, javascript-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] "Antaŭ %d horo"
+msgstr[1] "Antaŭ %d horoj"
+
+#: js/ui/payg.js:593
+#, fuzzy, javascript-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s tuttage."
+msgstr[1] "%s tuttage."
+
+#: js/ui/payg.js:609
+#, fuzzy, javascript-format
+msgid "%s second has been added to your Pay As You Go credit."
+msgid_plural "%s seconds have been added to your Pay As You Go credit."
+msgstr[0] "%s estas aldonita de via preferataj aplikaĵoj."
+msgstr[1] "%s estas aldonita de via preferataj aplikaĵoj."
+
+#: js/ui/payg.js:616
+#, fuzzy, javascript-format
+msgid "%s minute has been added to your Pay As You Go credit."
+msgid_plural "%s minutes have been added to your Pay As You Go credit."
+msgstr[0] "%s estas aldonita de via preferataj aplikaĵoj."
+msgstr[1] "%s estas aldonita de via preferataj aplikaĵoj."
+
+#: js/ui/payg.js:623
+#, fuzzy, javascript-format
+msgid "%s hour has been added to your Pay As You Go credit."
+msgid_plural "%s hours have been added to your Pay As You Go credit."
+msgstr[0] "%s estas aldonita de via preferataj aplikaĵoj."
+msgstr[1] "%s estas aldonita de via preferataj aplikaĵoj."
+
+#: js/ui/payg.js:630
+#, fuzzy, javascript-format
+msgid "%s day has been added to your Pay As You Go credit."
+msgid_plural "%s days have been added to your Pay As You Go credit."
+msgstr[0] "%s estas aldonita de via preferataj aplikaĵoj."
+msgstr[1] "%s estas aldonita de via preferataj aplikaĵoj."
+
+#: js/ui/payg.js:637
+#, fuzzy, javascript-format
+msgid "%s month has been added to your Pay As You Go credit."
+msgid_plural "%s months have been added to your Pay As You Go credit."
+msgstr[0] "%s estas aldonita de via preferataj aplikaĵoj."
+msgstr[1] "%s estas aldonita de via preferataj aplikaĵoj."
+
+#: js/ui/payg.js:644
+#, fuzzy
+msgid "1 year has been added to your Pay As You Go credit."
+msgstr "%s estas aldonita de via preferataj aplikaĵoj."
+
+#. Unlock permanently message
+#: js/ui/payg.js:647
+msgid "You have successfully unlocked your Endless Machine"
+msgstr ""
 
 #: js/ui/runDialog.js:58
 msgid "Enter a Command"
 msgstr "Enigu komandon"
 
-#: js/ui/runDialog.js:98 js/ui/windowMenu.js:167
+#: js/ui/runDialog.js:99 js/ui/status/automaticUpdates.js:277
+#: js/ui/windowMenu.js:167
 msgid "Close"
 msgstr "Fermi"
 
-#: js/ui/runDialog.js:260
+#: js/ui/runDialog.js:264
 msgid "Restart is not available on Wayland"
 msgstr "Restartigado ne disponeblas sur Wayland"
 
-#: js/ui/runDialog.js:265
+#: js/ui/runDialog.js:269
 msgid "Restarting…"
 msgstr "Restartante…"
 
 #. Translators: This is a time format for a date in
 #. long format
-#: js/ui/screenShield.js:73
+#: js/ui/screenShield.js:74
 msgid "%A, %B %d"
 msgstr "%A, %-d-a de %B"
 
-#: js/ui/screenShield.js:129
+#: js/ui/screenShield.js:130
 #, javascript-format
 msgid "%d new message"
 msgid_plural "%d new messages"
 msgstr[0] "%d nova mesaĝo"
 msgstr[1] "%d novaj mesaĝoj"
 
-#: js/ui/screenShield.js:131
+#: js/ui/screenShield.js:132
 #, javascript-format
 msgid "%d new notification"
 msgid_plural "%d new notifications"
 msgstr[0] "%d nova sciigo"
 msgstr[1] "%d novaj sciigoj"
 
-#: js/ui/screenShield.js:444 js/ui/status/system.js:269
+#: js/ui/screenShield.js:471 js/ui/status/system.js:319
 msgid "Lock"
 msgstr "Ŝlosi"
 
-#: js/ui/screenShield.js:708
+#: js/ui/screenShield.js:763
 msgid "GNOME needs to lock the screen"
 msgstr "GNOME bezonas ŝlosi la ekranon"
 
@@ -1563,60 +2170,66 @@ msgstr "GNOME bezonas ŝlosi la ekranon"
 #.
 #. XXX: another option is to kick the user into the gdm login
 #. screen, where we're not affected by grabs
-#: js/ui/screenShield.js:822 js/ui/screenShield.js:1294
+#: js/ui/screenShield.js:882 js/ui/screenShield.js:1402
 msgid "Unable to lock"
 msgstr "Ne eblas ŝlosi"
 
-#: js/ui/screenShield.js:823 js/ui/screenShield.js:1295
+#: js/ui/screenShield.js:883 js/ui/screenShield.js:1403
 msgid "Lock was blocked by an application"
 msgstr "Ŝloso estis blokita de aplikaĵo"
 
-#: js/ui/search.js:647
+#: js/ui/search.js:793
 msgid "Searching…"
 msgstr "Serĉante…"
 
-#: js/ui/search.js:649
+#: js/ui/search.js:795
 msgid "No results."
 msgstr "Neniuj rezultoj."
 
-#: js/ui/search.js:773
-#, javascript-format
-msgid "%d more"
-msgid_plural "%d more"
-msgstr[0] "%d pli"
-msgstr[1] "%d pli"
-
-#: js/ui/shellEntry.js:20
+#: js/ui/shellEntry.js:32
 msgid "Copy"
 msgstr "Kopii"
 
-#: js/ui/shellEntry.js:25
+#: js/ui/shellEntry.js:37
 msgid "Paste"
 msgstr "Alglui"
 
-#: js/ui/shellEntry.js:91
+#: js/ui/shellEntry.js:103
 msgid "Show Text"
 msgstr "Montri tekston"
 
-#: js/ui/shellEntry.js:93
+#: js/ui/shellEntry.js:105
 msgid "Hide Text"
 msgstr "Kaŝi tekston"
 
-#: js/ui/shellMountOperation.js:304
+#: js/ui/shellEntry.js:212
+#, fuzzy, javascript-format
+msgid "Search %s and more…"
+msgstr "Serĉante…"
+
+#: js/ui/shellEntry.js:214
+msgid "Search the internet and more…"
+msgstr ""
+
+#: js/ui/shellEntry.js:216
+#, fuzzy
+msgid "Search…"
+msgstr "Serĉante…"
+
+#: js/ui/shellMountOperation.js:307
 msgid "Hidden Volume"
 msgstr "Kaŝita datumportilo"
 
-#: js/ui/shellMountOperation.js:307
+#: js/ui/shellMountOperation.js:310
 msgid "Windows System Volume"
 msgstr "Datumportilo sistema de Vindozo"
 
-#: js/ui/shellMountOperation.js:310
-#| msgid "Mouse Keys"
+#: js/ui/shellMountOperation.js:313
 msgid "Uses Keyfiles"
 msgstr "Uzas ŝlosildosierojn"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:316
+#: js/ui/shellMountOperation.js:319
 #, javascript-format
 msgid ""
 "To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead."
@@ -1624,107 +2237,148 @@ msgstr ""
 "Por malŝlosi datumportilon kiu uzas ŝlosildosierojn, anstataŭe uzu la <i>%s</"
 "i> programon."
 
-#: js/ui/shellMountOperation.js:323
+#: js/ui/shellMountOperation.js:326
 msgid "PIM Number"
 msgstr "PIM-numero"
 
-#: js/ui/shellMountOperation.js:341
+#: js/ui/shellMountOperation.js:344
 msgid "The PIM must be a number or empty."
 msgstr "La PIM devas esti aŭ numero aŭ malplena."
 
-#: js/ui/shellMountOperation.js:352
+#: js/ui/shellMountOperation.js:355
 msgid "Password"
 msgstr "Pasvorto"
 
-#: js/ui/shellMountOperation.js:382
+#: js/ui/shellMountOperation.js:394
 msgid "Remember Password"
 msgstr "Memorigi pasvorton"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:404
+#: js/ui/shellMountOperation.js:418
 #, javascript-format
 msgid "Open %s"
 msgstr "Malfermi aplikaĵon %s"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:476
+#: js/ui/shellMountOperation.js:492
 #, javascript-format
 msgid "Unable to start %s"
 msgstr "Ne povas ruli aplikaĵon %s"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:478
+#: js/ui/shellMountOperation.js:494
 #, javascript-format
 msgid "Couldn’t find the %s application"
 msgstr "Ne povis trovi aplikaĵon %s"
 
-#: js/ui/status/accessibility.js:36
+#: js/ui/status/accessibility.js:35
 msgid "Accessibility"
 msgstr "Atingeblo"
 
-#: js/ui/status/accessibility.js:51
+#: js/ui/status/accessibility.js:50
 msgid "Zoom"
 msgstr "Zomi"
 
-#: js/ui/status/accessibility.js:58
+#: js/ui/status/accessibility.js:57
 msgid "Screen Reader"
 msgstr "Ekrana legilo"
 
-#: js/ui/status/accessibility.js:62
+#: js/ui/status/accessibility.js:61
 msgid "Screen Keyboard"
 msgstr "Ekrana klavaro"
 
-#: js/ui/status/accessibility.js:66
+#: js/ui/status/accessibility.js:65
 msgid "Visual Alerts"
 msgstr "Vidaj avertoj"
 
-#: js/ui/status/accessibility.js:69
+#: js/ui/status/accessibility.js:68
 msgid "Sticky Keys"
 msgstr "Fiksaj klavoj"
 
-#: js/ui/status/accessibility.js:72
+#: js/ui/status/accessibility.js:71
 msgid "Slow Keys"
 msgstr "Malrapidaj klavoj"
 
-#: js/ui/status/accessibility.js:75
+#: js/ui/status/accessibility.js:74
 msgid "Bounce Keys"
 msgstr "Saltaj klavoj"
 
-#: js/ui/status/accessibility.js:78
+#: js/ui/status/accessibility.js:77
 msgid "Mouse Keys"
 msgstr "Musklavoj"
 
-#: js/ui/status/accessibility.js:136
+#: js/ui/status/accessibility.js:135
 msgid "High Contrast"
 msgstr "Alta kontrasto"
 
-#: js/ui/status/accessibility.js:178
+#: js/ui/status/accessibility.js:177
 msgid "Large Text"
 msgstr "Granda teksto"
+
+#: js/ui/status/automaticUpdates.js:78
+msgid "Updates Queue"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:98
+#, fuzzy
+msgid "Set a Schedule"
+msgstr "Nenio estas planita"
+
+#. The status label
+#: js/ui/status/automaticUpdates.js:189
+msgid "Automatic Updates"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:254
+msgid "Automatic updates on"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:255
+msgid ""
+"You have Unlimited Data so automatic updates have been turned on for this "
+"connection."
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:258
+msgid "Automatic updates are turned off to save your data"
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:259
+msgid ""
+"You will need to choose which Endless updates to apply when on this "
+"connection."
+msgstr ""
+
+#: js/ui/status/automaticUpdates.js:281
+#, fuzzy
+msgid "Change Settings…"
+msgstr "Sonagordoj"
 
 #: js/ui/status/bluetooth.js:39
 msgid "Bluetooth"
 msgstr "Bludento"
 
-#: js/ui/status/bluetooth.js:48 js/ui/status/network.js:591
+#: js/ui/status/bluetooth.js:48 js/ui/status/network.js:590
 msgid "Bluetooth Settings"
 msgstr "Bludento-agordoj"
 
 #. Translators: this is the number of connected bluetooth devices
-#: js/ui/status/bluetooth.js:128
+#: js/ui/status/bluetooth.js:131
 #, javascript-format
 msgid "%d Connected"
 msgid_plural "%d Connected"
 msgstr[0] "%d Konektita"
 msgstr[1] "%d Konektitaj"
 
-#: js/ui/status/bluetooth.js:130
-msgid "Off"
-msgstr "Malŝaltita"
+#: js/ui/status/bluetooth.js:133
+#, fuzzy
+msgid "Bluetooth Off"
+msgstr "Bludento"
 
-#: js/ui/status/bluetooth.js:132
-msgid "On"
-msgstr "Ŝaltita"
+#: js/ui/status/bluetooth.js:135
+#, fuzzy
+msgid "Bluetooth On"
+msgstr "Bludento"
 
 #: js/ui/status/brightness.js:38
 msgid "Brightness"
@@ -1751,19 +2405,20 @@ msgstr "Duaranga klako"
 msgid "Dwell Click"
 msgstr "Daŭra klako"
 
-#: js/ui/status/keyboard.js:814
+#: js/ui/status/keyboard.js:866
 msgid "Keyboard"
 msgstr "Klavaro"
 
-#: js/ui/status/keyboard.js:836
+#: js/ui/status/keyboard.js:890
 msgid "Show Keyboard Layout"
 msgstr "Montri klavararanĝon"
 
-#: js/ui/status/location.js:64 js/ui/status/location.js:172
+#: js/ui/status/location.js:64 js/ui/status/location.js:173
 msgid "Location Enabled"
 msgstr "Loko ŝaltita"
 
-#: js/ui/status/location.js:65 js/ui/status/location.js:173
+#: js/ui/status/location.js:65 js/ui/status/location.js:174
+#: js/ui/status/orientation.js:48 js/ui/status/orientation.js:80
 msgid "Disable"
 msgstr "Malŝalti"
 
@@ -1771,40 +2426,40 @@ msgstr "Malŝalti"
 msgid "Privacy Settings"
 msgstr "Privatecaj agordoj"
 
-#: js/ui/status/location.js:171
+#: js/ui/status/location.js:172
 msgid "Location In Use"
 msgstr "Loko uzata"
 
-#: js/ui/status/location.js:175
+#: js/ui/status/location.js:176
 msgid "Location Disabled"
 msgstr "Loko malŝaltita"
 
-#: js/ui/status/location.js:176
+#: js/ui/status/location.js:177 js/ui/status/orientation.js:83
 msgid "Enable"
 msgstr "Ŝalti"
 
 #. Translators: %s is an application name
-#: js/ui/status/location.js:355
+#: js/ui/status/location.js:356
 #, javascript-format
 msgid "Give %s access to your location?"
 msgstr "Ĉu permesi al %s aliri vian lokon?"
 
-#: js/ui/status/location.js:356
+#: js/ui/status/location.js:357
 msgid "Location access can be changed at any time from the privacy settings."
 msgstr "Loka aliro povas ŝanĝiĝi iam ajn en la privateco-agordoj."
 
-#: js/ui/status/network.js:67
+#: js/ui/status/network.js:66
 msgid "<unknown>"
 msgstr "<nekonata>"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:421 js/ui/status/network.js:1303
+#: js/ui/status/network.js:420 js/ui/status/network.js:1303
 #, javascript-format
 msgid "%s Off"
 msgstr "%s malŝaltita"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:424
+#: js/ui/status/network.js:423
 #, javascript-format
 msgid "%s Connected"
 msgstr "%s konektita"
@@ -1812,111 +2467,111 @@ msgstr "%s konektita"
 #. Translators: this is for network devices that are physically present but are not
 #. under NetworkManager's control (and thus cannot be used in the menu);
 #. %s is a network identifier
-#: js/ui/status/network.js:429
+#: js/ui/status/network.js:428
 #, javascript-format
 msgid "%s Unmanaged"
 msgstr "%s nemastrumita"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:432
+#: js/ui/status/network.js:431
 #, javascript-format
 msgid "%s Disconnecting"
 msgstr "%s malkonektante"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:439 js/ui/status/network.js:1295
+#: js/ui/status/network.js:438 js/ui/status/network.js:1295
 #, javascript-format
 msgid "%s Connecting"
 msgstr "%s konektante"
 
 #. Translators: this is for network connections that require some kind of key or password; %s is a network identifier
-#: js/ui/status/network.js:442
+#: js/ui/status/network.js:441
 #, javascript-format
 msgid "%s Requires Authentication"
 msgstr "%s postulas aŭtentigon"
 
 #. Translators: this is for devices that require some kind of firmware or kernel
 #. module, which is missing; %s is a network identifier
-#: js/ui/status/network.js:450
+#: js/ui/status/network.js:449
 #, javascript-format
 msgid "Firmware Missing For %s"
 msgstr "Mikroprogramo mankas por %s"
 
 #. Translators: this is for a network device that cannot be activated (for example it
 #. is disabled by rfkill, or it has no coverage; %s is a network identifier
-#: js/ui/status/network.js:454
+#: js/ui/status/network.js:453
 #, javascript-format
 msgid "%s Unavailable"
 msgstr "%s nedisponebla"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:457
+#: js/ui/status/network.js:456
 #, javascript-format
 msgid "%s Connection Failed"
 msgstr "%s konekto malsukcesis"
 
-#: js/ui/status/network.js:469
+#: js/ui/status/network.js:468
 msgid "Wired Settings"
 msgstr "Drataj agordoj"
 
-#: js/ui/status/network.js:512
+#: js/ui/status/network.js:511
 msgid "Mobile Broadband Settings"
 msgstr "Porteblaj larĝkapacitaj agordoj"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:559 js/ui/status/network.js:1300
+#: js/ui/status/network.js:558 js/ui/status/network.js:1300
 #, javascript-format
 msgid "%s Hardware Disabled"
 msgstr "%s aparataro malŝaltita"
 
 #. Translators: this is for a network device that cannot be activated
 #. because it's disabled by rfkill (airplane mode); %s is a network identifier
-#: js/ui/status/network.js:563
+#: js/ui/status/network.js:562
 #, javascript-format
 msgid "%s Disabled"
 msgstr "%s malŝaltita"
 
-#: js/ui/status/network.js:603
+#: js/ui/status/network.js:602
 msgid "Connect to Internet"
 msgstr "Konekti al interreto"
 
-#: js/ui/status/network.js:797
+#: js/ui/status/network.js:796
 msgid "Airplane Mode is On"
 msgstr "Aviadila reĝimo ŝaltita"
 
-#: js/ui/status/network.js:798
+#: js/ui/status/network.js:797
 msgid "Wi-Fi is disabled when airplane mode is on."
 msgstr "Vifio malebliĝas se aviadila reĝimo estas ŝaltita."
 
-#: js/ui/status/network.js:799
+#: js/ui/status/network.js:798
 msgid "Turn Off Airplane Mode"
 msgstr "Malŝalti aviadilan reĝimon"
 
-#: js/ui/status/network.js:808
+#: js/ui/status/network.js:807
 msgid "Wi-Fi is Off"
 msgstr "Vifio malŝaltita"
 
-#: js/ui/status/network.js:809
+#: js/ui/status/network.js:808
 msgid "Wi-Fi needs to be turned on in order to connect to a network."
 msgstr "Necesas ŝalti vifion por konekti al reto."
 
-#: js/ui/status/network.js:810
+#: js/ui/status/network.js:809
 msgid "Turn On Wi-Fi"
 msgstr "Ŝalti vifion"
 
-#: js/ui/status/network.js:835
+#: js/ui/status/network.js:834
 msgid "Wi-Fi Networks"
 msgstr "Vifiaj retoj"
 
-#: js/ui/status/network.js:837
+#: js/ui/status/network.js:836
 msgid "Select a network"
 msgstr "Elekti reton"
 
-#: js/ui/status/network.js:866
+#: js/ui/status/network.js:865
 msgid "No Networks"
 msgstr "Neniu reto"
 
-#: js/ui/status/network.js:887 js/ui/status/rfkill.js:105
+#: js/ui/status/network.js:886 js/ui/status/rfkill.js:105
 msgid "Use hardware switch to turn off"
 msgstr "Uzi aparataran ŝaltilon por malŝalti"
 
@@ -1998,21 +2653,38 @@ msgstr "Konekto malsukcesis"
 msgid "Activation of network connection failed"
 msgstr "Aktivigo de reto-konekto malsukcesis"
 
-#: js/ui/status/nightLight.js:61
+#: js/ui/status/nightLight.js:44
+msgid "Display Settings"
+msgstr "Ekran-agordoj"
+
+#: js/ui/status/nightLight.js:62
 msgid "Night Light Disabled"
 msgstr "Noktlumo malŝaltita"
 
-#: js/ui/status/nightLight.js:62
+#: js/ui/status/nightLight.js:63
 msgid "Night Light On"
 msgstr "Noktlumo ŝaltita"
 
-#: js/ui/status/nightLight.js:63
+#: js/ui/status/nightLight.js:65
 msgid "Resume"
 msgstr "Daŭrigi"
 
-#: js/ui/status/nightLight.js:64
+#: js/ui/status/nightLight.js:66
 msgid "Disable Until Tomorrow"
 msgstr "Malŝalti ĝis morgaŭ"
+
+#: js/ui/status/payg.js:30
+msgid "Enter unlock code…"
+msgstr ""
+
+#: js/ui/status/payg.js:90
+#, fuzzy
+msgid "Getting time…"
+msgstr "Restartante…"
+
+#: js/ui/status/payg.js:94
+msgid "Less than 1 minute"
+msgstr ""
 
 #: js/ui/status/power.js:46
 msgid "Power Settings"
@@ -2044,7 +2716,7 @@ msgstr "Restas %d:%02d (%d %%)"
 msgid "%d∶%02d Until Full (%d %%)"
 msgstr "%d:%02d ĝis plena (%d %%)"
 
-#: js/ui/status/power.js:135 js/ui/status/power.js:137
+#: js/ui/status/power.js:136 js/ui/status/power.js:138
 #, javascript-format
 msgid "%d %%"
 msgstr "%d %%"
@@ -2064,27 +2736,23 @@ msgstr "Malŝalti"
 msgid "Airplane Mode On"
 msgstr "Aviadila reĝimo ŝaltita"
 
-#: js/ui/status/system.js:201
+#: js/ui/status/system.js:277
 msgid "Switch User"
 msgstr "Ŝanĝi uzanton"
 
-#: js/ui/status/system.js:213
+#: js/ui/status/system.js:289 js/ui/status/system.js:313
 msgid "Log Out"
 msgstr "Adiaŭi"
 
-#: js/ui/status/system.js:225
+#: js/ui/status/system.js:301
 msgid "Account Settings"
 msgstr "Kontoagordoj"
 
-#: js/ui/status/system.js:254
-msgid "Orientation Lock"
-msgstr "Orientiĝa ŝloso"
-
-#: js/ui/status/system.js:280
+#: js/ui/status/system.js:329
 msgid "Suspend"
 msgstr "Dormeti"
 
-#: js/ui/status/system.js:290
+#: js/ui/status/system.js:338
 msgid "Power Off"
 msgstr "Malŝalti"
 
@@ -2122,11 +2790,11 @@ msgstr "Thunderbolt aŭtentiga eraro"
 msgid "Could not authorize the Thunderbolt device: %s"
 msgstr "Ne povis aŭtentigi la Thunderbolt aparaton: %s"
 
-#: js/ui/status/volume.js:128
+#: js/ui/status/volume.js:129
 msgid "Volume changed"
 msgstr "Laŭteco ŝanĝita"
 
-#: js/ui/status/volume.js:193
+#: js/ui/status/volume.js:200
 msgid "Volume"
 msgstr "Laŭteco"
 
@@ -2158,43 +2826,39 @@ msgstr "Nur ekstera"
 msgid "Built-in Only"
 msgstr "Nur integrita"
 
-#: js/ui/unlockDialog.js:50
+#: js/ui/unlockDialog.js:53
 msgid "Log in as another user"
 msgstr "Saluti kiel alia uzanto"
 
-#: js/ui/unlockDialog.js:67
+#: js/ui/unlockDialog.js:70
 msgid "Unlock Window"
 msgstr "Malŝlosi fenestron"
 
-#: js/ui/viewSelector.js:173
+#: js/ui/viewSelector.js:655
 msgid "Applications"
 msgstr "Aplikaĵoj"
-
-#: js/ui/viewSelector.js:177
-msgid "Search"
-msgstr "Serĉi"
 
 #: js/ui/windowAttentionHandler.js:20
 #, javascript-format
 msgid "“%s” is ready"
 msgstr "“%s” pretas"
 
-#: js/ui/windowManager.js:54
+#: js/ui/windowManager.js:62
 msgid "Do you want to keep these display settings?"
 msgstr "Ĉu vi volas konservi ĉi tiujn ekranajn agordojn?"
 
 #. Translators: this and the following message should be limited in length,
 #. to avoid ellipsizing the labels.
 #.
-#: js/ui/windowManager.js:66
+#: js/ui/windowManager.js:74
 msgid "Revert Settings"
 msgstr "Malfari ŝanĝojn"
 
-#: js/ui/windowManager.js:69
+#: js/ui/windowManager.js:77
 msgid "Keep Changes"
 msgstr "Konservi ŝanĝojn"
 
-#: js/ui/windowManager.js:87
+#: js/ui/windowManager.js:95
 #, javascript-format
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
@@ -2203,7 +2867,7 @@ msgstr[1] "Agordaj ŝanĝoj malfaritos post %d sekundoj"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
-#: js/ui/windowManager.js:683
+#: js/ui/windowManager.js:861
 #, javascript-format
 msgid "%d × %d"
 msgstr "%d × %d"
@@ -2303,6 +2967,7 @@ msgid "Description"
 msgstr "Priskribo"
 
 #: src/extensions-tool/command-create.c:217
+#, c-format
 msgid ""
 "UUID is a globally-unique identifier for your extension.\n"
 "This should be in the format of an email address (clicktofocus@janedoe."
@@ -2341,7 +3006,6 @@ msgstr "Krei novan etendaĵon"
 
 #: src/extensions-tool/command-create.c:275
 #: src/extensions-tool/command-list.c:158
-#| msgid "Unknown artist"
 msgid "Unknown arguments"
 msgstr "Nekonataj argumentoj"
 
@@ -2372,12 +3036,10 @@ msgid "More than one UUID given"
 msgstr "Ricevis pli ol unu UUID"
 
 #: src/extensions-tool/command-enable.c:57
-#| msgid "Extension"
 msgid "Enable an extension"
 msgstr "Ŝalti etendaĵon"
 
 #: src/extensions-tool/command-info.c:79
-#| msgid "No extensions installed"
 msgid "Show extensions info"
 msgstr "Montri informojn de etendaĵoj"
 
@@ -2390,12 +3052,10 @@ msgid "EXTENSION_BUNDLE"
 msgstr "ETENDAĴA_PAKAĴO"
 
 #: src/extensions-tool/command-install.c:184
-#| msgid "UUIDs of extensions to enable"
 msgid "Install an extension bundle"
 msgstr "Instali entendaĵan pakaĵon"
 
 #: src/extensions-tool/command-install.c:201
-#| msgid "No extensions installed"
 msgid "No extension bundle specified"
 msgstr "Neniu etendaĵa pakaĵo estas specifita"
 
@@ -2404,32 +3064,26 @@ msgid "More than one extension bundle specified"
 msgstr "Pli ol unu etendaĵa pakaĵo estas specifita"
 
 #: src/extensions-tool/command-list.c:118
-#| msgid "Shell Extensions"
 msgid "Show user-installed extensions"
 msgstr "Montri etendaĵojn de la uzanto"
 
 #: src/extensions-tool/command-list.c:121
-#| msgid "Shell Extensions"
 msgid "Show system-installed extensions"
 msgstr "Montri etendaĵojn de la sistemo"
 
 #: src/extensions-tool/command-list.c:124
-#| msgid "Shell Extensions"
 msgid "Show enabled extensions"
 msgstr "Montri ŝaltitajn etendaĵojn"
 
 #: src/extensions-tool/command-list.c:127
-#| msgid "Shell Extensions"
 msgid "Show disabled extensions"
 msgstr "Montri malŝaltitajn etendaĵojn"
 
 #: src/extensions-tool/command-list.c:130
-#| msgid "GNOME Shell Extension Preferences"
 msgid "Show extensions with preferences"
 msgstr "Montri etendaĵojn kun agordoj"
 
 #: src/extensions-tool/command-list.c:133
-#| msgid "Visit extension homepage"
 msgid "Print extension details"
 msgstr "Presi detalojn de etendaĵo"
 
@@ -2491,7 +3145,6 @@ msgid "More than one source directory specified"
 msgstr "Pli ol unu fontdosierujo specifita"
 
 #: src/extensions-tool/command-prefs.c:90
-#| msgid "GNOME Shell Extension Preferences"
 msgid "Opens extension preferences"
 msgstr "Malfermi agordojn de la etendaĵo"
 
@@ -2516,7 +3169,6 @@ msgid "Original author"
 msgstr "Origina aŭtoro"
 
 #: src/extensions-tool/main.c:184
-#| msgid "Session"
 msgid "Version"
 msgstr "Versio"
 
@@ -2529,7 +3181,7 @@ msgstr "Stato"
 msgid "“version” takes no arguments"
 msgstr "“versio” anticipas neniun argumenton"
 
-#: src/extensions-tool/main.c:223 src/extensions-tool/main.c:239
+#: src/extensions-tool/main.c:223 src/extensions-tool/main.c:243
 msgid "Usage:"
 msgstr "Uzo:"
 
@@ -2537,80 +3189,69 @@ msgstr "Uzo:"
 msgid "Print version information and exit."
 msgstr "Presi versian informon kaj ĉesi."
 
-#: src/extensions-tool/main.c:240
+#: src/extensions-tool/main.c:241 src/extensions-tool/main.c:244
 msgid "COMMAND"
 msgstr "KOMANDO"
 
-#: src/extensions-tool/main.c:240
+#: src/extensions-tool/main.c:244
 msgid "[ARGS…]"
 msgstr "[ARG-oj…]"
 
-#: src/extensions-tool/main.c:242
+#: src/extensions-tool/main.c:246
 msgid "Commands:"
 msgstr "Komandoj:"
 
-#: src/extensions-tool/main.c:243
-#| msgid "Print version"
+#: src/extensions-tool/main.c:247
 msgid "Print help"
 msgstr "Presi helpon"
 
-#: src/extensions-tool/main.c:244 src/main.c:460
+#: src/extensions-tool/main.c:248 src/main.c:460
 msgid "Print version"
 msgstr "Presi version"
 
-#: src/extensions-tool/main.c:245
-#| msgid "Extension"
+#: src/extensions-tool/main.c:249
 msgid "Enable extension"
 msgstr "Ŝalti etendaĵon"
 
-#: src/extensions-tool/main.c:246
-#| msgid "Extension"
+#: src/extensions-tool/main.c:250
 msgid "Disable extension"
 msgstr "Malŝalti etendaĵon"
 
-#: src/extensions-tool/main.c:247
-#| msgid "Extension"
+#: src/extensions-tool/main.c:251
 msgid "Reset extension"
 msgstr "Reagordi etendaĵon"
 
-#: src/extensions-tool/main.c:248
-#| msgid "Shell Extensions"
+#: src/extensions-tool/main.c:252
 msgid "Uninstall extension"
 msgstr "Malinstali etendaĵon"
 
-#: src/extensions-tool/main.c:249
-#| msgid "Visit extension homepage"
+#: src/extensions-tool/main.c:253
 msgid "List extensions"
 msgstr "Listigi etendaĵojn"
 
-#: src/extensions-tool/main.c:250 src/extensions-tool/main.c:251
-#| msgid "No extensions installed"
+#: src/extensions-tool/main.c:254 src/extensions-tool/main.c:255
 msgid "Show extension info"
 msgstr "Montri informojn de etendaĵo"
 
-#: src/extensions-tool/main.c:252
-#| msgid "GNOME Shell Extension Preferences"
+#: src/extensions-tool/main.c:256
 msgid "Open extension preferences"
 msgstr "Malfermi agordojn de etendaĵo"
 
-#: src/extensions-tool/main.c:253
-#| msgid "Extension"
+#: src/extensions-tool/main.c:257
 msgid "Create extension"
 msgstr "Krei etendaĵo"
 
-#: src/extensions-tool/main.c:254
-#| msgid "Extension"
+#: src/extensions-tool/main.c:258
 msgid "Package extension"
 msgstr "Pakaĵa etendaĵo"
 
-#: src/extensions-tool/main.c:255
-#| msgid "UUIDs of extensions to enable"
+#: src/extensions-tool/main.c:259
 msgid "Install extension bundle"
 msgstr "Instali entendaĵan pakaĵon"
 
-#: src/extensions-tool/main.c:257
-#, c-format
-msgid "Use %s to get detailed help.\n"
+#: src/extensions-tool/main.c:261
+#, fuzzy, c-format
+msgid "Use “%s” to get detailed help.\n"
 msgstr "Uzu %s por detala helpo.\n"
 
 #: src/main.c:466
@@ -2625,12 +3266,12 @@ msgstr "Uzi specifan reĝimon, ekz. “gdm” por la salut-ekrano"
 msgid "List possible modes"
 msgstr "Listigi eblajn reĝimojn"
 
-#: src/shell-app.c:264
+#: src/shell-app.c:265
 msgctxt "program"
 msgid "Unknown"
 msgstr "Nekonata"
 
-#: src/shell-app.c:515
+#: src/shell-app.c:555
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "Malsukcesis lanĉi “%s”"
@@ -2669,6 +3310,169 @@ msgstr[1] "%u enigoj"
 msgid "System Sounds"
 msgstr "Sistemsonoj"
 
+#: js/ui/appIconBar.js:211
+msgid "Other workspaces"
+msgstr ""
+
+#: js/ui/appIconBar.js:220
+#, fuzzy
+msgid "Current workspace"
+msgstr "Limigi ŝaltilon al aktuala laborspaco."
+
+#: js/ui/appIconBar.js:296
+msgid "Pin to Taskbar"
+msgstr ""
+
+#: js/ui/appIconBar.js:300
+msgid "Unpin from Taskbar"
+msgstr ""
+
+#: js/ui/appIconBar.js:316
+#, fuzzy, javascript-format
+msgid "Quit %s"
+msgstr "Ĉesi"
+
+#: js/ui/endlessButton.js:12
+msgid "Endless Button"
+msgstr ""
+
+#: js/ui/endlessButton.js:55
+#, fuzzy
+msgid "Show Desktop"
+msgstr "Montri detalojn"
+
+#: js/ui/endlessButton.js:60
+#, fuzzy
+msgid "Show Apps"
+msgstr "Montri aplikaĵojn"
+
+#: js/ui/forceAppExitDialog.js:48
+#, fuzzy
+msgid "Quit applications"
+msgstr "Aplikaĵoj"
+
+#: js/ui/forceAppExitDialog.js:54
+msgid ""
+"If an application doesn't respond for a while, select its name and click "
+"Quit Application."
+msgstr ""
+
+#: js/ui/forceAppExitDialog.js:85
+#, fuzzy
+msgid "System Monitor"
+msgstr "Sistemsonoj"
+
+#: js/ui/forceAppExitDialog.js:92
+#, fuzzy
+msgid "Quit Application"
+msgstr "Aplikaĵoj"
+
+#: js/ui/hotCorner.js:13
+msgid "Hot Corner"
+msgstr ""
+
+#: js/ui/hotCorner.js:26
+#, fuzzy
+msgid "Enable Hot Corner"
+msgstr "Ŝalti etendaĵon"
+
+#: js/ui/hotCorner.js:30
+#, fuzzy
+msgid "Disable Hot Corner"
+msgstr "Malŝalti ĝis morgaŭ"
+
+#: js/ui/iconGridLayout.js:296
+#, fuzzy, javascript-format
+msgid "%s has been removed"
+msgstr "%s estas forigita de via preferataj aplikaĵoj."
+
+#: js/ui/iconGridLayout.js:522
+#, fuzzy
+msgid "New Folder"
+msgstr "Sennoma dosierujo"
+
+#: js/ui/internetSearch.js:69
+#, fuzzy, javascript-format
+msgid "Open \"%s\" in browser"
+msgstr "Malfermaj fenestroj"
+
+#. Translators: the first %s is the search engine name, and the second
+#. * is the search string. For instance, 'Search Google for "hello"'.
+#.
+#: js/ui/internetSearch.js:78
+#, javascript-format
+msgid "Search %s for \"%s\""
+msgstr ""
+
+#: js/ui/internetSearch.js:80
+#, javascript-format
+msgid "Search the internet for \"%s\""
+msgstr ""
+
+#: js/ui/status/orientation.js:44
+msgid "Orientation Lock"
+msgstr "Orientiĝa ŝloso"
+
+#: js/ui/userMenu.js:16
+msgid "Social Accounts"
+msgstr ""
+
+#: js/ui/userMenu.js:19
+msgid "Settings"
+msgstr "Agordoj"
+
+#: js/ui/userMenu.js:24
+msgid "Give Us Feedback"
+msgstr ""
+
+#: js/ui/userMenu.js:27
+msgid "Help"
+msgstr ""
+
+#: src/shell-desktop-dir-info.c:485
+#, fuzzy
+msgid "Unnamed"
+msgstr "Sennoma dosierujo"
+
+#: src/shell-desktop-dir-info.c:745
+#, c-format
+msgid "Custom definition for %s"
+msgstr ""
+
+#~ msgid "Frequently used applications will appear here"
+#~ msgstr "Ofte uzataj aplikaĵoj aperos ĉi tie"
+
+# Oftaj aplikaĵoj  --Carmen
+#~ msgid "Frequent"
+#~ msgstr "Oftaj"
+
+#~ msgid "All"
+#~ msgstr "Ĉiuj"
+
+#~ msgid "Add to Favorites"
+#~ msgstr "Aldoni al preferataj"
+
+# Imperativo
+#~ msgid "Type to search…"
+#~ msgstr "Tajpu por serĉi…"
+
+#~ msgid "Top Bar"
+#~ msgstr "Supra breto"
+
+#~ msgid "%d more"
+#~ msgid_plural "%d more"
+#~ msgstr[0] "%d pli"
+#~ msgstr[1] "%d pli"
+
+#~ msgid "Off"
+#~ msgstr "Malŝaltita"
+
+#~ msgid "On"
+#~ msgstr "Ŝaltita"
+
+#~ msgid "Search"
+#~ msgstr "Serĉi"
+
 #~ msgid ""
 #~ "Keybinding that pauses and resumes all running tweens, for debugging "
 #~ "purposes"
@@ -2694,9 +3498,6 @@ msgstr "Sistemsonoj"
 #~ msgid "There was an error loading the preferences dialog for %s:"
 #~ msgstr "Eraro okazis dum ŝarĝado de la agorda dialogo de %s:"
 
-#~ msgid "%s all day."
-#~ msgstr "%s tuttage."
-
 #~ msgid "%s, then %s later."
 #~ msgstr "%s, tiam %s."
 
@@ -2705,9 +3506,6 @@ msgstr "Sistemsonoj"
 
 #~ msgid "Feels like %s."
 #~ msgstr "Sentas kiel %s."
-
-#~ msgid "Show the week date in the calendar"
-#~ msgstr "Montri la semajnajntagon en la kalendaro"
 
 #~ msgid "If true, display the ISO week date in the calendar."
 #~ msgstr "Montri la semajndaton laŭ ISO en la kalendaro."
@@ -2780,9 +3578,6 @@ msgstr "Sistemsonoj"
 #~ msgctxt "list saturday"
 #~ msgid "S"
 #~ msgstr "sa"
-
-#~ msgid "Nothing Scheduled"
-#~ msgstr "Nenio estas planita"
 
 #~ msgid "Today"
 #~ msgstr "Hodiaŭ"
@@ -2931,17 +3726,11 @@ msgstr "Sistemsonoj"
 #~ msgid "Open"
 #~ msgstr "Malfermi"
 
-#~ msgid "Remove"
-#~ msgstr "Forigi"
-
 #~ msgid "Clear Messages"
 #~ msgstr "Vakigi mesaĝojn"
 
 #~ msgid "Notification Settings"
 #~ msgstr "Sciigaj agordoj"
-
-#~ msgid "Tray Menu"
-#~ msgstr "Pleto-menuo"
 
 #~ msgid "No Messages"
 #~ msgstr "Neniuj mesaĝoj"
@@ -3038,9 +3827,6 @@ msgstr "Sistemsonoj"
 #~ msgid "Please enter the PIN mentioned on the device."
 #~ msgstr "Bonvole enigu la PIN-kodon montranta de la aparato."
 
-#~ msgid "OK"
-#~ msgstr "Akcepti"
-
 #~ msgid "unavailable"
 #~ msgstr "nedisponebla"
 
@@ -3076,9 +3862,6 @@ msgstr "Sistemsonoj"
 
 #~ msgid "File extension used for storing the screencast"
 #~ msgstr "La dosiersufikso uzata por konservi la ekranregistraĵon"
-
-#~ msgid "Power"
-#~ msgstr "kurento"
 
 #~ msgid "Restart"
 #~ msgstr "Restartigi"
