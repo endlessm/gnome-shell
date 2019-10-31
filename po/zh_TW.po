@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell 3.3.90\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-31 09:50+0000\n"
+"POT-Creation-Date: 2019-10-31 09:52+0000\n"
 "PO-Revision-Date: 2019-03-31 23:32+0800\n"
 "Last-Translator: Cheng-Chia Tseng <pswo10680@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) <zh-l10n@lists.linux.org.tw>\n"
@@ -206,15 +206,15 @@ msgstr "啟用允許審視 Shell 應用程式狀態的 D-Bus API。"
 
 #: data/org.gnome.shell.gschema.xml.in:133
 msgid "Whether the App Center is displayed"
-msgstr ""
+msgstr "是否要顯示應用程式中心"
 
 #: data/org.gnome.shell.gschema.xml.in:136
 msgid "Whether the application grid displays the App Center icon."
-msgstr ""
+msgstr "應用程式網格是否顯示應用程式中心的圖示。"
 
 #: data/org.gnome.shell.gschema.xml.in:142
 msgid "Whether the Tray Area will be enabled"
-msgstr ""
+msgstr "是否啟用通知區域"
 
 #: data/org.gnome.shell.gschema.xml.in:145
 msgid ""
@@ -222,23 +222,24 @@ msgid ""
 "for those applications still relying on the tray area will display their "
 "status icons (e.g. Steam, Dropbox, Skype...)."
 msgstr ""
+"這將啟用底部欄位的右側區域，應用程式的圖示仍需要該系統匣區域來顯示其狀態圖示"
+"（如 Steam、Dropbox、Skype...）"
 
 #: data/org.gnome.shell.gschema.xml.in:153
-#, fuzzy
 msgid "Enable Hack mode"
-msgstr "已啟用"
+msgstr "啟用 Hack 模式"
 
 #: data/org.gnome.shell.gschema.xml.in:154
 msgid "If true, enables the Hack experience"
-msgstr ""
+msgstr "如為真，啟用 Hack 體驗"
 
 #: data/org.gnome.shell.gschema.xml.in:158
 msgid "Pulse Hack desktop icon"
-msgstr ""
+msgstr "暫停 Hack 桌面圖示"
 
 #: data/org.gnome.shell.gschema.xml.in:159
 msgid "If true, the Hack desktop icon will pulse to attract the user."
-msgstr ""
+msgstr "如為真，Hack 桌面圖示將暫停來吸引用戶。"
 
 #: data/org.gnome.shell.gschema.xml.in:163
 #, fuzzy
@@ -251,17 +252,17 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:168
 msgid "Enables the hot corner for the window picker"
-msgstr ""
+msgstr "啟用視窗選擇器的熱角"
 
 #: data/org.gnome.shell.gschema.xml.in:171
 msgid ""
 "By default, the hot corner for the window picker is enabled. Set false to "
 "disable the hot corner."
-msgstr ""
+msgstr "依照預設值，視窗選擇器的熱角為啟用狀態。設置為假來停用熱角。"
 
 #: data/org.gnome.shell.gschema.xml.in:178
 msgid "Set the left/right position of the hot corner for the window picker"
-msgstr ""
+msgstr "為視窗選擇器設定熱角左／右位置"
 
 #: data/org.gnome.shell.gschema.xml.in:181
 msgid ""
@@ -269,20 +270,22 @@ msgid ""
 "the hot corner to a left corner. The position is not affected by the RTL vs. "
 "LTR text direction."
 msgstr ""
+"熱角預設位置在右邊角落。設置為假可將熱角移至左方。此位置不受 RTL 及 LTR 文字"
+"方向影響。"
 
 #: data/org.gnome.shell.gschema.xml.in:189
 msgid "Set the top/bottom position of the hot corner for the window picker"
-msgstr ""
+msgstr "為視窗選擇器設定熱角上／下位置"
 
 #: data/org.gnome.shell.gschema.xml.in:192
 msgid ""
 "Default position of the hot corner is in a bottom corner. Set false to move "
 "the hot corner to a top corner."
-msgstr ""
+msgstr "熱角的預設位置在下方角落。設置為假將熱角移至上方角落。"
 
 #: data/org.gnome.shell.gschema.xml.in:199
 msgid "Set the size of the hot corner target"
-msgstr ""
+msgstr "設定熱角標的的大小"
 
 #: data/org.gnome.shell.gschema.xml.in:202
 msgid ""
@@ -290,10 +293,12 @@ msgid ""
 "Default is for a single pixel in the very corner. For some virtual machines, "
 "this value may need to be set larger than the default."
 msgstr ""
+"熱角標的方格單唯尺寸內的像素數。預設為最角落的單一像素。對一些虛擬機器來說，"
+"此數值可能需要設定為比預設值還大。"
 
 #: data/org.gnome.shell.gschema.xml.in:212
 msgid "Prevent apps from being automatically maximized on launch"
-msgstr ""
+msgstr "防止應用程式在啟動時自動放到最大"
 
 #: data/org.gnome.shell.gschema.xml.in:215
 msgid ""
@@ -301,10 +306,12 @@ msgid ""
 "screens, prevents applications from being forced to open maximized, and does "
 "not automatically switch to the app selector when a window is minimized."
 msgstr ""
+"讓視窗管理更像標準 Gnome。隱藏應用程式啟用畫面、防止程式強制開啟至最大視窗、"
+"以及在視窗最小化時不會自動轉換至 app 選擇器。"
 
 #: data/org.gnome.shell.gschema.xml.in:224
 msgid "Whether password reset is allowed"
-msgstr ""
+msgstr "是否允許密碼重置"
 
 #: data/org.gnome.shell.gschema.xml.in:225
 msgid ""
@@ -314,12 +321,15 @@ msgid ""
 "button, respectively. Note that it only makes sense to set this key for the "
 "Debian-gdm user; changing it for your own user account will have no effect."
 msgstr ""
+"此鍵用以控制是否在登入畫面顯示「忘記密碼？」按鈕。'預設' 告訴 GNOME Shell 使"
+"用供應商的預設設定。'啟用' 和 '停用' 分別用於指定啟用或停用重置按鈕。請注意，"
+"設定此鍵僅對 Debian-gdm 使用者有意義；在您自己的使用者帳號進行變更將沒有效"
+"果。"
 
 #: data/org.gnome.shell.gschema.xml.in:236
-#, fuzzy
 msgid ""
 "List of desktop file IDs for applications pinned to taskbar (DEPRECATED)"
-msgstr "喜好的應用程式桌面檔案 ID 清單"
+msgstr "鎖定至任務欄的應用程式之桌面檔案 IDs 列表（廢棄）"
 
 #: data/org.gnome.shell.gschema.xml.in:237
 msgid ""
@@ -328,20 +338,22 @@ msgid ""
 "value in here will be automatically copied over to the favorite-apps key by "
 "the shell on start, and then cleared from here."
 msgstr ""
+"對應這些身份標示的應用程式會顯現於無盡桌面底部的任務欄。此功能現在廢棄：此處"
+"任一數值將會於啟用時自動複製至最愛 apps 金鑰，且由此處刪除。"
 
 #: data/org.gnome.shell.gschema.xml.in:246
 msgid "Layout of application launcher icons in the grid"
-msgstr ""
+msgstr "座標方格上的應用程式啟動器佈局"
 
 #: data/org.gnome.shell.gschema.xml.in:247
 msgid ""
 "This key specifies the exact order of the icons shown in the applications "
 "launcher view."
-msgstr ""
+msgstr "此金鑰詳列各圖示在應用程式啟動器畫面中的個別順序。"
 
 #: data/org.gnome.shell.gschema.xml.in:253
 msgid "Languages for which the discovery feed feature is enabled."
-msgstr ""
+msgstr "啟用探索摘要功能所需的語言。"
 
 #: data/org.gnome.shell.gschema.xml.in:256
 msgid ""
@@ -349,48 +361,50 @@ msgid ""
 "will be enabled. You will need to restart the shell for changes to this "
 "setting to take effect."
 msgstr ""
+"如果系統語言與此任一語言相符，探索摘要將被啟用。你必須重啟 shell 才能套用在此"
+"設定上的變更。"
 
 #: data/org.gnome.shell.gschema.xml.in:262
 msgid "Whether or not to enable the wobbly effect"
-msgstr ""
+msgstr "是否啟用搖擺效果"
 
 #: data/org.gnome.shell.gschema.xml.in:265
 msgid "WOBBLY!"
-msgstr ""
+msgstr "搖擺！"
 
 #: data/org.gnome.shell.gschema.xml.in:272
 msgid "Wobbly effect Spring Constant"
-msgstr ""
+msgstr "搖擺效果彈性常數"
 
 #: data/org.gnome.shell.gschema.xml.in:275
 msgid "Springiness of wobbly effect"
-msgstr ""
+msgstr "搖擺效果的彈性"
 
 #: data/org.gnome.shell.gschema.xml.in:282
 msgid "Wobbly effect Friction"
-msgstr ""
+msgstr "搖擺效果摩擦力"
 
 #: data/org.gnome.shell.gschema.xml.in:285
 msgid "Friction of wobbly effect"
-msgstr ""
+msgstr "搖擺效果的摩擦力"
 
 #: data/org.gnome.shell.gschema.xml.in:292
 msgid "Wobbly effect slowdown factor"
-msgstr ""
+msgstr "搖擺效果減慢係數"
 
 #: data/org.gnome.shell.gschema.xml.in:295
 msgid "Slowdown factor of wobbly effect (1.0 being normal speed)"
-msgstr ""
+msgstr "搖擺效果的減慢係數（1.0 為正常速率）"
 
 #: data/org.gnome.shell.gschema.xml.in:302
 msgid "Wobbly effect object movement range"
-msgstr ""
+msgstr "搖擺效果物件動態範圍"
 
 #: data/org.gnome.shell.gschema.xml.in:305
 msgid ""
 "How much objects are allowed to move in the mesh. A higher range allows for "
 "a more pronounced effect."
-msgstr ""
+msgstr "被允許在 mesh 中移動的物件數量。設定在較高的範圍可有較顯著之效果。"
 
 #: data/org.gnome.shell.gschema.xml.in:317
 msgid "Keybinding to open the application menu"
@@ -470,108 +484,107 @@ msgid "Switch to application 9"
 msgstr "切換至應用程式 9"
 
 #: data/org.gnome.shell.gschema.xml.in:392
-#, fuzzy
 msgid "Keybinding that shows the force app exit dialog"
-msgstr "開啟應用程式選單的組合鍵"
+msgstr "顯示強制退出應用程式對話框的按鍵繫結"
 
 #: data/org.gnome.shell.gschema.xml.in:397
-#, fuzzy
 msgid "Keybinding to activate the first app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第一個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:398
 msgid ""
 "Keybinding to open the first app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第一個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:404
-#, fuzzy
 msgid "Keybinding to activate the second app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第二個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:405
 msgid ""
 "Keybinding to open the second app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第二個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:411
-#, fuzzy
 msgid "Keybinding to activate the third app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第三個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:412
 msgid ""
 "Keybinding to open the third app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第三個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:418
-#, fuzzy
 msgid "Keybinding to activate the fourth app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第四個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:419
 msgid ""
 "Keybinding to open the fourth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第四個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:425
-#, fuzzy
 msgid "Keybinding to activate the fifth app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第五個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:426
 msgid ""
 "Keybinding to open the fifth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第五個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:432
-#, fuzzy
 msgid "Keybinding to activate the sixth app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第六個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:433
 msgid ""
 "Keybinding to open the sixth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第六個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:439
-#, fuzzy
 msgid "Keybinding to activate the seventh app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第七個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:440
 msgid ""
 "Keybinding to open the seventh app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第七個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:446
-#, fuzzy
 msgid "Keybinding to activate the eighth app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中第八個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:447
 msgid ""
 "Keybinding to open the eighth app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中第八個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:453
-#, fuzzy
 msgid "Keybinding to activate the last app in the icon bar."
-msgstr "開啟應用程式選單的組合鍵。"
+msgstr "用來啟動圖示列中最後一個應用程式的按鍵繫結。"
 
 #: data/org.gnome.shell.gschema.xml.in:454
 msgid ""
 "Keybinding to open the last app in the icon bar, or switch to the app if "
 "already open."
 msgstr ""
+"用來打開圖示列中最後一個應用程式的按鍵繫結，如已打開的話則切換至應用程式。"
 
 #: data/org.gnome.shell.gschema.xml.in:465
 #: data/org.gnome.shell.gschema.xml.in:492
@@ -664,53 +677,53 @@ msgstr "在滑鼠模式中延遲焦點變更直到指標停止移動"
 
 #: data/org.gnome.shell.gschema.xml.in:581
 msgid "Watermark file"
-msgstr ""
+msgstr "浮水印檔案"
 
 #: data/org.gnome.shell.gschema.xml.in:582
 msgid "The full watermark file path"
-msgstr ""
+msgstr "浮水印檔案的完整路徑"
 
 #: data/org.gnome.shell.gschema.xml.in:586
 msgid "Watermark position"
-msgstr ""
+msgstr "浮水印位置"
 
 #: data/org.gnome.shell.gschema.xml.in:587
 msgid ""
 "The position of the watermark; valid values are 'center', 'bottom-left', "
 "'bottom-center' and 'bottom-right'"
-msgstr ""
+msgstr "浮水印的位置；有效值為 '正中'、'左下'、'底部中間' 和 '右下'"
 
 #: data/org.gnome.shell.gschema.xml.in:595
 msgid "Watermark size"
-msgstr ""
+msgstr "浮水印尺寸"
 
 #: data/org.gnome.shell.gschema.xml.in:596
 msgid "The watermark size in percent relative to the screen width"
-msgstr ""
+msgstr "浮水印大小占螢幕寬度百分比"
 
 #: data/org.gnome.shell.gschema.xml.in:601
 msgid "Watermark border"
-msgstr ""
+msgstr "浮水印邊界"
 
 #: data/org.gnome.shell.gschema.xml.in:602
 msgid "The watermark around the logo"
-msgstr ""
+msgstr "商標周邊的浮水印"
 
 #: data/org.gnome.shell.gschema.xml.in:607
 msgid "Watermark opacity"
-msgstr ""
+msgstr "浮水印的不透明度"
 
 #: data/org.gnome.shell.gschema.xml.in:608
 msgid "The watermark of the logo"
-msgstr ""
+msgstr "商標的浮水印"
 
 #: data/org.gnome.shell.gschema.xml.in:612
 msgid "Watermark always visible"
-msgstr ""
+msgstr "浮水印總是可見"
 
 #: data/org.gnome.shell.gschema.xml.in:613
 msgid "Show the watermark even on a non default background"
-msgstr ""
+msgstr "即使在非預設背景上也顯示浮水印"
 
 #: data/org.gnome.Shell.PortalHelper.desktop.in.in:3
 msgid "Network Login"
@@ -769,11 +782,11 @@ msgstr ""
 
 #: js/gdm/authPrompt.js:124
 msgid "Show password hint"
-msgstr ""
+msgstr "顯示密碼提示"
 
 #: js/gdm/authPrompt.js:140
 msgid "Forgot password?"
-msgstr ""
+msgstr "忘記帳號密碼"
 
 #: js/gdm/authPrompt.js:189 js/ui/audioDeviceSelection.js:53
 #: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:150
@@ -804,7 +817,7 @@ msgstr "登入"
 #. Translators: During a password reset, prompt for the "secret code" provided by customer support.
 #: js/gdm/authPrompt.js:636
 msgid "Enter unlock code provided by customer support:"
-msgstr ""
+msgstr "輸入客戶支援提供的授權代碼："
 
 #. Translators: Password reset. The first %s is a verification code and the second is an email.
 #: js/gdm/authPrompt.js:639
@@ -813,17 +826,17 @@ msgid ""
 "Please inform customer support of your verification code %s by emailing %s. "
 "The code will remain valid until you click Cancel or turn off your computer."
 msgstr ""
+"請將你的認證碼 %s 經由傳送電子郵件至 %s 來通知客戶服務人員。直到你點擊取消或"
+"關閉你的電腦之前此認證碼皆會保持有效。"
 
 #. Translators: Button on login dialog, after clicking Forgot Password?
 #: js/gdm/authPrompt.js:644
-#, fuzzy
 msgid "Reset Password"
-msgstr "記住密碼"
+msgstr "重設密碼"
 
 #: js/gdm/authPrompt.js:717
-#, fuzzy
 msgid "Your unlock code was incorrect. Please try again."
-msgstr "抱歉，那沒有作用。請再試一次。"
+msgstr "您的解鎖碼不正確。請再試一次。"
 
 #: js/gdm/loginDialog.js:299
 msgid "Choose Session"
@@ -1070,7 +1083,7 @@ msgstr "%Y年%b%-d日%p %l∶%M"
 #.
 #: js/misc/util.js:532
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #. TRANSLATORS: this is the title of the wifi captive portal login window
 #: js/portalHelper/main.js:40
@@ -1102,9 +1115,8 @@ msgstr "使用者名稱："
 
 #. Add the "Remove from desktop" menu item at the end.
 #: js/ui/appDisplay.js:1928 js/ui/appDisplay.js:2557
-#, fuzzy
 msgid "Remove from desktop"
-msgstr "自喜好中移除"
+msgstr "從桌面移除"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2503 js/ui/panel.js:79
@@ -1150,11 +1162,11 @@ msgstr "改變背景…"
 
 #: js/ui/backgroundMenu.js:18
 msgid "Add App"
-msgstr ""
+msgstr "新增應用程式"
 
 #: js/ui/backgroundMenu.js:24
 msgid "Add Website"
-msgstr ""
+msgstr "新增網站"
 
 #. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0" (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
 #: js/ui/calendar.js:41
@@ -1341,19 +1353,19 @@ msgstr "連線"
 
 #: js/ui/components/networkAgent.js:171
 msgid "Limited Data"
-msgstr ""
+msgstr "有限數據"
 
 #: js/ui/components/networkAgent.js:181
 msgid "Unlimited Data"
-msgstr ""
+msgstr "無限制數據"
 
 #: js/ui/components/networkAgent.js:193 js/ui/components/networkAgent.js:228
 msgid "Enable if your connection has limits on how much you can download."
-msgstr ""
+msgstr "如果你的連線設有下載限制，請啟用此項。"
 
 #: js/ui/components/networkAgent.js:230
 msgid "This connection doesn't have limits on how much you can download."
-msgstr ""
+msgstr "此連線不設下載限制。"
 
 #. Cisco LEAP
 #: js/ui/components/networkAgent.js:397 js/ui/components/networkAgent.js:409
@@ -1382,7 +1394,7 @@ msgstr "服務："
 #: js/ui/components/networkAgent.js:497
 #, javascript-format
 msgid "Enter the Wi-Fi password for “%s”"
-msgstr ""
+msgstr "輸入 “%s” 的 Wi-Fi 密碼"
 
 #: js/ui/components/networkAgent.js:502 js/ui/components/networkAgent.js:885
 msgid "Wired 802.1X authentication"
@@ -1825,7 +1837,7 @@ msgstr "復原"
 
 #: js/ui/overview.js:115
 msgid "No apps are open"
-msgstr ""
+msgstr "沒有打開任何應用程式"
 
 #. Translators: This is the main view to select
 #. activities. See also note for "Activities" string.
@@ -1897,32 +1909,30 @@ msgid "System"
 msgstr "系統"
 
 #: js/ui/panel.js:795
-#, fuzzy
 msgctxt "User menu"
 msgid "User Menu"
-msgstr "系統匣選單"
+msgstr "用戶選單"
 
 #: js/ui/panel.js:827
-#, fuzzy
 msgctxt "Power menu"
 msgid "Power"
-msgstr "關閉電源"
+msgstr "電源"
 
 #: js/ui/panel.js:905
 msgid "Bottom Bar"
-msgstr ""
+msgstr "底條"
 
 #: js/ui/paygUnlockDialog.js:83
 msgid "Your Pay As You Go usage credit has expired."
-msgstr ""
+msgstr "您的預付信用已經失效。"
 
 #: js/ui/paygUnlockDialog.js:102
 msgid "Enter a new code to unlock your computer:"
-msgstr ""
+msgstr "輸入新代碼以解除電腦鎖定："
 
 #: js/ui/paygUnlockDialog.js:122
 msgid "Don’t have an unlock code? That’s OK!"
-msgstr ""
+msgstr "沒有解鎖代碼？沒關係！"
 
 #. The second possible override is to use the template text below
 #. with the contact's name and phone number, if BOTH are present.
@@ -1931,141 +1941,136 @@ msgstr ""
 msgid ""
 "Talk to your sales representative to purchase a new code. Call or text %s at "
 "%s"
-msgstr ""
+msgstr "與銷售代表聯絡以購買新代碼。給 %s 致電或發送簡訊，電話號碼為 %s"
 
 #. No overrides present, default to fallback text.
 #: js/ui/paygUnlockDialog.js:145
 msgid "Talk to your sales representative to purchase a new code."
-msgstr ""
+msgstr "與銷售代表聯絡以購買新代碼。"
 
 #: js/ui/paygUnlockDialog.js:156
-#, fuzzy
 msgid "Unlock Machine"
-msgstr "解鎖視窗"
+msgstr "解除機器鎖定"
 
 #: js/ui/paygUnlockDialog.js:321
 msgid "Success!"
-msgstr ""
+msgstr "成功！"
 
 #: js/ui/paygUnlockDialog.js:347
 msgid "Remaining time cleared!"
-msgstr ""
+msgstr "剩餘時間已清除！"
 
 #: js/ui/paygUnlockDialog.js:348
-#, fuzzy
 msgid "OK!"
-msgstr "確定"
+msgstr "OK!"
 
 #: js/ui/payg.js:37
 msgid "Pay As You Go"
-msgstr ""
+msgstr "預付"
 
 #: js/ui/payg.js:38
 msgid "Enter an unlock code to extend the time before your credit has expired."
-msgstr ""
+msgstr "在信用過期前輸入解鎖代碼延長時間。"
 
 #: js/ui/payg.js:39
 #, javascript-format
 msgid "Subscription runs out in %s."
-msgstr ""
+msgstr "訂閱將於 %s 後到期。"
 
 #: js/ui/payg.js:226
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
-msgstr[0] ""
+msgstr[0] "已嘗試太多次，請在 %s 分鐘後重試。"
 
 #: js/ui/payg.js:230
 msgid "Too many attempts. Try again in a few seconds."
-msgstr ""
+msgstr "已嘗試太多次，請在幾秒鐘後再試。"
 
 #: js/ui/payg.js:252
-#, fuzzy
 msgid "Invalid code. Please try again."
-msgstr "抱歉，那沒有作用。請再試一次。"
+msgstr "代碼無效，請再試一次。"
 
 #: js/ui/payg.js:254
 msgid "Code already used. Please enter a new code."
-msgstr ""
+msgstr "代碼已被使用，請輸入新的代碼。"
 
 #: js/ui/payg.js:256
 msgid "Time exceeded while verifying the code"
-msgstr ""
+msgstr "驗證代碼逾時"
 
 #. We don't consider any other error here (and we don't consider DISABLED explicitly,
 #. since that should not happen), but still we need to show something to the user.
 #: js/ui/payg.js:260
-#, fuzzy
 msgid "Unknown error"
-msgstr "不明"
+msgstr "未知錯誤"
 
 #: js/ui/payg.js:427
 msgid "Apply Code"
-msgstr ""
+msgstr "使用代碼"
 
 #: js/ui/payg.js:574
 #, javascript-format
 msgid "%s second"
 msgid_plural "%s seconds"
-msgstr[0] ""
+msgstr[0] "%s 秒"
 
 #: js/ui/payg.js:578 js/ui/payg.js:588
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s minute"
 msgid_plural "%s minutes"
-msgstr[0] "%d 分鐘前"
+msgstr[0] "%s 分鐘"
 
 #: js/ui/payg.js:582 js/ui/payg.js:599
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s hour"
 msgid_plural "%s hours"
-msgstr[0] "%d 小時前"
+msgstr[0] "%s 小時"
 
 #: js/ui/payg.js:593
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s day"
 msgid_plural "%s days"
-msgstr[0] "全天%s。"
+msgstr[0] "%s 天"
 
 #: js/ui/payg.js:609
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s second has been added to your Pay As You Go credit."
 msgid_plural "%s seconds have been added to your Pay As You Go credit."
-msgstr[0] "%s 已加入您的喜好中。"
+msgstr[0] "您的預付信用已經新增 %s 秒。"
 
 #: js/ui/payg.js:616
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s minute has been added to your Pay As You Go credit."
 msgid_plural "%s minutes have been added to your Pay As You Go credit."
-msgstr[0] "%s 已加入您的喜好中。"
+msgstr[0] "您的預付信用已經新增 %s 分鐘。"
 
 #: js/ui/payg.js:623
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s hour has been added to your Pay As You Go credit."
 msgid_plural "%s hours have been added to your Pay As You Go credit."
-msgstr[0] "%s 已加入您的喜好中。"
+msgstr[0] "您的預付信用已經新增 %s 小時。"
 
 #: js/ui/payg.js:630
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s day has been added to your Pay As You Go credit."
 msgid_plural "%s days have been added to your Pay As You Go credit."
-msgstr[0] "%s 已加入您的喜好中。"
+msgstr[0] "您的預付信用已經新增 %s 天。"
 
 #: js/ui/payg.js:637
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s month has been added to your Pay As You Go credit."
 msgid_plural "%s months have been added to your Pay As You Go credit."
-msgstr[0] "%s 已加入您的喜好中。"
+msgstr[0] "您的預付信用已經新增 %s 個月。"
 
 #: js/ui/payg.js:644
-#, fuzzy
 msgid "1 year has been added to your Pay As You Go credit."
-msgstr "%s 已加入您的喜好中。"
+msgstr "您的預付信用已經新增 1 年。"
 
 #. Unlock permanently message
 #: js/ui/payg.js:647
 msgid "You have successfully unlocked your Endless Machine"
-msgstr ""
+msgstr "您已成功解鎖 Endless Machine"
 
 #: js/ui/runDialog.js:58
 msgid "Enter a Command"
@@ -2150,18 +2155,17 @@ msgid "Hide Text"
 msgstr "隱藏文字"
 
 #: js/ui/shellEntry.js:212
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "Search %s and more…"
-msgstr "搜尋…"
+msgstr "搜尋 %s 以及更多…"
 
 #: js/ui/shellEntry.js:214
 msgid "Search the internet and more…"
-msgstr ""
+msgstr "搜尋網際網路，以及更多…"
 
 #: js/ui/shellEntry.js:216
-#, fuzzy
 msgid "Search…"
-msgstr "搜尋…"
+msgstr "搜尋……"
 
 #: js/ui/shellMountOperation.js:307
 #, fuzzy
@@ -2264,42 +2268,40 @@ msgstr "大型文字"
 
 #: js/ui/status/automaticUpdates.js:78
 msgid "Updates Queue"
-msgstr ""
+msgstr "更新隊列"
 
 #: js/ui/status/automaticUpdates.js:98
-#, fuzzy
 msgid "Set a Schedule"
-msgstr "沒有預訂行程"
+msgstr "設定時間表"
 
 #. The status label
 #: js/ui/status/automaticUpdates.js:189
 msgid "Automatic Updates"
-msgstr ""
+msgstr "自動更新"
 
 #: js/ui/status/automaticUpdates.js:254
 msgid "Automatic updates on"
-msgstr ""
+msgstr "自動更新已開啟"
 
 #: js/ui/status/automaticUpdates.js:255
 msgid ""
 "You have Unlimited Data so automatic updates have been turned on for this "
 "connection."
-msgstr ""
+msgstr "你可以使用無限數據，因此已開啟自動更新功能。"
 
 #: js/ui/status/automaticUpdates.js:258
 msgid "Automatic updates are turned off to save your data"
-msgstr ""
+msgstr "已關閉自動更新功能以節省你的數據用量"
 
 #: js/ui/status/automaticUpdates.js:259
 msgid ""
 "You will need to choose which Endless updates to apply when on this "
 "connection."
-msgstr ""
+msgstr "你需要選擇在此連線上執行哪些 Endless 更新。"
 
 #: js/ui/status/automaticUpdates.js:281
-#, fuzzy
 msgid "Change Settings…"
-msgstr "音效設定值"
+msgstr "變更設定……"
 
 #: js/ui/status/bluetooth.js:39
 msgid "Bluetooth"
@@ -2317,14 +2319,12 @@ msgid_plural "%d Connected"
 msgstr[0] "%d 已連線"
 
 #: js/ui/status/bluetooth.js:133
-#, fuzzy
 msgid "Bluetooth Off"
-msgstr "藍牙"
+msgstr "藍牙已關閉"
 
 #: js/ui/status/bluetooth.js:135
-#, fuzzy
 msgid "Bluetooth On"
-msgstr "藍牙"
+msgstr "藍牙已開啟"
 
 #: js/ui/status/brightness.js:38
 msgid "Brightness"
@@ -2617,16 +2617,15 @@ msgstr "停用直到明天"
 
 #: js/ui/status/payg.js:30
 msgid "Enter unlock code…"
-msgstr ""
+msgstr "輸入解鎖代碼..."
 
 #: js/ui/status/payg.js:90
-#, fuzzy
 msgid "Getting time…"
-msgstr "重新啟動…"
+msgstr "正在取得時間..."
 
 #: js/ui/status/payg.js:94
 msgid "Less than 1 minute"
-msgstr ""
+msgstr "少於 1 分鐘"
 
 #: js/ui/status/power.js:46
 msgid "Power Settings"
@@ -3271,88 +3270,81 @@ msgstr "系統音效"
 
 #: js/ui/appIconBar.js:211
 msgid "Other workspaces"
-msgstr ""
+msgstr "其他的工作空間"
 
 #: js/ui/appIconBar.js:220
-#, fuzzy
 msgid "Current workspace"
-msgstr "限制切換器使用目前的工作區。"
+msgstr "目前的工作空間"
 
 #: js/ui/appIconBar.js:296
 msgid "Pin to Taskbar"
-msgstr ""
+msgstr "釘選至工作列"
 
 #: js/ui/appIconBar.js:300
 msgid "Unpin from Taskbar"
-msgstr ""
+msgstr "從工作列取消釘選"
 
 #: js/ui/appIconBar.js:316
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "Quit %s"
-msgstr "結束"
+msgstr "退出 %s"
 
 #: js/ui/endlessButton.js:12
 msgid "Endless Button"
-msgstr ""
+msgstr "Endless 按鈕"
 
 #: js/ui/endlessButton.js:55
-#, fuzzy
 msgid "Show Desktop"
-msgstr "顯示詳細資訊"
+msgstr "顯示桌面"
 
 #: js/ui/endlessButton.js:60
-#, fuzzy
 msgid "Show Apps"
 msgstr "顯示應用程式"
 
 #: js/ui/forceAppExitDialog.js:48
-#, fuzzy
 msgid "Quit applications"
-msgstr "應用程式"
+msgstr "退出應用程式"
 
 #: js/ui/forceAppExitDialog.js:54
 msgid ""
 "If an application doesn't respond for a while, select its name and click "
 "Quit Application."
 msgstr ""
+"如果應用程式已有一段時間沒有回應，選取此應用程式的名稱並點擊離開應用程式。"
 
 #: js/ui/forceAppExitDialog.js:85
-#, fuzzy
 msgid "System Monitor"
-msgstr "系統音效"
+msgstr "系統監控"
 
 #: js/ui/forceAppExitDialog.js:92
-#, fuzzy
 msgid "Quit Application"
-msgstr "應用程式"
+msgstr "結束應用程式"
 
 #: js/ui/hotCorner.js:13
-#, fuzzy
 msgid "Hot Corner"
-msgstr "未連線"
+msgstr "熱角"
 
 #: js/ui/hotCorner.js:26
 msgid "Enable Hot Corner"
-msgstr ""
+msgstr "啟用熱角"
 
 #: js/ui/hotCorner.js:30
-#, fuzzy
 msgid "Disable Hot Corner"
-msgstr "停用直到明天"
+msgstr "禁用 Hot Corner"
 
 #: js/ui/iconGridLayout.js:296
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "%s has been removed"
-msgstr "%s 已經從您的喜好中移除。"
+msgstr "已移除 %s"
 
 #: js/ui/iconGridLayout.js:522
 msgid "New Folder"
-msgstr ""
+msgstr "新資料夾"
 
 #: js/ui/internetSearch.js:69
 #, javascript-format
 msgid "Open \"%s\" in browser"
-msgstr ""
+msgstr "在瀏覽器中開啟「%s」"
 
 #. Translators: the first %s is the search engine name, and the second
 #. * is the search string. For instance, 'Search Google for "hello"'.
@@ -3360,12 +3352,12 @@ msgstr ""
 #: js/ui/internetSearch.js:78
 #, javascript-format
 msgid "Search %s for \"%s\""
-msgstr ""
+msgstr "用 %s 搜索「%s」"
 
 #: js/ui/internetSearch.js:80
 #, javascript-format
 msgid "Search the internet for \"%s\""
-msgstr ""
+msgstr "在網際網路上搜索「%s」"
 
 #: js/ui/status/orientation.js:44
 msgid "Orientation Lock"
@@ -3373,7 +3365,7 @@ msgstr "方向鎖"
 
 #: js/ui/userMenu.js:16
 msgid "Social Accounts"
-msgstr ""
+msgstr "社群帳戶"
 
 #: js/ui/userMenu.js:19
 msgid "Settings"
@@ -3385,16 +3377,16 @@ msgstr ""
 
 #: js/ui/userMenu.js:27
 msgid "Help"
-msgstr ""
+msgstr "說明"
 
 #: src/shell-desktop-dir-info.c:485
 msgid "Unnamed"
-msgstr ""
+msgstr "未命名"
 
 #: src/shell-desktop-dir-info.c:745
 #, c-format
 msgid "Custom definition for %s"
-msgstr ""
+msgstr "針對 %s 的自行定義"
 
 #~ msgid ""
 #~ "Keybinding that pauses and resumes all running tweens, for debugging "

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-31 09:50+0000\n"
+"POT-Creation-Date: 2019-10-31 09:52+0000\n"
 "PO-Revision-Date: 2019-02-16 15:54+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
@@ -988,12 +988,14 @@ msgstr "Жаңа ғана"
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d минут бұрын"
+msgstr[1] "%d минут бұрын"
 
 #: js/misc/util.js:245
 #, javascript-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "%d сағат бұрын"
+msgstr[1] "%d сағат бұрын"
 
 #: js/misc/util.js:248
 msgid "Yesterday"
@@ -1004,24 +1006,28 @@ msgstr "Кеше"
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "%d күн бұрын"
+msgstr[1] "%d күн бұрын"
 
 #: js/misc/util.js:253
 #, javascript-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "%d апта бұрын"
+msgstr[1] "%d апта бұрын"
 
 #: js/misc/util.js:256
 #, javascript-format
 msgid "%d month ago"
 msgid_plural "%d months ago"
 msgstr[0] "%d ай бұрын"
+msgstr[1] "%d ай бұрын"
 
 #: js/misc/util.js:258
 #, javascript-format
 msgid "%d year ago"
 msgid_plural "%d years ago"
 msgstr[0] "%d жыл бұрын"
+msgstr[1] "%d жыл бұрын"
 
 #. Translators: Time in 24h format
 #: js/misc/util.js:288
@@ -1574,12 +1580,14 @@ msgstr "Шығу"
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s жүйеден автоматты түрде %d секундтан кейін шығады."
+msgstr[1] "%s жүйеден автоматты түрде %d секундтан кейін шығады."
 
 #: js/ui/endSessionDialog.js:45
 #, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
 msgstr[0] "Сіз жүйеден автоматты түрде %d секундтан кейін шығасыз."
+msgstr[1] "Сіз жүйеден автоматты түрде %d секундтан кейін шығасыз."
 
 #: js/ui/endSessionDialog.js:51
 msgctxt "button"
@@ -1601,6 +1609,7 @@ msgstr "Жаңартуларды орнату және сөндіру"
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] "Жүйе %d секундтан кейін автоматты түрде сөндіріледі."
+msgstr[1] "Жүйе %d секундтан кейін автоматты түрде сөндіріледі."
 
 #: js/ui/endSessionDialog.js:64
 msgctxt "checkbox"
@@ -1627,6 +1636,7 @@ msgstr "Қайта қосу"
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
 msgstr[0] "Жүйе %d секундтан кейін автоматты түрде қайта қосылады."
+msgstr[1] "Жүйе %d секундтан кейін автоматты түрде қайта қосылады."
 
 #: js/ui/endSessionDialog.js:92
 msgctxt "title"
@@ -1639,6 +1649,9 @@ msgid "The system will automatically restart and install updates in %d second."
 msgid_plural ""
 "The system will automatically restart and install updates in %d seconds."
 msgstr[0] ""
+"Жүйе %d секундтан кейін автоматты түрде қайта қосылады және жаңартуларды "
+"орнатады."
+msgstr[1] ""
 "Жүйе %d секундтан кейін автоматты түрде қайта қосылады және жаңартуларды "
 "орнатады."
 
@@ -1944,10 +1957,9 @@ msgid "User Menu"
 msgstr "Трей мәзірі"
 
 #: js/ui/panel.js:827
-#, fuzzy
 msgctxt "Power menu"
 msgid "Power"
-msgstr "Сөндіру"
+msgstr "Эл. қорегі"
 
 #: js/ui/panel.js:905
 msgid "Bottom Bar"
@@ -2135,12 +2147,14 @@ msgstr "%A, %B %d"
 msgid "%d new message"
 msgid_plural "%d new messages"
 msgstr[0] "%d жаңа хабарлама"
+msgstr[1] "%d жаңа хабарлама"
 
 #: js/ui/screenShield.js:132
 #, javascript-format
 msgid "%d new notification"
 msgid_plural "%d new notifications"
 msgstr[0] "%d жаңа ескерту"
+msgstr[1] "%d жаңа ескерту"
 
 #: js/ui/screenShield.js:471 js/ui/status/system.js:319
 msgid "Lock"
@@ -2314,7 +2328,7 @@ msgstr "Жоспар бос"
 #. The status label
 #: js/ui/status/automaticUpdates.js:189
 msgid "Automatic Updates"
-msgstr ""
+msgstr "Автоматты жаңартулар"
 
 #: js/ui/status/automaticUpdates.js:254
 msgid "Automatic updates on"
@@ -2355,6 +2369,7 @@ msgstr "Bluetooth баптаулары"
 msgid "%d Connected"
 msgid_plural "%d Connected"
 msgstr[0] "%d байланысқан"
+msgstr[1] "%d байланысқан"
 
 #: js/ui/status/bluetooth.js:133
 #, fuzzy
@@ -2616,18 +2631,21 @@ msgstr "Желі баптаулары"
 msgid "%s Wired Connection"
 msgid_plural "%s Wired Connections"
 msgstr[0] "%s сымды желі байланысы"
+msgstr[1] "%s сымды желі байланысы"
 
 #: js/ui/status/network.js:1579
 #, javascript-format
 msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
 msgstr[0] "%s Wi-Fi желі байланысы"
+msgstr[1] "%s Wi-Fi желі байланысы"
 
 #: js/ui/status/network.js:1583
 #, javascript-format
 msgid "%s Modem Connection"
 msgid_plural "%s Modem Connections"
 msgstr[0] "%s модем желі байланысы"
+msgstr[1] "%s модем желі байланысы"
 
 #: js/ui/status/network.js:1716
 msgid "Connection failed"
@@ -2847,6 +2865,7 @@ msgstr "Өзгерістерді сақтау"
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
 msgstr[0] "Өзгертілген баптаулар %d секундтан кейін қалпына келтіріледі"
+msgstr[1] "Өзгертілген баптаулар %d секундтан кейін қалпына келтіріледі"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
@@ -3300,6 +3319,7 @@ msgstr "Аутентификация терезесін пайдаланушы �
 msgid "%u Output"
 msgid_plural "%u Outputs"
 msgstr[0] "%u шығысы"
+msgstr[1] "%u шығысы"
 
 #. translators:
 #. * The number of sound inputs on a particular device
@@ -3308,6 +3328,7 @@ msgstr[0] "%u шығысы"
 msgid "%u Input"
 msgid_plural "%u Inputs"
 msgstr[0] "%u кірісі"
+msgstr[1] "%u кірісі"
 
 #: subprojects/gvc/gvc-mixer-control.c:2736
 msgid "System Sounds"
