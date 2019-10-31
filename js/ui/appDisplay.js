@@ -483,10 +483,10 @@ class AllViewContainer extends St.Widget {
 });
 
 var AllView = class AllView extends BaseAppView {
-    constructor() {
+    constructor(params = {}) {
         super({ usePagination: true },
               { minRows: EOS_DESKTOP_MIN_ROWS });
-        this.actor = new AllViewContainer(this._grid);
+        this.actor = new AllViewContainer(this._grid, params);
         this._scrollView = this.actor.scrollView;
         this._stack = this.actor.stack;
         this._stackBox = this.actor.stackBox;
