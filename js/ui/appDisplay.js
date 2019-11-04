@@ -240,6 +240,9 @@ class BaseAppView {
             this._allItems.splice(iconIndex, 1);
             this._grid.removeItem(icon);
             delete this._items[icon.id];
+
+            if (icon === this._hackAppIcon)
+                this._hackAppIcon = null;
         });
 
         // Add new app icons
