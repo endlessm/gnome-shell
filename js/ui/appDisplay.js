@@ -1881,6 +1881,8 @@ var RenameFolderMenu = class RenameFolderMenu extends PopupMenu.PopupMenu {
         super(source.actor, 0.5, St.Side.BOTTOM);
         this.actor.add_style_class_name('rename-folder-popup');
 
+        this._iconGridLayout = IconGridLayout.getDefault();
+
         // We want to keep the item hovered while the menu is up
         this.blockSourceEvents = true;
 
