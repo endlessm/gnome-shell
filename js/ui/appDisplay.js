@@ -1522,6 +1522,14 @@ class ViewIcon extends GObject.Object {
     get iconState() {
         return this._iconState;
     }
+
+    _canAccept(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
+        return true;
+    }
 });
 
 var FolderIcon = GObject.registerClass({
@@ -1631,6 +1639,9 @@ var FolderIcon = GObject.registerClass({
     }
 
     _canAccept(source) {
+        if (!super._canAccept(source))
+            return false;
+
         if (!(source instanceof AppIcon))
             return false;
 
@@ -2388,6 +2399,9 @@ var AppIcon = GObject.registerClass({
     }
 
     _canAccept(source) {
+        if (!super._canAccept(source))
+            return false;
+
         let view = _getViewFromIcon(source);
 
         return source != this &&
@@ -2799,5 +2813,10 @@ class HackAppIcon extends AppIcon {
 
     handleDragOver() {
         return DND.DragMotionResult.NO_DROP;
+    }
+
+    acceptDrop() {
+        // This will catch the drop event and do nothing
+        return true;
     }
 });
