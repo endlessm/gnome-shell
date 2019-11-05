@@ -156,7 +156,7 @@ var ViewsDisplayLayout = GObject.registerClass({
             GObject.ParamFlags.READWRITE,
             0, 1, 0)
     },
-}, class ViewsDisplayLayout extends Clutter.BinLayout {
+}, class ViewsDisplayLayout extends Clutter.BoxLayout {
     _init(entry, discoveryFeedButton, gridContainer, searchResultsActor) {
         super._init();
 
