@@ -698,10 +698,9 @@ var ViewSelector = class {
 
         this._overviewViewsClone = new ViewsClone(this, this._viewsDisplay, true);
         Main.overview.setViewsClone(this._overviewViewsClone);
-        this._appsPage.bind_property('visible',
-                                     this._overviewViewsClone, 'visible',
-                                     GObject.BindingFlags.SYNC_CREATE |
-                                     GObject.BindingFlags.INVERT_BOOLEAN);
+        this._appsPage.connect('notify::opacity', () => {
+            this._overviewViewsClone.visible = this._appsPage.opacity != 255;
+        });
     }
 
     _onEmptySpaceClicked() {
@@ -754,6 +753,7 @@ var ViewSelector = class {
         params = Params.parse(params, { a11yFocus: null });
 
         let page = new St.Bin({ child: actor,
+                                opacity: 0,
                                 x_align: St.Align.START,
                                 y_align: St.Align.START,
                                 x_fill: true,
@@ -765,19 +765,15 @@ var ViewSelector = class {
                 proxy: this.actor,
                 focusCallback: () => this._a11yFocusPage(page),
             });
-        page.hide();
         this.actor.add_actor(page);
         return page;
     }
 
     _fadePageIn(oldPage, doFadeAnimation) {
-        if (oldPage) {
+        if (oldPage)
             oldPage.opacity = 0;
-            oldPage.hide();
-        }
 
         this.emit('page-empty');
-        this._activePage.show();
 
         if (doFadeAnimation) {
             this._activePage.ease({
