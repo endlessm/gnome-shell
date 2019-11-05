@@ -351,6 +351,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         };
         Object.assign(this._expandedLabel.actor, expandedLabelActorParams);
         this._expandedLabel.actor.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+        this._expandedLabel.actor.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
 
         hbox.remove_child(contentBox);
         wrapWidget.add_child(contentBox);
