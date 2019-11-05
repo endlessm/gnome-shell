@@ -47,8 +47,8 @@ function getWindows(workspace) {
     // ... map windows to their parent where appropriate ...
     return windows.map(w => {
         return w.is_attached_dialog() ? w.get_transient_for() : w;
-    // ... and filter out skip-taskbar windows and duplicates
-    }).filter((w, i, a) => !w.skip_taskbar && a.indexOf(w) == i);
+    // ... and filter out hack inactive, skip-taskbar windows and duplicates
+    }).filter((w, i, a) => !w._hackIsInactiveWindow && !w.skip_taskbar && a.indexOf(w) == i);
 }
 
 var AppSwitcherPopup = GObject.registerClass(
