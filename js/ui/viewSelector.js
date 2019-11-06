@@ -148,11 +148,6 @@ var ShowOverviewAction = GObject.registerClass({
 });
 
 var ViewsDisplayLayout = GObject.registerClass({
-    Signals: {
-        'grid-available-size-changed': {
-            param_types: [GObject.TYPE_INT, GObject.TYPE_INT]
-        },
-    },
     Properties: {
         'expansion': GObject.ParamSpec.double(
             'expansion',
@@ -161,17 +156,17 @@ var ViewsDisplayLayout = GObject.registerClass({
             GObject.ParamFlags.READWRITE,
             0, 1, 0)
     },
-}, class ViewsDisplayLayout extends Clutter.BinLayout {
-    _init(entry, discoveryFeedButton, gridContainerActor, searchResultsActor) {
+}, class ViewsDisplayLayout extends Clutter.BoxLayout {
+    _init(entry, discoveryFeedButton, gridContainer, searchResultsActor) {
         super._init();
 
         this._entry = entry;
         this._discoveryFeedButton = discoveryFeedButton;
-        this._gridContainerActor = gridContainerActor;
+        this._gridContainer = gridContainer;
         this._searchResultsActor = searchResultsActor;
 
         this._entry.connect('style-changed', this._onStyleChanged.bind(this));
-        this._gridContainerActor.connect('style-changed', this._onStyleChanged.bind(this));
+        this._gridContainer.actor.connect('style-changed', this._onStyleChanged.bind(this));
 
         this._heightAboveEntry = 0;
         this.expansion = 0;
@@ -191,7 +186,7 @@ var ViewsDisplayLayout = GObject.registerClass({
         // all view when calculating its centered position. This is to offset
         // the icon labels at the bottom of the icon grid, so the icons
         // themselves appears centered.
-        let themeNode = this._gridContainerActor.get_theme_node();
+        let themeNode = this._gridContainer.actor.get_theme_node();
         let topPadding = themeNode.get_length('-natural-padding-top');
         let heightAbove = this._centeredHeightAbove(viewHeight + topPadding, availHeight);
         let leftover = Math.max(availHeight - viewHeight - heightAbove, 0);
@@ -213,7 +208,12 @@ var ViewsDisplayLayout = GObject.registerClass({
         entryHeight += entryMinPadding * 2;
 
         // GridContainer height
-        let gridContainerHeight = this._gridContainerActor.get_preferred_height(availWidth)[1];
+        // Step 1: pre pre-allocate the grid with the maximum available size
+        this._gridContainer.adaptToSize(availWidth, availHeight - entryHeight);
+
+        // Use the maximum preferred size for now
+        let gridContainerHeight = this._gridContainer.actor.get_preferred_height(availWidth)[1];
+
         let heightAboveGrid = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
         this._heightAboveEntry = this._centeredHeightAbove(entryHeight, heightAboveGrid);
 
@@ -230,7 +230,7 @@ var ViewsDisplayLayout = GObject.registerClass({
         let gridContainerBox = allocation.copy();
         // The grid container box should have the dimensions of this container but start
         // after the search entry and according to the calculated xplacement policies
-        gridContainerBox.y1 = this._computeGridContainerPlacement(gridContainerHeight, entryHeight, availHeight);
+        gridContainerBox.y1 = heightAboveGrid;
 
         let searchResultsBox = allocation.copy();
 
@@ -243,6 +243,9 @@ var ViewsDisplayLayout = GObject.registerClass({
             searchResultsBox.y2 = searchResultsBox.y1 + searchResultsHeight;
         }
 
+        // Step 2: pre-allocate to a smaller, but realistic, size
+        this._gridContainer.adaptToSize(availWidth, gridContainerBox.get_height());
+
         return [entryBox, discoveryFeedButtonBox, gridContainerBox, searchResultsBox];
     }
 
@@ -250,18 +253,13 @@ var ViewsDisplayLayout = GObject.registerClass({
         let [entryBox, discoveryFeedButtonBox, gridContainerBox, searchResultsBox] =
             this._computeChildrenAllocation(box);
 
-        // We want to emit the signal BEFORE any allocation has happened since the
-        // icon grid will need to precompute certain values before being able to
-        // report a sensible preferred height for the specified width.
-
-        this.emit('grid-available-size-changed',
-                  gridContainerBox.x2 - gridContainerBox.x1,
-                  gridContainerBox.y2 - gridContainerBox.y1);
-
         this._entry.allocate(entryBox, flags);
         if (this._discoveryFeedButton)
             this._discoveryFeedButton.allocate(discoveryFeedButtonBox, flags);
-        this._gridContainerActor.allocate(gridContainerBox, flags);
+
+        // Step 3: actually allocate the grid
+        this._gridContainer.actor.allocate(gridContainerBox, flags);
+
         if (this._searchResultsActor)
             this._searchResultsActor.allocate(searchResultsBox, flags);
     }
@@ -270,10 +268,10 @@ var ViewsDisplayLayout = GObject.registerClass({
         if (v == this._expansion || this._searchResultsActor == null)
             return;
 
-        this._gridContainerActor.visible = v != 1;
+        this._gridContainer.actor.visible = v != 1;
         this._searchResultsActor.visible = v != 0;
 
-        this._gridContainerActor.opacity = (1 - v) * 255;
+        this._gridContainer.actor.opacity = (1 - v) * 255;
         this._searchResultsActor.opacity = v * 255;
 
         if (this._discoveryFeedButton) {
@@ -308,7 +306,7 @@ class ViewsDisplayContainer extends St.Widget {
         let layoutManager = new ViewsDisplayLayout(
             entry,
             discoveryFeedButton,
-            gridContainer.actor,
+            gridContainer,
             searchResults.actor);
         super._init({
             layout_manager: layoutManager,
@@ -316,25 +314,11 @@ class ViewsDisplayContainer extends St.Widget {
             y_expand: true,
         });
 
-        layoutManager.connect('grid-available-size-changed', this._onGridAvailableSizeChanged.bind(this));
-
         this.add_child(this._entry);
         if (this._discoveryFeedButton)
             this.add_child(this._discoveryFeedButton);
         this.add_child(this._gridContainer.actor);
         this.add_child(this._searchResults.actor);
-    }
-
-    _onGridAvailableSizeChanged(actor, width, height) {
-        let box = new Clutter.ActorBox();
-        box.x1 = box.y1 = 0;
-        box.x2 = width;
-        box.y2 = height;
-        box = this._gridContainer.actor.get_theme_node().get_content_box(box);
-        let availWidth = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-
-        this._gridContainer.adaptToSize(availWidth, availHeight);
     }
 
     showPage(page, doAnimation) {
@@ -524,14 +508,9 @@ class ViewsClone extends St.Widget {
         let layoutManager = new ViewsDisplayLayout(
             entry,
             discoveryFeedButton,
-            this._allViewClone.actor,
+            this._allViewClone,
             null
         );
-
-        this._firstRelayout = false;
-
-        layoutManager.connect('grid-available-size-changed',
-            this._onGridAvailableSizeChanged.bind(this));
 
         super._init({
             layout_manager: layoutManager,
@@ -598,30 +577,6 @@ class ViewsClone extends St.Widget {
                 );
             }
         });
-    }
-
-    _onGridAvailableSizeChanged(actor, width, height) {
-        let box = new Clutter.ActorBox();
-        box.x1 = box.y1 = 0;
-        box.x2 = width;
-        box.y2 = height;
-        box = this._allViewClone.actor.get_theme_node().get_content_box(box);
-        let availWidth = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-
-        this._allViewClone.adaptToSize(availWidth, availHeight);
-
-        if (!this._firstRelayout &&
-            this.visible &&
-            this.opacity != 0 &&
-            this._viewSelector.getActivePage() == ViewPage.APPS) {
-
-            GLib.idle_add(GLib.PRIORITY_LOW, () => {
-                this._allViewClone.gridActor.queue_relayout();
-                return GLib.SOURCE_REMOVE;
-            });
-            this._firstRelayout = true;
-        }
     }
 
     set saturation(factor) {
@@ -743,10 +698,9 @@ var ViewSelector = class {
 
         this._overviewViewsClone = new ViewsClone(this, this._viewsDisplay, true);
         Main.overview.setViewsClone(this._overviewViewsClone);
-        this._appsPage.bind_property('visible',
-                                     this._overviewViewsClone, 'visible',
-                                     GObject.BindingFlags.SYNC_CREATE |
-                                     GObject.BindingFlags.INVERT_BOOLEAN);
+        this._appsPage.connect('notify::opacity', () => {
+            this._overviewViewsClone.visible = this._appsPage.opacity != 255;
+        });
     }
 
     _onEmptySpaceClicked() {
@@ -799,6 +753,7 @@ var ViewSelector = class {
         params = Params.parse(params, { a11yFocus: null });
 
         let page = new St.Bin({ child: actor,
+                                opacity: 0,
                                 x_align: St.Align.START,
                                 y_align: St.Align.START,
                                 x_fill: true,
@@ -810,19 +765,15 @@ var ViewSelector = class {
                 proxy: this.actor,
                 focusCallback: () => this._a11yFocusPage(page),
             });
-        page.hide();
         this.actor.add_actor(page);
         return page;
     }
 
     _fadePageIn(oldPage, doFadeAnimation) {
-        if (oldPage) {
+        if (oldPage)
             oldPage.opacity = 0;
-            oldPage.hide();
-        }
 
         this.emit('page-empty');
-        this._activePage.show();
 
         if (doFadeAnimation) {
             this._activePage.ease({
