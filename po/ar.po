@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-31 09:39+0000\n"
-"PO-Revision-Date: 2019-10-31 09:56+0000\n"
+"PO-Revision-Date: 2019-11-06 02:32+0000\n"
 "Last-Translator: Will Thompson <wjt@endlessm.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/endless-os/gnome-shell/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -91,7 +91,7 @@ msgstr "تحتوي ملحقات GNOME Shell على خاصية UUID؛ يدرج ه
 
 #: data/org.gnome.shell.gschema.xml.in:42
 msgid "UUIDs of extensions to force disabling"
-msgstr ""
+msgstr "معرّفات UUID للامتدادات التي سيفرض تعطيلها"
 
 #: data/org.gnome.shell.gschema.xml.in:43
 msgid ""
@@ -100,7 +100,7 @@ msgid ""
 "also manipulate this list with the EnableExtension and DisableExtension "
 "D-Bus methods on org.gnome.Shell. This key takes precedence over the "
 "“enabled-extensions” setting."
-msgstr ""
+msgstr "تحتوي امتدادات GNOME Shell على خاصية UUID / المعرّف الوحيد الشامل؛ يسرد هذا المفتاح الامتدادات التي يجب تعطيلها، حتى لو تم تحميلها كجزء من الوضع الحالي. يمكنك أيضاً التعامل مع هذه القائمة باستخدام أساليب دي بس \"تمكين الامتداد\" و\"تعطيل الامتداد\" على org.gnome.Shell. هذا المفتاح له الأسبقية على إعداد \"الامتدادات الممكّنة\"."
 
 #: data/org.gnome.shell.gschema.xml.in:53
 msgid "Disable user extensions"
@@ -234,11 +234,11 @@ msgstr "إذا كان هذا صحيحاً، فستنبض أيقونة سطح ا�
 
 #: data/org.gnome.shell.gschema.xml.in:163
 msgid "Show the Hack launcher in the desktop"
-msgstr ""
+msgstr "عرض برنامج تشغيل Hack في سطح المكتب"
 
 #: data/org.gnome.shell.gschema.xml.in:164
 msgid "If true, the Hack desktop icon will be shown."
-msgstr ""
+msgstr "إذا كان هذا صحيحاً، فستظهر أيقونة Hack على سطح المكتب."
 
 #: data/org.gnome.shell.gschema.xml.in:168
 msgid "Enables the hot corner for the window picker"
@@ -584,19 +584,19 @@ msgstr "إذا كان صحيحا، يتم عرض نظام ويندوز من مس
 
 #: data/org.gnome.shell.gschema.xml.in:503
 msgid "Locations"
-msgstr ""
+msgstr "المواقع"
 
 #: data/org.gnome.shell.gschema.xml.in:504
 msgid "The locations to show in world clocks"
-msgstr ""
+msgstr "المواقع التي ستظهر في ساعات العالم"
 
 #: data/org.gnome.shell.gschema.xml.in:514
 msgid "Automatic location"
-msgstr ""
+msgstr "الموقع التلقائي"
 
 #: data/org.gnome.shell.gschema.xml.in:515
 msgid "Whether to fetch the current location or not"
-msgstr ""
+msgstr "سواء لجلب الموقع الحالي أم لا"
 
 #: data/org.gnome.shell.gschema.xml.in:522
 msgid "Location"
@@ -604,7 +604,7 @@ msgstr "المكان"
 
 #: data/org.gnome.shell.gschema.xml.in:523
 msgid "The location for which to show a forecast"
-msgstr ""
+msgstr "الموقع الذي تظهر التوقعات من خلاله"
 
 #: data/org.gnome.shell.gschema.xml.in:535
 msgid "Attach modal dialog to the parent window"
@@ -734,7 +734,7 @@ msgstr "تصفح في «البرمجيات»"
 msgid ""
 "We’re very sorry, but it was not possible to get the list of installed "
 "extensions. Make sure you are logged into GNOME and try again."
-msgstr ""
+msgstr "نعتذر بشدة، ولكن قد تعذّر الحصول على قائمة الامتدادات المثبتة. تأكد من تسجيلك للدخول إلى GNOME وحاول مرة أخرى."
 
 #: js/gdm/authPrompt.js:124
 msgid "Show password hint"
@@ -871,7 +871,7 @@ msgstr "اخرج"
 #. semicolons
 #: js/misc/systemActions.js:108
 msgid "logout;log out;sign off"
-msgstr ""
+msgstr "تسجيل الخروج؛ الخروج؛ تسجيل الخروج"
 
 #. Translators: The name of the suspend action in search
 #: js/misc/systemActions.js:113
@@ -1107,7 +1107,7 @@ msgstr "إزالة من سطح المكتب"
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2503 js/ui/panel.js:79
 msgid "Open Windows"
-msgstr ""
+msgstr "فتح الويندوز"
 
 #: js/ui/appDisplay.js:2522 js/ui/panel.js:86
 msgid "New Window"
@@ -1303,11 +1303,11 @@ msgstr "فُصل القرص الخارجي"
 
 #: js/ui/components/automountManager.js:209
 msgid "Unable to unlock volume"
-msgstr ""
+msgstr "غير قادر على فتح مستوى الصوت"
 
 #: js/ui/components/automountManager.js:210
 msgid "The installed udisks version does not support the PIM setting"
-msgstr ""
+msgstr "لا يدعم إصدار udisks المثبت إعداد PIM"
 
 #: js/ui/components/autorunManager.js:328
 #, javascript-format
@@ -2229,30 +2229,30 @@ msgstr "البحث..."
 
 #: js/ui/shellMountOperation.js:307
 msgid "Hidden Volume"
-msgstr ""
+msgstr "صوت مخفي"
 
 #: js/ui/shellMountOperation.js:310
 msgid "Windows System Volume"
-msgstr ""
+msgstr "وحدة تخزين نظام الويندوز"
 
 #: js/ui/shellMountOperation.js:313
 msgid "Uses Keyfiles"
-msgstr ""
+msgstr "يستخدم Keyfiles"
 
 #. Translators: %s is the Disks application
 #: js/ui/shellMountOperation.js:319
 #, javascript-format
 msgid ""
 "To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead."
-msgstr ""
+msgstr "لفتح وحدة تخزين تستخدم keyfiles، استخدم وسيلة <i>%s</i> بدلاً من ذلك."
 
 #: js/ui/shellMountOperation.js:326
 msgid "PIM Number"
-msgstr ""
+msgstr "رقم التكرار الشخصي المضاعف / PIM"
 
 #: js/ui/shellMountOperation.js:344
 msgid "The PIM must be a number or empty."
-msgstr ""
+msgstr "يجب أن يكون رمز PIM رقماً أو فارغاً."
 
 #: js/ui/shellMountOperation.js:355
 msgid "Password"
@@ -2272,13 +2272,13 @@ msgstr "افتح %s"
 #: js/ui/shellMountOperation.js:492
 #, javascript-format
 msgid "Unable to start %s"
-msgstr ""
+msgstr "يتعذّر بدء %s"
 
 #. Translators: %s is the Disks application
 #: js/ui/shellMountOperation.js:494
 #, javascript-format
 msgid "Couldn’t find the %s application"
-msgstr ""
+msgstr "تعذّر العثور على تطبيق %s"
 
 #: js/ui/status/accessibility.js:35
 msgid "Accessibility"
@@ -2399,19 +2399,19 @@ msgstr "نقرة واحدة"
 
 #: js/ui/status/dwellClick.js:18
 msgid "Double Click"
-msgstr ""
+msgstr "نقرة مزدوجة"
 
 #: js/ui/status/dwellClick.js:23
 msgid "Drag"
-msgstr ""
+msgstr "سحب"
 
 #: js/ui/status/dwellClick.js:28
 msgid "Secondary Click"
-msgstr ""
+msgstr "النقرة الثانوية"
 
 #: js/ui/status/dwellClick.js:37
 msgid "Dwell Click"
-msgstr ""
+msgstr "تطبيق Dwell Click"
 
 #: js/ui/status/keyboard.js:866
 msgid "Keyboard"
@@ -2966,7 +2966,7 @@ msgstr "تقويم إيفُليوشِن"
 msgid ""
 "Name should be a very short (ideally descriptive) string.\n"
 "Examples are: %s"
-msgstr ""
+msgstr "يجب أن يكون الاسم عبارة عن سلسلة قصيرة جداً من الرموز (وصفية بشكل مثالي).\nالأمثلة هي: %s"
 
 #: src/extensions-tool/command-create.c:192 src/extensions-tool/main.c:169
 msgid "Name"
@@ -2977,7 +2977,7 @@ msgstr "الاسم"
 msgid ""
 "Description is a single-sentence explanation of what your extension does.\n"
 "Examples are: %s"
-msgstr ""
+msgstr "الوصف هو عبارة عن جملة واحدة توضح ما يقوم به الامتداد الخاص بك.\nالأمثلة هي: %s"
 
 #: src/extensions-tool/command-create.c:206 src/extensions-tool/main.c:172
 msgid "Description"
@@ -2988,48 +2988,48 @@ msgstr "الوصف"
 msgid ""
 "UUID is a globally-unique identifier for your extension.\n"
 "This should be in the format of an email address (clicktofocus@janedoe.example.com)\n"
-msgstr ""
+msgstr "UUID هو معرف وحيد شامل للامتداد الخاص بك.\nيجب أن يكون هذا بتنسيق عنوان بريد إلكتروني (clicktofocus@janedoe.example.com)\n"
 
 #: src/extensions-tool/command-create.c:239
 msgid "The unique identifier of the new extension"
-msgstr ""
+msgstr "المعرف الوحيد للامتداد الجديد"
 
 #: src/extensions-tool/command-create.c:242
 msgid "NAME"
-msgstr ""
+msgstr "الاسم"
 
 #: src/extensions-tool/command-create.c:243
 msgid "The user-visible name of the new extension"
-msgstr ""
+msgstr "اسم المستخدم المرئي للامتداد الجديد"
 
 #: src/extensions-tool/command-create.c:245
 msgid "DESCRIPTION"
-msgstr ""
+msgstr "الوصف"
 
 #: src/extensions-tool/command-create.c:247
 msgid "A short description of what the extension does"
-msgstr ""
+msgstr "وصف قصير لما يفعله الامتداد"
 
 #: src/extensions-tool/command-create.c:250
 msgid "Enter extension information interactively"
-msgstr ""
+msgstr "أدخل معلومات الامتداد بشكل تفاعلي"
 
 #: src/extensions-tool/command-create.c:258
 msgid "Create a new extension"
-msgstr ""
+msgstr "إنشاء امتداد جديد"
 
 #: src/extensions-tool/command-create.c:275
 #: src/extensions-tool/command-list.c:158
 msgid "Unknown arguments"
-msgstr ""
+msgstr "وسائط غير معروفة"
 
 #: src/extensions-tool/command-create.c:284
 msgid "UUID, name and description are required"
-msgstr ""
+msgstr "مطلوب معرّف UUID والاسم والوصف"
 
 #: src/extensions-tool/command-disable.c:57
 msgid "Disable an extension"
-msgstr ""
+msgstr "تعطيل امتداد ما"
 
 #: src/extensions-tool/command-disable.c:74
 #: src/extensions-tool/command-enable.c:74
@@ -3038,7 +3038,7 @@ msgstr ""
 #: src/extensions-tool/command-reset.c:74
 #: src/extensions-tool/command-uninstall.c:89
 msgid "No UUID given"
-msgstr ""
+msgstr "لم يتم تعيين معرّف UUID"
 
 #: src/extensions-tool/command-disable.c:79
 #: src/extensions-tool/command-enable.c:79
@@ -3047,132 +3047,132 @@ msgstr ""
 #: src/extensions-tool/command-reset.c:79
 #: src/extensions-tool/command-uninstall.c:94
 msgid "More than one UUID given"
-msgstr ""
+msgstr "تم تعيين أكثر من معرّف وحيد شامل / UUID "
 
 #: src/extensions-tool/command-enable.c:57
 msgid "Enable an extension"
-msgstr ""
+msgstr "تمكين امتداد ما"
 
 #: src/extensions-tool/command-info.c:79
 msgid "Show extensions info"
-msgstr ""
+msgstr "عرض معلومات الامتدادات"
 
 #: src/extensions-tool/command-install.c:173
 msgid "Overwrite an existing extension"
-msgstr ""
+msgstr "الكتابة فوق امتداد موجود"
 
 #: src/extensions-tool/command-install.c:175
 msgid "EXTENSION_BUNDLE"
-msgstr ""
+msgstr "حزمة_ الامتدادات"
 
 #: src/extensions-tool/command-install.c:184
 msgid "Install an extension bundle"
-msgstr ""
+msgstr "تثبيت حزمة امتدادات"
 
 #: src/extensions-tool/command-install.c:201
 msgid "No extension bundle specified"
-msgstr ""
+msgstr "لم يتم تحديد حزمة امتدادات"
 
 #: src/extensions-tool/command-install.c:207
 msgid "More than one extension bundle specified"
-msgstr ""
+msgstr "تم تحديد أكثر من حزمة امتدادات واحدة"
 
 #: src/extensions-tool/command-list.c:118
 msgid "Show user-installed extensions"
-msgstr ""
+msgstr "عرض الامتدادات المثبتة من قبل المستخدم"
 
 #: src/extensions-tool/command-list.c:121
 msgid "Show system-installed extensions"
-msgstr ""
+msgstr "عرض الامتدادات المثبتة على النظام"
 
 #: src/extensions-tool/command-list.c:124
 msgid "Show enabled extensions"
-msgstr ""
+msgstr "إظهار الامتدادات الممكّنة"
 
 #: src/extensions-tool/command-list.c:127
 msgid "Show disabled extensions"
-msgstr ""
+msgstr "إظهار الامتدادات المعطلة"
 
 #: src/extensions-tool/command-list.c:130
 msgid "Show extensions with preferences"
-msgstr ""
+msgstr "عرض الامتدادات ذات التفضيلات"
 
 #: src/extensions-tool/command-list.c:133
 msgid "Print extension details"
-msgstr ""
+msgstr "طباعة تفاصيل الامتداد"
 
 #: src/extensions-tool/command-list.c:141
 msgid "List installed extensions"
-msgstr ""
+msgstr "إدراج الامتدادات المثبتة في قائمة"
 
 #: src/extensions-tool/command-pack.c:450
 msgid "FILE"
-msgstr ""
+msgstr "ملف"
 
 #: src/extensions-tool/command-pack.c:451
 msgid "Additional source to include in the bundle"
-msgstr ""
+msgstr "المصدر الإضافي المراد تضمينه في الحزمة"
 
 #: src/extensions-tool/command-pack.c:454
 msgid "SCHEMA"
-msgstr ""
+msgstr "المخطط"
 
 #: src/extensions-tool/command-pack.c:455
 msgid "A GSettings schema that should be included"
-msgstr ""
+msgstr "مخطط GSettings الذي يجب تضمينه"
 
 #: src/extensions-tool/command-pack.c:457
 #: src/extensions-tool/command-pack.c:468
 msgid "DIRECTORY"
-msgstr ""
+msgstr "الدليل"
 
 #: src/extensions-tool/command-pack.c:459
 msgid "The directory where translations are found"
-msgstr ""
+msgstr "الدليل الذي توجد به الترجمات"
 
 #: src/extensions-tool/command-pack.c:461
 msgid "DOMAIN"
-msgstr ""
+msgstr "النطاق"
 
 #: src/extensions-tool/command-pack.c:463
 msgid "The gettext domain to use for translations"
-msgstr ""
+msgstr "نطاق gettext المستخدم للترجمات"
 
 #: src/extensions-tool/command-pack.c:466
 msgid "Overwrite an existing pack"
-msgstr ""
+msgstr "الكتابة فوق حزمة موجودة"
 
 #: src/extensions-tool/command-pack.c:470
 msgid "The directory where the pack should be created"
-msgstr ""
+msgstr "الدليل الذي يجب إنشاء الحزمة به"
 
 #: src/extensions-tool/command-pack.c:472
 msgid "SOURCE_DIRECTORY"
-msgstr ""
+msgstr "دليل المصدر"
 
 #: src/extensions-tool/command-pack.c:481
 msgid "Create an extension bundle"
-msgstr ""
+msgstr "إنشاء حزمة امتدادات"
 
 #: src/extensions-tool/command-pack.c:500
 msgid "More than one source directory specified"
-msgstr ""
+msgstr "تم تحديد أكثر من دليل مصدر واحد"
 
 #: src/extensions-tool/command-prefs.c:90
 msgid "Opens extension preferences"
-msgstr ""
+msgstr "يفتح تفضيلات الامتدادات"
 
 #: src/extensions-tool/command-reset.c:57
 msgid "Reset an extension"
-msgstr ""
+msgstr "إعادة تعيين امتداد"
 
 #: src/extensions-tool/command-uninstall.c:72
 msgid "Uninstall an extension"
-msgstr ""
+msgstr "إلغاء تثبيت امتداد ما"
 
 #: src/extensions-tool/main.c:175
 msgid "Path"
-msgstr ""
+msgstr "مسار"
 
 #: src/extensions-tool/main.c:178
 msgid "URL"
@@ -3180,7 +3180,7 @@ msgstr "المسار"
 
 #: src/extensions-tool/main.c:181
 msgid "Original author"
-msgstr ""
+msgstr "المؤلف الأصلي"
 
 #: src/extensions-tool/main.c:184
 msgid "Version"
@@ -3192,15 +3192,15 @@ msgstr "الولاية"
 
 #: src/extensions-tool/main.c:221
 msgid "“version” takes no arguments"
-msgstr ""
+msgstr "“version” لا تأخذ أي وسائط"
 
 #: src/extensions-tool/main.c:223 src/extensions-tool/main.c:243
 msgid "Usage:"
-msgstr ""
+msgstr "الاستخدام:"
 
 #: src/extensions-tool/main.c:226
 msgid "Print version information and exit."
-msgstr ""
+msgstr "طباعة معلومات الإصدار والخروج."
 
 #: src/extensions-tool/main.c:241 src/extensions-tool/main.c:244
 msgid "COMMAND"
@@ -3208,15 +3208,15 @@ msgstr "أمر"
 
 #: src/extensions-tool/main.c:244
 msgid "[ARGS…]"
-msgstr ""
+msgstr "[الوسائط…]"
 
 #: src/extensions-tool/main.c:246
 msgid "Commands:"
-msgstr ""
+msgstr "الأوامر:"
 
 #: src/extensions-tool/main.c:247
 msgid "Print help"
-msgstr ""
+msgstr "طباعة المساعدة"
 
 #: src/extensions-tool/main.c:248 src/main.c:460
 msgid "Print version"
@@ -3224,48 +3224,48 @@ msgstr "اطبع الإصدارة"
 
 #: src/extensions-tool/main.c:249
 msgid "Enable extension"
-msgstr ""
+msgstr "تمكين الامتداد"
 
 #: src/extensions-tool/main.c:250
 msgid "Disable extension"
-msgstr ""
+msgstr "تعطيل الامتداد"
 
 #: src/extensions-tool/main.c:251
 msgid "Reset extension"
-msgstr ""
+msgstr "إعادة تعيين الامتداد"
 
 #: src/extensions-tool/main.c:252
 msgid "Uninstall extension"
-msgstr ""
+msgstr "إلغاء تثبيت الامتداد"
 
 #: src/extensions-tool/main.c:253
 msgid "List extensions"
-msgstr ""
+msgstr "إدراج الامتدادات في قائمة"
 
 #: src/extensions-tool/main.c:254 src/extensions-tool/main.c:255
 msgid "Show extension info"
-msgstr ""
+msgstr "عرض معلومات الامتداد"
 
 #: src/extensions-tool/main.c:256
 msgid "Open extension preferences"
-msgstr ""
+msgstr "فتح تفضيلات الامتدادات"
 
 #: src/extensions-tool/main.c:257
 msgid "Create extension"
-msgstr ""
+msgstr "إنشاء امتداد"
 
 #: src/extensions-tool/main.c:258
 msgid "Package extension"
-msgstr ""
+msgstr "امتداد الحزمة"
 
 #: src/extensions-tool/main.c:259
 msgid "Install extension bundle"
-msgstr ""
+msgstr "تثبيت حزمة امتدادات"
 
 #: src/extensions-tool/main.c:261
 #, c-format
 msgid "Use “%s” to get detailed help.\n"
-msgstr ""
+msgstr "استخدم “%s” لتحصل على مساعدة تفصيلية.\n"
 
 #: src/main.c:466
 msgid "Mode used by GDM for login screen"
