@@ -6,12 +6,13 @@
 # Chao-Hsiung Liao <j_h_liau@yahoo.com.tw>, 2010
 # Roddy Shuler <roddy@stanfordalumni.org>, 2017-2018
 # Wei-Lun Chao <chaoweilun@gmail.com>, 2010
+# Will Thompson <wjt@endlessm.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-31 09:39+0000\n"
-"PO-Revision-Date: 2019-10-31 09:56+0000\n"
+"PO-Revision-Date: 2019-11-06 10:56+0000\n"
 "Last-Translator: Will Thompson <wjt@endlessm.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/endless-os/gnome-shell/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +86,7 @@ msgstr "GNOME Shell 擴充套件有 UUID 屬性；這個設定鍵列出了應載
 
 #: data/org.gnome.shell.gschema.xml.in:42
 msgid "UUIDs of extensions to force disabling"
-msgstr ""
+msgstr "要強制停用的擴充 UUIDs"
 
 #: data/org.gnome.shell.gschema.xml.in:43
 msgid ""
@@ -94,7 +95,7 @@ msgid ""
 "also manipulate this list with the EnableExtension and DisableExtension "
 "D-Bus methods on org.gnome.Shell. This key takes precedence over the "
 "“enabled-extensions” setting."
-msgstr ""
+msgstr "GNOME Shell 擴充有 UUID 屬性；此金鑰列出應被停用的擴充，包含在當前模式中正在使用之項目。您也可用 org.gnome.Shell 上的 EnableExtension 及 DisableExtension D-Bus 方式調整清單。此金鑰優先於「啟用-擴充」設定。"
 
 #: data/org.gnome.shell.gschema.xml.in:53
 msgid "Disable user extensions"
@@ -228,11 +229,11 @@ msgstr "如為真，Hack 桌面圖示將暫停來吸引用戶。"
 
 #: data/org.gnome.shell.gschema.xml.in:163
 msgid "Show the Hack launcher in the desktop"
-msgstr ""
+msgstr "在桌面顯示 Hack 啟動器"
 
 #: data/org.gnome.shell.gschema.xml.in:164
 msgid "If true, the Hack desktop icon will be shown."
-msgstr ""
+msgstr "如果為 True，將會顯示出 Hack 桌面圖示。"
 
 #: data/org.gnome.shell.gschema.xml.in:168
 msgid "Enables the hot corner for the window picker"
@@ -578,19 +579,19 @@ msgstr "如果設定為「true」，切換器將僅顯示目前工作區中的�
 
 #: data/org.gnome.shell.gschema.xml.in:503
 msgid "Locations"
-msgstr ""
+msgstr "位置"
 
 #: data/org.gnome.shell.gschema.xml.in:504
 msgid "The locations to show in world clocks"
-msgstr ""
+msgstr "世界時鐘裡顯示的地點"
 
 #: data/org.gnome.shell.gschema.xml.in:514
 msgid "Automatic location"
-msgstr ""
+msgstr "自動地點"
 
 #: data/org.gnome.shell.gschema.xml.in:515
 msgid "Whether to fetch the current location or not"
-msgstr ""
+msgstr "是否要取得當前地點"
 
 #: data/org.gnome.shell.gschema.xml.in:522
 msgid "Location"
@@ -598,7 +599,7 @@ msgstr "位置"
 
 #: data/org.gnome.shell.gschema.xml.in:523
 msgid "The location for which to show a forecast"
-msgstr ""
+msgstr "顯示預測的地點"
 
 #: data/org.gnome.shell.gschema.xml.in:535
 msgid "Attach modal dialog to the parent window"
@@ -728,7 +729,7 @@ msgstr "在《軟體》中瀏覽"
 msgid ""
 "We’re very sorry, but it was not possible to get the list of installed "
 "extensions. Make sure you are logged into GNOME and try again."
-msgstr ""
+msgstr "我們非常抱歉，但無法取得已安裝擴充的清單。確保您有登入 GNOME 並再試一次。"
 
 #: js/gdm/authPrompt.js:124
 msgid "Show password hint"
@@ -865,7 +866,7 @@ msgstr "登出"
 #. semicolons
 #: js/misc/systemActions.js:108
 msgid "logout;log out;sign off"
-msgstr ""
+msgstr "登出；登出；登出"
 
 #. Translators: The name of the suspend action in search
 #: js/misc/systemActions.js:113
@@ -1071,7 +1072,7 @@ msgstr "從桌面移除"
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2503 js/ui/panel.js:79
 msgid "Open Windows"
-msgstr ""
+msgstr "開啟 Windows"
 
 #: js/ui/appDisplay.js:2522 js/ui/panel.js:86
 msgid "New Window"
@@ -1267,11 +1268,11 @@ msgstr "外部裝置已拔除"
 
 #: js/ui/components/automountManager.js:209
 msgid "Unable to unlock volume"
-msgstr ""
+msgstr "無法解鎖卷宗"
 
 #: js/ui/components/automountManager.js:210
 msgid "The installed udisks version does not support the PIM setting"
-msgstr ""
+msgstr "安裝的 udisks 版本不支援 PIM 設定"
 
 #: js/ui/components/autorunManager.js:328
 #, javascript-format
@@ -2108,30 +2109,30 @@ msgstr "搜尋……"
 
 #: js/ui/shellMountOperation.js:307
 msgid "Hidden Volume"
-msgstr ""
+msgstr "隱藏的音量"
 
 #: js/ui/shellMountOperation.js:310
 msgid "Windows System Volume"
-msgstr ""
+msgstr "Windows 系統音量"
 
 #: js/ui/shellMountOperation.js:313
 msgid "Uses Keyfiles"
-msgstr ""
+msgstr "使用密鑰"
 
 #. Translators: %s is the Disks application
 #: js/ui/shellMountOperation.js:319
 #, javascript-format
 msgid ""
 "To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead."
-msgstr ""
+msgstr "如要解鎖使用密鑰的卷宗，請改為使用<i>%s</i> 功能。"
 
 #: js/ui/shellMountOperation.js:326
 msgid "PIM Number"
-msgstr ""
+msgstr "PIM 號碼"
 
 #: js/ui/shellMountOperation.js:344
 msgid "The PIM must be a number or empty."
-msgstr ""
+msgstr "PIM 須為數字或留白。"
 
 #: js/ui/shellMountOperation.js:355
 msgid "Password"
@@ -2151,13 +2152,13 @@ msgstr "開啟 %s"
 #: js/ui/shellMountOperation.js:492
 #, javascript-format
 msgid "Unable to start %s"
-msgstr ""
+msgstr "無法啟動 %s"
 
 #. Translators: %s is the Disks application
 #: js/ui/shellMountOperation.js:494
 #, javascript-format
 msgid "Couldn’t find the %s application"
-msgstr ""
+msgstr "無法找到 %s 應用程式"
 
 #: js/ui/status/accessibility.js:35
 msgid "Accessibility"
@@ -2273,19 +2274,19 @@ msgstr "單擊"
 
 #: js/ui/status/dwellClick.js:18
 msgid "Double Click"
-msgstr ""
+msgstr "雙點擊"
 
 #: js/ui/status/dwellClick.js:23
 msgid "Drag"
-msgstr ""
+msgstr "拖曳"
 
 #: js/ui/status/dwellClick.js:28
 msgid "Secondary Click"
-msgstr ""
+msgstr "二次點擊"
 
 #: js/ui/status/dwellClick.js:37
 msgid "Dwell Click"
-msgstr ""
+msgstr "停留點擊"
 
 #: js/ui/status/keyboard.js:866
 msgid "Keyboard"
@@ -2820,7 +2821,7 @@ msgstr "Evolution 行事曆"
 msgid ""
 "Name should be a very short (ideally descriptive) string.\n"
 "Examples are: %s"
-msgstr ""
+msgstr "名稱應為非常短（最好是敘述性）的字串。\n例如：%s"
 
 #: src/extensions-tool/command-create.c:192 src/extensions-tool/main.c:169
 msgid "Name"
@@ -2831,7 +2832,7 @@ msgstr "名稱"
 msgid ""
 "Description is a single-sentence explanation of what your extension does.\n"
 "Examples are: %s"
-msgstr ""
+msgstr "敘述為解釋該擴充功能的單一句子。\n例如：%s"
 
 #: src/extensions-tool/command-create.c:206 src/extensions-tool/main.c:172
 msgid "Description"
@@ -2842,11 +2843,11 @@ msgstr "描述"
 msgid ""
 "UUID is a globally-unique identifier for your extension.\n"
 "This should be in the format of an email address (clicktofocus@janedoe.example.com)\n"
-msgstr ""
+msgstr "UUID 是您的擴充之通用唯一識別碼。\n其格式應像 email 位址一樣 (clicktofocus@janedoe.example.com)\n"
 
 #: src/extensions-tool/command-create.c:239
 msgid "The unique identifier of the new extension"
-msgstr ""
+msgstr "新擴充的唯一識別碼"
 
 #: src/extensions-tool/command-create.c:242
 msgid "NAME"
@@ -2854,36 +2855,36 @@ msgstr "NAME"
 
 #: src/extensions-tool/command-create.c:243
 msgid "The user-visible name of the new extension"
-msgstr ""
+msgstr "新擴充的用戶可見名稱"
 
 #: src/extensions-tool/command-create.c:245
 msgid "DESCRIPTION"
-msgstr ""
+msgstr "敘述"
 
 #: src/extensions-tool/command-create.c:247
 msgid "A short description of what the extension does"
-msgstr ""
+msgstr "擴充功能作用的簡短描述"
 
 #: src/extensions-tool/command-create.c:250
 msgid "Enter extension information interactively"
-msgstr ""
+msgstr "以互動方式輸入擴充功能資訊"
 
 #: src/extensions-tool/command-create.c:258
 msgid "Create a new extension"
-msgstr ""
+msgstr "創造新擴充"
 
 #: src/extensions-tool/command-create.c:275
 #: src/extensions-tool/command-list.c:158
 msgid "Unknown arguments"
-msgstr ""
+msgstr "未知的引數"
 
 #: src/extensions-tool/command-create.c:284
 msgid "UUID, name and description are required"
-msgstr ""
+msgstr "UUID、名稱與敘述為必要"
 
 #: src/extensions-tool/command-disable.c:57
 msgid "Disable an extension"
-msgstr ""
+msgstr "停用一項擴充"
 
 #: src/extensions-tool/command-disable.c:74
 #: src/extensions-tool/command-enable.c:74
@@ -2892,7 +2893,7 @@ msgstr ""
 #: src/extensions-tool/command-reset.c:74
 #: src/extensions-tool/command-uninstall.c:89
 msgid "No UUID given"
-msgstr ""
+msgstr "未給定 UUID"
 
 #: src/extensions-tool/command-disable.c:79
 #: src/extensions-tool/command-enable.c:79
@@ -2901,63 +2902,63 @@ msgstr ""
 #: src/extensions-tool/command-reset.c:79
 #: src/extensions-tool/command-uninstall.c:94
 msgid "More than one UUID given"
-msgstr ""
+msgstr "給定多於一個 UUID"
 
 #: src/extensions-tool/command-enable.c:57
 msgid "Enable an extension"
-msgstr ""
+msgstr "啟用一個擴充"
 
 #: src/extensions-tool/command-info.c:79
 msgid "Show extensions info"
-msgstr ""
+msgstr "顯示擴充資訊"
 
 #: src/extensions-tool/command-install.c:173
 msgid "Overwrite an existing extension"
-msgstr ""
+msgstr "覆寫一個現有的擴充功能"
 
 #: src/extensions-tool/command-install.c:175
 msgid "EXTENSION_BUNDLE"
-msgstr ""
+msgstr "擴充＿包"
 
 #: src/extensions-tool/command-install.c:184
 msgid "Install an extension bundle"
-msgstr ""
+msgstr "安裝一個擴充包"
 
 #: src/extensions-tool/command-install.c:201
 msgid "No extension bundle specified"
-msgstr ""
+msgstr "未指定擴充包"
 
 #: src/extensions-tool/command-install.c:207
 msgid "More than one extension bundle specified"
-msgstr ""
+msgstr "已指定一個以上擴充套件"
 
 #: src/extensions-tool/command-list.c:118
 msgid "Show user-installed extensions"
-msgstr ""
+msgstr "顯示用戶安裝的擴充"
 
 #: src/extensions-tool/command-list.c:121
 msgid "Show system-installed extensions"
-msgstr ""
+msgstr "顯示由系統安裝的擴充"
 
 #: src/extensions-tool/command-list.c:124
 msgid "Show enabled extensions"
-msgstr ""
+msgstr "顯示啟用的擴充功能"
 
 #: src/extensions-tool/command-list.c:127
 msgid "Show disabled extensions"
-msgstr ""
+msgstr "顯示停用的擴充"
 
 #: src/extensions-tool/command-list.c:130
 msgid "Show extensions with preferences"
-msgstr ""
+msgstr "顯示擴充與選項"
 
 #: src/extensions-tool/command-list.c:133
 msgid "Print extension details"
-msgstr ""
+msgstr "列印擴充細節"
 
 #: src/extensions-tool/command-list.c:141
 msgid "List installed extensions"
-msgstr ""
+msgstr "列出已安裝的擴充"
 
 #: src/extensions-tool/command-pack.c:450
 msgid "FILE"
@@ -2965,64 +2966,64 @@ msgstr "FILE"
 
 #: src/extensions-tool/command-pack.c:451
 msgid "Additional source to include in the bundle"
-msgstr ""
+msgstr "要加入群組的額外來源"
 
 #: src/extensions-tool/command-pack.c:454
 msgid "SCHEMA"
-msgstr ""
+msgstr "綱要"
 
 #: src/extensions-tool/command-pack.c:455
 msgid "A GSettings schema that should be included"
-msgstr ""
+msgstr "應包含一個 GSettings 綱要"
 
 #: src/extensions-tool/command-pack.c:457
 #: src/extensions-tool/command-pack.c:468
 msgid "DIRECTORY"
-msgstr ""
+msgstr "目錄"
 
 #: src/extensions-tool/command-pack.c:459
 msgid "The directory where translations are found"
-msgstr ""
+msgstr "找到翻譯的目錄"
 
 #: src/extensions-tool/command-pack.c:461
 msgid "DOMAIN"
-msgstr ""
+msgstr "網域"
 
 #: src/extensions-tool/command-pack.c:463
 msgid "The gettext domain to use for translations"
-msgstr ""
+msgstr "用來翻譯的 gettext 網域"
 
 #: src/extensions-tool/command-pack.c:466
 msgid "Overwrite an existing pack"
-msgstr ""
+msgstr "覆寫一個現存封包"
 
 #: src/extensions-tool/command-pack.c:470
 msgid "The directory where the pack should be created"
-msgstr ""
+msgstr "封包應被創建的目錄"
 
 #: src/extensions-tool/command-pack.c:472
 msgid "SOURCE_DIRECTORY"
-msgstr ""
+msgstr "來源＿目錄"
 
 #: src/extensions-tool/command-pack.c:481
 msgid "Create an extension bundle"
-msgstr ""
+msgstr "創造擴充組"
 
 #: src/extensions-tool/command-pack.c:500
 msgid "More than one source directory specified"
-msgstr ""
+msgstr "指定了多於一個來源目錄"
 
 #: src/extensions-tool/command-prefs.c:90
 msgid "Opens extension preferences"
-msgstr ""
+msgstr "開啟擴充功能喜好設定"
 
 #: src/extensions-tool/command-reset.c:57
 msgid "Reset an extension"
-msgstr ""
+msgstr "重設擴充"
 
 #: src/extensions-tool/command-uninstall.c:72
 msgid "Uninstall an extension"
-msgstr ""
+msgstr "解除安裝一項擴充"
 
 #: src/extensions-tool/main.c:175
 msgid "Path"
@@ -3034,7 +3035,7 @@ msgstr "URL"
 
 #: src/extensions-tool/main.c:181
 msgid "Original author"
-msgstr ""
+msgstr "原始作者"
 
 #: src/extensions-tool/main.c:184
 msgid "Version"
@@ -3046,15 +3047,15 @@ msgstr "州"
 
 #: src/extensions-tool/main.c:221
 msgid "“version” takes no arguments"
-msgstr ""
+msgstr "「版本」未採用引數"
 
 #: src/extensions-tool/main.c:223 src/extensions-tool/main.c:243
 msgid "Usage:"
-msgstr ""
+msgstr "使用方式："
 
 #: src/extensions-tool/main.c:226
 msgid "Print version information and exit."
-msgstr ""
+msgstr "列印版本資訊並離開。"
 
 #: src/extensions-tool/main.c:241 src/extensions-tool/main.c:244
 msgid "COMMAND"
@@ -3062,15 +3063,15 @@ msgstr "COMMAND"
 
 #: src/extensions-tool/main.c:244
 msgid "[ARGS…]"
-msgstr ""
+msgstr "[ARGS…]"
 
 #: src/extensions-tool/main.c:246
 msgid "Commands:"
-msgstr ""
+msgstr "指令："
 
 #: src/extensions-tool/main.c:247
 msgid "Print help"
-msgstr ""
+msgstr "列印說明"
 
 #: src/extensions-tool/main.c:248 src/main.c:460
 msgid "Print version"
@@ -3078,48 +3079,48 @@ msgstr "顯示版本"
 
 #: src/extensions-tool/main.c:249
 msgid "Enable extension"
-msgstr ""
+msgstr "容許擴充"
 
 #: src/extensions-tool/main.c:250
 msgid "Disable extension"
-msgstr ""
+msgstr "停用擴充"
 
 #: src/extensions-tool/main.c:251
 msgid "Reset extension"
-msgstr ""
+msgstr "重設擴充"
 
 #: src/extensions-tool/main.c:252
 msgid "Uninstall extension"
-msgstr ""
+msgstr "解除安裝擴充"
 
 #: src/extensions-tool/main.c:253
 msgid "List extensions"
-msgstr ""
+msgstr "列出擴充"
 
 #: src/extensions-tool/main.c:254 src/extensions-tool/main.c:255
 msgid "Show extension info"
-msgstr ""
+msgstr "顯示擴充資訊"
 
 #: src/extensions-tool/main.c:256
 msgid "Open extension preferences"
-msgstr ""
+msgstr "開啟擴充選項"
 
 #: src/extensions-tool/main.c:257
 msgid "Create extension"
-msgstr ""
+msgstr "建立擴充功能"
 
 #: src/extensions-tool/main.c:258
 msgid "Package extension"
-msgstr ""
+msgstr "封裝擴充功能"
 
 #: src/extensions-tool/main.c:259
 msgid "Install extension bundle"
-msgstr ""
+msgstr "安裝擴充包"
 
 #: src/extensions-tool/main.c:261
 #, c-format
 msgid "Use “%s” to get detailed help.\n"
-msgstr ""
+msgstr "使用 “%s” 獲得詳細協助。\n"
 
 #: src/main.c:466
 msgid "Mode used by GDM for login screen"
