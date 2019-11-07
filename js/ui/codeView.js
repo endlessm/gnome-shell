@@ -559,6 +559,7 @@ var CodingSession = GObject.registerClass({
                     this._detachBackendWindow();
                     this._grabbed = false;
                     this._syncButtonVisibility();
+                    this._synchronizeButton(this._actorForCurrentState().meta_window);
                     return GLib.SOURCE_REMOVE;
                 });
         }
