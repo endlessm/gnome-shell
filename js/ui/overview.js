@@ -128,6 +128,9 @@ class NoWindowsDialog extends ModalDialog.ModalDialog {
             this.close(global.get_current_time());
             return Clutter.EVENT_PROPAGATE;
         });
+
+        this.opacity = 0;
+        this.visible = true;
     }
 
     show() {
