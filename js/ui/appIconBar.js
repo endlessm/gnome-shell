@@ -289,7 +289,7 @@ const AppIconButton = GObject.registerClass({
 
         this._rightClickMenuManager = new PopupMenu.PopupMenuManager(this);
 
-        this._rightClickMenu = new PopupMenu.PopupMenu(this, 0.0, St.Side.TOP, 0);
+        this._rightClickMenu = new PopupMenu.PopupMenu(this, 0.0, St.Side.BOTTOM, 0);
         this._rightClickMenu.blockSourceEvents = true;
 
         if (allowsPinning) {
