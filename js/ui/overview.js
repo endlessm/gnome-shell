@@ -130,7 +130,7 @@ class NoWindowsDialog extends ModalDialog.ModalDialog {
         });
     }
 
-    show() {
+    popup() {
         if (this._timeoutId != 0)
             GLib.source_remove(this._timeoutId);
 
@@ -139,14 +139,14 @@ class NoWindowsDialog extends ModalDialog.ModalDialog {
                 GLib.PRIORITY_DEFAULT,
                 NO_WINDOWS_OPEN_DIALOG_TIMEOUT,
                 () => {
-                    this.hide();
+                    this.popdown();
                     return GLib.SOURCE_REMOVE;
                 }
             );
         this.open(global.get_current_time());
     }
 
-    hide() {
+    popdown() {
         if (this._timeoutId != 0) {
             GLib.source_remove(this._timeoutId);
             this._timeoutId = 0;
@@ -569,7 +569,7 @@ var Overview = class {
         }
 
         if (!Main.workspaceMonitor.hasActiveWindows) {
-            this._noWindowsDialog.show();
+            this._noWindowsDialog.popup();
             return;
         }
 
@@ -596,7 +596,7 @@ var Overview = class {
         }
 
         if (!Main.workspaceMonitor.hasActiveWindows) {
-            this._noWindowsDialog.show();
+            this._noWindowsDialog.popup();
             return;
         }
 
@@ -776,7 +776,7 @@ var Overview = class {
         this._shown = false;
 
         // Hide the 'No windows dialog' in case it is open
-        this._noWindowsDialog.hide();
+        this._noWindowsDialog.popdown();
 
         this._animateNotVisible();
         this._syncGrab();
