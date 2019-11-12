@@ -77,14 +77,18 @@ class KeyringDialog extends ModalDialog.ModalDialog {
 
             this._workSpinner = new Animation.Spinner(WORK_SPINNER_ICON_SIZE, true);
 
+            this._capsLockWarningLabel = new ShellEntry.CapsLockWarning(this._passwordEntry);
+
             if (rtl) {
                 layout.attach(this._workSpinner.actor, 0, row, 1, 1);
                 layout.attach(this._passwordEntry, 1, row, 1, 1);
                 layout.attach(label, 2, row, 1, 1);
+                layout.attach(this._capsLockWarningLabel, 2, row + 1, 1, 1);
             } else {
                 layout.attach(label, 0, row, 1, 1);
                 layout.attach(this._passwordEntry, 1, row, 1, 1);
                 layout.attach(this._workSpinner.actor, 2, row, 1, 1);
+                layout.attach(this._capsLockWarningLabel, 0, row + 1, 1, 1);
             }
             row++;
         } else {
@@ -105,12 +109,15 @@ class KeyringDialog extends ModalDialog.ModalDialog {
             });
             ShellEntry.addContextMenu(this._confirmEntry);
             this._confirmEntry.clutter_text.connect('activate', this._onConfirmActivate.bind(this));
+            this._confirmEntryCapsLockWarning = new ShellEntry.CapsLockWarning(this._confirmEntry);
             if (rtl) {
                 layout.attach(this._confirmEntry, 0, row, 1, 1);
                 layout.attach(label, 1, row, 1, 1);
+                layout.attach(this._confirmEntryCapsLockWarning, 1, row + 1, 1, 1);
             } else {
                 layout.attach(label, 0, row, 1, 1);
                 layout.attach(this._confirmEntry, 1, row, 1, 1);
+                layout.attach(this._confirmEntryCapsLockWarning, 0, row + 1, 1, 1);
             }
             row++;
         } else {

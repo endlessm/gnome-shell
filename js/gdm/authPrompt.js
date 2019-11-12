@@ -111,8 +111,16 @@ var AuthPrompt = class {
 
         this._entry.grab_key_focus();
 
-        this._message = new St.Label({ opacity: 0,
-                                       styleClass: 'login-dialog-message' });
+        this._capsLockWarningLabel = new ShellEntry.CapsLockWarning(this._entry);
+        this.add_child(this._capsLockWarningLabel);
+
+        this._message = new St.Label({
+            opacity: 0,
+            styleClass: 'login-dialog-message',
+            x_expand: false,
+            y_expand: true,
+            y_align: Clutter.ActorAlign.START,
+        });
         this._message.clutter_text.line_wrap = true;
         this._message.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.actor.add(this._message, { x_fill: false,
