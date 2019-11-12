@@ -102,12 +102,18 @@ var AuthenticationDialog = GObject.registerClass({
         this._userChangedId = this._user.connect('changed', this._onUserChanged.bind(this));
         this._onUserChanged();
 
-        this._passwordLabel = new St.Label(({ style_class: 'prompt-dialog-password-label' }));
-        this._passwordBox.add(this._passwordLabel, { y_fill: false, y_align: St.Align.MIDDLE });
-        this._passwordEntry = new St.Entry({ style_class: 'prompt-dialog-password-entry',
-                                             text: "",
-                                             can_focus: true });
-        ShellEntry.addContextMenu(this._passwordEntry, { isPassword: true });
+        this._passwordLabel = new St.Label({
+            style_class: 'prompt-dialog-password-label',
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._passwordBox.add_child(this._passwordLabel);
+        this._passwordEntry = new St.PasswordEntry({
+            style_class: 'prompt-dialog-password-entry',
+            text: "",
+            can_focus: true,
+            x_expand: true,
+        });
+        ShellEntry.addContextMenu(this._passwordEntry);
         this._passwordEntry.clutter_text.connect('activate', this._onEntryActivate.bind(this));
         this._passwordBox.add(this._passwordEntry,
                               { expand: true });
@@ -279,10 +285,7 @@ var AuthenticationDialog = GObject.registerClass({
         else
             this._passwordLabel.set_text(request);
 
-        if (echoOn)
-            this._passwordEntry.clutter_text.set_password_char('');
-        else
-            this._passwordEntry.clutter_text.set_password_char('\u25cf'); // ● U+25CF BLACK CIRCLE
+        this._passwordEntry.password_visible = echoOn;
 
         this._inputSourceManager.passwordModeEnabled = true;
         this._passwordBox.show();
