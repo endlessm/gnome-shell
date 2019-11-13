@@ -486,7 +486,7 @@ class AllViewContainer extends St.Widget {
 });
 
 var AllView = class AllView extends BaseAppView {
-    constructor(params = {}) {
+    constructor(params = {}, allViewParams = {}) {
         super({ usePagination: true },
               { minRows: EOS_DESKTOP_MIN_ROWS });
         this.actor = new AllViewContainer(this._grid, params);
@@ -586,8 +586,12 @@ var AllView = class AllView extends BaseAppView {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
 
-        Main.overview.connect('item-drag-begin', this._onDragBegin.bind(this));
-        Main.overview.connect('item-drag-end', this._onDragEnd.bind(this));
+        allViewParams = Params.parse(allViewParams, { allowDnD: true });
+        this._allowDnD = allViewParams.allowDnD;
+        if (this._allowDnD) {
+            Main.overview.connect('item-drag-begin', this._onDragBegin.bind(this));
+            Main.overview.connect('item-drag-end', this._onDragEnd.bind(this));
+        }
 
         this._nEventBlockerInhibits = 0;
     }
@@ -637,7 +641,7 @@ var AllView = class AllView extends BaseAppView {
                     return;
 
                 icon = new AppIcon(app, {
-                    isDraggable: favoritesWritable,
+                    isDraggable: favoritesWritable && this._allowDnD,
                 });
             }
 
@@ -1547,7 +1551,7 @@ var FolderIcon = GObject.registerClass({
             toggle_mode: true,
         };
         let iconParams = {
-            isDraggable: true,
+            isDraggable: parentView._allowDnD,
             createIcon: this._createIcon.bind(this),
             setSizeManually: false,
         };
