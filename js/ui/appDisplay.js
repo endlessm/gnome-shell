@@ -956,10 +956,14 @@ var AllView = class AllView extends BaseAppView {
         if (this._grid.contains(icon.actor))
             this._handleDragOvershoot(dragEvent);
 
+        if (!this._grid.contains(dragEvent.targetActor))
+            this._grid.removeNudges();
+
         return DND.DragMotionResult.CONTINUE;
     }
 
     _onDragEnd() {
+        this._grid.removeNudges();
         if (this._dragMonitor) {
             DND.removeDragMonitor(this._dragMonitor);
             this._dragMonitor = null;
