@@ -52,6 +52,7 @@ class SideComponent extends GObject.Object {
         super._init();
         this._propertiesChangedId = 0;
         this._desktopShownId = 0;
+        this._overviewPageChangedId = 0;
 
         this._proxyIface = proxyIface;
         this._proxyInfo = Gio.DBusInterfaceInfo.new_for_xml(this._proxyIface);
