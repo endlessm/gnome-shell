@@ -586,14 +586,33 @@ var AllView = class AllView extends BaseAppView {
             Main.queueDeferredWork(this._redisplayWorkId);
         });
 
+        this._dragMonitor = null;
         allViewParams = Params.parse(allViewParams, { allowDnD: true });
         this._allowDnD = allViewParams.allowDnD;
         if (this._allowDnD) {
-            Main.overview.connect('item-drag-begin', this._onDragBegin.bind(this));
-            Main.overview.connect('item-drag-end', this._onDragEnd.bind(this));
+            this._itemDragBeginId = Main.overview.connect(
+                'item-drag-begin', this._onDragBegin.bind(this));
+            this._itemDragEndId = Main.overview.connect(
+                'item-drag-end', this._onDragEnd.bind(this));
+
+        } else {
+            this._itemDragBeginId = 0;
+            this._itemDragEndId = 0;
         }
+        this.actor.connect('destroy', this._onDestroy.bind(this));
 
         this._nEventBlockerInhibits = 0;
+    }
+
+    _onDestroy() {
+        if (this._itemDragBeginId) {
+            Main.overview.disconnect(this._itemDragBeginId);
+            delete this._itemDragBeginId;
+        }
+        if (this._itemDragEndId) {
+            Main.overview.disconnect(this._itemDragEndId);
+            delete this._itemDragEndId;
+        }
     }
 
     getAppInfos() {
@@ -1453,6 +1472,7 @@ class ViewIcon extends GObject.Object {
             });
         }
 
+        this._dragMonitor = null;
         this._itemDragBeginId = Main.overview.connect(
             'item-drag-begin', this._onDragBegin.bind(this));
         this._itemDragEndId = Main.overview.connect(
@@ -1648,9 +1668,11 @@ var FolderIcon = GObject.registerClass({
 
     _onDragEnd() {
         this.actor.remove_style_pseudo_class('drop');
-        this._parentView.uninhibitEventBlocker();
-        DND.removeDragMonitor(this._dragMonitor);
-        this._dragMonitor = null;
+        if (this._dragMonitor) {
+            this._parentView.uninhibitEventBlocker();
+            DND.removeDragMonitor(this._dragMonitor);
+            this._dragMonitor = null;
+        }
     }
 
     _canAccept(source) {
@@ -2466,8 +2488,10 @@ var AppIcon = GObject.registerClass({
 
     _onDragEnd() {
         this.actor.remove_style_pseudo_class('drop');
-        DND.removeDragMonitor(this._dragMonitor);
-        this._dragMonitor = null;
+        if (this._dragMonitor) {
+            DND.removeDragMonitor(this._dragMonitor);
+            this._dragMonitor = null;
+        }
     }
 
     handleDragOver(source, _actor, x, y) {
