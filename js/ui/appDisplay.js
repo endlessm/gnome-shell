@@ -1499,6 +1499,15 @@ class ViewIcon extends GObject.Object {
     }
 
     _onDestroy() {
+        if (this._itemDragBeginId) {
+            Main.overview.disconnect(this._itemDragBeginId);
+            delete this._itemDragBeginId;
+        }
+        if (this._itemDragEndId) {
+            Main.overview.disconnect(this._itemDragEndId);
+            delete this._itemDragEndId;
+        }
+
         this.actor._delegate = null;
     }
 
@@ -1597,9 +1606,6 @@ var FolderIcon = GObject.registerClass({
     }
 
     onDestroy() {
-        Main.overview.disconnect(this._itemDragBeginId);
-        Main.overview.disconnect(this._itemDragEndId);
-
         this.view.actor.destroy();
 
         if (this._spaceReadySignalId) {
@@ -2206,9 +2212,6 @@ var AppIcon = GObject.registerClass({
     }
 
     _onDestroy() {
-        Main.overview.disconnect(this._itemDragBeginId);
-        Main.overview.disconnect(this._itemDragEndId);
-
         if (this._folderPreviewId > 0) {
             GLib.source_remove(this._folderPreviewId);
             this._folderPreviewId = 0;
