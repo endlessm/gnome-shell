@@ -6,6 +6,7 @@ const Mainloop = imports.mainloop;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
+const Settings = Hack.imports.utils.getSettings();
 
 const Animation = imports.ui.animation.Animation;
 const Clubhouse = Hack.imports.ui.clubhouse;
@@ -470,7 +471,7 @@ var CodingSession = GObject.registerClass({
 
         this._initToolboxAppActionGroup();
 
-        this._hackModeChangedId = global.settings.connect('changed::hack-mode-enabled',
+        this._hackModeChangedId = Settings.connect('changed::hack-mode-enabled',
             this._syncButtonVisibility.bind(this));
         this._overviewHiddenId = Main.overview.connect('hidden',
             this._overviewStateChanged.bind(this));
@@ -908,7 +909,7 @@ var CodingSession = GObject.registerClass({
             this._focusWindowId = 0;
         }
         if (this._hackModeChangedId != 0) {
-            global.settings.disconnect(this._hackModeChangedId);
+            Settings.disconnect(this._hackModeChangedId);
             this._hackModeChangedId = 0;
         }
         if (this._overviewHiddenId) {
@@ -1128,7 +1129,7 @@ var CodingSession = GObject.registerClass({
         let primaryMonitor = Main.layoutManager.primaryMonitor;
         let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
 
-        if (!global.settings.get_boolean('hack-mode-enabled')) {
+        if (!Settings.get_boolean('hack-mode-enabled')) {
             this._button.hide();
             return;
         }
@@ -1378,8 +1379,8 @@ var CodeViewManager = GObject.registerClass({
             });
         });
 
-        global.settings.connect('changed::hack-mode-enabled', () => {
-            let activated = global.settings.get_boolean('hack-mode-enabled');
+        Settings.connect('changed::hack-mode-enabled', () => {
+            let activated = Settings.get_boolean('hack-mode-enabled');
             if (!activated) {
                 this._sessions.forEach((session) => {
                     let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
@@ -1498,7 +1499,7 @@ var CodeViewManager = GObject.registerClass({
         if (this._stopped)
             return false;
 
-        if (!global.settings.get_boolean('hack-mode-enabled') || !this._isClubhouseInstalled())
+        if (!Settings.get_boolean('hack-mode-enabled') || !this._isClubhouseInstalled())
             return false;
 
         // Do not manage apps that don't have an associated .desktop file
