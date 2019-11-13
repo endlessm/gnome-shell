@@ -501,7 +501,9 @@ class ViewsClone extends St.Widget {
         entry.reactive = false;
         entry.clutter_text.reactive = false;
 
-        this._allViewClone = new AppDisplay.AllView({ allowScrolling: false });
+        this._allViewClone = new AppDisplay.AllView({ allowScrolling: false }, {
+            allowDnD: false,
+        });
         this._allViewClone._eventBlocker.visible = true;
 
         let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
