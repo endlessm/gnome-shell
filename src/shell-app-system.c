@@ -141,7 +141,8 @@ add_aliases (ShellAppSystem  *self,
   ShellAppSystemPrivate *priv = self->priv;
   const char *id = g_app_info_get_id (G_APP_INFO (info));
   const char *alias;
-  g_autofree char *renamed_from = NULL;
+  g_autofree char **renamed_from_list = NULL;
+  size_t i;
 
   alias = g_desktop_app_info_get_string (info, X_ENDLESS_ALIAS_KEY);
   if (alias != NULL)
@@ -150,28 +151,12 @@ add_aliases (ShellAppSystem  *self,
       g_hash_table_insert (priv->alias_to_id, desktop_alias, g_strdup (id));
     }
 
-  /* GDesktopAppInfo does not provide a way to get a string list from the
-   * .desktop file. Open-code it for now.
-   *
-   * https://gitlab.gnome.org/GNOME/glib/merge_requests/339
-   */
-  renamed_from = g_desktop_app_info_get_string (info, X_FLATPAK_RENAMED_FROM_KEY);
-  if (renamed_from != NULL)
+  renamed_from_list = g_desktop_app_info_get_string_list (info, X_FLATPAK_RENAMED_FROM_KEY, NULL);
+  for (i = 0; renamed_from_list != NULL && renamed_from_list[i] != NULL; i++)
     {
-      gchar **renamed_from_list = g_strsplit (renamed_from, ";",  -1);
-      size_t i;
-
-      for (i = 0; renamed_from_list[i] != NULL; i++)
-        {
-          if (renamed_from_list[i][0] != '\0')
-            g_hash_table_insert (priv->alias_to_id,
-                                 g_steal_pointer (&renamed_from_list[i]),
-                                 g_strdup (id));
-          else
-            g_free (renamed_from_list[i]);
-        }
-
-      g_free (renamed_from_list);
+      g_hash_table_insert (priv->alias_to_id,
+                           g_steal_pointer (&renamed_from_list[i]),
+                           g_strdup (id));
     }
 }
 
