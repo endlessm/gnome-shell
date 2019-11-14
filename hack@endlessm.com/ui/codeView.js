@@ -13,7 +13,7 @@ const Clubhouse = Hack.imports.ui.clubhouse;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
 const Soundable = Hack.imports.ui.soundable;
-const ShellDBus = imports.ui.shellDBus;
+const Service = Hack.imports.service;
 const SoundServer = Hack.imports.misc.soundServer;
 
 const WINDOW_ANIMATION_TIME = 250;
@@ -467,7 +467,7 @@ var CodingSession = GObject.registerClass({
         this._grabTimeoutId = 0;
 
         super._init(params);
-        this._hackableApp = new ShellDBus.HackableApp(this);
+        this._hackableApp = new Service.HackableApp(this);
 
         this._initToolboxAppActionGroup();
 

@@ -27,6 +27,7 @@ const { Clutter, Flatpak, Gio, GLib, GObject, Json, Pango, Shell, St } = imports
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
+const Settings = Hack.imports.utils.getSettings();
 
 const Animation = imports.ui.animation.Animation;
 const Main = imports.ui.main;
@@ -36,31 +37,14 @@ const SideComponent = imports.ui.sideComponent;
 const Soundable = Hack.imports.ui.soundable;
 const SoundServer = Hack.imports.misc.soundServer;
 
-const { loadInterfaceXML } = imports.misc.fileUtils;
+const { loadInterfaceXML } = Hack.imports.utils;
 
 const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 200;
 
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
-const ClubhouseIface = `
-<node>
-  <interface name="com.hack_computer.Clubhouse">
-    <method name="show">
-      <arg type="u" direction="in" name="timestamp"/>
-    </method>
-    <method name="hide">
-      <arg type="u" direction="in" name="timestamp"/>
-    </method>
-    <method name="getAnimationMetadata">
-      <arg type="s" direction="in" name="path"/>
-      <arg type="v" direction="out" name="metadata"/>
-    </method>
-    <property name="Visible" type="b" access="read"/>
-    <property name="SuggestingOpen" type="b" access="read"/>
-  </interface>
-</node>
-`;
+const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
 
 // Some button labels are replaced by customized icons if they match a
 // unicode emoji character, as per Design request.
@@ -418,7 +402,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     addButton(button, callback) {
         if (Object.keys(CLUBHOUSE_ICONS_FOR_EMOJI).includes(button.label)) {
             let icon = CLUBHOUSE_ICONS_FOR_EMOJI[button.label];
-            let iconUrl = `resource:///org/gnome/shell/theme/${icon}`;
+            let iconUrl = `file://${Hack.path}/data/icons/${icon}`;
             button.label = '';
 
             button.add_style_class_name('icon-button');
@@ -674,8 +658,8 @@ var Component = GObject.registerClass({
 
         super._init(this._clubhouseIface, this._clubhouseId, this._clubhousePath);
 
-        global.settings.connect('changed::hack-mode-enabled', () => {
-            let activated = global.settings.get_boolean('hack-mode-enabled');
+        Settings.connect('changed::hack-mode-enabled', () => {
+            let activated = Settings.get_boolean('hack-mode-enabled');
             // Only enable if clubhouse app is installed
             activated = activated && !!this.getClubhouseApp();
 
@@ -824,7 +808,7 @@ var Component = GObject.registerClass({
     }
 
     _imageUsesClubhouse() {
-        return global.settings.get_boolean('hack-mode-enabled');
+        return Settings.get_boolean('hack-mode-enabled');
     }
 
     _overrideAddNotification() {
@@ -935,3 +919,25 @@ var Component = GObject.registerClass({
             this._itemBanner.actor.visible = this._enabled;
     }
 });
+
+var CLUBHOUSE = null;
+
+// TODO:
+//  * messageList.js: add notification text markup
+//  * animation.js
+//  * notificationDaemon.js
+//  * sideComponent.js
+
+function enable() {
+    CLUBHOUSE = new Component();
+
+    if (CLUBHOUSE)
+        CLUBHOUSE.enable();
+}
+
+function disable() {
+    if (CLUBHOUSE) {
+        CLUBHOUSE.disable();
+        delete CLUBHOUSE;
+    }
+}
