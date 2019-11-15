@@ -32,8 +32,11 @@ const Settings = Hack.imports.utils.getSettings();
 const Animation = imports.ui.animation.Animation;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const MessageList = imports.ui.messageList;
 const NotificationDaemon = imports.ui.notificationDaemon;
 const SideComponent = imports.ui.sideComponent;
+const Util = imports.misc.util;
+
 const Soundable = Hack.imports.ui.soundable;
 const SoundServer = Hack.imports.misc.soundServer;
 
@@ -64,12 +67,87 @@ var ClubhouseAnimation = class ClubhouseAnimation extends Animation {
         let speed = defaultDelay || 200;
         super(file, width, height, speed);
 
+        this._frameIndex = 0;
+        this._framesInfo = [];
+
         if (frames)
             this.setFramesInfo(this._parseFrames(frames));
     }
 
+    play() {
+        if (this._isLoaded && this._timeoutId == 0) {
+            // Set the frame to be the previous one, so when we update it
+            // when play is called, it shows the current frame instead of
+            // the next one.
+            if (this._frameIndex == 0)
+                this._frameIndex = this._framesInfo.length - 1;
+            else
+                this._frameIndex -= 1;
+
+            this._update();
+        }
+
+        this._isPlaying = true;
+    }
+
+    _showFrame(frame) {
+        let oldFrameActor = this._getCurrentFrameActor();
+        if (oldFrameActor)
+            oldFrameActor.hide();
+
+        this._frameIndex = (frame % this._framesInfo.length);
+
+        let newFrameActor = this._getCurrentFrameActor();
+        if (newFrameActor)
+            newFrameActor.show();
+    }
+
+    _syncAnimationSize() {
+        super._syncAnimationSize();
+        if (this._isLoaded && this._framesInfo.length === 0) {
+            // If a custom sequence of frames wasn't provided,
+            // fallback to play the frames in sequence.
+            for (let i = 0; i < this._animations.get_n_children(); i++)
+                this._framesInfo.push({'frameIndex': i, 'frameDelay': this._speed});
+        }
+    }
+
+    _update() {
+        this._showFrame(this._frameIndex + 1);
+
+        // Show the next frame after the timeout of the current one
+        this._timeoutId = GLib.timeout_add(GLib.PRIORITY_LOW, this._getCurrentDelay(),
+                                           this._update.bind(this));
+
+        GLib.Source.set_name_by_id(this._timeoutId, '[gnome-shell] this._update');
+
+        return GLib.SOURCE_REMOVE;
+    }
+
+    _getCurrentFrame() {
+        return this._framesInfo[this._frameIndex];
+    }
+
+    _getCurrentFrameActor() {
+        let currentFrame = this._getCurrentFrame();
+        return this._animations.get_child_at_index(currentFrame.frameIndex);
+    }
+
+    setFramesInfo(framesInfo) {
+        let wasPlaying = this._isPlaying;
+        this.stop();
+
+        this._framesInfo = framesInfo;
+
+        // If the animation was playing, we continue to play it here
+        // (where it will use the new frames)
+        if (wasPlaying)
+            this.play();
+    }
+
     _getCurrentDelay() {
-        let delay = super._getCurrentDelay();
+        let currentFrame = this._getCurrentFrame();
+        let delay = currentFrame.frameDelay;
         if (typeof delay === 'string') {
             let [delayA, delayB] = delay.split('-');
             return GLib.random_int_range(parseInt(delayA), parseInt(delayB));
@@ -920,19 +998,94 @@ var Component = GObject.registerClass({
     }
 });
 
-var CLUBHOUSE = null;
+// rich markup
+function _fixMarkup(text, allowMarkup, onlySimpleMarkup) {
+    if (allowMarkup) {
+        // Support &amp;, &quot;, &apos;, &lt; and &gt;, escape all other
+        // occurrences of '&'.
+        let _text = text.replace(/&(?!amp;|quot;|apos;|lt;|gt;)/g, '&amp;');
 
-// TODO:
-//  * messageList.js: add notification text markup
-//  * animation.js
-//  * notificationDaemon.js
-//  * sideComponent.js
+        if (onlySimpleMarkup) {
+            // Support <b>, <i>, and <u>, escape anything else
+            // so it displays as raw markup.
+            // Ref: https://developer.gnome.org/notification-spec/#markup
+            _text = _text.replace(/<(?!\/?[biu]>)/g, '&lt;');
+        }
+
+        try {
+            Pango.parse_markup(_text, -1, '');
+            return _text;
+        } catch (e) {}
+    }
+
+    // !allowMarkup, or invalid markup
+    return GLib.markup_escape_text(text, -1);
+}
+
+function setBody(text) {
+    this._bodyText = text;
+    this.bodyLabel.setMarkup(text ? text.replace(/\n/g, ' ') : '',
+                             this._useBodyMarkup, this._bodySimpleMarkup);
+    if (this._expandedLabel)
+        this._expandedLabel.setMarkup(text, this._useBodyMarkup, this._bodySimpleMarkup);
+}
+
+function setUseBodySimpleMarkup(enable) {
+    if (!!this._bodySimpleMarkup === enable)
+        return;
+    this._bodySimpleMarkup = enable;
+    if (this.bodyLabel)
+        this.setBody(this._bodyText);
+}
+
+function setMarkup(text, allowMarkup, onlySimpleMarkup=true) {
+    text = text ? _fixMarkup(text, allowMarkup, onlySimpleMarkup) : '';
+    this._text = text;
+
+    this.actor.clutter_text.set_markup(text);
+    /* clutter_text.text contain text without markup */
+    this._urls = Util.findUrls(this.actor.clutter_text.text);
+    this._highlightUrls();
+}
+
+function activateAction(actionId, target) {
+    this.activateActionFull(actionId, target, true);
+}
+
+function activateActionFull(actionId, target, hideOverview) {
+    this._createApp((app, error) => {
+        if (error == null)
+            app.ActivateActionRemote(actionId, target ? [target] : [],
+                                     NotificationDaemon.getPlatformData());
+        else
+            logError(error, 'Failed to activate application proxy');
+    });
+    Main.overview.hide();
+    Main.panel.closeCalendar();
+
+    if (hideOverview) {
+        Main.overview.hide();
+        Main.panel.closeCalendar();
+    }
+}
+
+var CLUBHOUSE = null;
+const originalSetMarkup = MessageList.URLHighlighter.prototype.setMarkup;
+const originalSetBody = MessageList.Message.prototype.setBody;
+const originalActivateAction = NotificationDaemon.GtkNotificationDaemonAppSource.activateAction;
 
 function enable() {
     CLUBHOUSE = new Component();
 
     if (CLUBHOUSE)
         CLUBHOUSE.enable();
+
+    MessageList.URLHighlighter.prototype.setMarkup = setMarkup;
+    MessageList.Message.prototype.setUseBodySimpleMarkup = setUseBodySimpleMarkup;
+    MessageList.Message.prototype.setBody = setBody;
+
+    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateActionFull = activateActionFull;
+    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateAction = activateAction;
 }
 
 function disable() {
@@ -940,4 +1093,10 @@ function disable() {
         CLUBHOUSE.disable();
         delete CLUBHOUSE;
     }
+
+    MessageList.URLHighlighter.setMarkup = originalSetMarkup;
+    MessageList.Message.prototype.setBody = originalSetBody;
+    MessageList.Message.prototype.setUseBodySimpleMarkup = null;
+    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateActionFull = null;
+    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateAction = originalActivateAction;
 }
