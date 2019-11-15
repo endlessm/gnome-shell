@@ -10,17 +10,17 @@ function init(metadata) {
 }
 
 function enable() {
-    log("HACK ENABLE");
     appDisplay.enable();
     clubhouse.enable();
+    codeView.enable();
 
     Service.enable();
 }
 
 function disable() {
-    log("HACK DISABLE");
     appDisplay.disable();
     clubhouse.disable();
+    codeView.enable();
 
     Service.disable();
 }

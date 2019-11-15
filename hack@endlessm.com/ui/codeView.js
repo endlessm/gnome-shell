@@ -1623,3 +1623,79 @@ var CodeViewManager = GObject.registerClass({
         });
     }
 });
+
+// TODO:
+// * js/ui/windowManager.js (Code view integration, this is the harder part)
+
+// altTab.js
+
+const AltTab = imports.ui.altTab;
+const originalGetWindow = AltTab.getWindows;
+
+function getWindows(workspace) {
+    // We ignore skip-taskbar windows in switchers, but if they are attached
+    // to their parent, their position in the MRU list may be more appropriate
+    // than the parent; so start with the complete list ...
+    let windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL,
+                                              workspace);
+    // ... map windows to their parent where appropriate ...
+    return windows.map(w => {
+        return w.is_attached_dialog() ? w.get_transient_for() : w;
+    // ... and filter out hack inactive, skip-taskbar windows and duplicates
+    }).filter((w, i, a) => !w._hackIsInactiveWindow && !w.skip_taskbar && a.indexOf(w) == i);
+}
+
+// appIconBar.js
+const AppIconBar = imports.ui.appIconBar;
+const originalGetInterestingWindow = AppIconBar.AppIconButton.prototype._getInterestingWindows;
+
+function getInterestingWindows() {
+    let windows = this._app.get_windows();
+    let hasSpeedwagon = false;
+    windows = windows.filter(function(metaWindow) {
+        hasSpeedwagon = hasSpeedwagon || Shell.WindowTracker.is_speedwagon_window(metaWindow);
+        return !metaWindow.is_skip_taskbar() && !metaWindow._hackIsInactiveWindow;
+    });
+    return [windows, hasSpeedwagon];
+}
+
+// workspace.js
+const Workspace = imports.ui.workspace;
+const originalIsOverviewWindow = Workspace.Workspace.prototype._isOverviewWindow;
+
+function isOverviewWindow(win) {
+    return !win.get_meta_window().skip_taskbar && !win.get_meta_window()._hackIsInactiveWindow;
+}
+
+function enable() {
+    AltTab.getWindows = getWindows;
+    AltTab.AppIcon.prototype = {
+        get cachedWindows() {
+            let cached = this._cachedWindows || [];
+            return cached.filter((win) => {
+                return !win._hackIsInactiveWindow;
+            });
+        },
+        set cachedWindows(windowList) {
+            this._cachedWindows = windowList;
+        },
+    };
+
+    AppIconBar.AppIconButton.prototype._getInterestingWindows = getInterestingWindows;
+    Workspace.Workspace.prototype._isOverviewWindow = isOverviewWindow;
+}
+
+function disable() {
+    AltTab.getWindow = originalGetWindow;
+    AltTab.AppIcon.prototype = {
+        get cachedWindows() {
+            return this._cachedWindows || [];
+        },
+        set cachedWindows(windowList) {
+            this._cachedWindows = windowList;
+        },
+    };
+
+    AppIconBar.AppIconButton.prototype._getInterestingWindows = originalGetInterestingWindow;
+    Workspace.Workspace.prototype._isOverviewWindow = originalIsOverviewWindow;
+}
