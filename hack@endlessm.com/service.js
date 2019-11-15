@@ -31,15 +31,15 @@ var Service = class {
                                                   this._checkFocusAppChanged.bind(this));
         Settings.connect('changed::hack-mode-enabled', () => {
             this._dbusImpl.emit_property_changed('HackModeEnabled',
-                                                 new GLib.Variant('s', this.HackModeEnabled));
+                                                 new GLib.Variant('b', this.HackModeEnabled));
         });
         Settings.connect('changed::hack-icon-pulse', () => {
             this._dbusImpl.emit_property_changed('HackIconPulse',
-                                                 new GLib.Variant('s', this.HackIconPulse));
+                                                 new GLib.Variant('b', this.HackIconPulse));
         });
         Settings.connect('changed::show-hack-launcher', () => {
             this._dbusImpl.emit_property_changed('ShowHackLauncher',
-                                                 new GLib.Variant('s', this.ShowHackLauncher));
+                                                 new GLib.Variant('b', this.ShowHackLauncher));
         });
     }
 
