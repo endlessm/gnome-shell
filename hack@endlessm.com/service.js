@@ -263,75 +263,53 @@ var SHELL_DBUS_SERVICE = null;
 var HACKABLE_APPS_MANAGER_SERVICE = null;
 
 var STORE_SERVICE = {
-    AddApplication: null,
-    AddAppIfNotVisible: null,
-    RemoveApplication: null,
+    AddApplication: ShellDBus.AppStoreService.prototype.AddApplication,
+    AddAppIfNotVisible: ShellDBus.AppStoreService.prototype.AddAppIfNotVisible,
+    RemoveApplication: ShellDBus.AppStoreService.prototype.RemoveApplication,
 };
-
-var storeServiceAddApplication = null;
-var storeServiceAddAppIfNotVisible = null;
-var storeServiceAddAppIfNotVisible = null;
-
-var MAIN_START = Main.start;
-
 
 function enable() {
     SHELL_DBUS_SERVICE = new Service();
     HACKABLE_APPS_MANAGER_SERVICE = new HackableAppsManager();
 
-    Main.start = () => {
-        MAIN_START();
-        let storeService = Main.shellDBusService._appStoreService;
-        if (storeService) {
-            STORE_SERVICE.AddApplication = storeService.AddApplication.bind(storeService);
-            STORE_SERVICE.AddAppIfNotVisible = storeService.AddAppIfNotVisible.bind(storeService);
-            STORE_SERVICE.RemoveApplication = storeService.RemoveApplication.bind(storeService);
+    ShellDBus.AppStoreService.prototype.AddApplication = function(id) {
+        ShellDBus._reportAppAddedMetric(id);
 
-            storeService.AddApplication = (id) => {
-                ShellDBus._reportAppAddedMetric(id);
-
-                if (id === CLUBHOUSE_ID) {
-                    Settings.set_boolean('show-hack-launcher', true);
-                    storeService._iconGridLayout.emit('changed');
-                    return;
-                }
-
-                STORE_SERVICE.AddApplication(id);
-            }
-
-            storeService.AddAppIfNotVisible = (id) => {
-                if (id === CLUBHOUSE_ID) {
-                    Settings.set_boolean('show-hack-launcher', true);
-                    storeService._iconGridLayout.emit('changed');
-                    ShellDBus._reportAppAddedMetric(id);
-                    return;
-                }
-
-                STORE_SERVICE.AddAppIfNotVisible(id);
-            }
-
-            storeService.RemoveApplication = (id) => {
-                if (id === CLUBHOUSE_ID) {
-                    global.settings.set_boolean('show-hack-launcher', false);
-                    storeService._iconGridLayout.emit('changed');
-                    return;
-                }
-
-                STORE_SERVICE.RemoveApplication(id);
-            }
+        if (id === CLUBHOUSE_ID) {
+            Settings.set_boolean('show-hack-launcher', true);
+            this._iconGridLayout.emit('changed');
+            return;
         }
-    };
+
+        STORE_SERVICE.AddApplication.bind(this)(id);
+    }
+
+    ShellDBus.AppStoreService.prototype.AddAppIfNotVisible = function(id) {
+        if (id === CLUBHOUSE_ID) {
+            Settings.set_boolean('show-hack-launcher', true);
+            this._iconGridLayout.emit('changed');
+            ShellDBus._reportAppAddedMetric(id);
+            return;
+        }
+
+        STORE_SERVICE.AddAppIfNotVisible.bind(this)(id);
+    }
+
+    ShellDBus.AppStoreService.prototype.RemoveApplication = function(id) {
+        if (id === CLUBHOUSE_ID) {
+            global.settings.set_boolean('show-hack-launcher', false);
+            this._iconGridLayout.emit('changed');
+            return;
+        }
+
+        STORE_SERVICE.RemoveApplication.bind(this)(id);
+    }
 }
 
 function disable() {
-    Main.start = MAIN_START;
-
-    let storeService = Main.shellDBusService._appStoreService;
-    if (storeService) {
-        storeService.AddApplication = STORE_SERVICE.AddApplication;
-        storeService.AddAppIfNotVisible = STORE_SERVICE.AddAppIfNotVisible;
-        storeService.RemoveApplication = STORE_SERVICE.RemoveApplication;
-    }
+    ShellDBus.AppStoreService.prototype.AddApplication = STORE_SERVICE.AddApplication;
+    ShellDBus.AppStoreService.prototype.AddAppIfNotVisible = STORE_SERVICE.AddAppIfNotVisible;
+    ShellDBus.AppStoreService.prototype.RemoveApplication = STORE_SERVICE.RemoveApplication;
 
     if (SHELL_DBUS_SERVICE) {
         delete SHELL_DBUS_SERVICE;

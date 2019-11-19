@@ -150,39 +150,49 @@ class HackAppIcon extends AppIcon {
 
 const {AllView} = imports.ui.appDisplay;
 const originalLoadApps = AllView.prototype._loadApps;
+const originalRemoveIcon = IconGridLayout.IconGridLayout.prototype.removeIcon;
 
-function maybeAddHackIcon(apps) {
-    if (!_shouldShowHackLauncher())
-        return;
+const CLUBHOUSE_ID = 'com.hack_computer.Clubhouse.desktop';
 
-    if (!this._hackAppIcon)
-        this._hackAppIcon = new HackAppIcon();
-
-    apps.unshift(this._hackAppIcon);
-}
+// one icon for each AllView, there's two, the main and the gray
+var HackIcons = {};
 
 function loadApps() {
     let newApps = originalLoadApps.bind(this)();
-    this._maybeAddHackIcon(newApps);
+
+    if (_shouldShowHackLauncher()) {
+        if (!HackIcons[this])
+            HackIcons[this] = new HackAppIcon();
+
+        newApps.unshift(HackIcons[this]);
+    }
+
     return newApps;
 }
 
 // TODO: implement DnD limits and removement special case
 
 function enable() {
-    AllView.prototype._hackAppIcon = null;
-    AllView.prototype._maybeAddHackIcon = maybeAddHackIcon;
     AllView.prototype._loadApps = loadApps;
 
     const iconGridLayout = IconGridLayout.getDefault();
     iconGridLayout.emit('changed');
+
+    IconGridLayout.IconGridLayout.prototype.removeIcon = function(id) {
+        if (id === CLUBHOUSE_ID) {
+            Object.keys(HackIcons).forEach((k) => HackIcons[k].remove());
+            return;
+        }
+
+        originalRemoveIcon.bind(this)(id);
+    };
 }
 
 function disable() {
     AllView.prototype._loadApps = originalLoadApps;
-    delete AllView.prototype._maybeAddHackIcon;
-    delete AllView.prototype._hackAppIcon;
 
     const iconGridLayout = IconGridLayout.getDefault();
     iconGridLayout.emit('changed');
+
+    HackIcons = {};
 }
