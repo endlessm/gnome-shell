@@ -504,6 +504,7 @@ class ViewsClone extends St.Widget {
         this._allViewClone = new AppDisplay.AllView({ allowScrolling: false }, {
             allowDnD: false,
         });
+        this._allViewClone.actor.style_class = 'all-apps all-apps-scroller';
         this._allViewClone._eventBlocker.visible = true;
 
         let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
