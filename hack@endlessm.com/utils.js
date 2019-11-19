@@ -41,3 +41,25 @@ function loadInterfaceXML(iface) {
 
     return xml;
 }
+
+function override(object, methodName, callback) {
+    if (!object._fnOverrides)
+        object._fnOverrides = {};
+
+    const original = object.prototype[methodName];
+    object._fnOverrides[methodName] = original;
+    object.prototype[methodName] = callback;
+}
+
+function restore(object) {
+    if (object._fnOverrides) {
+        Object.keys(object._fnOverrides).forEach((k) => {
+            object.prototype[k] = object._fnOverrides[k];
+        });
+        delete object._fnOverrides;
+    }
+}
+
+function original(object, methodName) {
+    return object._fnOverrides[methodName];
+}

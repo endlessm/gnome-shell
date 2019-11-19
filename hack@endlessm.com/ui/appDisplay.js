@@ -1,12 +1,14 @@
 const { Clutter, Gio, GLib, GObject, St } = imports.gi;
 
-const { AppIcon } = imports.ui.appDisplay;
+const AppDisplay = imports.ui.appDisplay;
 const IconGridLayout = imports.ui.iconGridLayout;
 const Main = imports.ui.main;
+const DND = imports.ui.dnd;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
 const Settings = Hack.imports.utils.getSettings();
+const {override, restore, original} = Hack.imports.utils;
 
 const Clubhouse = Hack.imports.ui.clubhouse;
 
@@ -17,7 +19,7 @@ function _shouldShowHackLauncher() {
 }
 
 var HackAppIcon = GObject.registerClass(
-class HackAppIcon extends AppIcon {
+class HackAppIcon extends AppDisplay.AppIcon {
     _init() {
         let viewIconParams = {
             isDraggable: true,
@@ -186,6 +188,39 @@ function enable() {
 
         originalRemoveIcon.bind(this)(id);
     };
+
+    // Disable movements
+    override(AppDisplay.BaseAppView, '_canAccept', function(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
+        return original(AppDisplay.BaseAppView, '_canAccept').bind(this)(source);
+    });
+
+    override(AppDisplay.ViewIcon, '_canAccept', function(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
+        return true;
+    });
+
+    override(AppDisplay.FolderIcon, '_canAccept', function(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
+        return original(AppDisplay.FolderIcon, '_canAccept').bind(this)(source);
+    });
+
+    override(AppDisplay.AppIcon, '_canAccept', function(source) {
+        // Disable movement of the HackAppIcon
+        if (source instanceof HackAppIcon)
+            return false;
+
+        return original(AppDisplay.AppIcon, '_canAccept').bind(this)(source);
+    });
 }
 
 function disable() {
@@ -195,4 +230,9 @@ function disable() {
     iconGridLayout.emit('changed');
 
     HackIcons = {};
+
+    restore(AppDisplay.BaseAppView);
+    restore(AppDisplay.ViewIcon);
+    restore(AppDisplay.FolderIcon);
+    restore(AppDisplay.AppIcon);
 }
