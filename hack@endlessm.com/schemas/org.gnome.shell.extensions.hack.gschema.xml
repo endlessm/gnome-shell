@@ -2,7 +2,7 @@
 <schemalist>
   <schema path="/org/gnome/shell/extensions/hack/" id="org.gnome.shell.extensions.hack" >
     <key type="b" name="hack-mode-enabled">
-      <default>false</default>
+      <default>true</default>
       <summary>Enable Hack mode</summary>
       <description>If true, enables the Hack experience</description>
     </key>
@@ -15,6 +15,56 @@
       <default>true</default>
       <summary>Show the Hack launcher in the desktop</summary>
       <description>If true, the Hack desktop icon will be shown.</description>
+    </key>
+    <key name="wobbly-effect" type="b">
+      <default>false</default>
+      <summary>
+        Whether or not to enable the wobbly effect
+      </summary>
+      <description>
+        WOBBLY!
+      </description>
+    </key>
+    <key name="wobbly-spring-k" type="d">
+      <range min="2.0" max="10.0"/>
+      <default>8.0</default>
+      <summary>
+        Wobbly effect Spring Constant
+      </summary>
+      <description>
+        Springiness of wobbly effect
+      </description>
+    </key>
+    <key name="wobbly-spring-friction" type="d">
+      <range min="2.0" max="10.0"/>
+      <default>3.0</default>
+      <summary>
+        Wobbly effect Friction
+      </summary>
+      <description>
+        Friction of wobbly effect
+      </description>
+    </key>
+    <key name="wobbly-slowdown-factor" type="d">
+      <range min="1.0" max="5.0"/>
+      <default>1.0</default>
+      <summary>
+        Wobbly effect slowdown factor
+      </summary>
+      <description>
+        Slowdown factor of wobbly effect (1.0 being normal speed)
+      </description>
+    </key>
+    <key name="wobbly-object-movement-range" type="d">
+      <range min="10.0" max="500.0"/>
+      <default>100.0</default>
+      <summary>
+        Wobbly effect object movement range
+      </summary>
+      <description>
+        How much objects are allowed to move in the mesh. A higher range
+        allows for a more pronounced effect.
+      </description>
     </key>
   </schema>
 </schemalist>

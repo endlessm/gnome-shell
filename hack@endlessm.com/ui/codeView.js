@@ -310,7 +310,7 @@ var WindowTrackingButton = GObject.registerClass({
         this._updateSounds();
 
         // pulse effect
-        let gfile = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/flip-glow.png');
+        let gfile = Gio.File.new_for_uri(`file://${Hack.path}/data/icons/flip-glow.png`);
         this._pulseAnimation = new Animation(gfile,
             FLIP_BUTTON_WIDTH,
             FLIP_BUTTON_HEIGHT,
@@ -1624,9 +1624,6 @@ var CodeViewManager = GObject.registerClass({
     }
 });
 
-// TODO:
-// * js/ui/windowManager.js (Code view integration, this is the harder part)
-
 // altTab.js
 
 const AltTab = imports.ui.altTab;
@@ -1667,6 +1664,100 @@ function isOverviewWindow(win) {
     return !win.get_meta_window().skip_taskbar && !win.get_meta_window()._hackIsInactiveWindow;
 }
 
+// windowManager.js
+const WindowManager = imports.ui.windowManager;
+const Wobbly = Hack.imports.ui.wobbly;
+const SideComponent = imports.ui.sideComponent;
+
+function _windowCanWobble(win, op) {
+    if (win.is_override_redirect() ||
+        op != Meta.GrabOp.MOVING)
+        return false;
+
+    return true;
+}
+
+function _windowGrabbed(display, screen, win, op) {
+    // Occassionally, window can be null, in cases where grab-op-begin
+    // was emitted on a window from shell-toolkit. Ignore these grabs.
+    if (!win)
+        return;
+
+    if (!_windowCanWobble(win, op))
+        return;
+
+    let actor = win.get_compositor_private();
+    if (!actor._animatableSurface)
+        return;
+
+    // This is an event that may cause an animation
+    // on the window.
+    let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
+    if (attachedEffect)
+        attachedEffect.activate('move', { grabbed: true });
+
+    this._codeViewManager.handleWindowGrab(actor, true);
+}
+
+function _windowUngrabbed(display, op, win) {
+    // Occassionally, window can be null, in cases where grab-op-end
+    // was emitted on a window from shell-toolkit. Ignore these grabs.
+    if (!win)
+        return;
+
+    let actor = win.get_compositor_private();
+    if (!actor._animatableSurface)
+        return;
+
+    // This is an event that may cause an animation on the window
+    let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
+    if (attachedEffect)
+        attachedEffect.activate('move', { grabbed: false });
+
+    this._codeViewManager.handleWindowGrab(actor, false);
+}
+
+function mapWindow(shellwm, actor) {
+    actor._windowType = actor.meta_window.get_window_type();
+    let metaWindow = actor.meta_window;
+    let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
+
+    if (!isSplashWindow) {
+        // If we have an active splash window for the app, don't animate it.
+        let tracker = Shell.WindowTracker.get_default();
+        let app = tracker.get_window_app(metaWindow);
+        let hasSplashWindow = (app && app.get_windows().some(w => {
+            return Shell.WindowTracker.is_speedwagon_window(w);
+        }));
+        if (hasSplashWindow) {
+            if (!this._codeViewManager.handleMapWindow(actor))
+                shellwm.completed_map(actor);
+            return;
+        }
+    }
+
+    if (SideComponent.isSideComponentWindow(actor.meta_window)) {
+        return;
+    }
+
+    if (actor._windowType === Meta.WindowType.NORMAL && !isSplashWindow) {
+        return this._codeViewManager.handleMapWindow(actor);
+    }
+}
+
+function destroyWindow(shellwm, actor) {
+    this._codeViewManager.handleDestroyWindow(actor);
+}
+
+const WM_HANDLERS = [];
+var GRAB_BEGIN = 0;
+var GRAB_END = 0;
+function _wmConnect(signal, fn) {
+    const handler = global.window_manager.connect(signal, fn);
+    WM_HANDLERS.push(handler);
+    return handler;
+}
+
 function enable() {
     AltTab.getWindows = getWindows;
     AltTab.AppIcon.prototype = {
@@ -1683,6 +1774,41 @@ function enable() {
 
     AppIconBar.AppIconButton.prototype._getInterestingWindows = getInterestingWindows;
     Workspace.Workspace.prototype._isOverviewWindow = isOverviewWindow;
+
+    Main.wm._codeViewManager = new CodeViewManager();
+    Main.wm._animationsServer = null;
+    Main.wm._wobblyEffect = null;
+    Wobbly.enableWobblyFx(Main.wm);
+
+    _wmConnect('kill-window-effects', (shellwm, actor) => {
+        Main.wm._codeViewManager.killEffectsOnActor(actor);
+    });
+    _wmConnect('map', (shellwm, actor) => {
+        // Endless libanimation extension
+        if (Main.wm._animationsServer) {
+            actor._animatableSurface = Main.wm._animationsServer.register_surface(
+                new Wobbly.ShellWindowManagerAnimatableSurface(actor));
+        }
+
+        // Add the wobbly effect if it is enabled
+        if (Main.wm._wobblyEffect) {
+            actor._animatableSurface.attach_animation_effect_with_server_priority(
+                'move', Main.wm._wobblyEffect);
+        }
+    });
+
+    _wmConnect('destroy', (shellwm, actor) => {
+        if (actor._animatableSurface) {
+            Main.wm._animationsServer.unregister_surface(actor._animatableSurface);
+            actor._animatableSurface = null;
+        }
+    });
+
+    GRAB_BEGIN = global.display.connect('grab-op-begin', _windowGrabbed.bind(Main.wm));
+    GRAB_END = global.display.connect('grab-op-end', _windowUngrabbed.bind(Main.wm));
+
+    _wmConnect('map', mapWindow.bind(Main.wm));
+    _wmConnect('destroy', destroyWindow.bind(Main.wm));
 }
 
 function disable() {
@@ -1698,4 +1824,14 @@ function disable() {
 
     AppIconBar.AppIconButton.prototype._getInterestingWindows = originalGetInterestingWindow;
     Workspace.Workspace.prototype._isOverviewWindow = originalIsOverviewWindow;
+
+    Main.wm._codeViewManager = null;
+    Wobbly.disableWobblyFx(Main.wm);
+
+    WM_HANDLERS.forEach((handler) => {
+        global.window_manager.disconnect(handler);
+    });
+
+    global.display.disconnect(GRAB_BEGIN);
+    global.display.disconnect(GRAB_END);
 }

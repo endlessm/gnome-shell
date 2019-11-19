@@ -41,6 +41,27 @@ var Service = class {
             this._dbusImpl.emit_property_changed('ShowHackLauncher',
                                                  new GLib.Variant('b', this.ShowHackLauncher));
         });
+
+        Settings.connect('changed::wobbly-effect', () => {
+            this._dbusImpl.emit_property_changed('WobblyEffect',
+                                                 new GLib.Variant('b', this.WobblyEffect));
+        });
+        Settings.connect('changed::wobbly-spring-k', () => {
+            this._dbusImpl.emit_property_changed('WobblySpringK',
+                                                 new GLib.Variant('d', this.WobblySpringK));
+        });
+        Settings.connect('changed::wobbly-spring-friction', () => {
+            this._dbusImpl.emit_property_changed('WobblySpringFriction',
+                                                 new GLib.Variant('d', this.WobblySpringFriction));
+        });
+        Settings.connect('changed::wobbly-slowdown-factor', () => {
+            this._dbusImpl.emit_property_changed('WobblySlowdownFactor',
+                                                 new GLib.Variant('d', this.WobblySlowdownFactor));
+        });
+        Settings.connect('changed::wobbly-object-movement-range', () => {
+            this._dbusImpl.emit_property_changed('WobblyObjectMovementRange',
+                                                 new GLib.Variant('d', this.WobblyObjectMovementRange));
+        });
     }
 
     MinimizeAll() {
@@ -87,6 +108,46 @@ var Service = class {
 
     set ShowHackLauncher(enabled) {
         Settings.set_boolean('show-hack-launcher', enabled);
+    }
+
+    get WobblyEffect() {
+        return Settings.get_boolean('wobbly-effect');
+    }
+
+    set WobblyEffect(enabled) {
+        Settings.set_boolean('wobbly-effect', enabled);
+    }
+
+    get WobblySpringK() {
+        return Settings.get_double('wobbly-spring-k');
+    }
+
+    set WobblySpringK(value) {
+        Settings.set_double('wobbly-spring-k', value);
+    }
+
+    get WobblySpringFriction() {
+        return Settings.get_double('wobbly-spring-friction');
+    }
+
+    set WobblySpringFriction(value) {
+        Settings.set_double('wobbly-spring-friction', value);
+    }
+
+    get WobblySlowdownFactor() {
+        return Settings.get_double('wobbly-slowdown-factor');
+    }
+
+    set WobblySlowdownFactor(value) {
+        Settings.set_double('wobbly-slowdown-factor', value);
+    }
+
+    get WobblyObjectMovementRange() {
+        return Settings.get_double('wobbly-object-movement-range');
+    }
+
+    set WobblyObjectMovementRange(value) {
+        Settings.set_double('wobbly-object-movement-range', value);
     }
 };
 
@@ -164,10 +225,9 @@ var HackableAppsManager = class {
             return;
         }
 
-        // TODO: Fix this, codeviewmanager instance!
-        //this._codeViewManager = Main.wm._codeViewManager;
-        //this._codeViewManager.connect('session-added', this._onSessionAdded.bind(this));
-        //this._codeViewManager.connect('session-removed', this._onSessionRemoved.bind(this));
+        this._codeViewManager = Main.wm._codeViewManager;
+        this._codeViewManager.connect('session-added', this._onSessionAdded.bind(this));
+        this._codeViewManager.connect('session-removed', this._onSessionRemoved.bind(this));
 
         this._nextId = 0;
     }
