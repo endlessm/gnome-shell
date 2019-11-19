@@ -148,37 +148,40 @@ class HackAppIcon extends AppIcon {
 
 // Monkey patching
 
-const AllView = Main.overview.viewSelector._viewsDisplay._appDisplay._allView;
-const originalLoadApps = AllView._loadApps.bind(AllView);
+const {AllView} = imports.ui.appDisplay;
+const originalLoadApps = AllView.prototype._loadApps;
+
+function maybeAddHackIcon(apps) {
+    if (!_shouldShowHackLauncher())
+        return;
+
+    if (!this._hackAppIcon)
+        this._hackAppIcon = new HackAppIcon();
+
+    apps.unshift(this._hackAppIcon);
+}
+
+function loadApps() {
+    let newApps = originalLoadApps.bind(this)();
+    this._maybeAddHackIcon(newApps);
+    return newApps;
+}
 
 // TODO: implement DnD limits and removement special case
 
 function enable() {
-    AllView._hackAppIcon = null;
-    AllView._maybeAddHackIcon = (apps) => {
-        if (!_shouldShowHackLauncher())
-            return;
-
-        if (!AllView._hackAppIcon)
-            AllView._hackAppIcon = new HackAppIcon();
-
-        apps.unshift(AllView._hackAppIcon);
-    }
-
-    AllView._loadApps = () => {
-        let newApps = originalLoadApps();
-        AllView._maybeAddHackIcon(newApps);
-        return newApps;
-    };
+    AllView.prototype._hackAppIcon = null;
+    AllView.prototype._maybeAddHackIcon = maybeAddHackIcon;
+    AllView.prototype._loadApps = loadApps;
 
     const iconGridLayout = IconGridLayout.getDefault();
     iconGridLayout.emit('changed');
 }
 
 function disable() {
-    AllView._loadApps = originalLoadApps;
-    delete AllView._maybeAddHackIcon;
-    delete AllView._hackAppIcon;
+    AllView.prototype._loadApps = originalLoadApps;
+    delete AllView.prototype._maybeAddHackIcon;
+    delete AllView.prototype._hackAppIcon;
 
     const iconGridLayout = IconGridLayout.getDefault();
     iconGridLayout.emit('changed');
