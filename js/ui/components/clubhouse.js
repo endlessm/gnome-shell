@@ -645,12 +645,30 @@ class ClubhouseNotificationSource extends NotificationDaemon.GtkNotificationDaem
     }
 };
 
+// Enabling hack-mode for hack1 users
+function _migrateHack1() {
+    const hackComponents = Gio.File.new_for_uri('file:///var/lib/flatpak/app/com.endlessm.HackComponents');
+    if (!hackComponents.query_exists(null))
+        return;
+
+    // Only enable the first time, to allow the user to disable the hack mode
+    try {
+        Gio.File.new_for_path('.hack1-migrated').create(Gio.FileCreateFlags.NONE, null);
+        global.settings.set_boolean('hack-mode-enabled', true);
+        log('Hack 1 migration: enabled hack mode and created indicator file');
+    } catch (e) {
+        log('Hack 1 migration: already done, skipping');
+    }
+}
+
 var Component = GObject.registerClass({
 }, class ClubhouseComponent extends SideComponent.SideComponent {
     _init(clubhouseIface, clubhouseId, clubhousePath) {
         this._clubhouseId = clubhouseId || 'com.hack_computer.Clubhouse';
         this._clubhouseIface = clubhouseIface || ClubhouseIface;
         this._clubhousePath = clubhousePath || CLUBHOUSE_DBUS_OBJ_PATH;
+
+        _migrateHack1();
 
         super._init(this._clubhouseIface, this._clubhouseId, this._clubhousePath);
 
@@ -900,8 +918,9 @@ var Component = GObject.registerClass({
             this.proxy.call('migrationQuest', null, Gio.DBusCallFlags.NONE, -1, null, (source, result) => {
                 try {
                     this.proxy.call_finish(result);
+                    log('Hack 1 migration: migration quest started');
                 } catch (err) {
-                    logError(err, 'Error running the migrationQuest in clubhouse');
+                    logError(err, 'Hack 1 migration: migration quest could not be started');
                 }
             });
         }
