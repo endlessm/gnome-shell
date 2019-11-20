@@ -653,7 +653,8 @@ function _migrateHack1() {
 
     // Only enable the first time, to allow the user to disable the hack mode
     try {
-        Gio.File.new_for_path('.hack1-migrated').create(Gio.FileCreateFlags.NONE, null);
+        const filePath = GLib.build_filenamev([GLib.get_user_config_dir(), '.hack1-migrated']);
+        Gio.File.new_for_path(filePath).create(Gio.FileCreateFlags.NONE, null);
         global.settings.set_boolean('hack-mode-enabled', true);
         log('Hack 1 migration: enabled hack mode and created indicator file');
     } catch (e) {
