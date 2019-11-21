@@ -20,7 +20,7 @@ function enable() {
 function disable() {
     appDisplay.disable();
     clubhouse.disable();
-    codeView.enable();
+    codeView.disable();
 
     Service.disable();
 }

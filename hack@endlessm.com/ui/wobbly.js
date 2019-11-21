@@ -137,7 +137,6 @@ var EOSShellWobbly = GObject.registerClass({
     remove() {
         if (this.actor) {
             this.actor.remove_effect(this);
-            this.actor = null;
         }
     }
 

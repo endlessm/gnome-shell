@@ -1760,17 +1760,17 @@ function _wmConnect(signal, fn) {
 
 function enable() {
     AltTab.getWindows = getWindows;
-    AltTab.AppIcon.prototype = {
-        get cachedWindows() {
+     Object.defineProperty(AltTab.AppIcon.prototype, 'cachedWindows', {
+        get: function() {
             let cached = this._cachedWindows || [];
             return cached.filter((win) => {
                 return !win._hackIsInactiveWindow;
             });
         },
-        set cachedWindows(windowList) {
+        set: function(windowList) {
             this._cachedWindows = windowList;
         },
-    };
+     });
 
     AppIconBar.AppIconButton.prototype._getInterestingWindows = getInterestingWindows;
     Workspace.Workspace.prototype._isOverviewWindow = isOverviewWindow;
