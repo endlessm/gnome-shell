@@ -1528,6 +1528,11 @@ class ViewIcon extends GObject.Object {
             delete this._itemDragEndId;
         }
 
+        if (this._dragMonitor) {
+            DND.removeDragMonitor(this._dragMonitor);
+            this._dragMonitor = null;
+        }
+
         this.actor._delegate = null;
     }
 
