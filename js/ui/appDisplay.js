@@ -236,10 +236,11 @@ class BaseAppView {
         // Remove old app icons
         removedApps.forEach(icon => {
             let iconIndex = this._allItems.indexOf(icon);
+            let id = icon.id;
 
             this._allItems.splice(iconIndex, 1);
-            this._grid.removeItem(icon);
-            delete this._items[icon.id];
+            icon.actor.destroy();
+            delete this._items[id];
 
             if (icon === this._hackAppIcon)
                 this._hackAppIcon = null;
