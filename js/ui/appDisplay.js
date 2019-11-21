@@ -644,10 +644,9 @@ var AllView = class AllView extends BaseAppView {
         let favoritesWritable = global.settings.is_writable('favorite-apps');
 
         items.forEach((itemId) => {
-            let icon = null;
+            let icon = this._items[itemId];
 
             if (this._iconGridLayout.iconIsFolder(itemId)) {
-                icon = this._items[itemId];
                 if (!icon) {
                     let item = Shell.DesktopDirInfo.new(itemId);
                     icon = new FolderIcon(item, this);
