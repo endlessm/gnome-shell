@@ -44,15 +44,17 @@ function override(object, methodName, callback) {
     if (!object._fnOverrides)
         object._fnOverrides = {};
 
-    const originalMethod = object.prototype[methodName];
+    const baseObject = object.prototype || object;
+    const originalMethod = baseObject[methodName];
     object._fnOverrides[methodName] = originalMethod;
-    object.prototype[methodName] = callback;
+    baseObject[methodName] = callback;
 }
 
 function restore(object) {
+    const baseObject = object.prototype || object;
     if (object._fnOverrides) {
         Object.keys(object._fnOverrides).forEach(k => {
-            object.prototype[k] = object._fnOverrides[k];
+            baseObject[k] = object._fnOverrides[k];
         });
         delete object._fnOverrides;
     }

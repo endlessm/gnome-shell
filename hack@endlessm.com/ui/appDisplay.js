@@ -9,7 +9,7 @@ const DND = imports.ui.dnd;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
 const Settings = Hack.imports.utils.getSettings();
-const { override, restore, original } = Hack.imports.utils;
+const Utils = Hack.imports.utils;
 
 const Clubhouse = Hack.imports.ui.clubhouse;
 
@@ -153,58 +153,44 @@ class HackAppIcon extends AppDisplay.AppIcon {
     }
 });
 
-
 // Monkey patching
-
-const { AllView } = imports.ui.appDisplay;
-const originalLoadApps = AllView.prototype._loadApps;
-const originalRemoveIcon = IconGridLayout.IconGridLayout.prototype.removeIcon;
-
 const CLUBHOUSE_ID = 'com.hack_computer.Clubhouse.desktop';
 
 // one icon for each AllView, there's two, the main and the gray
 var HackIcons = {};
 
-function loadApps() {
-    const newApps = originalLoadApps.bind(this)();
-
-    if (_shouldShowHackLauncher()) {
-        if (!HackIcons[this])
-            HackIcons[this] = new HackAppIcon();
-
-        newApps.unshift(HackIcons[this]);
-    }
-
-    return newApps;
-}
-
-// TODO: implement DnD limits and removement special case
-
 function enable() {
-    AllView.prototype._loadApps = loadApps;
+    Utils.override(AppDisplay.AllView, '_loadApps', function() {
+        const newApps = Utils.original(AppDisplay.AllView, '_loadApps').bind(this)();
 
-    const iconGridLayout = IconGridLayout.getDefault();
-    iconGridLayout.emit('changed');
+        if (_shouldShowHackLauncher()) {
+            if (!HackIcons[this])
+                HackIcons[this] = new HackAppIcon();
 
-    IconGridLayout.IconGridLayout.prototype.removeIcon = function(id) {
+            newApps.unshift(HackIcons[this]);
+        }
+
+        return newApps;
+    });
+    Utils.override(IconGridLayout.IconGridLayout, 'removeIcon', function(id) {
         if (id === CLUBHOUSE_ID) {
             Object.keys(HackIcons).forEach(k => HackIcons[k].remove());
             return;
         }
 
-        originalRemoveIcon.bind(this)(id);
-    };
+        Utils.original(IconGridLayout.IconGridLayout, 'removeIcon').bind(this)(id);
+    });
 
     // Disable movements
-    override(AppDisplay.BaseAppView, '_canAccept', function(source) {
+    Utils.override(AppDisplay.BaseAppView, '_canAccept', function(source) {
         // Disable movement of the HackAppIcon
         if (source instanceof HackAppIcon)
             return false;
 
-        return original(AppDisplay.BaseAppView, '_canAccept').bind(this)(source);
+        return Utils.original(AppDisplay.BaseAppView, '_canAccept').bind(this)(source);
     });
 
-    override(AppDisplay.ViewIcon, '_canAccept', source => {
+    Utils.override(AppDisplay.ViewIcon, '_canAccept', source => {
         // Disable movement of the HackAppIcon
         if (source instanceof HackAppIcon)
             return false;
@@ -212,33 +198,37 @@ function enable() {
         return true;
     });
 
-    override(AppDisplay.FolderIcon, '_canAccept', function(source) {
+    Utils.override(AppDisplay.FolderIcon, '_canAccept', function(source) {
         // Disable movement of the HackAppIcon
         if (source instanceof HackAppIcon)
             return false;
 
-        return original(AppDisplay.FolderIcon, '_canAccept').bind(this)(source);
+        return Utils.original(AppDisplay.FolderIcon, '_canAccept').bind(this)(source);
     });
 
-    override(AppDisplay.AppIcon, '_canAccept', function(source) {
+    Utils.override(AppDisplay.AppIcon, '_canAccept', function(source) {
         // Disable movement of the HackAppIcon
         if (source instanceof HackAppIcon)
             return false;
 
-        return original(AppDisplay.AppIcon, '_canAccept').bind(this)(source);
+        return Utils.original(AppDisplay.AppIcon, '_canAccept').bind(this)(source);
     });
-}
-
-function disable() {
-    AllView.prototype._loadApps = originalLoadApps;
 
     const iconGridLayout = IconGridLayout.getDefault();
     iconGridLayout.emit('changed');
+}
 
+function disable() {
     HackIcons = {};
 
-    restore(AppDisplay.BaseAppView);
-    restore(AppDisplay.ViewIcon);
-    restore(AppDisplay.FolderIcon);
-    restore(AppDisplay.AppIcon);
+    Utils.restore(AppDisplay.BaseAppView);
+    Utils.restore(AppDisplay.ViewIcon);
+    Utils.restore(AppDisplay.FolderIcon);
+    Utils.restore(AppDisplay.AppIcon);
+
+    Utils.restore(AppDisplay.AllView);
+    Utils.restore(IconGridLayout.IconGridLayout);
+
+    const iconGridLayout = IconGridLayout.getDefault();
+    iconGridLayout.emit('changed');
 }

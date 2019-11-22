@@ -6,6 +6,7 @@ const { Clutter, Gio, GLib, GObject, Gtk, Meta, Shell, St } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
 const Settings = Hack.imports.utils.getSettings();
+const Utils = Hack.imports.utils;
 
 const { Animation } = imports.ui.animation;
 const Clubhouse = Hack.imports.ui.clubhouse;
@@ -1633,10 +1634,13 @@ var CodeViewManager = GObject.registerClass({
     }
 });
 
-// altTab.js
+// Monkey patching
 
 const AltTab = imports.ui.altTab;
-const originalGetWindow = AltTab.getWindows;
+const AppIconBar = imports.ui.appIconBar;
+const Workspace = imports.ui.workspace;
+const Wobbly = Hack.imports.ui.wobbly;
+const SideComponent = imports.ui.sideComponent;
 
 function getWindows(workspace) {
     // We ignore skip-taskbar windows in switchers, but if they are attached
@@ -1650,10 +1654,6 @@ function getWindows(workspace) {
     }).filter((w, i, a) => !w._hackIsInactiveWindow && !w.skip_taskbar && a.indexOf(w) === i);
 }
 
-// appIconBar.js
-const AppIconBar = imports.ui.appIconBar;
-const originalGetInterestingWindow = AppIconBar.AppIconButton.prototype._getInterestingWindows;
-
 function getInterestingWindows() {
     let windows = this._app.get_windows();
     let hasSpeedwagon = false;
@@ -1664,16 +1664,9 @@ function getInterestingWindows() {
     return [windows, hasSpeedwagon];
 }
 
-// workspace.js
-const Workspace = imports.ui.workspace;
-const originalIsOverviewWindow = Workspace.Workspace.prototype._isOverviewWindow;
-
 function isOverviewWindow(win) {
     return !win.get_meta_window().skip_taskbar && !win.get_meta_window()._hackIsInactiveWindow;
 }
-
-const Wobbly = Hack.imports.ui.wobbly;
-const SideComponent = imports.ui.sideComponent;
 
 function _windowCanWobble(win, op) {
     return !win.is_override_redirect() && op === Meta.GrabOp.MOVING;
@@ -1758,7 +1751,7 @@ function _wmConnect(signal, fn) {
 }
 
 function enable() {
-    AltTab.getWindows = getWindows;
+    Utils.override(AltTab, 'getWindows', getWindows);
     Object.defineProperty(AltTab.AppIcon.prototype, 'cachedWindows', {
         get: function() {
             const cached = this._cachedWindows || [];
@@ -1769,8 +1762,8 @@ function enable() {
         },
     });
 
-    AppIconBar.AppIconButton.prototype._getInterestingWindows = getInterestingWindows;
-    Workspace.Workspace.prototype._isOverviewWindow = isOverviewWindow;
+    Utils.override(AppIconBar.AppIconButton, '_getInterestingWindows', getInterestingWindows);
+    Utils.override(Workspace.Workspace, '_isOverviewWindow', isOverviewWindow);
 
     Main.wm._codeViewManager = new CodeViewManager();
     Main.wm._animationsServer = null;
@@ -1809,18 +1802,18 @@ function enable() {
 }
 
 function disable() {
-    AltTab.getWindow = originalGetWindow;
-    AltTab.AppIcon.prototype = {
-        get cachedWindows() {
-            return this._cachedWindows || [];
+    Utils.restore(AltTab);
+    Object.defineProperty(AltTab.AppIcon.prototype, 'cachedWindows', {
+        get: function() {
+            return this._cachedWindows;
         },
-        set cachedWindows(windowList) {
+        set: function(windowList) {
             this._cachedWindows = windowList;
         },
-    };
+    });
 
-    AppIconBar.AppIconButton.prototype._getInterestingWindows = originalGetInterestingWindow;
-    Workspace.Workspace.prototype._isOverviewWindow = originalIsOverviewWindow;
+    Utils.restore(AppIconBar.AppIconButton);
+    Utils.restore(Workspace.Workspace);
 
     Main.wm._codeViewManager = null;
     Wobbly.disableWobblyFx(Main.wm);

@@ -28,6 +28,7 @@ const { Clutter, Flatpak, Gio, GLib, GObject, Json, Pango, Shell, St } = imports
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
 const Settings = Hack.imports.utils.getSettings();
+const Utils = Hack.imports.utils;
 
 const { Animation } = imports.ui.animation;
 const Main = imports.ui.main;
@@ -40,14 +41,12 @@ const Util = imports.misc.util;
 const Soundable = Hack.imports.ui.soundable;
 const SoundServer = Hack.imports.misc.soundServer;
 
-const { loadInterfaceXML } = Hack.imports.utils;
-
 const { GtkNotificationDaemon } = NotificationDaemon;
 
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 200;
 
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
-const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
+const ClubhouseIface = Utils.loadInterfaceXML('com.hack_computer.Clubhouse');
 
 // Some button labels are replaced by customized icons if they match a
 // unicode emoji character, as per Design request.
@@ -1003,6 +1002,8 @@ var Component = GObject.registerClass({
     }
 });
 
+// Monkey patching
+
 // rich markup
 function _fixMarkup(text, allowMarkup, onlySimpleMarkup) {
     if (allowMarkup) {
@@ -1076,9 +1077,6 @@ function activateActionFull(actionId, target, hideOverview) {
 }
 
 var CLUBHOUSE = null;
-const originalSetMarkup = MessageList.URLHighlighter.prototype.setMarkup;
-const originalSetBody = MessageList.Message.prototype.setBody;
-const originalActivateAction = NotificationDaemon.GtkNotificationDaemonAppSource.activateAction;
 
 function enable() {
     CLUBHOUSE = new Component();
@@ -1086,12 +1084,12 @@ function enable() {
     if (CLUBHOUSE)
         CLUBHOUSE.enable();
 
-    MessageList.URLHighlighter.prototype.setMarkup = setMarkup;
-    MessageList.Message.prototype.setUseBodySimpleMarkup = setUseBodySimpleMarkup;
-    MessageList.Message.prototype.setBody = setBody;
+    Utils.override(MessageList.URLHighlighter, 'setMarkup', setMarkup);
+    Utils.override(MessageList.Message, 'setUseBodySimpleMarkup', setUseBodySimpleMarkup);
+    Utils.override(MessageList.Message, 'setBody', setBody);
 
-    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateActionFull = activateActionFull;
-    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateAction = activateAction;
+    Utils.override(NotificationDaemon.GtkNotificationDaemonAppSource, 'activateActionFull', activateActionFull);
+    Utils.override(NotificationDaemon.GtkNotificationDaemonAppSource, 'activateAction', activateAction);
 }
 
 function disable() {
@@ -1100,9 +1098,8 @@ function disable() {
         CLUBHOUSE = null;
     }
 
+    Utils.restore(MessageList.URLHighlighter);
+    Utils.restore(MessageList.Message);
+    Utils.restore(NotificationDaemon.GtkNotificationDaemonAppSource);
     MessageList.URLHighlighter.setMarkup = originalSetMarkup;
-    MessageList.Message.prototype.setBody = originalSetBody;
-    MessageList.Message.prototype.setUseBodySimpleMarkup = null;
-    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateActionFull = null;
-    NotificationDaemon.GtkNotificationDaemonAppSource.prototype.activateAction = originalActivateAction;
 }
