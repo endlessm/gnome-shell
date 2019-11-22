@@ -15,29 +15,29 @@ var Button = GObject.registerClass({
             '',
             '',
             GObject.ParamFlags.READWRITE,
-            ''
+            '',
         ),
         'enter-sound-event-id': GObject.ParamSpec.string(
             'enter-sound-event-id',
             '',
             '',
             GObject.ParamFlags.READWRITE,
-            ''
+            '',
         ),
         'hover-sound-event-id': GObject.ParamSpec.string(
             'hover-sound-event-id',
             '',
             '',
             GObject.ParamFlags.READWRITE,
-            ''
+            '',
         ),
         'stop-hover-sound-on-click': GObject.ParamSpec.boolean(
             'stop-hover-sound-on-click',
             '',
             '',
             GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT,
-            false
-        )
+            false,
+        ),
     },
 }, class SoundableButton extends St.Button {
     _init(params) {

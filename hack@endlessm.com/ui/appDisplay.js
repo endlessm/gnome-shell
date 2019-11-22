@@ -1,14 +1,15 @@
+/* exported enable, disable */
+
 const { Clutter, Gio, GLib, GObject, St } = imports.gi;
 
 const AppDisplay = imports.ui.appDisplay;
 const IconGridLayout = imports.ui.iconGridLayout;
-const Main = imports.ui.main;
 const DND = imports.ui.dnd;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
 const Settings = Hack.imports.utils.getSettings();
-const {override, restore, original} = Hack.imports.utils;
+const { override, restore, original } = Hack.imports.utils;
 
 const Clubhouse = Hack.imports.ui.clubhouse;
 
@@ -21,16 +22,16 @@ function _shouldShowHackLauncher() {
 var HackAppIcon = GObject.registerClass(
 class HackAppIcon extends AppDisplay.AppIcon {
     _init() {
-        let viewIconParams = {
+        const viewIconParams = {
             isDraggable: true,
             showMenu: true,
         };
 
-        let iconParams = {
+        const iconParams = {
             createIcon: this._createIcon.bind(this),
         };
 
-        let app = Clubhouse.getClubhouseApp();
+        const app = Clubhouse.getClubhouseApp();
         this._activated = false;
 
         super._init(app, viewIconParams, iconParams);
@@ -64,11 +65,11 @@ class HackAppIcon extends AppDisplay.AppIcon {
             duration: 100,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         };
-        this._easeIcon({...params, scale_x: 1.1, scale_y: 1.1})
-            .then(this._easeIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
-            .then(this._easeIcon.bind(this, {...params, scale_x: 1.1, scale_y: 1.1}))
-            .then(this._easeIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
-            .then(this._easeIcon.bind(this, {...params, scale_x: 1.0, scale_y: 1.0}))
+        this._easeIcon({ ...params, scale_x: 1.1, scale_y: 1.1 })
+            .then(this._easeIcon.bind(this, { ...params, scale_x: 0.9, scale_y: 0.9 }))
+            .then(this._easeIcon.bind(this, { ...params, scale_x: 1.1, scale_y: 1.1 }))
+            .then(this._easeIcon.bind(this, { ...params, scale_x: 0.9, scale_y: 0.9 }))
+            .then(this._easeIcon.bind(this, { ...params, scale_x: 1.0, scale_y: 1.0 }))
             .then(() => {
                 this._pulseWaitId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
                     this._pulseWaitId = 0;
@@ -80,8 +81,8 @@ class HackAppIcon extends AppDisplay.AppIcon {
     }
 
     _easeIcon(easeParams) {
-        return new Promise((resolve) => {
-            const params = {...easeParams, onComplete: () => resolve(this) };
+        return new Promise(resolve => {
+            const params = { ...easeParams, onComplete: () => resolve(this) };
             this.icon.icon.ease(params);
         });
     }
@@ -91,8 +92,8 @@ class HackAppIcon extends AppDisplay.AppIcon {
         if (this._activated)
             iconUri = `file://${Hack.path}/data/icons/hack-button-on.svg`;
 
-        let iconFile = Gio.File.new_for_uri(iconUri);
-        let gicon = new Gio.FileIcon({ file: iconFile });
+        const iconFile = Gio.File.new_for_uri(iconUri);
+        const gicon = new Gio.FileIcon({ file: iconFile });
 
         return new St.Icon({
             gicon: gicon,
@@ -110,12 +111,14 @@ class HackAppIcon extends AppDisplay.AppIcon {
         super.activate(button);
     }
 
-    _canAccept(source) {
+    _canAccept() {
+        void this;
         return false;
     }
 
     // Override to avoid animation on launch
     animateLaunch() {
+        void this;
     }
 
     remove() {
@@ -124,6 +127,7 @@ class HackAppIcon extends AppDisplay.AppIcon {
     }
 
     get name() {
+        void this;
         return 'Hack';
     }
 
@@ -138,10 +142,12 @@ class HackAppIcon extends AppDisplay.AppIcon {
     }
 
     handleDragOver() {
+        void this;
         return DND.DragMotionResult.NO_DROP;
     }
 
     acceptDrop() {
+        void this;
         // This will catch the drop event and do nothing
         return true;
     }
@@ -150,7 +156,7 @@ class HackAppIcon extends AppDisplay.AppIcon {
 
 // Monkey patching
 
-const {AllView} = imports.ui.appDisplay;
+const { AllView } = imports.ui.appDisplay;
 const originalLoadApps = AllView.prototype._loadApps;
 const originalRemoveIcon = IconGridLayout.IconGridLayout.prototype.removeIcon;
 
@@ -160,7 +166,7 @@ const CLUBHOUSE_ID = 'com.hack_computer.Clubhouse.desktop';
 var HackIcons = {};
 
 function loadApps() {
-    let newApps = originalLoadApps.bind(this)();
+    const newApps = originalLoadApps.bind(this)();
 
     if (_shouldShowHackLauncher()) {
         if (!HackIcons[this])
@@ -182,7 +188,7 @@ function enable() {
 
     IconGridLayout.IconGridLayout.prototype.removeIcon = function(id) {
         if (id === CLUBHOUSE_ID) {
-            Object.keys(HackIcons).forEach((k) => HackIcons[k].remove());
+            Object.keys(HackIcons).forEach(k => HackIcons[k].remove());
             return;
         }
 
@@ -198,7 +204,7 @@ function enable() {
         return original(AppDisplay.BaseAppView, '_canAccept').bind(this)(source);
     });
 
-    override(AppDisplay.ViewIcon, '_canAccept', function(source) {
+    override(AppDisplay.ViewIcon, '_canAccept', source => {
         // Disable movement of the HackAppIcon
         if (source instanceof HackAppIcon)
             return false;

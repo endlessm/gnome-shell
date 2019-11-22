@@ -1,14 +1,13 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
-/* exported CodeViewManager */
+/* exported enable, disable */
 
 const { Clutter, Gio, GLib, GObject, Gtk, Meta, Shell, St } = imports.gi;
-const Mainloop = imports.mainloop;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Hack = ExtensionUtils.getCurrentExtension();
 const Settings = Hack.imports.utils.getSettings();
 
-const Animation = imports.ui.animation.Animation;
+const { Animation } = imports.ui.animation;
 const Clubhouse = Hack.imports.ui.clubhouse;
 const Main = imports.ui.main;
 const Params = imports.misc.params;
@@ -21,7 +20,7 @@ const WINDOW_ANIMATION_TIME = 250;
 
 var CodingSessionStateEnum = {
     APP: 0,
-    TOOLBOX: 1
+    TOOLBOX: 1,
 };
 
 const _HACKABLE_DESKTOP_KEY = 'X-Endless-Hackable';
@@ -32,13 +31,13 @@ const FLIP_BUTTON_HEIGHT = 124;
 const FLIP_BUTTON_PULSE_SPEED = 100;
 
 const _HACK_SHADER_MAP = {
-    'none': null,
-    'desaturate': {
+    none: null,
+    desaturate: {
         constructor: Shell.CodeViewEffect,
         colors: ['#05213f', '#031c39', '#00275c', '#8d6531', '#f4f1a2'],
         points: [0.00, 0.07, 0.32, 0.65, 1.00],
     },
-    'fizzics': {
+    fizzics: {
         constructor: Shell.CodeViewEffect,
         colors: ['#05213f', '#031c39', '#114283', '#b27220', '#f4f1a2'],
         points: [0.00, 0.10, 0.20, 0.60, 1.00],
@@ -68,15 +67,15 @@ function _ensureAfterFirstFrame(win, callback) {
         return;
     }
 
-    let firstFrameConnection = win.connect('first-frame', () => {
+    const firstFrameConnection = win.connect('first-frame', () => {
         win.disconnect(firstFrameConnection);
         callback();
     });
 }
 
 function _getAppId(win) {
-    let app = Shell.WindowTracker.get_default().get_window_app(win);
-    let gtkId = win.get_gtk_application_id();
+    const app = Shell.WindowTracker.get_default().get_window_app(win);
+    const gtkId = win.get_gtk_application_id();
     if (gtkId)
         return gtkId;
 
@@ -87,25 +86,33 @@ function _getAppId(win) {
 function _getWindowId(win) {
     if (win.gtk_window_object_path)
         return win.gtk_window_object_path;
-    return ('window:%d').format(win.get_stable_sequence());
+    return 'window:%d'.format(win.get_stable_sequence());
 }
 
 function _getToolboxTarget(win) {
-    let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(win);
-    let variant = proxy.get_cached_property('Target');
-    let [targetAppId, targetWindowId] = variant.deep_unpack();
+    const proxy = Shell.WindowTracker.get_hack_toolbox_proxy(win);
+    const variant = proxy.get_cached_property('Target');
+    const [targetAppId, targetWindowId] = variant.deep_unpack();
     return [targetAppId, targetWindowId];
 }
 
-const _ensureHackDataFile = (function () {
+const _ensureHackDataFile = (function() {
     let keyfile = new GLib.KeyFile();
     let initialized = false;
-    let monitors = [];
+    const monitors = [];
 
     const flatpakInstallationPaths = [
         GLib.build_filenamev([GLib.get_home_dir(), '.local/share/flatpak']),
         '/var/lib/flatpak',
     ];
+
+    function _onFileChange(_monitor, _file, _otherFile, ev, _data) {
+        if (ev === Gio.FileMonitorEvent.CHANGES_DONE_HINT) {
+            // forces the keyfile reload the next time the function is called
+            keyfile = new GLib.KeyFile();
+            initialized = false;
+        }
+    }
 
     return function() {
         if (initialized)
@@ -123,13 +130,7 @@ const _ensureHackDataFile = (function () {
                 path = GLib.build_filenamev([path, 'hack-data.ini']);
                 const file = Gio.file_new_for_path(path);
                 const monitor = file.monitor_file(Gio.FileMonitorFlags.NONE, null);
-                monitor.connect('changed', (_monitor, _file, _otherfile, ev, _data) => {
-                    if (ev === Gio.FileMonitorEvent.CHANGES_DONE_HINT) {
-                        // forces the keyfile reload the next time the function is called
-                        keyfile = new GLib.KeyFile();
-                        initialized = false;
-                    }
-                });
+                monitor.connect('changed', _onFileChange);
                 // we keep a reference to the monitor object to avoid destroy and
                 // signal disconnection
                 monitors.push(monitor);
@@ -196,14 +197,14 @@ function _appIsAllowedHacking(desktopId) {
 // Synchronize geometry of MetaWindowActor src to dst by
 // applying both the physical geometry and maximization state.
 function _synchronizeMetaWindowActorGeometries(src, dst) {
-    let srcGeometry = src.meta_window.get_frame_rect();
-    let dstGeometry = dst.meta_window.get_frame_rect();
+    const srcGeometry = src.meta_window.get_frame_rect();
+    const dstGeometry = dst.meta_window.get_frame_rect();
 
-    let srcIsMaximized = (src.meta_window.maximized_horizontally &&
-                          src.meta_window.maximized_vertically);
-    let dstIsMaximized = (dst.meta_window.maximized_horizontally &&
-                          dst.meta_window.maximized_vertically);
-    let maximizationStateChanged = srcIsMaximized != dstIsMaximized;
+    const srcIsMaximized = src.meta_window.maximized_horizontally &&
+                           src.meta_window.maximized_vertically;
+    const dstIsMaximized = dst.meta_window.maximized_horizontally &&
+                           dst.meta_window.maximized_vertically;
+    const maximizationStateChanged = srcIsMaximized !== dstIsMaximized;
 
     // If we're going to change the maximization state, skip
     // effects on the destination window, since we're synchronizing it
@@ -216,12 +217,13 @@ function _synchronizeMetaWindowActorGeometries(src, dst) {
     if (srcIsMaximized && !dstIsMaximized)
         dst.meta_window.maximize(Meta.MaximizeFlags.BOTH);
 
-    if (!srcGeometry.equal(dstGeometry))
+    if (!srcGeometry.equal(dstGeometry)) {
         dst.meta_window.move_resize_frame(true,
             srcGeometry.x,
             srcGeometry.y,
             srcGeometry.width,
             srcGeometry.height);
+    }
 }
 
 function _synchronizeViewSourceButtonToRectCorner(button, rect) {
@@ -256,7 +258,7 @@ function _setDimmedState(button, dimmed) {
 }
 
 function _flipButtonAroundRectCenter(props) {
-    let {
+    const {
         button,
         rect,
         startAngle,
@@ -271,7 +273,7 @@ function _flipButtonAroundRectCenter(props) {
     button.rotation_center_y = new Clutter.Vertex({
         x: rect.width * 0.5,
         y: button.height * 0.5,
-        z: 0
+        z: 0,
     });
     button.rotation_angle_y = startAngle;
     button.ease_property('rotation_angle_y', midpointAngle, {
@@ -286,15 +288,15 @@ function _flipButtonAroundRectCenter(props) {
                 onComplete: () => {
                     if (onRotationComplete)
                         onRotationComplete();
-                }
+                },
             });
-        }
+        },
     });
 }
 
 var WindowTrackingButton = GObject.registerClass({
     Signals: {
-        'clicked': {}
+        clicked: {},
     },
 }, class WindowTrackingButton extends Soundable.Button {
     _init(params) {
@@ -302,15 +304,15 @@ var WindowTrackingButton = GObject.registerClass({
         this._rect = null;
         this._highlighted = false;
 
-        let buttonParams = _getViewSourceButtonParams(true);
-        params = Params.parse(params, buttonParams, true);
+        const buttonParams = _getViewSourceButtonParams(true);
+        const parsedParams = Params.parse(params, buttonParams, true);
 
-        super._init(params);
+        super._init(parsedParams);
 
         this._updateSounds();
 
         // pulse effect
-        let gfile = Gio.File.new_for_uri(`file://${Hack.path}/data/icons/flip-glow.png`);
+        const gfile = Gio.File.new_for_uri(`file://${Hack.path}/data/icons/flip-glow.png`);
         this._pulseAnimation = new Animation(gfile,
             FLIP_BUTTON_WIDTH,
             FLIP_BUTTON_HEIGHT,
@@ -354,8 +356,8 @@ var WindowTrackingButton = GObject.registerClass({
             button: this,
             rect: this._rect,
             startAngle: 0,
-            midpointAngle: direction == Gtk.DirectionType.RIGHT ? 90 : -90,
-            finishAngle: direction == Gtk.DirectionType.RIGHT ? 180 : -180,
+            midpointAngle: direction === Gtk.DirectionType.RIGHT ? 90 : -90,
+            finishAngle: direction === Gtk.DirectionType.RIGHT ? 180 : -180,
             onRotationMidpoint: () => {
                 this.opacity = 0;
                 this.state = targetState;
@@ -369,7 +371,7 @@ var WindowTrackingButton = GObject.registerClass({
         // Create a temporary button which we'll use to show a "flip-in"
         // animation along with the incoming window. This is removed as soon
         // as the animation is complete.
-        let animationButton = new St.Button(_getViewSourceButtonParams(false));
+        const animationButton = new St.Button(_getViewSourceButtonParams(false));
         Main.layoutManager.uiGroup.add_actor(animationButton);
         _synchronizeViewSourceButtonToRectCorner(animationButton, this._rect);
 
@@ -377,16 +379,16 @@ var WindowTrackingButton = GObject.registerClass({
         _flipButtonAroundRectCenter({
             button: animationButton,
             rect: this._rect,
-            startAngle: direction == Gtk.DirectionType.RIGHT ? -180 : 180,
-            midpointAngle: direction == Gtk.DirectionType.RIGHT ? -90 : 90,
+            startAngle: direction === Gtk.DirectionType.RIGHT ? -180 : 180,
+            midpointAngle: direction === Gtk.DirectionType.RIGHT ? -90 : 90,
             finishAngle: 0,
             onRotationMidpoint: () => {
                 animationButton.opacity = 255;
-                _setFlippedState(animationButton, targetState == CodingSessionStateEnum.TOOLBOX);
+                _setFlippedState(animationButton, targetState === CodingSessionStateEnum.TOOLBOX);
             },
             onRotationComplete: () => {
                 animationButton.destroy();
-            }
+            },
         });
     }
 
@@ -396,7 +398,7 @@ var WindowTrackingButton = GObject.registerClass({
     }
 
     set state(value) {
-        this._flipped = value == CodingSessionStateEnum.TOOLBOX;
+        this._flipped = value === CodingSessionStateEnum.TOOLBOX;
         _setFlippedState(this, this._flipped);
         this._updateSounds();
     }
@@ -415,26 +417,26 @@ const SessionDestroyEvent = {
 
 var CodingSession = GObject.registerClass({
     Properties: {
-        'app': GObject.ParamSpec.object('app',
+        app: GObject.ParamSpec.object('app',
             '',
             '',
             GObject.ParamFlags.READWRITE,
             Meta.WindowActor),
-        'state': GObject.ParamSpec.int('state',
+        state: GObject.ParamSpec.int('state',
             '',
             '',
             GObject.ParamFlags.READABLE,
             0, Object.keys(CodingSessionStateEnum).length,
             CodingSessionStateEnum.APP),
-        'toolbox': GObject.ParamSpec.object('toolbox',
+        toolbox: GObject.ParamSpec.object('toolbox',
             '',
             '',
             GObject.ParamFlags.READWRITE,
             Meta.WindowActor),
     },
     Signals: {
-        'minimized': {},
-        'unminimized': {},
+        minimized: {},
+        unminimized: {},
     },
 }, class CodingSession extends GObject.Object {
     _init(params) {
@@ -545,7 +547,7 @@ var CodingSession = GObject.registerClass({
 
     setGrabbed(grabbed) {
         if (this._grabTimeoutId > 0) {
-            Mainloop.source_remove(this._grabTimeoutId);
+            GLib.source_remove(this._grabTimeoutId);
             this._grabTimeoutId = 0;
         }
 
@@ -555,17 +557,17 @@ var CodingSession = GObject.registerClass({
             this._syncButtonVisibility();
         } else {
             // giving some time to finish possible window movement FXs
-            this._grabTimeoutId = Mainloop.timeout_add(500,
-                () => {
-                    Mainloop.source_remove(this._grabTimeoutId);
-                    this._grabTimeoutId = 0;
 
-                    this._detachBackendWindow();
-                    this._grabbed = false;
-                    this._syncButtonVisibility();
-                    this._synchronizeButton(this._actorForCurrentState().meta_window);
-                    return GLib.SOURCE_REMOVE;
-                });
+            this._grabTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+                GLib.source_remove(this._grabTimeoutId);
+                this._grabTimeoutId = 0;
+
+                this._detachBackendWindow();
+                this._grabbed = false;
+                this._syncButtonVisibility();
+                this._synchronizeButton(this._actorForCurrentState().meta_window);
+                return GLib.SOURCE_REMOVE;
+            });
         }
     }
 
@@ -611,7 +613,7 @@ var CodingSession = GObject.registerClass({
         if (this._button)
             return;
 
-        let actor = this._actorForCurrentState();
+        const actor = this._actorForCurrentState();
         if (!actor)
             return;
 
@@ -655,13 +657,13 @@ var CodingSession = GObject.registerClass({
     }
 
     _updateWindowPairingState() {
-        let actor = this._actorForCurrentState();
+        const actor = this._actorForCurrentState();
         if (!actor)
             return;
 
         actor.meta_window._hackIsInactiveWindow = false;
 
-        let otherActor = this._getOtherActor(actor);
+        const otherActor = this._getOtherActor(actor);
         if (otherActor)
             otherActor.meta_window._hackIsInactiveWindow = true;
     }
@@ -701,7 +703,7 @@ var CodingSession = GObject.registerClass({
         if (this.app)
             return false;
 
-        let appRemovedActor = this._appRemovedActor;
+        const appRemovedActor = this._appRemovedActor;
         this._appRemovedActor = null;
 
         // We can admit this window. Wire up signals and synchronize
@@ -738,10 +740,10 @@ var CodingSession = GObject.registerClass({
     }
 
     _actorForCurrentState() {
-        if (this._state == CodingSessionStateEnum.APP)
+        if (this._state === CodingSessionStateEnum.APP)
             return this.app;
-        else
-            return this.toolbox;
+
+        return this.toolbox;
     }
 
     _isActorFromSession(actor) {
@@ -749,7 +751,7 @@ var CodingSession = GObject.registerClass({
     }
 
     _isCurrentWindow(win) {
-        let actor = this._actorForCurrentState();
+        const actor = this._actorForCurrentState();
         return actor && actor.meta_window === win;
     }
 
@@ -765,12 +767,12 @@ var CodingSession = GObject.registerClass({
         if (effect) {
             effect.enabled = enabled;
         } else {
-            let appInfo = this._shellApp.get_app_info();
+            const appInfo = this._shellApp.get_app_info();
             let shaderEffect = appInfo.get_string(_HACK_SHADER_DESKTOP_KEY);
             if (!shaderEffect)
                 shaderEffect = _HACK_DEFAULT_SHADER;
 
-            let shaderDef = _HACK_SHADER_MAP[shaderEffect];
+            const shaderDef = _HACK_SHADER_MAP[shaderEffect];
             if (shaderDef) {
                 effect = new shaderDef.constructor({ enabled });
                 effect.set_gradient_stops(shaderDef.colors, shaderDef.points);
@@ -780,8 +782,8 @@ var CodingSession = GObject.registerClass({
     }
 
     _initToolboxAppActionGroup() {
-        let toolboxId = this.toolboxId;
-        let toolboxPath = `/${toolboxId.replace(/\./g, '/')}`;
+        const { toolboxId } = this;
+        const toolboxPath = `/${toolboxId.replace(/\./g, '/')}`;
 
         this._toolboxAppActionGroup =
             Gio.DBusActionGroup.get(Gio.DBus.session, toolboxId, toolboxPath);
@@ -848,7 +850,7 @@ var CodingSession = GObject.registerClass({
             this._appActionProxy = null;
         }
 
-        let windowTracker = Shell.WindowTracker.get_default();
+        const windowTracker = Shell.WindowTracker.get_default();
         this._shellApp = windowTracker.get_window_app(this.app.meta_window);
 
         this._ensureButton();
@@ -887,7 +889,7 @@ var CodingSession = GObject.registerClass({
         // We assume we have a toolbox here, or this.appRemovedByFlipBack would be false
         this._setState(CodingSessionStateEnum.TOOLBOX);
 
-        let actor = this._actorForCurrentState();
+        const actor = this._actorForCurrentState();
         if (actor) {
             actor.rotation_angle_y = 0;
             this._setEffectsEnabled(actor, false);
@@ -904,11 +906,11 @@ var CodingSession = GObject.registerClass({
     // The assumption here is that the session will be removed immediately
     // after destruction.
     destroy(eventType) {
-        if (this._focusWindowId != 0) {
+        if (this._focusWindowId !== 0) {
             global.display.disconnect(this._focusWindowId);
             this._focusWindowId = 0;
         }
-        if (this._hackModeChangedId != 0) {
+        if (this._hackModeChangedId !== 0) {
             Settings.disconnect(this._hackModeChangedId);
             this._hackModeChangedId = 0;
         }
@@ -939,7 +941,7 @@ var CodingSession = GObject.registerClass({
         }
 
         if (this._grabTimeoutId !== 0) {
-            Mainloop.source_remove(this._grabTimeoutId);
+            GLib.source_remove(this._grabTimeoutId);
             this._grabTimeoutId = 0;
         }
 
@@ -947,14 +949,13 @@ var CodingSession = GObject.registerClass({
         // unless we are destroying the session because the app window was
         // destroyed in the first place
         if (this.app && !this.app.is_destroyed()) {
-            let appWindow = this.app.meta_window;
+            const appWindow = this.app.meta_window;
 
-            if (eventType != SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED) {
+            if (eventType !== SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED)
                 appWindow.delete(global.get_current_time());
-            } else if (this._state === CodingSessionStateEnum.TOOLBOX &&
-                     this.toolbox && !this.toolbox.is_destroyed()) {
+            else if (this._state === CodingSessionStateEnum.TOOLBOX &&
+                     this.toolbox && !this.toolbox.is_destroyed())
                 this.app.rotation_angle_y = this.toolbox.rotation_angle_y;
-            }
 
             this.app = null;
             this._shellApp = null;
@@ -964,10 +965,10 @@ var CodingSession = GObject.registerClass({
         // unless we are destroying the session because the toolbox window was
         // destroyed in the first place
         if (this.toolbox && !this.toolbox.is_destroyed()) {
-            let toolboxWindow = this.toolbox.meta_window;
+            const toolboxWindow = this.toolbox.meta_window;
             this.toolbox = null;
 
-            if (eventType != SessionDestroyEvent.SESSION_DESTROY_TOOLBOX_DESTROYED)
+            if (eventType !== SessionDestroyEvent.SESSION_DESTROY_TOOLBOX_DESTROYED)
                 toolboxWindow.delete(global.get_current_time());
         }
 
@@ -991,18 +992,18 @@ var CodingSession = GObject.registerClass({
         // Get the minimum size of both the app and the toolbox window
         // and then determine the maximum of the two. We won't permit
         // either window to get any smaller.
-        let [minAppWidth, minAppHeight] = this.app.meta_window.get_minimum_size_hints();
-        let [minToolboxWidth, minToolboxHeight] = this.toolbox.meta_window.get_minimum_size_hints();
+        const [minAppWidth, minAppHeight] = this.app.meta_window.get_minimum_size_hints();
+        const [minToolboxWidth, minToolboxHeight] = this.toolbox.meta_window.get_minimum_size_hints();
 
         // We need to compare these dimensions in frame coordinates, since
         // one of the two windows may be client-side decorated.
-        let minAppRect = this.app.meta_window.client_rect_to_frame_rect(
+        const minAppRect = this.app.meta_window.client_rect_to_frame_rect(
             new Meta.Rectangle({ x: 0, y: 0, width: minAppWidth, height: minAppHeight }));
-        let minToolboxRect = this.toolbox.meta_window.client_rect_to_frame_rect(
+        const minToolboxRect = this.toolbox.meta_window.client_rect_to_frame_rect(
             new Meta.Rectangle({ x: 0, y: 0, width: minToolboxWidth, height: minToolboxHeight }));
 
-        let minWidth = Math.max(minAppRect.width, minToolboxRect.width);
-        let minHeight = Math.max(minAppRect.height, minToolboxRect.height);
+        const minWidth = Math.max(minAppRect.width, minToolboxRect.width);
+        const minHeight = Math.max(minAppRect.height, minToolboxRect.height);
 
         win.expand_allocated_geometry(minWidth, minHeight);
     }
@@ -1026,7 +1027,12 @@ var CodingSession = GObject.registerClass({
     // if a flip animation should be played. That is the responsibility of
     // the caller.
     _switchToToolbox() {
-        if (!this.toolbox) {
+        if (this.toolbox) {
+            this._setupAnimation(CodingSessionStateEnum.TOOLBOX,
+                this.app,
+                null, this.toolbox,
+                Gtk.DirectionType.LEFT);
+        } else {
             this._toolboxAppActionGroup.activate_action(
                 'flip',
                 new GLib.Variant('(ss)', [
@@ -1034,11 +1040,6 @@ var CodingSession = GObject.registerClass({
                     _getWindowId(this.app.meta_window),
                 ]));
             this._button.reactive = false;
-        } else {
-            this._setupAnimation(CodingSessionStateEnum.TOOLBOX,
-                this.app,
-                null, this.toolbox,
-                Gtk.DirectionType.LEFT);
         }
     }
 
@@ -1068,7 +1069,7 @@ var CodingSession = GObject.registerClass({
         if (!this._windowsNeedSync())
             return;
 
-        let actor = win.get_compositor_private();
+        const actor = win.get_compositor_private();
         _synchronizeMetaWindowActorGeometries(actor, this._getOtherActor(actor));
     }
 
@@ -1081,7 +1082,7 @@ var CodingSession = GObject.registerClass({
 
         this._button.hide();
 
-        let toMini = this._getOtherActor(actor);
+        const toMini = this._getOtherActor(actor);
 
         // Only want to minimize if we weren't already minimized.
         if (toMini && !toMini.meta_window.minimized)
@@ -1099,7 +1100,7 @@ var CodingSession = GObject.registerClass({
 
         this._button.show();
 
-        let toUnMini = this._getOtherActor(actor);
+        const toUnMini = this._getOtherActor(actor);
 
         // We only want to unminimize a window here if it was previously
         // minimized.
@@ -1110,8 +1111,8 @@ var CodingSession = GObject.registerClass({
     }
 
     _overviewStateChanged() {
-        let actor = this._actorForCurrentState();
-        let otherActor = this._getOtherActor(actor);
+        const actor = this._actorForCurrentState();
+        const otherActor = this._getOtherActor(actor);
         if (otherActor)
             this._setEffectsEnabled(otherActor, !Main.overview.visible);
 
@@ -1119,15 +1120,15 @@ var CodingSession = GObject.registerClass({
     }
 
     _syncButtonVisibility() {
-        let focusedWindow = global.display.get_focus_window();
+        const focusedWindow = global.display.get_focus_window();
         if (!focusedWindow)
             return;
 
         // Don't show if the screen is locked
-        let locked = Main.sessionMode.isLocked;
+        const locked = Main.sessionMode.isLocked;
 
-        let primaryMonitor = Main.layoutManager.primaryMonitor;
-        let inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
+        const { primaryMonitor } = Main.layoutManager;
+        const inFullscreen = primaryMonitor && primaryMonitor.inFullscreen;
 
         if (!Settings.get_boolean('hack-mode-enabled')) {
             this._button.hide();
@@ -1136,7 +1137,7 @@ var CodingSession = GObject.registerClass({
 
         // Show only if either this window or the toolbox window
         // is in focus, visible and hackable
-        let focusedActor = focusedWindow.get_compositor_private();
+        const focusedActor = focusedWindow.get_compositor_private();
         if (this._isActorFromSession(focusedActor) &&
             focusedActor.visible &&
             !Main.overview.visible &&
@@ -1144,7 +1145,6 @@ var CodingSession = GObject.registerClass({
             !locked &&
             !this._grabbed &&
             this._hackable) {
-
             if (!this.toolbox) {
                 this._toolboxAppActionGroup.activate_action(
                     'init',
@@ -1155,8 +1155,9 @@ var CodingSession = GObject.registerClass({
             }
 
             this._button.show();
-        } else
+        } else {
             this._button.hide();
+        }
     }
 
     _restoreButtonState() {
@@ -1169,23 +1170,23 @@ var CodingSession = GObject.registerClass({
 
     _activateAppFlip() {
         // Support a 'flip' action in the app, if it exposes it
-        const flipState = (this._state == CodingSessionStateEnum.TOOLBOX);
+        const flipState = this._state === CodingSessionStateEnum.TOOLBOX;
         if (this._appActionProxy && this._appActionProxy.has_action('flip'))
             this._appActionProxy.activate_action('flip', new GLib.Variant('b', flipState));
     }
 
     _focusWindowChanged() {
-        let focusedWindow = global.display.get_focus_window();
+        const focusedWindow = global.display.get_focus_window();
         if (!focusedWindow)
             return;
 
         this._syncButtonVisibility();
 
-        let focusedActor = focusedWindow.get_compositor_private();
+        const focusedActor = focusedWindow.get_compositor_private();
         if (!this._isActorFromSession(focusedActor))
             return;
 
-        let actor = this._actorForCurrentState();
+        const actor = this._actorForCurrentState();
         if (actor !== focusedActor) {
             // FIXME: we probably selected this window from the overview or the taskbar.
             // Flipping makes little sense as the window has already been activated,
@@ -1193,8 +1194,11 @@ var CodingSession = GObject.registerClass({
             // In the future, we want to change the behavior of those activation points
             // so that when a toolbox is present, it is only possible to switch side
             // when the flip button is clicked.
-            this._setState(focusedActor === this.app ?
-                CodingSessionStateEnum.APP : CodingSessionStateEnum.TOOLBOX);
+            if (focusedActor === this.app)
+                this._setState(CodingSessionStateEnum.APP);
+            else
+                this._setState(CodingSessionStateEnum.TOOLBOX);
+
             this._activateAppFlip();
             focusedActor.rotation_angle_y = 0;
             actor.rotation_angle_y = 180;
@@ -1234,11 +1238,11 @@ var CodingSession = GObject.registerClass({
             newDst.show();
 
         // Hide the destination until midpoint
-        if (direction == Gtk.DirectionType.LEFT)
+        if (direction === Gtk.DirectionType.LEFT)
             newDst.opacity = 0;
 
         // we have to set those after unmaximize/maximized otherwise they are lost
-        newDst.rotation_angle_y = direction == Gtk.DirectionType.RIGHT ? -180 : 180;
+        newDst.rotation_angle_y = direction === Gtk.DirectionType.RIGHT ? -180 : 180;
         src.rotation_angle_y = 0;
         newDst.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
         src.pivot_point = new Clutter.Point({ x: 0.5, y: 0.5 });
@@ -1253,7 +1257,8 @@ var CodingSession = GObject.registerClass({
     }
 
     _playAnimationSound(direction) {
-        if (direction == Gtk.DirectionType.LEFT)
+        void this;
+        if (direction === Gtk.DirectionType.LEFT)
             SoundServer.getDefault().play('shell/tracking-button/flip/click');
         else
             SoundServer.getDefault().play('shell/tracking-button/flip-inverse/click');
@@ -1270,17 +1275,17 @@ var CodingSession = GObject.registerClass({
         // This will allow for a smooth transition.
         src.ease_property(
             'rotation_angle_y',
-            direction == Gtk.DirectionType.RIGHT ? 90 : -90,
+            direction === Gtk.DirectionType.RIGHT ? 90 : -90,
             {
                 duration: WINDOW_ANIMATION_TIME * 2,
                 mode: Clutter.AnimationMode.EASE_IN_QUAD,
                 onComplete: this._rotateOutToMidpointCompleted.bind(this, src, direction),
             });
 
-        let dst = oldDst ? oldDst : newDst;
+        const dst = oldDst ? oldDst : newDst;
         dst.ease_property(
             'rotation_angle_y',
-            direction == Gtk.DirectionType.RIGHT ? -90 : 90,
+            direction === Gtk.DirectionType.RIGHT ? -90 : 90,
             {
                 duration: WINDOW_ANIMATION_TIME * 2,
                 mode: Clutter.AnimationMode.EASE_IN_QUAD,
@@ -1295,7 +1300,7 @@ var CodingSession = GObject.registerClass({
 
         src.ease_property(
             'rotation_angle_y',
-            direction == Gtk.DirectionType.RIGHT ? 180 : -180,
+            direction === Gtk.DirectionType.RIGHT ? 180 : -180,
             {
                 duration: WINDOW_ANIMATION_TIME * 2,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
@@ -1322,14 +1327,14 @@ var CodingSession = GObject.registerClass({
             onComplete: () => {
                 this._restoreButtonState();
                 this._rotateInCompleted();
-            }
+            },
         });
     }
 
     // We need to keep these separate here so that they can be called
     // by killEffects later if required.
     _rotateInCompleted() {
-        let actor = this._rotatingInActor;
+        const actor = this._rotatingInActor;
         if (!actor)
             return;
 
@@ -1339,7 +1344,7 @@ var CodingSession = GObject.registerClass({
     }
 
     _rotateOutCompleted(resetRotation) {
-        let actor = this._rotatingOutActor;
+        const actor = this._rotatingOutActor;
         if (!actor)
             return;
 
@@ -1363,7 +1368,7 @@ const SessionLookupFlags = {
 var CodeViewManager = GObject.registerClass({
     Signals: {
         'session-added': { param_types: [GObject.TYPE_OBJECT] },
-        'session-removed': { param_types: [GObject.TYPE_OBJECT] }
+        'session-removed': { param_types: [GObject.TYPE_OBJECT] },
     },
 }, class CodeViewManager extends GObject.Object {
     _init(params) {
@@ -1372,7 +1377,7 @@ var CodeViewManager = GObject.registerClass({
         this._sessions = [];
 
         global.display.connect('window-created', (display, win) => {
-            let windowActor = win.get_compositor_private();
+            const windowActor = win.get_compositor_private();
             windowActor._drawnFirstFrame = false;
             windowActor.connect('first-frame', () => {
                 windowActor._drawnFirstFrame = true;
@@ -1380,20 +1385,20 @@ var CodeViewManager = GObject.registerClass({
         });
 
         Settings.connect('changed::hack-mode-enabled', () => {
-            let activated = Settings.get_boolean('hack-mode-enabled');
-            if (!activated) {
-                this._sessions.forEach((session) => {
-                    let eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
-                    this._removeSession(session, eventType);
-                });
-            } else {
+            const activated = Settings.get_boolean('hack-mode-enabled');
+            if (activated) {
                 // enable FtH for all windows!
-                global.get_window_actors().forEach((actor) => {
+                global.get_window_actors().forEach(actor => {
                     this.handleMapWindow(actor);
                 });
 
-                this._sessions.forEach((session) => {
+                this._sessions.forEach(session => {
                     session._syncButtonVisibility();
+                });
+            } else {
+                this._sessions.forEach(session => {
+                    const eventType = SessionDestroyEvent.SESSION_DESTROY_APP_DESTROYED;
+                    this._removeSession(session, eventType);
                 });
             }
         });
@@ -1409,7 +1414,7 @@ var CodeViewManager = GObject.registerClass({
     }
 
     _addSession(actor) {
-        let session = new CodingSession({ app: actor });
+        const session = new CodingSession({ app: actor });
 
         // When the app is minimized the WM doesn't emit the destroy signal if
         // the app is closed, for this reason we need to listen to the 'destroy'
@@ -1417,24 +1422,24 @@ var CodeViewManager = GObject.registerClass({
         // CodingSession list and avoid possible gnome-shell crash
         let destroyAppHandlerId = 0;
         let destroyToolboxHandlerId = 0;
-        session.connect('minimized', (session) => {
-            if (session.app) {
-                destroyAppHandlerId = session.app.connect('destroy',
+        session.connect('minimized', s => {
+            if (s.app) {
+                destroyAppHandlerId = s.app.connect('destroy',
                     this.handleDestroyWindow.bind(this));
             }
 
-            if (session.toolbox) {
-                destroyToolboxHandlerId = session.toolbox.connect('destroy',
+            if (s.toolbox) {
+                destroyToolboxHandlerId = s.toolbox.connect('destroy',
                     this.handleDestroyWindow.bind(this));
             }
         });
-        session.connect('unminimized', (session) => {
+        session.connect('unminimized', s => {
             if (destroyAppHandlerId) {
-                session.app.disconnect(destroyAppHandlerId);
+                s.app.disconnect(destroyAppHandlerId);
                 destroyAppHandlerId = 0;
             }
             if (destroyToolboxHandlerId) {
-                session.toolbox.disconnect(destroyToolboxHandlerId);
+                s.toolbox.disconnect(destroyToolboxHandlerId);
                 destroyToolboxHandlerId = 0;
             }
         });
@@ -1447,7 +1452,7 @@ var CodeViewManager = GObject.registerClass({
         // Destroy the session here and remove it from the list
         session.destroy(eventType);
 
-        let idx = this._sessions.indexOf(session);
+        const idx = this._sessions.indexOf(session);
         if (idx === -1)
             return;
 
@@ -1483,7 +1488,7 @@ var CodeViewManager = GObject.registerClass({
     }
 
     handleWindowGrab(actor, grabbed) {
-        let session = this._getSession(actor,
+        const session = this._getSession(actor,
             SessionLookupFlags.SESSION_LOOKUP_APP | SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (!session)
             return;
@@ -1492,6 +1497,7 @@ var CodeViewManager = GObject.registerClass({
     }
 
     _isClubhouseInstalled() {
+        void this;
         return Clubhouse.getClubhouseApp() || Clubhouse.getClubhouseApp('com.endlessm.Clubhouse');
     }
 
@@ -1503,15 +1509,15 @@ var CodeViewManager = GObject.registerClass({
             return false;
 
         // Do not manage apps that don't have an associated .desktop file
-        let windowTracker = Shell.WindowTracker.get_default();
-        let shellApp = windowTracker.get_window_app(actor.meta_window);
+        const windowTracker = Shell.WindowTracker.get_default();
+        const shellApp = windowTracker.get_window_app(actor.meta_window);
         if (!shellApp)
             return false;
-        let appInfo = shellApp.get_app_info();
+        const appInfo = shellApp.get_app_info();
         if (!appInfo)
             return false;
 
-        let gtkId = actor.meta_window.get_gtk_application_id();
+        const gtkId = actor.meta_window.get_gtk_application_id();
 
         // The custom X-Endless-Hackable key has the last word always
         if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
@@ -1539,12 +1545,12 @@ var CodeViewManager = GObject.registerClass({
 
         // It might be a "HackToolbox". Check that, and if so,
         // add it to the window group for the window.
-        let proxy = Shell.WindowTracker.get_hack_toolbox_proxy(actor.meta_window);
+        const proxy = Shell.WindowTracker.get_hack_toolbox_proxy(actor.meta_window);
         let handled = false;
 
         // This is a new proxy window, make it join the session
         if (proxy) {
-            let [targetAppId, targetWindowId] = _getToolboxTarget(actor.meta_window);
+            const [targetAppId, targetWindowId] = _getToolboxTarget(actor.meta_window);
 
             let session = this._getSessionForTargetAppWindow(
                 targetAppId, targetWindowId);
@@ -1574,52 +1580,55 @@ var CodeViewManager = GObject.registerClass({
     }
 
     killEffectsOnActor(actor) {
-        let session = this._getSession(actor,
+        const session = this._getSession(actor,
             SessionLookupFlags.SESSION_LOOKUP_APP | SessionLookupFlags.SESSION_LOOKUP_TOOLBOX);
         if (session)
             session.killEffects();
     }
 
     _getSession(actor, flags) {
-        return this._sessions.find((session) => {
-            return (((session.app === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_APP)) ||
-                    ((session.toolbox === actor) && (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)));
+        return this._sessions.find(session => {
+            if (flags & SessionLookupFlags.SESSION_LOOKUP_APP)
+                return session.app === actor;
+            if (flags & SessionLookupFlags.SESSION_LOOKUP_TOOLBOX)
+                return session.toolbox === actor;
+            return false;
         });
     }
 
     _getAvailableSessionForTargetApp(targetAppId) {
-        return this._sessions.find((session) => {
-            return (session.app &&
-                    !session.app.is_destroyed() &&
-                    !session.toolbox &&
-                    _getAppId(session.app.meta_window) == targetAppId);
+        return this._sessions.find(session => {
+            return session.app &&
+                   !session.app.is_destroyed() &&
+                   !session.toolbox &&
+                   _getAppId(session.app.meta_window) === targetAppId;
         });
     }
 
     _getAvailableSessionForToolboxTarget(appId) {
-        return this._sessions.find((session) => {
-            return (!session.app &&
-                    session.toolbox &&
-                    !session.toolbox.is_destroyed() &&
-                    _getToolboxTarget(session.toolbox.meta_window)[0] == appId);
+        return this._sessions.find(session => {
+            return !session.app &&
+                   session.toolbox &&
+                   !session.toolbox.is_destroyed() &&
+                   _getToolboxTarget(session.toolbox.meta_window)[0] === appId;
         });
     }
 
     _getSessionForTargetAppWindow(targetAppId, targetWindowId) {
-        return this._sessions.find((session) => {
-            return (session.app &&
-                    !session.app.is_destroyed() &&
-                    _getAppId(session.app.meta_window) == targetAppId &&
-                    _getWindowId(session.app.meta_window) == targetWindowId);
+        return this._sessions.find(session => {
+            return session.app &&
+                   !session.app.is_destroyed() &&
+                   _getAppId(session.app.meta_window) === targetAppId &&
+                   _getWindowId(session.app.meta_window) === targetWindowId;
         });
     }
 
     _getSessionForToolboxTarget(appId, windowId) {
-        return this._sessions.find((session) => {
-            return (session.toolbox &&
-                    !session.toolbox.is_destroyed () &&
-                    _getToolboxTarget(session.toolbox.meta_window)[0] == appId &&
-                    _getToolboxTarget(session.toolbox.meta_window)[1] == windowId);
+        return this._sessions.find(session => {
+            return session.toolbox &&
+                   !session.toolbox.is_destroyed() &&
+                   _getToolboxTarget(session.toolbox.meta_window)[0] === appId &&
+                   _getToolboxTarget(session.toolbox.meta_window)[1] === windowId;
         });
     }
 });
@@ -1633,13 +1642,12 @@ function getWindows(workspace) {
     // We ignore skip-taskbar windows in switchers, but if they are attached
     // to their parent, their position in the MRU list may be more appropriate
     // than the parent; so start with the complete list ...
-    let windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL,
-                                              workspace);
+    const windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, workspace);
     // ... map windows to their parent where appropriate ...
     return windows.map(w => {
         return w.is_attached_dialog() ? w.get_transient_for() : w;
     // ... and filter out hack inactive, skip-taskbar windows and duplicates
-    }).filter((w, i, a) => !w._hackIsInactiveWindow && !w.skip_taskbar && a.indexOf(w) == i);
+    }).filter((w, i, a) => !w._hackIsInactiveWindow && !w.skip_taskbar && a.indexOf(w) === i);
 }
 
 // appIconBar.js
@@ -1649,7 +1657,7 @@ const originalGetInterestingWindow = AppIconBar.AppIconButton.prototype._getInte
 function getInterestingWindows() {
     let windows = this._app.get_windows();
     let hasSpeedwagon = false;
-    windows = windows.filter(function(metaWindow) {
+    windows = windows.filter(metaWindow => {
         hasSpeedwagon = hasSpeedwagon || Shell.WindowTracker.is_speedwagon_window(metaWindow);
         return !metaWindow.is_skip_taskbar() && !metaWindow._hackIsInactiveWindow;
     });
@@ -1664,17 +1672,11 @@ function isOverviewWindow(win) {
     return !win.get_meta_window().skip_taskbar && !win.get_meta_window()._hackIsInactiveWindow;
 }
 
-// windowManager.js
-const WindowManager = imports.ui.windowManager;
 const Wobbly = Hack.imports.ui.wobbly;
 const SideComponent = imports.ui.sideComponent;
 
 function _windowCanWobble(win, op) {
-    if (win.is_override_redirect() ||
-        op != Meta.GrabOp.MOVING)
-        return false;
-
-    return true;
+    return !win.is_override_redirect() && op === Meta.GrabOp.MOVING;
 }
 
 function _windowGrabbed(display, screen, win, op) {
@@ -1686,13 +1688,13 @@ function _windowGrabbed(display, screen, win, op) {
     if (!_windowCanWobble(win, op))
         return;
 
-    let actor = win.get_compositor_private();
+    const actor = win.get_compositor_private();
     if (!actor._animatableSurface)
         return;
 
     // This is an event that may cause an animation
     // on the window.
-    let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
+    const attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
     if (attachedEffect)
         attachedEffect.activate('move', { grabbed: true });
 
@@ -1705,12 +1707,12 @@ function _windowUngrabbed(display, op, win) {
     if (!win)
         return;
 
-    let actor = win.get_compositor_private();
+    const actor = win.get_compositor_private();
     if (!actor._animatableSurface)
         return;
 
     // This is an event that may cause an animation on the window
-    let attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
+    const attachedEffect = actor._animatableSurface.highest_priority_attached_effect_for_event('move');
     if (attachedEffect)
         attachedEffect.activate('move', { grabbed: false });
 
@@ -1719,16 +1721,15 @@ function _windowUngrabbed(display, op, win) {
 
 function mapWindow(shellwm, actor) {
     actor._windowType = actor.meta_window.get_window_type();
-    let metaWindow = actor.meta_window;
-    let isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
+    const metaWindow = actor.meta_window;
+    const isSplashWindow = Shell.WindowTracker.is_speedwagon_window(metaWindow);
 
     if (!isSplashWindow) {
         // If we have an active splash window for the app, don't animate it.
-        let tracker = Shell.WindowTracker.get_default();
-        let app = tracker.get_window_app(metaWindow);
-        let hasSplashWindow = (app && app.get_windows().some(w => {
-            return Shell.WindowTracker.is_speedwagon_window(w);
-        }));
+        const tracker = Shell.WindowTracker.get_default();
+        const app = tracker.get_window_app(metaWindow);
+        const someWindow = app.get_windows().some(w => Shell.WindowTracker.is_speedwagon_window(w));
+        const hasSplashWindow = app && someWindow;
         if (hasSplashWindow) {
             if (!this._codeViewManager.handleMapWindow(actor))
                 shellwm.completed_map(actor);
@@ -1736,13 +1737,11 @@ function mapWindow(shellwm, actor) {
         }
     }
 
-    if (SideComponent.isSideComponentWindow(actor.meta_window)) {
+    if (SideComponent.isSideComponentWindow(actor.meta_window))
         return;
-    }
 
-    if (actor._windowType === Meta.WindowType.NORMAL && !isSplashWindow) {
-        return this._codeViewManager.handleMapWindow(actor);
-    }
+    if (actor._windowType === Meta.WindowType.NORMAL && !isSplashWindow)
+        this._codeViewManager.handleMapWindow(actor);
 }
 
 function destroyWindow(shellwm, actor) {
@@ -1760,17 +1759,15 @@ function _wmConnect(signal, fn) {
 
 function enable() {
     AltTab.getWindows = getWindows;
-     Object.defineProperty(AltTab.AppIcon.prototype, 'cachedWindows', {
+    Object.defineProperty(AltTab.AppIcon.prototype, 'cachedWindows', {
         get: function() {
-            let cached = this._cachedWindows || [];
-            return cached.filter((win) => {
-                return !win._hackIsInactiveWindow;
-            });
+            const cached = this._cachedWindows || [];
+            return cached.filter(win => !win._hackIsInactiveWindow);
         },
         set: function(windowList) {
             this._cachedWindows = windowList;
         },
-     });
+    });
 
     AppIconBar.AppIconButton.prototype._getInterestingWindows = getInterestingWindows;
     Workspace.Workspace.prototype._isOverviewWindow = isOverviewWindow;
@@ -1828,7 +1825,7 @@ function disable() {
     Main.wm._codeViewManager = null;
     Wobbly.disableWobblyFx(Main.wm);
 
-    WM_HANDLERS.forEach((handler) => {
+    WM_HANDLERS.forEach(handler => {
         global.window_manager.disconnect(handler);
     });
 

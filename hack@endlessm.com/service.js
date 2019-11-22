@@ -1,3 +1,5 @@
+/* exported HackableApp, enable, disable */
+
 const { Gio, GLib, Shell } = imports.gi;
 const ShellDBus = imports.ui.shellDBus;
 
@@ -9,8 +11,6 @@ const Main = imports.ui.main;
 
 const { loadInterfaceXML } = Hack.imports.utils;
 
-const Codeview = Hack.imports.ui.codeView;
-
 const IFACE = loadInterfaceXML('com.hack_computer.hack');
 const CLUBHOUSE_ID = 'com.hack_computer.Clubhouse.desktop';
 
@@ -18,53 +18,54 @@ var Service = class {
     constructor() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(IFACE, this);
         Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.hack_computer.hack',
-                                       Gio.BusNameOwnerFlags.REPLACE, null, null);
+            Gio.BusNameOwnerFlags.REPLACE, null, null);
 
         try {
             this._dbusImpl.export(Gio.DBus.session, '/com/hack_computer/hack');
-        } catch(e) {
+        } catch (e) {
             logError(e, 'Cannot export Hack service');
             return;
         }
 
         Shell.WindowTracker.get_default().connect('notify::focus-app',
-                                                  this._checkFocusAppChanged.bind(this));
+            this._checkFocusAppChanged.bind(this));
         Settings.connect('changed::hack-mode-enabled', () => {
             this._dbusImpl.emit_property_changed('HackModeEnabled',
-                                                 new GLib.Variant('b', this.HackModeEnabled));
+                new GLib.Variant('b', this.HackModeEnabled));
         });
         Settings.connect('changed::hack-icon-pulse', () => {
             this._dbusImpl.emit_property_changed('HackIconPulse',
-                                                 new GLib.Variant('b', this.HackIconPulse));
+                new GLib.Variant('b', this.HackIconPulse));
         });
         Settings.connect('changed::show-hack-launcher', () => {
             this._dbusImpl.emit_property_changed('ShowHackLauncher',
-                                                 new GLib.Variant('b', this.ShowHackLauncher));
+                new GLib.Variant('b', this.ShowHackLauncher));
         });
 
         Settings.connect('changed::wobbly-effect', () => {
             this._dbusImpl.emit_property_changed('WobblyEffect',
-                                                 new GLib.Variant('b', this.WobblyEffect));
+                new GLib.Variant('b', this.WobblyEffect));
         });
         Settings.connect('changed::wobbly-spring-k', () => {
             this._dbusImpl.emit_property_changed('WobblySpringK',
-                                                 new GLib.Variant('d', this.WobblySpringK));
+                new GLib.Variant('d', this.WobblySpringK));
         });
         Settings.connect('changed::wobbly-spring-friction', () => {
             this._dbusImpl.emit_property_changed('WobblySpringFriction',
-                                                 new GLib.Variant('d', this.WobblySpringFriction));
+                new GLib.Variant('d', this.WobblySpringFriction));
         });
         Settings.connect('changed::wobbly-slowdown-factor', () => {
             this._dbusImpl.emit_property_changed('WobblySlowdownFactor',
-                                                 new GLib.Variant('d', this.WobblySlowdownFactor));
+                new GLib.Variant('d', this.WobblySlowdownFactor));
         });
         Settings.connect('changed::wobbly-object-movement-range', () => {
             this._dbusImpl.emit_property_changed('WobblyObjectMovementRange',
-                                                 new GLib.Variant('d', this.WobblyObjectMovementRange));
+                new GLib.Variant('d', this.WobblyObjectMovementRange));
         });
     }
 
     MinimizeAll() {
+        void this;
         global.get_window_actors().forEach(actor => {
             actor.metaWindow.minimize();
         });
@@ -79,74 +80,91 @@ var Service = class {
     }
 
     get FocusedApp() {
+        void this;
         let appId = '';
-        let tracker = Shell.WindowTracker.get_default();
+        const tracker = Shell.WindowTracker.get_default();
         if (tracker.focus_app)
             appId = tracker.focus_app.get_id();
         return appId;
     }
 
     get HackModeEnabled() {
+        void this;
         return Settings.get_boolean('hack-mode-enabled');
     }
 
     set HackModeEnabled(enabled) {
+        void this;
         Settings.set_boolean('hack-mode-enabled', enabled);
     }
 
     get HackIconPulse() {
+        void this;
         return Settings.get_boolean('hack-icon-pulse');
     }
 
     set HackIconPulse(enabled) {
+        void this;
         Settings.set_boolean('hack-icon-pulse', enabled);
     }
 
     get ShowHackLauncher() {
+        void this;
         return Settings.get_boolean('show-hack-launcher');
     }
 
     set ShowHackLauncher(enabled) {
+        void this;
         Settings.set_boolean('show-hack-launcher', enabled);
     }
 
     get WobblyEffect() {
+        void this;
         return Settings.get_boolean('wobbly-effect');
     }
 
     set WobblyEffect(enabled) {
+        void this;
         Settings.set_boolean('wobbly-effect', enabled);
     }
 
     get WobblySpringK() {
+        void this;
         return Settings.get_double('wobbly-spring-k');
     }
 
     set WobblySpringK(value) {
+        void this;
         Settings.set_double('wobbly-spring-k', value);
     }
 
     get WobblySpringFriction() {
+        void this;
         return Settings.get_double('wobbly-spring-friction');
     }
 
     set WobblySpringFriction(value) {
+        void this;
         Settings.set_double('wobbly-spring-friction', value);
     }
 
     get WobblySlowdownFactor() {
+        void this;
         return Settings.get_double('wobbly-slowdown-factor');
     }
 
     set WobblySlowdownFactor(value) {
+        void this;
         Settings.set_double('wobbly-slowdown-factor', value);
     }
 
     get WobblyObjectMovementRange() {
+        void this;
         return Settings.get_double('wobbly-object-movement-range');
     }
 
     set WobblyObjectMovementRange(value) {
+        void this;
         Settings.set_double('wobbly-object-movement-range', value);
     }
 };
@@ -164,7 +182,7 @@ var HackableApp = class {
         const objectPath = `/com/hack_computer/HackableApp/${objectId}`;
         try {
             this._dbusImpl.export(Gio.DBus.session, objectPath);
-        } catch(e) {
+        } catch (e) {
             logError(e, `Cannot export HackableApp at path ${objectPath}`);
         }
     }
@@ -216,11 +234,11 @@ var HackableAppsManager = class {
     constructor() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(HackableAppsManagerIface, this);
         Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.hack_computer.HackableAppsManager',
-                                       Gio.BusNameOwnerFlags.REPLACE, null, null);
+            Gio.BusNameOwnerFlags.REPLACE, null, null);
 
         try {
             this._dbusImpl.export(Gio.DBus.session, '/com/hack_computer/HackableAppsManager');
-        } catch(e) {
+        } catch (e) {
             logError(e, 'Cannot export HackableAppsManager');
             return;
         }
@@ -282,7 +300,7 @@ function enable() {
         }
 
         STORE_SERVICE.AddApplication.bind(this)(id);
-    }
+    };
 
     ShellDBus.AppStoreService.prototype.AddAppIfNotVisible = function(id) {
         if (id === CLUBHOUSE_ID) {
@@ -293,7 +311,7 @@ function enable() {
         }
 
         STORE_SERVICE.AddAppIfNotVisible.bind(this)(id);
-    }
+    };
 
     ShellDBus.AppStoreService.prototype.RemoveApplication = function(id) {
         if (id === CLUBHOUSE_ID) {
@@ -303,7 +321,7 @@ function enable() {
         }
 
         STORE_SERVICE.RemoveApplication.bind(this)(id);
-    }
+    };
 }
 
 function disable() {
@@ -311,13 +329,9 @@ function disable() {
     ShellDBus.AppStoreService.prototype.AddAppIfNotVisible = STORE_SERVICE.AddAppIfNotVisible;
     ShellDBus.AppStoreService.prototype.RemoveApplication = STORE_SERVICE.RemoveApplication;
 
-    if (SHELL_DBUS_SERVICE) {
-        delete SHELL_DBUS_SERVICE;
+    if (SHELL_DBUS_SERVICE)
         SHELL_DBUS_SERVICE = null;
-    }
 
-    if (HACKABLE_APPS_MANAGER_SERVICE) {
-        delete HACKABLE_APPS_MANAGER_SERVICE;
+    if (HACKABLE_APPS_MANAGER_SERVICE)
         HACKABLE_APPS_MANAGER_SERVICE = null;
-    }
 }
