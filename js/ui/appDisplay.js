@@ -1616,7 +1616,6 @@ var FolderIcon = GObject.registerClass({
         this.actor.connect('popup-menu', this._popupRenamePopup.bind(this));
 
         this.actor.connect('clicked', this.open.bind(this));
-        this.actor.connect('destroy', this.onDestroy.bind(this));
         this.actor.connect('notify::mapped', () => {
             if (!this.actor.mapped && this._popup)
                 this._popup.popdown();
@@ -1625,7 +1624,9 @@ var FolderIcon = GObject.registerClass({
         this._redisplay();
     }
 
-    onDestroy() {
+    _onDestroy() {
+        super._onDestroy();
+
         this.view.actor.destroy();
 
         if (this._spaceReadySignalId) {
@@ -2224,8 +2225,6 @@ var AppIcon = GObject.registerClass({
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this.actor);
 
-        this.actor.connect('destroy', this._onDestroy.bind(this));
-
         this._menuTimeoutId = 0;
         this._stateChangedId = this.app.connect('notify::state', () => {
             this._updateRunningStyle();
@@ -2234,6 +2233,8 @@ var AppIcon = GObject.registerClass({
     }
 
     _onDestroy() {
+        super._onDestroy();
+
         if (this._folderPreviewId > 0) {
             GLib.source_remove(this._folderPreviewId);
             this._folderPreviewId = 0;
