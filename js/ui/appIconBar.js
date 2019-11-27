@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 
-const { Clutter, Gdk, Gio, GObject,	
+const { Clutter, Gdk, Gio, GLib, GObject,
         Gtk, Meta, Shell, St } = imports.gi;
 
 const Signals = imports.signals;
@@ -148,19 +148,6 @@ const AppIconMenu = class extends PopupMenu.PopupMenu {
         this.shouldSwitchToOnHover = false;
 
         this._app = app;
-
-        // Chain our visibility and lifecycle to that of the source
-        this._parentActorMappedId = parentActor.connect('notify::mapped', () => {
-            if (!parentActor.mapped)
-                this.close();
-        });
-        parentActor.connect('destroy', () => {
-            if (this._parentActorMappedId > 0) {
-                parentActor.disconnect(this._parentActorMappedId);
-                this._parentActorMappedId = 0;
-            }
-            this.actor.destroy();
-        });
     }
 
     _redisplay() {
@@ -298,7 +285,16 @@ const AppIconButton = GObject.registerClass({
             });
 
             this._unpinMenuItem = this._rightClickMenu.addAction(_("Unpin from Taskbar"), () => {
-                this.emit('app-icon-unpinned');
+
+                // Unpin from taskbar in idle, so that we can avoid destroying
+                // the menu actor before it's closed
+                GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                    this._menu.destroy();
+
+                    this.emit('app-icon-unpinned');
+
+                    return GLib.SOURCE_REMOVE;
+                });
             });
 
             if (AppFavorites.getAppFavorites().isFavorite(this._app.get_id()))
