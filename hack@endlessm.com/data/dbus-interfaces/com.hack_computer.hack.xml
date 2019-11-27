@@ -2,6 +2,16 @@
   <interface name="com.hack_computer.hack">
     <method name="MinimizeAll"/>
 
+    <method name="SetToolbox">
+      <arg type="s" direction="in" name="appId"/>
+      <arg type="s" direction="in" name="toolboxId"/>
+    </method>
+
+    <method name="GetToolbox">
+      <arg type="s" direction="in" name="appId"/>
+      <arg type="s" direction="out" name="toolboId"/>
+    </method>
+
     <property name="HackModeEnabled" type="b" access="readwrite"/>
     <property name="HackIconPulse" type="b" access="readwrite"/>
     <property name="FocusedApp" type="s" access="read" />
@@ -12,5 +22,7 @@
     <property name="WobblySpringFriction" type="d" access="readwrite" />
     <property name="WobblySlowdownFactor" type="d" access="readwrite"/>
     <property name="WobblyObjectMovementRange" type="d" access="readwrite"/>
+
+    <property name="HackToolboxes" type="a{ss}" access="readwrite"/>
   </interface>
 </node>

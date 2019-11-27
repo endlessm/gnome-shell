@@ -62,6 +62,9 @@ const OldHackableIface = `
 </node>`;
 const OldHackableProxy = Gio.DBusProxy.makeProxyWrapper(OldHackableIface);
 
+const ToolboxIface = Utils.loadInterfaceXML('com.hack_computer.Toolbox');
+const DBusToolboxProxy = Gio.DBusProxy.makeProxyWrapper(ToolboxIface);
+
 function _ensureAfterFirstFrame(win, callback) {
     if (win._drawnFirstFrame) {
         callback();
@@ -178,6 +181,11 @@ function _appIsAllowedHacking(desktopId) {
         return true;
 
     const appId = desktopId.slice(0, -8);  // remove ".desktop"
+
+    const toolboxes = Settings.get_value('hack-toolboxes').deep_unpack();
+    if (appId in toolboxes)
+        return true;
+
     let allowOnlyList;
     try {
         [allowOnlyList] = keyfile.get_string_list('flip-to-hack', 'whitelist');
@@ -459,6 +467,7 @@ var CodingSession = GObject.registerClass({
         this._state = CodingSessionStateEnum.APP;
         this._toolboxActionGroup = null;
         this._toolboxAppActionGroup = null;
+        this._toolboxProxy = null;
 
         this._hackableProxy = null;
         this._hackablePropsChangedId = 0;
@@ -526,8 +535,11 @@ var CodingSession = GObject.registerClass({
     }
 
     get toolboxId() {
-        // FIXME: this should be extended to make it possible to launch
-        // arbitrary toolboxes in the future, depending on the application
+        // Custom toolbox
+        const toolboxes = Settings.get_value('hack-toolboxes').deep_unpack();
+        if (this.appId in toolboxes)
+            return toolboxes[this.appId];
+
         let prefix = 'com.hack_computer';
 
         if (this.appId.startsWith('com.endlessm.'))
@@ -789,6 +801,8 @@ var CodingSession = GObject.registerClass({
         this._toolboxAppActionGroup =
             Gio.DBusActionGroup.get(Gio.DBus.session, toolboxId, toolboxPath);
         this._toolboxAppActionGroup.list_actions();
+
+        this._toolboxProxy = new DBusToolboxProxy(Gio.DBus.session, toolboxId, toolboxPath);
     }
 
     _setupToolboxWindow() {
@@ -1034,6 +1048,14 @@ var CodingSession = GObject.registerClass({
                 null, this.toolbox,
                 Gtk.DirectionType.LEFT);
         } else {
+            try {
+                this._toolboxProxy.FlipRemote(this.appId, () => {
+                    // TODO: use this callback to show a spinning window or something
+                });
+            } catch (e) {
+                log(`The toolbox ${this.toolboxId} doesn't implement the com.hack_computer.Toolbox interface`);
+            }
+
             this._toolboxAppActionGroup.activate_action(
                 'flip',
                 new GLib.Variant('(ss)', [
@@ -1045,6 +1067,16 @@ var CodingSession = GObject.registerClass({
     }
 
     _switchToApp() {
+        try {
+            this._toolboxProxy.FlipBackRemote(this.appId, () => {
+                // TODO: use this callback to show a spinning window or something
+                // The application can do some operations, so we should ensure that
+                // we don't flip back until the operation ends.
+            });
+        } catch (e) {
+            log(`The toolbox ${this.toolboxId} doesn't implement the com.hack_computer.Toolbox interface`);
+        }
+
         if (this._toolboxActionGroup.has_action('flip-back')) {
             this._toolboxActionGroup.activate_action('flip-back', null);
             this.appRemovedByFlipBack = true;
@@ -1147,6 +1179,14 @@ var CodingSession = GObject.registerClass({
             !this._grabbed &&
             this._hackable) {
             if (!this.toolbox) {
+                try {
+                    this._toolboxProxy.InitRemote(_getAppId(this.app.meta_window), (result, error) => {
+                        [this._waitingToolboxId] = result;
+                    });
+                } catch (e) {
+                    log(`The toolbox ${this.toolboxId} doesn't implement the com.hack_computer.Toolbox interface`);
+                }
+
                 this._toolboxAppActionGroup.activate_action(
                     'init',
                     new GLib.Variant('(ss)', [
@@ -1520,6 +1560,14 @@ var CodeViewManager = GObject.registerClass({
 
         const gtkId = actor.meta_window.get_gtk_application_id();
 
+        // Generic toolbox
+        const codingSession = this._sessions.find(session => session._waitingToolboxId === gtkId);
+        if (codingSession) {
+            codingSession.admitToolboxWindowActor(actor);
+            codingSession._waitingToolboxId = null;
+            return;
+        }
+
         // The custom X-Endless-Hackable key has the last word always
         if (appInfo.has_key(_HACKABLE_DESKTOP_KEY)) {
             if (!appInfo.get_boolean(_HACKABLE_DESKTOP_KEY))
@@ -1725,12 +1773,14 @@ function mapWindow(shellwm, actor) {
         // If we have an active splash window for the app, don't animate it.
         const tracker = Shell.WindowTracker.get_default();
         const app = tracker.get_window_app(metaWindow);
-        const someWindow = app.get_windows().some(w => Shell.WindowTracker.is_speedwagon_window(w));
-        const hasSplashWindow = app && someWindow;
-        if (hasSplashWindow) {
-            if (!this._codeViewManager.handleMapWindow(actor))
-                shellwm.completed_map(actor);
-            return;
+        if (app) {
+            const someWindow = app.get_windows().some(w => Shell.WindowTracker.is_speedwagon_window(w));
+            const hasSplashWindow = app && someWindow;
+            if (hasSplashWindow) {
+                if (!this._codeViewManager.handleMapWindow(actor))
+                    shellwm.completed_map(actor);
+                return;
+            }
         }
     }
 

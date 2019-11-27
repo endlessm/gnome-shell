@@ -61,6 +61,10 @@ var Service = class {
             this._dbusImpl.emit_property_changed('WobblyObjectMovementRange',
                 new GLib.Variant('d', this.WobblyObjectMovementRange));
         });
+        Settings.connect('changed::hack-toolboxes', () => {
+            this._dbusImpl.emit_property_changed('HackToolboxes',
+                new GLib.Variant('a{ss}', this.HackToolboxes));
+        });
     }
 
     MinimizeAll() {
@@ -165,6 +169,31 @@ var Service = class {
     set WobblyObjectMovementRange(value) {
         void this;
         Settings.set_double('wobbly-object-movement-range', value);
+    }
+
+    get HackToolboxes() {
+        void this;
+        return Settings.get_value('hack-toolboxes').deep_unpack();
+    }
+
+    set HackToolboxes(value) {
+        void this;
+        const variant = new GLib.Variant('a{ss}', value);
+        Settings.set_value('hack-toolboxes', variant);
+    }
+
+    SetToolbox(appId, toolboxId) {
+        const toolboxes = this.HackToolboxes;
+        toolboxes[appId] = toolboxId;
+        this.HackToolboxes = toolboxes;
+    }
+
+    GetToolbox(appId) {
+        const toolboxes = this.HackToolboxes;
+        if (appId in toolboxes)
+            return toolboxes[appId];
+
+        return '';
     }
 };
 
