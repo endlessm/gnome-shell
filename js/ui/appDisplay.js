@@ -2674,6 +2674,7 @@ class AppCenterIcon extends AppIcon {
 
         this._id = EOS_APP_CENTER_ID;
         this._name = this.app.get_generic_name();
+        this.icon.label.text = this.name;
     }
 
     _onDragBegin() {
