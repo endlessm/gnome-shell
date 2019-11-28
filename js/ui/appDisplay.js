@@ -2687,7 +2687,7 @@ class AppCenterIcon extends AppIcon {
     _onDragEnd() {
         super._onDragEnd();
 
-        this.icon.label.text = this.app.get_generic_name();
+        this.icon.label.text = this.name;
         this.icon.update();
     }
 
