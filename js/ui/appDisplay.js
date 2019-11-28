@@ -2671,9 +2671,10 @@ class AppCenterIcon extends AppIcon {
         let app = appSys.lookup_app(EOS_APP_CENTER_ID);
 
         super._init(app, viewIconParams, iconParams);
+    }
 
-        this._id = EOS_APP_CENTER_ID;
-        this._name = this.app.get_generic_name();
+    get name() {
+        return _("More Apps");
     }
 
     _onDragBegin() {
