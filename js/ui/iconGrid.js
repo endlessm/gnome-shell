@@ -1222,7 +1222,7 @@ var PaginatedIconGrid = GObject.registerClass({
         // As a temporary solution for now, let's assume that the folder
         // will be closed after EXTRA_SPACE_ANIMATION_TIME and reset the
         // status + emit the space-closed signal only once at that point.
-        GLib.timeout_add_seconds(
+        GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
             EXTRA_SPACE_ANIMATION_TIME * St.Settings.get().slow_down_factor,
             () => {
