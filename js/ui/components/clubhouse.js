@@ -39,6 +39,10 @@ const GtkNotificationDaemon = NotificationDaemon.GtkNotificationDaemon;
 
 const CLUBHOUSE_BANNER_ANIMATION_TIME = 200;
 
+// This margin is used to position the banner relative to the top-left
+// or bottom-left corners of the screen.
+const CLUBHOUSE_BANNER_MARGIN = 30;
+
 const CLUBHOUSE_DBUS_OBJ_PATH = '/com/hack_computer/Clubhouse';
 const ClubhouseIface = loadInterfaceXML('com.hack_computer.Clubhouse');
 
@@ -225,6 +229,24 @@ var ClubhouseAnimator = class ClubhouseAnimator {
     }
 };
 
+var QuestBannerPosition = class QuestBannerPosition {
+    constructor() {
+        this._atBottom = false;
+    }
+
+    get atBottom() {
+        return this._atBottom;
+    }
+
+    set atBottom(bool) {
+        this._atBottom = bool;
+    }
+
+    toggle() {
+        this.atBottom = !this.atBottom;
+    }
+};
+
 var ClubhouseNotificationBanner =
 class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
     constructor(notification) {
@@ -316,6 +338,11 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             y_align: Clutter.ActorAlign.FILL,
         };
         Object.assign(this._bodyStack, bodyStackParams);
+
+        let secondaryBinParams = {
+            x_fill: false,
+        };
+        Object.assign(this._secondaryBin, secondaryBinParams);
 
         let iconBinParams = {
             x_fill: false,
@@ -419,16 +446,18 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
         this._textPages = fulltext.split('\n\n');
     }
 
+    _repositionY() {
+        this.actor.y = CLUBHOUSE_BANNER_MARGIN;
+    }
+
     reposition() {
         let monitor = Main.layoutManager.primaryMonitor;
         if (!monitor)
             return;
 
-        let margin = 30;
-
         this.actor.x = monitor.x + monitor.width;
 
-        let endX = this.actor.x - this.actor.width - margin;
+        let endX = this.actor.x - this.actor.width - CLUBHOUSE_BANNER_MARGIN;
 
         if (this._shouldSlideIn) {
             // If the banner is still sliding in, stop it (because we have a new position for it).
@@ -440,7 +469,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             let endClip = new Clutter.Geometry({
                 x: 0,
                 y: 0,
-                width: this.actor.width + margin,
+                width: this.actor.width + CLUBHOUSE_BANNER_MARGIN,
                 height: this.actor.height,
             });
             this.actor.set_clip(0, 0, 0, this.actor.height);
@@ -460,7 +489,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             this.actor.x = endX;
         }
 
-        this.actor.y = margin;
+        this._repositionY();
     }
 
     _onClicked() {
@@ -508,7 +537,6 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             return;
         }
 
-        let margin = 30;
         let endX = monitor.x + monitor.width;
 
         // clipping the actor to avoid appearing in the right monitor
@@ -518,7 +546,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
             width: 0,
             height: this.actor.height,
         });
-        this.actor.set_clip(0, 0, this.actor.width + margin, this.actor.height);
+        this.actor.set_clip(0, 0, this.actor.width + CLUBHOUSE_BANNER_MARGIN, this.actor.height);
 
         this.actor.ease({
             x: endX,
@@ -552,7 +580,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
 var ClubhouseQuestBanner =
 class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
-    constructor(notification, isFirstBanner, animator) {
+    constructor(notification, isFirstBanner, animator, position) {
         let icon = notification.gicon;
         let imagePath = null;
 
@@ -563,7 +591,13 @@ class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
         }
 
         super(notification);
+
+        this._upDownIcon = null;
+        this._setupUpDownButton();
+
         this._shouldSlideIn = isFirstBanner;
+        this._position = position;
+        this._bottomBanner = null;
 
         this._closeButton.visible = notification.urgency !== MessageTray.Urgency.CRITICAL;
 
@@ -577,6 +611,85 @@ class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
             });
         }
     }
+
+    setBottomBanner(bottomBanner) {
+        this._bottomBanner = bottomBanner;
+    }
+
+    _updateUpDownIcon() {
+        if (!this._upDownIcon)
+            return;
+
+        if (this._position.atBottom)
+            this._upDownIcon.icon_name = 'go-top-symbolic';
+        else
+            this._upDownIcon.icon_name = 'go-bottom-symbolic';
+    }
+
+    _setupUpDownButton() {
+        this._upDownIcon = new St.Icon({
+            icon_name: 'go-bottom-symbolic',
+            icon_size: 16,
+        });
+        let upDownButton = new Soundable.Button({
+            style_class: 'clubhouse-notification-updown-button',
+            child: this._upDownIcon,
+            click_sound_event_id: 'clubhouse/entry/close',
+            x_align: Clutter.ActorAlign.CENTER,
+        });
+        this._secondaryBin.add_actor(upDownButton);
+
+        this.actor.connect('notify::hover', () => {
+            if (this.actor.get_hover())
+                upDownButton.add_style_class_name('visible');
+            else
+                upDownButton.remove_style_class_name('visible');
+        });
+
+        upDownButton.connect('clicked', () => {
+            this._slideUpDown();
+        });
+    }
+
+    _getPositionY(atBottom) {
+        if (atBottom) {
+            let monitor = Main.layoutManager.primaryMonitor;
+            if (!monitor)
+                return 0;
+
+            return (monitor.y + monitor.height
+                    - this.actor.height - CLUBHOUSE_BANNER_MARGIN
+                    - Main.panel.get_height());
+        } else {
+            return CLUBHOUSE_BANNER_MARGIN;
+        }
+    }
+
+    _slideUpDown() {
+        this.actor.ease({
+            // Note, we pass the opposite position because we are
+            // toggling direction:
+            y: this._getPositionY(!this._position.atBottom),
+            duration: CLUBHOUSE_BANNER_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => {
+                this._position.toggle();
+                this._updateUpDownIcon();
+                if (this._bottomBanner && this._bottomBanner.actor)
+                    this._bottomBanner.reposition();
+            },
+        });
+    }
+
+    _repositionY() {
+        this.actor.y = this._getPositionY(this._position.atBottom);
+    }
+
+    reposition() {
+        super.reposition();
+        this._updateUpDownIcon();
+    }
+
 };
 
 var ClubhouseItemBanner =
@@ -592,11 +705,11 @@ class ClubhouseItemBanner extends ClubhouseNotificationBanner {
         this.reposition();
     }
 
-    reposition() {
-        super.reposition();
-
-        if (this._topBanner && this._topBanner.actor)
+    _repositionY() {
+        if (this._topBanner && this._topBanner.actor && !this._topBanner._position.atBottom)
             this.actor.y += this._topBanner.actor.height;
+        else
+            super._repositionY();
     }
 };
 
@@ -611,8 +724,8 @@ class ClubhouseNotification extends NotificationDaemon.GtkNotificationDaemonNoti
         this.setResident(true);
     }
 
-    createBanner(isFirstBanner, animator) {
-        return new ClubhouseQuestBanner(this, isFirstBanner, animator);
+    createBanner(isFirstBanner, animator, position) {
+        return new ClubhouseQuestBanner(this, isFirstBanner, animator, position);
     }
 };
 
@@ -693,6 +806,7 @@ var Component = GObject.registerClass({
         this._clubhouseProxyHandler = 0;
 
         this._clubhouseAnimator = null;
+        this._questBannerPosition = null;
 
         this.proxyConstructFlags = Gio.DBusProxyFlags.NONE;
 
@@ -756,6 +870,7 @@ var Component = GObject.registerClass({
             });
 
             this._clubhouseAnimator = new ClubhouseAnimator(this.proxy, this._clubhouseId);
+            this._questBannerPosition = new QuestBannerPosition();
         }
 
         this._enabled = true;
@@ -801,6 +916,8 @@ var Component = GObject.registerClass({
     _syncBanners() {
         if (this._itemBanner)
             this._itemBanner.setTopBanner(this._questBanner);
+        if (this._questBanner)
+            this._questBanner.setBottomBanner(this._itemBanner);
     }
 
     _clearQuestBanner() {
@@ -808,9 +925,7 @@ var Component = GObject.registerClass({
             return;
 
         this._questBanner.dismiss(!this._hasForegroundQuest);
-
         this._questBanner = null;
-
         this._syncBanners();
     }
 
@@ -820,6 +935,7 @@ var Component = GObject.registerClass({
 
         this._itemBanner.dismiss(true);
         this._itemBanner = null;
+        this._syncBanners();
     }
 
     _imageUsesClubhouse() {
@@ -874,7 +990,7 @@ var Component = GObject.registerClass({
 
             if (!this._questBanner) {
                 this._questBanner = notification.createBanner(!this._hasForegroundQuest,
-                    this._clubhouseAnimator);
+                    this._clubhouseAnimator, this._questBannerPosition);
                 this._hasForegroundQuest = true;
 
                 Main.layoutManager.addChrome(this._questBanner.actor);

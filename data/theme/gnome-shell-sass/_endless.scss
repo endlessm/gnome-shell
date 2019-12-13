@@ -810,6 +810,8 @@ $clubhouse_button_color_a: #76EECF;
 $clubhouse_button_color_b: #37DCB1;
 $clubhouse_button_color_c: #32BBA4;
 $clubhouse_button_color_d: #2D9B98;
+$clubhouse_action_buttons_color: #9B9B9B;
+$clubhouse_action_buttons_color_active: #44D7B6;
 
 .clubhouse-notification {
   background-color: transparent;
@@ -819,8 +821,20 @@ $clubhouse_button_color_d: #2D9B98;
     background-color: transparent;
   }
   .clubhouse-notification-close-button {
-    color: #9B9B9B;
+    color: $clubhouse_action_buttons_color;
     padding: 9px 5px 0 0;
+    &:hover {
+      color: $clubhouse_action_buttons_color_active;
+    }
+  }
+  .clubhouse-notification-updown-button {
+    color: transparent;
+    &.visible {
+      color: $clubhouse_action_buttons_color;
+      &:hover {
+        color: $clubhouse_action_buttons_color_active;
+      }
+    }
   }
   .notification-actions {
     padding: 0;
