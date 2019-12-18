@@ -2751,6 +2751,33 @@ class HackAppIcon extends AppIcon {
         this._activated = false;
 
         super._init(app, viewIconParams, iconParams);
+
+        this._infoPopup = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.TOP, 0);
+        /* Translators: The 'Endless Hack' is not translatable, it's the brand name */
+        const hackInfo = _('Endless Hack: unlock infinite possibilities through coding');
+        this._infoMenuItem = new PopupMenu.PopupMenuItem(hackInfo);
+        this._infoPopup.addMenuItem(this._infoMenuItem);
+        this._infoPopup.actor.hide();
+        Main.uiGroup.add_actor(this._infoPopup.actor);
+
+        this.actor.track_hover = true;
+        this.actor.connect('notify::hover', () => {
+            if (this.actor.hover) {
+                this._infoPopupId = GLib.timeout_add(
+                    GLib.PRIORITY_DEFAULT,
+                    300, () => {
+                        this._infoPopupId = null;
+                        this._infoPopup.open();
+                    });
+            } else {
+                if (this._infoPopupId) {
+                    GLib.source_remove(this._infoPopupId);
+                    this._infoPopupId = null;
+                }
+                this._infoPopup.close();
+            }
+        });
+
         this._pulse = global.settings.get_boolean('hack-icon-pulse');
         this._pulseWaitId = 0;
 
@@ -2861,5 +2888,14 @@ class HackAppIcon extends AppIcon {
     acceptDrop() {
         // This will catch the drop event and do nothing
         return true;
+    }
+
+    popupMenu() {
+        if (this._infoPopupId) {
+            GLib.source_remove(this._infoPopupId);
+            this._infoPopupId = null;
+        }
+        this._infoPopup.close();
+        super.popupMenu();
     }
 });
