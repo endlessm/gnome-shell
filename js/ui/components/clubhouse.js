@@ -580,7 +580,7 @@ class ClubhouseNotificationBanner extends MessageTray.NotificationBanner {
 
 var ClubhouseQuestBanner =
 class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
-    constructor(notification, isFirstBanner, animator, position) {
+    constructor(notification, isFirstBanner, animator, position, callback) {
         let icon = notification.gicon;
         let imagePath = null;
 
@@ -608,6 +608,7 @@ class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
 
                 animation.play();
                 this.setIcon(animation.actor);
+                callback();
             });
         }
     }
@@ -694,10 +695,11 @@ class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
 
 var ClubhouseItemBanner =
 class ClubhouseItemBanner extends ClubhouseNotificationBanner {
-    constructor(notification) {
+    constructor(notification, callback) {
         super(notification);
         this.actor.add_style_class_name('clubhouse-item-notification');
         this._topBanner = null;
+        callback();
     }
 
     setTopBanner(topBanner) {
@@ -724,8 +726,8 @@ class ClubhouseNotification extends NotificationDaemon.GtkNotificationDaemonNoti
         this.setResident(true);
     }
 
-    createBanner(isFirstBanner, animator, position) {
-        return new ClubhouseQuestBanner(this, isFirstBanner, animator, position);
+    createBanner(isFirstBanner, animator, position, callback) {
+        return new ClubhouseQuestBanner(this, isFirstBanner, animator, position, callback);
     }
 };
 
@@ -736,8 +738,8 @@ class ClubhouseItemNotification extends ClubhouseNotification {
         this.setResident(false);
     }
 
-    createBanner() {
-        return new ClubhouseItemBanner(this);
+    createBanner(callback) {
+        return new ClubhouseItemBanner(this, callback);
     }
 };
 
@@ -990,11 +992,11 @@ var Component = GObject.registerClass({
 
             if (!this._questBanner) {
                 this._questBanner = notification.createBanner(!this._hasForegroundQuest,
-                    this._clubhouseAnimator, this._questBannerPosition);
+                    this._clubhouseAnimator, this._questBannerPosition, () => {
+                        Main.layoutManager.addChrome(this._questBanner.actor);
+                        this._questBanner.reposition();
+                    });
                 this._hasForegroundQuest = true;
-
-                Main.layoutManager.addChrome(this._questBanner.actor);
-                this._questBanner.reposition();
             }
         } else if (notification.notificationId == 'quest-item') {
             notification.connect('destroy', (_notification, _reason) => {
@@ -1002,9 +1004,10 @@ var Component = GObject.registerClass({
             });
 
             if (!this._itemBanner) {
-                this._itemBanner = notification.createBanner();
-                Main.layoutManager.addChrome(this._itemBanner.actor);
-                this._itemBanner.reposition();
+                this._itemBanner = notification.createBanner(() => {
+                    Main.layoutManager.addChrome(this._itemBanner.actor);
+                    this._itemBanner.reposition();
+                });
             }
         }
 
