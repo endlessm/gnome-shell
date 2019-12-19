@@ -1,7 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported AppDisplay, AppSearchProvider */
 
-const { Clutter, Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Meta, Pango, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
 const AppActivation = imports.ui.appActivation;
@@ -2752,13 +2752,7 @@ class HackAppIcon extends AppIcon {
 
         super._init(app, viewIconParams, iconParams);
 
-        this._infoPopup = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.TOP, 0);
-        /* Translators: The 'Endless Hack' is not translatable, it's the brand name */
-        const hackInfo = _('Endless Hack: unlock infinite possibilities through coding');
-        this._infoMenuItem = new PopupMenu.PopupMenuItem(hackInfo);
-        this._infoPopup.addMenuItem(this._infoMenuItem);
-        this._infoPopup.actor.hide();
-        Main.uiGroup.add_actor(this._infoPopup.actor);
+        this._createInfoPopup();
 
         this.actor.track_hover = true;
         this.actor.connect('notify::hover', () => {
@@ -2897,5 +2891,68 @@ class HackAppIcon extends AppIcon {
         }
         this._infoPopup.close();
         super.popupMenu();
+    }
+
+    _createInfoPopup() {
+        this._infoPopupId = null;
+        this._infoPopup = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.TOP, 0);
+        this._infoPopup.box.add_style_class_name('hack-tooltip');
+        this._infoPopup.actor.add_style_class_name('hack-tooltip-arrow');
+        this._infoMenuItem = new HackPopupMenuItem();
+        this._infoPopup.addMenuItem(this._infoMenuItem);
+
+        this._infoPopup.actor.hide();
+        Main.uiGroup.add_actor(this._infoPopup.actor);
+    }
+});
+
+var HackPopupMenuItem = GObject.registerClass(
+class HackPopupMenuItem extends PopupMenu.PopupBaseMenuItem {
+    _init(params) {
+        super._init(params);
+        this.style_class = 'hack-popup-menu-item';
+
+        /* Translators: The 'Endless Hack' is not translatable, it's the brand name */
+        const title = _('Endless Hack: Unlock infinite possibilities through coding');
+        /* Translators: The 'Hack' is not translatable, it's the brand name */
+        const description = _('Hack is a new learning platform from Endless, focused on teaching\nthe foundations of programming and creative problem-solving\nto kids, ages 10 and up. With 5 different pathways, Hack has\na variety of activities that teach a wide range of skills and\nconcepts - check it out!');
+        const image = 'resource:///org/gnome/shell/theme/hack-tooltip.png';
+
+        const iconFile = Gio.File.new_for_uri(image);
+        const gicon = new Gio.FileIcon({ file: iconFile });
+
+        this.icon = new St.Icon({
+            gicon: gicon,
+            icon_size: 180,
+            pivot_point: new Clutter.Point({ x: 0.5, y: 0.5 }),
+            style_class: 'hack-tooltip-icon',
+            x_align: Clutter.ActorAlign.CENTER,
+        });
+
+        this.title = new St.Label({
+            style_class: 'hack-tooltip-title',
+            text: title,
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+
+        this.desc = new St.Label({
+            style_class: 'hack-tooltip-desc',
+            text: description,
+            x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+
+        this.rightBox = new St.BoxLayout({
+            style_class: 'hack-popup-menu-item-right',
+            vertical: true,
+        });
+        this.rightBox.add_child(this.title);
+        this.rightBox.add_child(this.desc);
+
+        this.add_child(this.icon);
+        this.add_child(this.rightBox);
     }
 });
