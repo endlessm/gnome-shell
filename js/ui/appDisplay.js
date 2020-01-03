@@ -2915,7 +2915,7 @@ class HackPopupMenuItem extends PopupMenu.PopupBaseMenuItem {
         /* Translators: The 'Endless Hack' is not translatable, it's the brand name */
         const title = _('Endless Hack: Unlock infinite possibilities through coding');
         /* Translators: The 'Hack' is not translatable, it's the brand name */
-        const description = _('Hack is a new learning platform from Endless, focused on teaching\nthe foundations of programming and creative problem-solving\nto kids, ages 10 and up. With 5 different pathways, Hack has\na variety of activities that teach a wide range of skills and\nconcepts - check it out!');
+        const description = _('Hack is a new learning platform from Endless, focused on teaching the foundations of programming and creative problem-solving to kids, ages 10 and up. With 5 different pathways, Hack has a variety of activities that teach a wide range of skills and concepts - check it out!');
         const image = 'resource:///org/gnome/shell/theme/hack-tooltip.png';
 
         const iconFile = Gio.File.new_for_uri(image);
@@ -2944,6 +2944,9 @@ class HackPopupMenuItem extends PopupMenu.PopupBaseMenuItem {
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
+        this.desc.clutter_text.set_line_wrap(true);
+        this.desc.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
+        this.desc.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
 
         this.rightBox = new St.BoxLayout({
             style_class: 'hack-popup-menu-item-right',
