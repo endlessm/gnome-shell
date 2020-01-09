@@ -1988,13 +1988,6 @@ var RenameFolderMenu = class RenameFolderMenu extends PopupMenu.PopupMenu {
         let separator = new PopupMenu.PopupSeparatorMenuItem();
         this.addMenuItem(separator);
 
-        // Add the "Remove from desktop" menu item at the end.
-        let item = new PopupMenu.PopupMenuItem(_("Remove from desktop"));
-        this.addMenuItem(item);
-        item.connect('activate', () => {
-            this._iconGridLayout.removeIcon(source.id, true);
-        });
-
         Main.uiGroup.add_actor(this.actor);
     }
 };
