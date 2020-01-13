@@ -39,6 +39,17 @@ var BeginRequestType = {
     DONT_PROVIDE_USERNAME: 1
 };
 
+function _getMachineId() {
+    let machineId;
+    try {
+        machineId = Shell.get_file_contents_utf8_sync('/etc/machine-id');
+    } catch (e) {
+        logError(e, "Failed to get contents for file '/etc/machine-id'");
+        machineId = '00000000000000000000000000000000';
+    }
+    return machineId;
+}
+
 var AuthPrompt = class {
     constructor(gdmClient, mode) {
         this.verificationStatus = AuthPromptStatus.NOT_VERIFYING;
@@ -583,6 +594,12 @@ var AuthPrompt = class {
         this.emit('cancelled');
     }
 
+    _getUserLastLoginTime() {
+        let userManager = AccountsService.UserManager.get_default();
+        let user = userManager.get_user(this._username);
+        return user.get_login_time();
+    }
+
     _generateResetCode() {
         // Note: These are not secure random numbers. Doesn't matter. The
         // mechanism to convert a reset code to unlock code is well-known, so
@@ -592,8 +609,15 @@ var AuthPrompt = class {
         // version had one less digit in the code).
         let resetCode = Main.customerSupport.passwordResetSalt ? '1' : '';
 
-        for (let n = 0; n < _RESET_CODE_LENGTH; n++)
-            resetCode = '%s%d'.format(resetCode, GLib.random_int_range(0, 10));
+        let machineId = _getMachineId();
+        let lastLoginTime = this._getUserLastLoginTime();
+        let input = machineId + this._username + lastLoginTime;
+        let checksum = GLib.compute_checksum_for_data(GLib.ChecksumType.SHA256, input);
+        checksum = checksum.replace(/\D/g, '');
+
+        let hashCode = `${parseInt(checksum) % (10 ** _RESET_CODE_LENGTH)}`;
+        resetCode = `${resetCode}${hashCode.padStart(_RESET_CODE_LENGTH, '0')}`;
+
         return resetCode;
     }
 
@@ -629,14 +653,11 @@ var AuthPrompt = class {
         this._entry.clutter_text.set_password_char('');
         this._passwordResetCode = this._generateResetCode();
 
-        // FIXME: This string is too long. It is ellipsized, even in English.
-        // It must be shortened after the Endless 3.2 release, once there is
-        // time to translate the shortened version.
         // Translators: During a password reset, prompt for the "secret code" provided by customer support.
-        this.setQuestion(_("Enter unlock code provided by customer support:"));
+        this.setQuestion(_("Enter unlock code:"));
         this.setMessage(
             // Translators: Password reset. The first %s is a verification code and the second is an email.
-            _("Please inform customer support of your verification code %s by emailing %s. The code will remain valid until you click Cancel or turn off your computer.").format(
+            _("Please inform customer support of your verification code %s by emailing %s. Customer support will use the verification code to provide you with an unlock code, which you can enter here.").format(
                 this._passwordResetCode,
                 Main.customerSupport.customerSupportEmail));
 
