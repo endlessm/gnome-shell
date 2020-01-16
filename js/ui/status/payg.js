@@ -32,6 +32,9 @@ var Indicator = class extends PanelMenu.SystemIndicator {
         });
         this.menu.addMenuItem(this._item);
 
+        // Account ID
+        this._initializeAccountIDMenu();
+
         // show this status applet if PAYG is enabled and fill in
         // "determining time..." label and icon
         this._sync();
@@ -103,6 +106,8 @@ var Indicator = class extends PanelMenu.SystemIndicator {
         this._item.label.text = this._getTimeRemainingString();
         this._item.icon.gicon = this._getMenuGicon();
         this._indicator.gicon = this._item.icon.gicon;
+
+        this._initializeAccountIDMenu();
     }
 
     _updateTimeRemainingAndSyncWhenReady() {
@@ -115,5 +120,26 @@ var Indicator = class extends PanelMenu.SystemIndicator {
                 this._paygManager.disconnect(paygManagerId);
             });
         }
+    }
+
+
+    // Differently from the remaining time counter, we just want to show the account ID
+    // when the backend properly supports it.
+    _initializeAccountIDMenu () {
+        if (this._verifyValidAccountID ()) {
+            if (this._paygItem != null)
+                return;
+            this._paygItem = new PopupMenu.PopupSubMenuMenuItem("", true);
+            this._paygItem.setSensitive(false);
+            this._paygItem.actor.visible = this._indicator.visible = this._paygManager.enabled;
+            this._paygItem.label.text = _("Account ID: %s").format(this._paygManager.accountID);
+            this._paygItem.icon.gicon = this._getMenuGicon();
+
+            this.menu.addMenuItem(this._paygItem);
+        }
+    }
+
+    _verifyValidAccountID () {
+        return Main.paygManager.accountID != "0";
     }
 };
