@@ -612,7 +612,7 @@ class ClubhouseQuestBanner extends ClubhouseNotificationBanner {
 
                 animation.play();
                 this.setIcon(animation.actor);
-                callback();
+                callback(this);
             });
         }
     }
@@ -703,7 +703,7 @@ class ClubhouseItemBanner extends ClubhouseNotificationBanner {
         super(notification);
         this.actor.add_style_class_name('clubhouse-item-notification');
         this._topBanner = null;
-        callback();
+        callback(this);
     }
 
     setTopBanner(topBanner) {
@@ -996,9 +996,11 @@ var Component = GObject.registerClass({
 
             if (!this._questBanner) {
                 this._questBanner = notification.createBanner(!this._hasForegroundQuest,
-                    this._clubhouseAnimator, this._questBannerPosition, () => {
-                        Main.layoutManager.addChrome(this._questBanner.actor);
-                        this._questBanner.reposition();
+                    this._clubhouseAnimator, this._questBannerPosition, (banner) => {
+                        Main.layoutManager.addChrome(banner.actor);
+                        banner.reposition();
+                        if (this._itemBanner)
+                            this._itemBanner.reposition();
                     });
                 this._hasForegroundQuest = true;
             }
@@ -1008,9 +1010,11 @@ var Component = GObject.registerClass({
             });
 
             if (!this._itemBanner) {
-                this._itemBanner = notification.createBanner(() => {
-                    Main.layoutManager.addChrome(this._itemBanner.actor);
-                    this._itemBanner.reposition();
+                this._itemBanner = notification.createBanner((banner) => {
+                    Main.layoutManager.addChrome(banner.actor);
+                    banner.reposition();
+                    if (this._questBanner)
+                        this._questBanner.reposition();
                 });
             }
         }
