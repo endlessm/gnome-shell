@@ -73,16 +73,32 @@ var PaygUnlockDialog = GObject.registerClass({
 
         let mainBox = new St.BoxLayout({ vertical: true,
                                          x_align: Clutter.ActorAlign.FILL,
-                                         y_align: Clutter.ActorAlign.CENTER,
+                                         y_align: Clutter.ActorAlign.FILL,
                                          x_expand: true,
-                                         y_expand: true,
-                                         style_class: 'unlock-dialog-payg-layout'});
-        this.actor.add_child(mainBox)
+                                         y_expand: true });
+        this.actor.add_child(mainBox);
+
+        let paygEnterCodeBox = new St.BoxLayout({ vertical: true,
+                                                  x_align: Clutter.ActorAlign.FILL,
+                                                  y_align: Clutter.ActorAlign.CENTER,
+                                                  x_expand: true,
+                                                  y_expand: true,
+                                                  style_class: 'unlock-dialog-payg-layout'});
+
+        mainBox.add_child(paygEnterCodeBox);
+
+        let titleBox = new St.BoxLayout({ vertical: true,
+                                          x_align: Clutter.ActorAlign.CENTER,
+                                          y_align: Clutter.ActorAlign.CENTER,
+                                          x_expand: true,
+                                          y_expand: true,
+                                          style_class: 'unlock-dialog-payg-layout'});
 
         let titleLabel = new St.Label({ style_class: 'unlock-dialog-payg-title',
                                         text: _("Your Pay As You Go usage credit has expired."),
                                         x_align: Clutter.ActorAlign.CENTER });
-        mainBox.add_child(titleLabel);
+
+        paygEnterCodeBox.add_child(titleLabel);
 
         let promptBox = new St.BoxLayout({ vertical: true,
                                            x_align: Clutter.ActorAlign.CENTER,
@@ -96,7 +112,7 @@ var PaygUnlockDialog = GObject.registerClass({
 
             return Clutter.EVENT_PROPAGATE;
         });
-        mainBox.add_child(promptBox);
+        paygEnterCodeBox.add_child(promptBox);
 
         let promptLabel = new St.Label({ style_class: 'unlock-dialog-payg-label',
                                          text: _("Enter a new code to unlock your computer:"),
@@ -124,6 +140,7 @@ var PaygUnlockDialog = GObject.registerClass({
         let helpLineMain = new St.Label({ style_class: 'unlock-dialog-payg-help-main',
                                           text: instructionsLine1,
                                           x_align: Clutter.ActorAlign.START });
+
         helpLineMain.clutter_text.line_wrap = true;
         helpLineMain.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
 
@@ -148,10 +165,28 @@ var PaygUnlockDialog = GObject.registerClass({
         let helpLineSub = new St.Label({ style_class: 'unlock-dialog-payg-help-sub',
                                          text: instructionsLine2,
                                          x_align: Clutter.ActorAlign.START });
+
         helpLineSub.clutter_text.line_wrap = true;
         helpLineSub.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
 
         promptBox.add_child(helpLineSub);
+
+        // The standard value for an empty ACCOUNT_ID is 0, which implies the backend provider doesn't
+        // support the feature.
+        if (Main.paygManager.accountID != "0") {
+            let infoBox = new St.BoxLayout({ vertical: true,
+                                             x_align: Clutter.ActorAlign.START,
+                                             y_align: Clutter.ActorAlign.END,
+                                             x_expand: true,
+                                             style_class: 'unlock-dialog-payg-layout'});
+
+            let accountIDText = _("Pay As You Go Account ID: %s").format(Main.paygManager.accountID);
+            let accountIDInfo = new St.Label ({ style_class: 'unlock-dialog-payg-account-id',
+                                                text: accountIDText });
+
+            infoBox.add_child(accountIDInfo);
+            mainBox.add_child(infoBox);
+        }
 
         Main.ctrlAltTabManager.addGroup(promptBox, _("Unlock Machine"), 'dialog-password-symbolic');
 
