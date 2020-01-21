@@ -552,6 +552,8 @@ class NotificationBanner extends Calendar.NotificationMessage {
 
         this._buttonBox.add(button);
         button.connect('clicked', () => {
+            callback();
+
             if (!this.notification.resident) {
                 // We don't hide a resident notification when the user invokes one of its actions,
                 // because it is common for such notifications to update themselves with new
@@ -560,8 +562,6 @@ class NotificationBanner extends Calendar.NotificationMessage {
                 this.emit('done-displaying');
                 this.notification.destroy();
             }
-
-            callback();
         });
 
         return button;
