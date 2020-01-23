@@ -51,7 +51,7 @@ var ParentalControlsManager = class {
         this._manager = new Malcontent.Manager({connection: connection});
 
         try {
-            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.GetAppFilterFlags.NONE, null);
+            this._appFilter = this._manager.get_app_filter(Shell.util_get_uid (), Malcontent.ManagerGetValueFlags.NONE, null);
         } catch (e) {
             if (e.matches(Malcontent.ManagerError, Malcontent.ManagerError.DISABLED)) {
                 log('Parental controls globally disabled');
@@ -65,7 +65,7 @@ var ParentalControlsManager = class {
             let current_uid = Shell.util_get_uid();
             // Emit 'changed' signal only if app-filter is changed for currently logged-in user.
             if (current_uid == uid)
-                this._manager.get_app_filter_async(current_uid, Malcontent.GetAppFilterFlags.NONE,
+                this._manager.get_app_filter_async(current_uid, Malcontent.ManagerGetValueFlags.NONE,
                                                    null, this._onAppFilterChanged.bind(this));
         });
     }
