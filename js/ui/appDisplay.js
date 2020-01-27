@@ -649,6 +649,10 @@ var AllView = class AllView extends BaseAppView {
             if (this._iconGridLayout.iconIsFolder(itemId)) {
                 if (!icon) {
                     let item = Shell.DesktopDirInfo.new(itemId);
+                    if (!item) {
+                        log(`Error loading folder for ${itemId}`);
+                        return;
+                    }
                     icon = new FolderIcon(item, this);
                 } else {
                     icon.update();
