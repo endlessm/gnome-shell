@@ -18,7 +18,7 @@
 # Jonh Wendell <wendell@bani.com.br>, 2010
 # Juan Diego Martins da Costa Cruz <juan.martins@ifrn.edu.br>, 2013
 # Leandro Stanger <leandrostanger@hotmail.com>, 2018
-# Leandro Stanger <leandrostanger@hotmail.com>, 2018-2019
+# Leandro Stanger <leandrostanger@hotmail.com>, 2018-2020
 # Mariana Barbosa <mariana@endlessm.com>, 2016-2018
 # Mariana Barbosa <mari@endlessm.com>, 2015-2016
 # Mazen Asef Ali <mazen@endlessm.com>, 2019
@@ -26,6 +26,7 @@
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2013
 # Rafael Fontenelle <rafaelff@gnome.org>, 2013-2017
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2013
+# Renato Peixoto Pinto <renato@endlessm.com>, 2020
 # Ricardo Pitanga <pitanga@endlessm.com>, 2013
 # Richard Vignais, 2014
 # Roddy Shuler <roddy@stanfordalumni.org>, 2015-2018
@@ -36,39 +37,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 12:52+0000\n"
-"PO-Revision-Date: 2020-01-02 12:52+0000\n"
-"Last-Translator: Will Thompson <wjt@endlessm.com>\n"
+"POT-Creation-Date: 2020-01-29 07:08+0000\n"
+"PO-Revision-Date: 2020-01-29 23:39+0000\n"
+"Last-Translator: Leandro Stanger <leandrostanger@hotmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/endless-os/gnome-shell/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: data/50-gnome-shell-system.xml:6
-msgid "System"
-msgstr "Sistema"
-
-#: data/50-gnome-shell-system.xml:9
-msgid "Show the notification list"
-msgstr "Mostra a lista de notificação"
-
-#: data/50-gnome-shell-system.xml:12
-msgid "Focus the active notification"
-msgstr "Ativar as notificação ativas"
-
-#: data/50-gnome-shell-system.xml:15
-msgid "Show the overview"
-msgstr "Mostrar o panorama"
-
-#: data/50-gnome-shell-system.xml:18
-msgid "Show all applications"
-msgstr "Mostrar todos os aplicativos"
-
-#: data/50-gnome-shell-system.xml:21
-msgid "Open the application menu"
-msgstr "Abre o menu do aplicativo"
 
 #: data/gnome-shell-extension-prefs.desktop.in.in:4
 #: js/extensionPrefs/main.js:211
@@ -756,15 +733,15 @@ msgid ""
 "extensions. Make sure you are logged into GNOME and try again."
 msgstr "Sentimos muito, mas não foi possível obter a lista de extensões instaladas. Certifique-se de estar em uma sessão do GNOME e tente novamente."
 
-#: js/gdm/authPrompt.js:124
+#: js/gdm/authPrompt.js:135
 msgid "Show password hint"
 msgstr "Mostrar lembrete de senha"
 
-#: js/gdm/authPrompt.js:140
+#: js/gdm/authPrompt.js:151
 msgid "Forgot password?"
 msgstr "Esqueceu a senha?"
 
-#: js/gdm/authPrompt.js:189 js/ui/audioDeviceSelection.js:53
+#: js/gdm/authPrompt.js:200 js/ui/audioDeviceSelection.js:53
 #: js/ui/components/networkAgent.js:145 js/ui/components/polkitAgent.js:150
 #: js/ui/endSessionDialog.js:446 js/ui/extensionDownloader.js:190
 #: js/ui/paygUnlockDialog.js:210 js/ui/shellMountOperation.js:403
@@ -773,44 +750,42 @@ msgstr "Esqueceu a senha?"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: js/gdm/authPrompt.js:208 js/gdm/authPrompt.js:259 js/gdm/authPrompt.js:500
+#: js/gdm/authPrompt.js:219 js/gdm/authPrompt.js:270 js/gdm/authPrompt.js:511
 msgid "Next"
 msgstr "Próximo"
 
-#: js/gdm/authPrompt.js:255 js/ui/paygUnlockDialog.js:231
+#: js/gdm/authPrompt.js:266 js/ui/paygUnlockDialog.js:231
 #: js/ui/shellMountOperation.js:407 js/ui/unlockDialog.js:45
 msgid "Unlock"
 msgstr "Desbloquear"
 
-#: js/gdm/authPrompt.js:257
+#: js/gdm/authPrompt.js:268
 msgctxt "button"
 msgid "Sign In"
 msgstr "Entrar"
 
-#. FIXME: This string is too long. It is ellipsized, even in English.
-#. It must be shortened after the Endless 3.2 release, once there is
-#. time to translate the shortened version.
 #. Translators: During a password reset, prompt for the "secret code" provided
 #. by customer support.
-#: js/gdm/authPrompt.js:636
-msgid "Enter unlock code provided by customer support:"
-msgstr "Digite o código para desbloqueio informado pela nossa central de atendimento ao consumidor:"
+#: js/gdm/authPrompt.js:657
+msgid "Enter unlock code:"
+msgstr "Digite o código de desbloqueio:"
 
 #. Translators: Password reset. The first %s is a verification code and the
 #. second is an email.
-#: js/gdm/authPrompt.js:639
+#: js/gdm/authPrompt.js:660
 #, javascript-format
 msgid ""
 "Please inform customer support of your verification code %s by emailing %s. "
-"The code will remain valid until you click Cancel or turn off your computer."
-msgstr "Por favor informe o seu código de verificação %s para a nossa central de atendimento pelo e-mail %s. O código permanecerá válido até que você clique em Cancelar ou desligue o seu computador."
+"Customer support will use the verification code to provide you with an "
+"unlock code, which you can enter here."
+msgstr "Por favor informe o seu código de verificação %s para a nossa central de atendimento através do e-mail %s. Nosso time utilizará o seu código de verificação para gerar um novo código de desbloqueio, que será enviado por e-mail. Insira o novo código de desbloqueio aqui."
 
 #. Translators: Button on login dialog, after clicking Forgot Password?
-#: js/gdm/authPrompt.js:644
+#: js/gdm/authPrompt.js:665
 msgid "Reset Password"
 msgstr "Criar uma nova senha"
 
-#: js/gdm/authPrompt.js:717
+#: js/gdm/authPrompt.js:738
 msgid "Your unlock code was incorrect. Please try again."
 msgstr "O seu código de bloqueio está incorreto. Por favor tente novamente."
 
@@ -995,20 +970,20 @@ msgstr[0] "%d ano atrás"
 msgstr[1] "%d anos atrás"
 
 #. Translators: Time in 24h format
-#: js/misc/util.js:288
+#: js/misc/util.js:291
 msgid "%H∶%M"
 msgstr "%H∶%M"
 
 #. Translators: this is the word "Yesterday" followed by a
 #. time string in 24h format. i.e. "Yesterday, 14:30"
-#: js/misc/util.js:294
+#: js/misc/util.js:297
 #, no-c-format
 msgid "Yesterday, %H∶%M"
 msgstr "Ontem, %H∶%M"
 
 #. Translators: this is the week day name followed by a time
 #. string in 24h format. i.e. "Monday, 14:30"
-#: js/misc/util.js:300
+#: js/misc/util.js:303
 #, no-c-format
 msgid "%A, %H∶%M"
 msgstr "%A, %H∶%M"
@@ -1016,7 +991,7 @@ msgstr "%A, %H∶%M"
 #. Translators: this is the month name and day number
 #. followed by a time string in 24h format.
 #. i.e. "May 25, 14:30"
-#: js/misc/util.js:306
+#: js/misc/util.js:309
 #, no-c-format
 msgid "%B %-d, %H∶%M"
 msgstr "%-d de %B, %H∶%M"
@@ -1024,26 +999,26 @@ msgstr "%-d de %B, %H∶%M"
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 24h format.
 #. i.e. "May 25 2012, 14:30"
-#: js/misc/util.js:312
+#: js/misc/util.js:315
 #, no-c-format
 msgid "%B %-d %Y, %H∶%M"
 msgstr "%-d de %B de %Y, %H∶%M"
 
 #. Translators: Time in 12h format
-#: js/misc/util.js:317
+#: js/misc/util.js:320
 msgid "%l∶%M %p"
 msgstr "%l∶%M %p"
 
 #. Translators: this is the word "Yesterday" followed by a
 #. time string in 12h format. i.e. "Yesterday, 2:30 pm"
-#: js/misc/util.js:323
+#: js/misc/util.js:326
 #, no-c-format
 msgid "Yesterday, %l∶%M %p"
 msgstr "Ontem, %l∶%M %p"
 
 #. Translators: this is the week day name followed by a time
 #. string in 12h format. i.e. "Monday, 2:30 pm"
-#: js/misc/util.js:329
+#: js/misc/util.js:332
 #, no-c-format
 msgid "%A, %l∶%M %p"
 msgstr "%A, %l∶%M %p"
@@ -1051,7 +1026,7 @@ msgstr "%A, %l∶%M %p"
 #. Translators: this is the month name and day number
 #. followed by a time string in 12h format.
 #. i.e. "May 25, 2:30 pm"
-#: js/misc/util.js:335
+#: js/misc/util.js:338
 #, no-c-format
 msgid "%B %-d, %l∶%M %p"
 msgstr "%-d de %B, %l∶%M %p"
@@ -1059,14 +1034,14 @@ msgstr "%-d de %B, %l∶%M %p"
 #. Translators: this is the month name, day number, year
 #. number followed by a time string in 12h format.
 #. i.e. "May 25 2012, 2:30 pm"
-#: js/misc/util.js:341
+#: js/misc/util.js:344
 #, no-c-format
 msgid "%B %-d %Y, %l∶%M %p"
 msgstr "%-d de %B de %Y, %l∶%M %p"
 
 #. * Translators: this is the name of the search engine that shows in the
 #. * Shell's desktop search entry.
-#: js/misc/util.js:532
+#: js/misc/util.js:540
 msgid "Google"
 msgstr "Google"
 
@@ -1095,42 +1070,41 @@ msgstr "Conceder acesso"
 msgid "Rename"
 msgstr "Renomear"
 
-#. Add the "Remove from desktop" menu item at the end.
-#: js/ui/appDisplay.js:1992 js/ui/appDisplay.js:2623
-msgid "Remove from desktop"
-msgstr "Remover da área de trabalho"
-
 #. Translators: This is the heading of a list of open windows
-#: js/ui/appDisplay.js:2569 js/ui/panel.js:79
+#: js/ui/appDisplay.js:2562 js/ui/panel.js:79
 msgid "Open Windows"
 msgstr "Abrir janelas"
 
-#: js/ui/appDisplay.js:2588 js/ui/panel.js:86
+#: js/ui/appDisplay.js:2581 js/ui/panel.js:86
 msgid "New Window"
 msgstr "Executar"
 
-#: js/ui/appDisplay.js:2600
+#: js/ui/appDisplay.js:2593
 msgid "Launch using Dedicated Graphics Card"
 msgstr "Inicia usando placa de vídeo dedicada"
 
-#: js/ui/appDisplay.js:2683
+#. Add the "Remove from desktop" menu item at the end.
+#: js/ui/appDisplay.js:2616
+msgid "Remove from desktop"
+msgstr "Remover da área de trabalho"
+
+#: js/ui/appDisplay.js:2676
 msgid "Remove"
 msgstr "Remover"
 
 #. Translators: The 'Endless Hack' is not translatable, it's the brand name
-#: js/ui/appDisplay.js:2916
+#: js/ui/appDisplay.js:2909
 msgid "Endless Hack: Unlock infinite possibilities through coding"
-msgstr ""
+msgstr "Endless Hack: Desbloqueie infinitas possibilidades através da codificação"
 
 #. Translators: The 'Hack' is not translatable, it's the brand name
-#: js/ui/appDisplay.js:2918
+#: js/ui/appDisplay.js:2911
 msgid ""
-"Hack is a new learning platform from Endless, focused on teaching\n"
-"the foundations of programming and creative problem-solving\n"
-"to kids, ages 10 and up. With 5 different pathways, Hack has\n"
-"a variety of activities that teach a wide range of skills and\n"
-"concepts - check it out!"
-msgstr ""
+"Hack is a new learning platform from Endless, focused on teaching the "
+"foundations of programming and creative problem-solving to kids, ages 10 and"
+" up. With 5 different pathways, Hack has a variety of activities that teach "
+"a wide range of skills and concepts - check it out!"
+msgstr "Hack é uma nova plataforma de aprendizado da Endless, focada no ensino dos fundamentos da programação e resolução criativa de problemas para crianças de 10 anos ou mais. Com 5 caminhos diferentes, Hack tem uma variedade de atividades que ensinam uma ampla gama de habilidades e conceitos - confira!"
 
 #: js/ui/audioDeviceSelection.js:40
 msgid "Select Audio Device"
@@ -1510,19 +1484,19 @@ msgstr "Relógios mundiais"
 msgid "Weather"
 msgstr "Meteorologia"
 
-#: js/ui/dateMenu.js:351
+#: js/ui/dateMenu.js:354
 msgid "Select a location…"
 msgstr "Selecione uma localização…"
 
-#: js/ui/dateMenu.js:359
+#: js/ui/dateMenu.js:362
 msgid "Loading…"
 msgstr "Carregando…"
 
-#: js/ui/dateMenu.js:369
+#: js/ui/dateMenu.js:372
 msgid "Go online for weather information"
 msgstr "Conecte-se à internet para obter as informações meteorológicas"
 
-#: js/ui/dateMenu.js:371
+#: js/ui/dateMenu.js:374
 msgid "Weather information is currently unavailable"
 msgstr "No momento as informações meteorológicas não estão disponíveis"
 
@@ -3246,23 +3220,23 @@ msgstr[1] "%u entradas"
 msgid "System Sounds"
 msgstr "Sons do sistema"
 
-#: js/ui/appIconBar.js:211
+#: js/ui/appIconBar.js:198
 msgid "Other workspaces"
 msgstr "Outras áreas de trabalho  "
 
-#: js/ui/appIconBar.js:220
+#: js/ui/appIconBar.js:207
 msgid "Current workspace"
 msgstr "Área de trabalho atual "
 
-#: js/ui/appIconBar.js:296
+#: js/ui/appIconBar.js:283
 msgid "Pin to Taskbar"
 msgstr "Afixar na barra de tarefas"
 
-#: js/ui/appIconBar.js:300
+#: js/ui/appIconBar.js:287
 msgid "Unpin from Taskbar"
 msgstr "Desafixar da barra de tarefas"
 
-#: js/ui/appIconBar.js:316
+#: js/ui/appIconBar.js:312
 #, javascript-format
 msgid "Quit %s"
 msgstr "Fechar %s"
