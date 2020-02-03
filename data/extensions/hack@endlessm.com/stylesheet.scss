@@ -1,0 +1,235 @@
+// Clubhouse Notifications View
+
+$clubhouse-notification-width: 536px;
+$clubhouse-image-width: 175px;
+$clubhouse-image-height: 187px;
+$clubhouse-item-size: 128px;
+$clubhouse_button_color_a: #76EECF;
+$clubhouse_button_color_b: #37DCB1;
+$clubhouse_button_color_c: #32BBA4;
+$clubhouse_button_color_d: #2D9B98;
+$clubhouse_action_buttons_color: #9B9B9B;
+$clubhouse_action_buttons_color_active: #44D7B6;
+
+.clubhouse-notification {
+  background-color: transparent;
+  width: $clubhouse-notification-width + 25px;
+  border: none;
+  &:hover, &:focus, &:active {
+    background-color: transparent;
+  }
+  &.with-buttons .clubhouse-notification-label {
+    margin-bottom: 30px;
+  }
+  .clubhouse-notification-close-button {
+    color: $clubhouse_action_buttons_color;
+    padding: 9px 5px 0 0;
+    &:hover {
+      color: $clubhouse_action_buttons_color_active;
+    }
+  }
+  .clubhouse-notification-updown-button {
+    color: transparent;
+    &.visible {
+      color: $clubhouse_action_buttons_color;
+      &:hover {
+        color: $clubhouse_action_buttons_color_active;
+      }
+    }
+  }
+  .notification-actions {
+    padding: 0;
+    margin: 0 0 10px 0;
+  }
+  .notification-button {
+    color: white;
+
+    // This is the default for buttons after the 3rd one (unlikely).
+    background-color: $clubhouse_button_color_d;
+
+    border-radius: 17.5px;
+    border: none;
+    padding: 10px;
+    margin: 5px 12px 5px 0;
+    font-family: Metropolis Semibold, sans-serif;
+    font-weight: 600; /* Semibold */
+    font-size: 15px;
+    box-shadow: 0 2px 4px 4px rgba(0, 0, 0, .2);
+    text-shadow: 0 0.5px 2px rgba(0, 0, 0, .4);
+    min-width: 115px;
+    &.text-button.child-1 {
+        margin-left: 55px;
+    }
+    &.icon-button {
+        min-width: 50px;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        padding: 0;
+        margin: 0 12px 0 0;
+        & > StIcon {
+            icon-size: 24px;
+            icon-shadow: 0 0.5px 2px rgba(0, 0, 0, .2);
+        }
+    }
+    &:hover {
+        background-color: lighten($clubhouse_button_color_d, 10%);
+    }
+    &:active {
+        background-color: darken($clubhouse_button_color_d, 10%);
+    }
+    &.child-1 {
+        background-gradient-start: $clubhouse_button_color_a;
+        background-gradient-end: $clubhouse_button_color_b;
+        background-gradient-direction: horizontal;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_a, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_b, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_a, 10%);
+            background-gradient-end: darken($clubhouse_button_color_b, 10%);
+        }
+    }
+    &.child-2 {
+        background-gradient-start: $clubhouse_button_color_b;
+        background-gradient-end: $clubhouse_button_color_c;
+        background-gradient-direction: horizontal;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_b, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_c, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_b, 10%);
+            background-gradient-end: darken($clubhouse_button_color_c, 10%);
+        }
+    }
+    &.child-3 {
+        background-gradient-start: $clubhouse_button_color_c;
+        background-gradient-end: $clubhouse_button_color_d;
+        background-gradient-direction: horizontal;
+        &:hover {
+            background-gradient-start: lighten($clubhouse_button_color_c, 10%);
+            background-gradient-end: lighten($clubhouse_button_color_d, 10%);
+        }
+        &:active {
+            background-gradient-start: darken($clubhouse_button_color_c, 10%);
+            background-gradient-end: darken($clubhouse_button_color_d, 10%);
+        }
+    }
+  }
+  .clubhouse-content-box {
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px 8px rgba(0, 0, 0, .2);
+    padding: 0;
+    margin-left: 25px;
+    margin-bottom: 33px;
+  }
+  .clubhouse-notification-label {
+    color: black;
+    margin-left: 30px;
+    margin-bottom: 25px;
+    width: ($clubhouse-notification-width - $clubhouse-image-width - 30px);
+    font: 18px "Metropolis Medium, Sans-Serif";
+  }
+  .clubhouse-notification-icon-bin {
+    padding: 0;
+    margin: 0;
+  }
+  .clubhouse-notification-image {
+    icon-size: $clubhouse-image-width;
+    min-width: $clubhouse-image-width;
+    min-height: $clubhouse-image-height;
+  }
+  &.clubhouse-item-notification {
+      .clubhouse-notification-icon-bin {
+          margin-right: 25px;
+      }
+      .clubhouse-notification-image {
+          icon-size: $clubhouse-item-size;
+          min-width: $clubhouse-item-size;
+          min-height: $clubhouse-item-size;
+      }
+  }
+}
+
+.clubhouse-open-button-icon {
+  width: 110px;
+  height: 110px;
+  background-image: url('data/icons/clubhouse-icon-normal.png');
+}
+
+.clubhouse-close-button-icon {
+  width: 110px;
+  height: 110px;
+  background-image: url('data/icons/clubhouse-close-button-normal.png');
+}
+
+// Endless Hack
+
+.view-source {
+    background-image: url("data/icons/flip-front-normal.png");
+    width: 66px;
+    height: 124px;
+    background-position: -30px 0px;
+    transition-duration: 100ms;
+
+    &.back {
+        background-image: url("data/icons/flip-back-normal.png");
+    }
+
+    &:hover {
+        background-image: url("data/icons/flip-front-hover.png");
+    }
+
+    &.back:hover {
+        background-image: url("data/icons/flip-back-hover.png");
+    }
+
+    &.dimmed,
+    &.dimmed:hover {
+        background-image: url("data/icons/flip-front-dimmed.png");
+    }
+
+    &.back.dimmed,
+    &.back.dimmed:hover {
+        background-image: url("data/icons/flip-back-dimmed.png");
+    }
+}
+
+.hack-tooltip-icon {
+  margin-right: 1em;
+}
+
+.hack-tooltip-title {
+  text-align: left;
+  font-weight: bold;
+  font-size: 12pt;
+  padding: 10px 5px;
+}
+
+.hack-tooltip-desc {
+  text-align: left;
+  font-size: 11pt;
+  padding: 10px 5px;
+}
+
+.hack-tooltip-arrow {
+  -arrow-background-color: white;
+  -arrow-border-color: transparent;
+}
+
+.hack-tooltip {
+  background-color: white;
+  max-width: 680px;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, .2);
+}
+
+.hack-popup-menu-item {
+  background-color: white;
+  color: black;
+  &:ltr { padding: .4em 1.75em .4em 0em; }
+}

@@ -45,6 +45,7 @@ foreach service_file : service_files
   )
 endforeach
 
+install_subdir('extensions', install_dir: join_paths(datadir, meson.project_name()))
 
 subdir('dbus-interfaces')
 subdir('theme')
