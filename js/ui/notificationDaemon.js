@@ -656,22 +656,15 @@ class GtkNotificationDaemonAppSource extends MessageTray.Source {
         return new GtkNotificationDaemonNotification(this, params);
     }
 
-    activateActionFull(actionId, target, hideOverview) {
+    activateAction(actionId, target) {
         this._createApp((app, error) => {
             if (error == null)
                 app.ActivateActionRemote(actionId, target ? [target] : [], getPlatformData());
             else
                 logError(error, 'Failed to activate application proxy');
         });
-
-        if (hideOverview) {
-            Main.overview.hide();
-            Main.panel.closeCalendar();
-        }
-    }
-
-    activateAction(actionId, target) {
-        this.activateActionFull(actionId, target, true);
+        Main.overview.hide();
+        Main.panel.closeCalendar();
     }
 
     open() {
