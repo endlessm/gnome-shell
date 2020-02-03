@@ -360,7 +360,7 @@ const AppIconButton = GObject.registerClass({
         let hasSpeedwagon = false;
         windows = windows.filter(function(metaWindow) {
             hasSpeedwagon = hasSpeedwagon || Shell.WindowTracker.is_speedwagon_window(metaWindow);
-            return !metaWindow.is_skip_taskbar() && !metaWindow._hackIsInactiveWindow;
+            return !metaWindow.is_skip_taskbar();
         });
         return [windows, hasSpeedwagon];
     }

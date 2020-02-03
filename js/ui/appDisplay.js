@@ -1,7 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported AppDisplay, AppSearchProvider */
 
-const { Clutter, Gio, GLib, GObject, Meta, Pango, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
 const AppActivation = imports.ui.appActivation;
@@ -24,8 +24,6 @@ const Util = imports.misc.util;
 const SystemActions = imports.misc.systemActions;
 
 const { loadInterfaceXML } = imports.misc.fileUtils;
-
-const Clubhouse = imports.ui.components.clubhouse;
 
 var MENU_POPUP_TIMEOUT = 600;
 var MAX_COLUMNS = 7;
@@ -159,12 +157,6 @@ function _findBestFolderName(apps) {
     return null;
 }
 
-function _shouldShowHackLauncher() {
-    // Only show the hack icon if the clubhouse app is in the system
-    const show = global.settings.get_boolean('show-hack-launcher');
-    return show && Clubhouse.getClubhouseApp();
-}
-
 class BaseAppView {
     constructor(params, gridParams) {
         if (this.constructor === BaseAppView)
@@ -241,9 +233,6 @@ class BaseAppView {
             this._allItems.splice(iconIndex, 1);
             icon.actor.destroy();
             delete this._items[id];
-
-            if (icon === this._hackAppIcon)
-                this._hackAppIcon = null;
         });
 
         // Add new app icons
@@ -373,10 +362,6 @@ class BaseAppView {
     }
 
     _canAccept(source) {
-        // Disable movement of the HackAppIcon
-        if (source instanceof HackAppIcon)
-            return false;
-
         return true;
     }
 
@@ -544,7 +529,6 @@ var AllView = class AllView extends BaseAppView {
                                  GObject.BindingFlags.SYNC_CREATE);
 
         this._appCenterIcon = null;
-        this._hackAppIcon = null;
 
         this._displayingPopup = false;
         this._currentPopupDestroyId = 0;
@@ -649,11 +633,6 @@ var AllView = class AllView extends BaseAppView {
             if (this._iconGridLayout.iconIsFolder(itemId)) {
                 if (!icon) {
                     let item = Shell.DesktopDirInfo.new(itemId);
-                    if (!item) {
-                        log(`Error loading folder for ${itemId}`);
-                        this._iconGridLayout.removeIcon(itemId, false);
-                        return;
-                    }
                     icon = new FolderIcon(item, this);
                 } else {
                     icon.update();
@@ -674,20 +653,8 @@ var AllView = class AllView extends BaseAppView {
 
         // Add the App Center icon if it is enabled (and installed)
         this._maybeAddAppCenterIcon(newApps);
-        // Add the Hack icon if it is enabled (and installed)
-        this._maybeAddHackIcon(newApps);
 
         return newApps;
-    }
-
-    _maybeAddHackIcon(apps) {
-        if (!_shouldShowHackLauncher())
-            return;
-
-        if (!this._hackAppIcon)
-            this._hackAppIcon = new HackAppIcon();
-
-        apps.unshift(this._hackAppIcon);
     }
 
     _maybeAddAppCenterIcon(apps) {
@@ -1570,14 +1537,6 @@ class ViewIcon extends GObject.Object {
     get iconState() {
         return this._iconState;
     }
-
-    _canAccept(source) {
-        // Disable movement of the HackAppIcon
-        if (source instanceof HackAppIcon)
-            return false;
-
-        return true;
-    }
 });
 
 var FolderIcon = GObject.registerClass({
@@ -1687,9 +1646,6 @@ var FolderIcon = GObject.registerClass({
     }
 
     _canAccept(source) {
-        if (!super._canAccept(source))
-            return false;
-
         if (!(source instanceof AppIcon))
             return false;
 
@@ -2437,9 +2393,6 @@ var AppIcon = GObject.registerClass({
     }
 
     _canAccept(source) {
-        if (!super._canAccept(source))
-            return false;
-
         let view = _getViewFromIcon(source);
 
         return source != this &&
@@ -2620,10 +2573,7 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
         // Add the "Remove from desktop" menu item at the end.
         let item = this._appendMenuItem(_("Remove from desktop"));
         item.connect('activate', () => {
-            if (this._source instanceof HackAppIcon)
-                this._source.remove();
-            else
-                this._iconGridLayout.removeIcon(this._source.id, true);
+            this._iconGridLayout.removeIcon(this._source.id, true);
         });
     }
 
@@ -2725,235 +2675,7 @@ class AppCenterIcon extends AppIcon {
         if (!this._canAccept(source))
             return false;
 
-        if (source instanceof HackAppIcon)
-            source.remove();
-
         this._iconGridLayout.removeIcon(source.id, true);
         return true;
-    }
-});
-
-var HackAppIcon = GObject.registerClass(
-class HackAppIcon extends AppIcon {
-    _init() {
-        let viewIconParams = {
-            isDraggable: true,
-            showMenu: true,
-        };
-
-        let iconParams = {
-            createIcon: this._createIcon.bind(this),
-        };
-
-        let app = Clubhouse.getClubhouseApp();
-        this._activated = false;
-
-        super._init(app, viewIconParams, iconParams);
-
-        this._createInfoPopup();
-
-        this.actor.track_hover = true;
-        this.actor.connect('notify::hover', () => {
-            if (this.actor.hover) {
-                this._infoPopupId = GLib.timeout_add(
-                    GLib.PRIORITY_DEFAULT,
-                    300, () => {
-                        this._infoPopupId = null;
-                        this._infoPopup.open();
-                    });
-            } else {
-                if (this._infoPopupId) {
-                    GLib.source_remove(this._infoPopupId);
-                    this._infoPopupId = null;
-                }
-                this._infoPopup.close();
-            }
-        });
-
-        this._pulse = global.settings.get_boolean('hack-icon-pulse');
-        this._pulseWaitId = 0;
-
-        this._activated = global.settings.get_boolean('hack-mode-enabled');
-        this.icon.update();
-
-        this._hackModeId = global.settings.connect('changed::hack-mode-enabled', () => {
-            this._activated = global.settings.get_boolean('hack-mode-enabled');
-            this.icon.update();
-        });
-
-        this._hackPulseId = global.settings.connect('changed::hack-icon-pulse', () => {
-            this._pulse = global.settings.get_boolean('hack-icon-pulse');
-            if (this._pulseWaitId) {
-                GLib.source_remove(this._pulseWaitId);
-                this._pulseWaitId = 0;
-            }
-            if (this._pulse)
-                this._startPulse();
-        });
-
-        if (this._pulse)
-            this._startPulse();
-    }
-
-    _startPulse() {
-        const params = {
-            duration: 100,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        };
-        this._easeIcon({...params, scale_x: 1.1, scale_y: 1.1})
-            .then(this._easeIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
-            .then(this._easeIcon.bind(this, {...params, scale_x: 1.1, scale_y: 1.1}))
-            .then(this._easeIcon.bind(this, {...params, scale_x: 0.9, scale_y: 0.9}))
-            .then(this._easeIcon.bind(this, {...params, scale_x: 1.0, scale_y: 1.0}))
-            .then(() => {
-                this._pulseWaitId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
-                    this._pulseWaitId = 0;
-                    if (this._pulse)
-                        this._startPulse();
-                    return GLib.SOURCE_REMOVE;
-                });
-            });
-    }
-
-    _easeIcon(easeParams) {
-        return new Promise((resolve) => {
-            const params = {...easeParams, onComplete: () => resolve(this) };
-            this.icon.icon.ease(params);
-        });
-    }
-
-    _createIcon(iconSize) {
-        let iconUri = 'resource:///org/gnome/shell/theme/hack-button-off.svg';
-        if (this._activated)
-            iconUri = 'resource:///org/gnome/shell/theme/hack-button-on.svg';
-
-        let iconFile = Gio.File.new_for_uri(iconUri);
-        let gicon = new Gio.FileIcon({ file: iconFile });
-
-        return new St.Icon({
-            gicon: gicon,
-            icon_size: iconSize,
-            pivot_point: new Clutter.Point({ x: 0.5, y: 0.5 }),
-        });
-    }
-
-    getDragActor() {
-        return this._createIcon(this._iconSize);
-    }
-
-    activate(button) {
-        global.settings.set_boolean('hack-icon-pulse', false);
-        super.activate(button);
-    }
-
-    _canAccept(source) {
-        return false;
-    }
-
-    // Override to avoid animation on launch
-    animateLaunch() {
-    }
-
-    remove() {
-        global.settings.set_boolean('show-hack-launcher', false);
-        this._iconGridLayout.emit('changed');
-    }
-
-    get name() {
-        return 'Hack';
-    }
-
-    _onDestroy() {
-        if (this._hackModeId)
-            global.settings.disconnect(this._hackModeId);
-        if (this._hackPulseId)
-            global.settings.disconnect(this._hackPulseId);
-        if (this._pulseWaitId)
-            GLib.source_remove(this._pulseWaitId);
-        super._onDestroy();
-    }
-
-    handleDragOver() {
-        return DND.DragMotionResult.NO_DROP;
-    }
-
-    acceptDrop() {
-        // This will catch the drop event and do nothing
-        return true;
-    }
-
-    popupMenu() {
-        if (this._infoPopupId) {
-            GLib.source_remove(this._infoPopupId);
-            this._infoPopupId = null;
-        }
-        this._infoPopup.close();
-        super.popupMenu();
-    }
-
-    _createInfoPopup() {
-        this._infoPopupId = null;
-        this._infoPopup = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.TOP, 0);
-        this._infoPopup.box.add_style_class_name('hack-tooltip');
-        this._infoPopup.actor.add_style_class_name('hack-tooltip-arrow');
-        this._infoMenuItem = new HackPopupMenuItem();
-        this._infoPopup.addMenuItem(this._infoMenuItem);
-
-        this._infoPopup.actor.hide();
-        Main.uiGroup.add_actor(this._infoPopup.actor);
-    }
-});
-
-var HackPopupMenuItem = GObject.registerClass(
-class HackPopupMenuItem extends PopupMenu.PopupBaseMenuItem {
-    _init(params) {
-        super._init(params);
-        this.style_class = 'hack-popup-menu-item';
-
-        /* Translators: The 'Endless Hack' is not translatable, it's the brand name */
-        const title = _('Endless Hack: Unlock infinite possibilities through coding');
-        /* Translators: The 'Hack' is not translatable, it's the brand name */
-        const description = _('Hack is a new learning platform from Endless, focused on teaching the foundations of programming and creative problem-solving to kids, ages 10 and up. With 5 different pathways, Hack has a variety of activities that teach a wide range of skills and concepts - check it out!');
-        const image = 'resource:///org/gnome/shell/theme/hack-tooltip.png';
-
-        const iconFile = Gio.File.new_for_uri(image);
-        const gicon = new Gio.FileIcon({ file: iconFile });
-
-        this.icon = new St.Icon({
-            gicon: gicon,
-            icon_size: 180,
-            pivot_point: new Clutter.Point({ x: 0.5, y: 0.5 }),
-            style_class: 'hack-tooltip-icon',
-            x_align: Clutter.ActorAlign.CENTER,
-        });
-
-        this.title = new St.Label({
-            style_class: 'hack-tooltip-title',
-            text: title,
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START,
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-
-        this.desc = new St.Label({
-            style_class: 'hack-tooltip-desc',
-            text: description,
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-        this.desc.clutter_text.set_line_wrap(true);
-        this.desc.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
-        this.desc.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-
-        this.rightBox = new St.BoxLayout({
-            style_class: 'hack-popup-menu-item-right',
-            vertical: true,
-        });
-        this.rightBox.add_child(this.title);
-        this.rightBox.add_child(this.desc);
-
-        this.add_child(this.icon);
-        this.add_child(this.rightBox);
     }
 });
