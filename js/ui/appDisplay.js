@@ -2747,6 +2747,7 @@ class HackAppIcon extends AppIcon {
 
         let app = Clubhouse.getClubhouseApp();
         this._activated = false;
+        this._flatpak_link = Gio.File.new_for_path('/var/lib/flatpak/app/com.hack_computer.Clubhouse/current/active');
 
         super._init(app, viewIconParams, iconParams);
 
@@ -2822,19 +2823,60 @@ class HackAppIcon extends AppIcon {
         });
     }
 
+    _checkNewRelease() {
+        this._flatpak_link.query_info_async(Gio.FILE_ATTRIBUTE_TIME_CHANGED,
+                                            0, 0, null, (file, res) => {
+            let info = file.query_info_finish(res);
+            let flatpak = info.get_attribute_uint64(Gio.FILE_ATTRIBUTE_TIME_CHANGED);
+            let last_launch = global.settings.get_int64('hack-last-launch');
+
+            this._badge.visible = flatpak > last_launch;
+        });
+    }
+
     _createIcon(iconSize) {
         let iconUri = 'resource:///org/gnome/shell/theme/hack-button-off.svg';
         if (this._activated)
             iconUri = 'resource:///org/gnome/shell/theme/hack-button-on.svg';
 
         let iconFile = Gio.File.new_for_uri(iconUri);
-        let gicon = new Gio.FileIcon({ file: iconFile });
+        let center = new Clutter.Point({ x: 0.5, y: 0.5 });
 
-        return new St.Icon({
-            gicon: gicon,
+        let icon = new St.Icon({
+            layout_manager: new Clutter.BinLayout(),
+            gicon: new Gio.FileIcon({ file: iconFile }),
             icon_size: iconSize,
-            pivot_point: new Clutter.Point({ x: 0.5, y: 0.5 }),
+            pivot_point: center,
         });
+
+        let badgeUri = 'resource:///org/gnome/shell/theme/hack-button-badge-new.svg';
+        let badgeFile = Gio.File.new_for_uri(badgeUri);
+
+        this._badge = new St.Icon({
+            gicon: new Gio.FileIcon({ file: badgeFile }),
+            icon_size: iconSize / 2,
+            pivot_point: center,
+            translation_x: iconSize * 0.5,
+            translation_y: iconSize * -0.5,
+        });
+
+        let iconContainer = new St.Widget({
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+        });
+
+        iconContainer.add_child(icon);
+        iconContainer.add_child(this._badge);
+        this._badge.hide();
+
+        this._checkNewRelease();
+
+        let monitor = this._flatpak_link.monitor(0, null);
+        if (monitor)
+            monitor.connect('changed', this._checkNewRelease);
+
+        return iconContainer;
     }
 
     getDragActor() {
@@ -2843,6 +2885,8 @@ class HackAppIcon extends AppIcon {
 
     activate(button) {
         global.settings.set_boolean('hack-icon-pulse', false);
+        global.settings.set_int64('hack-last-launch', GLib.get_real_time() / 1000000);
+        this._badge.hide();
         super.activate(button);
     }
 
