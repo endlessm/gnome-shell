@@ -97,7 +97,6 @@ var introspectService = null;
 var locatePointer = null;
 var discoveryFeed = null;
 var paygManager = null;
-var trayArea = null;
 var customerSupport = null;
 var workspaceMonitor = null;
 let _startDate;
