@@ -2748,6 +2748,9 @@ class HackAppIcon extends AppIcon {
         let app = Clubhouse.getClubhouseApp();
         this._activated = false;
         this._flatpak_link = Gio.File.new_for_path('/var/lib/flatpak/app/com.hack_computer.Clubhouse/current/active');
+        this._monitor = this._flatpak_link.monitor(0, null);
+        if (this._monitor)
+            this._monitor.connect('changed', this._checkNewRelease.bind(this));
 
         super._init(app, viewIconParams, iconParams);
 
@@ -2871,10 +2874,6 @@ class HackAppIcon extends AppIcon {
         this._badge.hide();
 
         this._checkNewRelease();
-
-        let monitor = this._flatpak_link.monitor(0, null);
-        if (monitor)
-            monitor.connect('changed', this._checkNewRelease);
 
         return iconContainer;
     }
