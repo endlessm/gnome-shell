@@ -51,7 +51,6 @@ const KbdA11yDialog = imports.ui.kbdA11yDialog;
 const Util = imports.misc.util;
 const LocatePointer = imports.ui.locatePointer;
 const PointerA11yTimeout = imports.ui.pointerA11yTimeout;
-const Watermark = imports.ui.watermark;
 const WorkspaceMonitor = imports.ui.workspaceMonitor;
 
 const A11Y_SCHEMA = 'org.gnome.desktop.a11y.keyboard';
@@ -106,7 +105,6 @@ let _a11ySettings = null;
 let _themeResource = null;
 let _oskResource = null;
 let _desktopAppClient = null;
-let _watermarkManager = null;
 
 function _sessionUpdated() {
     if (sessionMode.isPrimary)
@@ -313,10 +311,6 @@ function _initializeUI() {
             Scripting.runPerfScript(module, perfOutput);
         }
     });
-
-    /* Initialize watermarks */
-    _watermarkManager = new Watermark.WatermarkManager();
-    _watermarkManager.init();
 }
 
 function _getStylesheet(name) {
