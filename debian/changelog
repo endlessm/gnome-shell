@@ -1,24 +1,83 @@
-gnome-shell (3.34.1-1endless3) eos; urgency=medium
+gnome-shell (3.35.92-2) experimental; urgency=medium
 
-  * Add a "endless" custom session mode to enable system-extensions
-    - https://phabricator.endlessm.com/T28777
+  [ Marco Trevisan (Treviño) ]
+  * debian/control: Breaks on dashtodock minor than 67+git20200225-1
 
- -- Umang Jain <umang@endlessm.com>  Thu, 11 Feb 2020 18:30:00 +0530
+ -- Iain Lane <laney@debian.org>  Wed, 04 Mar 2020 09:24:55 +0000
 
+gnome-shell (3.35.92-1) experimental; urgency=medium
 
-gnome-shell (3.34.1-1endless2) eos; urgency=medium
+  * New upstream release
+  * control: Bump mutter deps to .92
+  * Style-looking-glass-variant-independant.patch: Drop, upstream
 
-  * Bump libmalcontent dependency for new/changed API (T28747)
+ -- Iain Lane <laney@debian.org>  Tue, 03 Mar 2020 16:37:58 +0000
 
- -- Philip Withnall <withnall@endlessm.com>  Thu, 23 Jan 2020 10:30:00 +0000
+gnome-shell (3.35.91-1) experimental; urgency=medium
 
-gnome-shell (3.34.1-1endless1) eos; urgency=medium
+  [ Marco Trevisan (Treviño) ]
+  * New upstream release
+    - Improve visual appearance of Weather integration
+    - New system dialog designs
+    - Sandbox the portal helper
+    - Improvements to the magnifier
+    - New lock screen (a merge of screen shield and unlock dialog)
+      (LP: #1832812, LP: #1827751)
+    - Show the suspend button in the power menu (LP: #1697143)
+    - Font size matches configured interface font size (LP: #1717453)
+    - Only enable OSK automatically if touch-mode is enabled (LP: #1721319)
+    - Added show-password emblem to password entries (LP: #1860540)
+  * debian/control:
+    - Update build dependencies
+  * debian/gnome-shell-common.install: Add extensions tool icons
+  * d/p/Style-looking-glass-variant-independant.patch:
+    - Allow to style looking glass properly
 
-  * Apply Endless-specific changes:
-    + Add various GIR build dependencies
-    + Depend on libanimation, xkbcommon, eos-metrics and libmalcontent.
+  [ Laurent Bigonville ]
+  * debian/rules: Do not override libexecdir so things are installed in
+    /usr/libexec now that's allowed by the policy
 
- -- Georges Basile Stavracas Neto <georges@endlessm.com>  Thu, 09 Oct 2019 17:18:22 -0300
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 24 Feb 2020 18:48:37 +0000
+
+gnome-shell (3.34.3-1) unstable; urgency=medium
+
+  * New upstream release
+    + polkitAgent: Fix confirming via keyboard when password-less
+  * control: Bump mutter BD to 3.34.3. This probably isn't *strictly*
+    required, but nevertheless let's keep them in sync.
+
+ -- Iain Lane <laney@debian.org>  Mon, 06 Jan 2020 13:40:57 +0000
+
+gnome-shell (3.34.2-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Georges Basile Stavracas Neto ]
+  * Add gnome-menus to Recommends.
+    The files installed by gnome-menus are needed for the functionality of
+    suggesting a name for a new folder to work.
+
+  [ Simon McVittie ]
+  * d/watch: Only watch for stable releases
+  * New upstream release
+  * d/gbp.conf: Use upstream/3.34.x branch
+  * Add build-dependency on libgnome-desktop-3-dev (>= 3.34.2) for new
+    systemd scope functionality
+  * Remove Breaks/Conflicts on packages older than Debian 9 (oldstable)
+  * Remove unused Lintian override
+  * Bump Standards-Version to 4.4.1
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 16 Dec 2019 16:55:02 +0000
+
+gnome-shell (3.34.1+git20191024-1) unstable; urgency=medium
+
+  * New upstream snapshot release
+    + Fix some animations using invalid parameters
+    + Compute lock timeout fade duration using animations parameters
+    + Ensure unredirection is disabled after animations
+    + Speed-up overview opening using windows cached centers (LP: #1848009)
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Fri, 25 Oct 2019 13:36:08 +0100
 
 gnome-shell (3.34.1-1) unstable; urgency=medium
 
