@@ -660,7 +660,8 @@ class PaygNotifier extends GObject.Object {
 
     notify(secondsLeft) {
         // Only notify when in an regular session, not in GDM or initial-setup.
-        if (Main.sessionMode.currentMode != 'user') {
+        if (Main.sessionMode.currentMode != 'user' &&
+            Main.sessionMode.currentMode != 'endless') {
             return;
         }
 
