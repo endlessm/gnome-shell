@@ -60,6 +60,7 @@ function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
     }
 
     clickAction.connect('long-press', (action, theActor, state) => {
+        log('+++ BackgroundMenu::clickaction::long-press');
         if (state == Clutter.LongPressState.QUERY) {
             return (action.get_button() == 0 ||
                      action.get_button() == 1) &&
@@ -73,6 +74,7 @@ function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
         return true;
     });
     clickAction.connect('clicked', action => {
+        log('+++ BackgroundMenu::clickaction::clicked');
         if (action.get_button() == 3) {
             let [x, y] = action.get_coords();
             openMenu(x, y);
@@ -80,6 +82,7 @@ function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
     });
 
     let grabOpBeginId = global.display.connect('grab-op-begin', () => {
+        log('+++ BackgroundMenu::clickaction::grab-op-begin');
         clickAction.release();
     });
     let cursorTracker = Meta.CursorTracker.get_for_display(global.display);
@@ -92,6 +95,7 @@ function _addBackgroundMenuFull(actor, clickAction, layoutManager) {
     });
 
     actor.connect('notify::allocation', () => {
+        log('+++ BackgroundMenu::actor::notify::allocation');
         // If the actor moves from underneath us, we should probably not
         // fire the long press action. It may have moved outside of the
         // range of where the cursor is, where we will never get ButtonPress

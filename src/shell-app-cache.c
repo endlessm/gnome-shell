@@ -2,6 +2,8 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
 #include "shell-app-cache-private.h"
 
 /**
@@ -103,22 +105,34 @@ load_folder (GHashTable *folders,
   g_assert (folders != NULL);
   g_assert (path != NULL);
 
+  fprintf(stderr, "+++ %s %d - loading folder at path %s\n", __FUNCTION__, __LINE__, path);
   dir = g_dir_open (path, 0, NULL);
-  if (dir == NULL)
+  if (dir == NULL) {
+    fprintf(stderr, "+++ %s %d - unable to open path %s\n", __FUNCTION__, __LINE__, path);
     return;
+  }
 
   while ((name = g_dir_read_name (dir)))
     {
+      g_autofree gchar *name_without_extension = NULL;
       g_autofree gchar *filename = NULL;
       g_autoptr(GKeyFile) keyfile = NULL;
 
-      /* First added wins */
-      if (g_hash_table_contains (folders, name))
+      if (!g_str_has_suffix (name, ".directory"))
         continue;
+
+      name_without_extension = g_strndup (name, strlen (name) - strlen (".directory"));
+
+      /* First added wins */
+      if (g_hash_table_contains (folders, name_without_extension)) {
+        fprintf(stderr, "+++ %s %d - translation for %s already exists\n", __FUNCTION__, __LINE__, name);
+        continue;
+      }
 
       filename = g_build_filename (path, name, NULL);
       keyfile = g_key_file_new ();
 
+      fprintf(stderr, "+++ %s %d - loading keyfile for %s with filename %s\n", __FUNCTION__, __LINE__, name, filename);
       if (g_key_file_load_from_file (keyfile, filename, G_KEY_FILE_NONE, NULL))
         {
           gchar *translated;
@@ -127,8 +141,9 @@ load_folder (GHashTable *folders,
                                                      "Desktop Entry", "Name",
                                                      NULL, NULL);
 
+          fprintf(stderr, "+++ %s %d - translation for %s with filename %s=%s\n", __FUNCTION__, __LINE__, name, filename, (translated ? translated : ""));
           if (translated != NULL)
-            g_hash_table_insert (folders, g_strdup (name), translated);
+            g_hash_table_insert (folders, g_steal_pointer (&name_without_extension), translated);
         }
     }
 }

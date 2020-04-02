@@ -122,8 +122,10 @@ function _findBestFolderName(apps) {
         return categories;
     }, commonCategories);
 
+    log('+++ _findBestFolderName commonCategories=' + commonCategories);
     for (let category of commonCategories) {
         let translated = Shell.util_get_translated_folder_name(category);
+        log('+++ _findBestFolderName translation for category %s=%s'.format(category, translated));
         if (translated !== null)
             return translated;
     }
@@ -349,6 +351,7 @@ var BaseAppView = GObject.registerClass({
     }
 
     _canAccept(source) {
+        log('+++ BaseAppView::canAccept');
         return true;
     }
 
@@ -381,15 +384,19 @@ var BaseAppView = GObject.registerClass({
     }
 
     acceptDrop(source, _actor, x, y) {
+        log('+++ BaseAppView::acceptDrop');
         this._grid.removeNudges();
 
-        if (!this._canAccept(source))
+        if (!this._canAccept(source)) {
+            log('+++ BaseAppView::acceptDrop - cant accept');
             return false;
+        }
 
         let [index] = this.canDropAt(x, y);
 
         this.moveItem(source, index);
 
+        log('+++ BaseAppView::acceptDrop - accepted');
         return true;
     }
 
@@ -466,8 +473,10 @@ class AppDisplay extends BaseAppView {
         this._eventBlocker = new St.Widget({
             x_expand: true,
             y_expand: true,
-            reactive: true,
-            visible: false,
+            //reactive: false,
+            //style_class: "testEventBlocker",
+            //opacity: 100,
+            //visible: true,
         });
         this._stack.add_actor(this._eventBlocker);
 
@@ -484,17 +493,32 @@ class AppDisplay extends BaseAppView {
 
         this._clickAction = new Clutter.ClickAction();
         this._clickAction.connect('clicked', () => {
+            log('+++ AppDisplay::clickaction::clicked action-enabled=' + this._clickAction.enabled);
+            log('+++ AppDisplay::clickaction::clicked eventblocker-reactive=' + this._eventBlocker.reactive);
             if (!this._currentDialog)
                 return;
 
+            log('+++ AppDisplay::clickaction::clicked 2');
             let [x, y] = this._clickAction.get_coords();
             let actor = global.stage.get_actor_at_pos(Clutter.PickMode.ALL, x, y);
-            if (!this._currentDialog.contains(actor))
+            if (!this._currentDialog.contains(actor)) {
+            log('+++ AppDisplay::clickaction::clicked 3');
                 this._currentDialog.popdown();
+            }
+            log('+++ AppDisplay::clickaction::clicked 4');
         });
         Main.overview.addAction(this._clickAction, false);
-        this._eventBlocker.bind_property('visible', this._clickAction,
+        this._eventBlocker.bind_property('reactive', this._clickAction,
             'enabled', GObject.BindingFlags.SYNC_CREATE);
+        log('+++ AppDisplay.eventblocker.visible=', this._eventBlocker.visible);
+        log('+++ AppDisplay.eventblocker.reactive=', this._eventBlocker.reactive);
+        log('+++ AppDisplay.clickAction.enabled=', this._clickAction.enabled);
+
+        this._clickAction.connect('notify::enabled', () => {
+            log('+++ AppDisplay.clickaction.notify::enabled=' + this._clickAction.enabled);
+            if (!this._clickAction.enabled)
+                this._clickAction.release();
+        });
 
         this._bgAction = new Clutter.ClickAction();
         Main.overview.addAction(this._bgAction);
@@ -504,6 +528,12 @@ class AppDisplay extends BaseAppView {
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN);
         this.bind_property('mapped', this._bgAction,
             'enabled', GObject.BindingFlags.SYNC_CREATE);
+        this._bgAction.connect('notify::enabled', () => {
+            log('+++ AppDisplay.bgaction.notify::enabled=' + this._bgAction.enabled);
+            if (!this._bgAction.enabled)
+                this._bgAction.release();
+        });
+
 
         this._appCenterIcon = null;
         this._currentDialog = null;
@@ -813,7 +843,8 @@ class AppDisplay extends BaseAppView {
     addFolderDialog(dialog) {
         this.add_child(dialog);
         dialog.connect('open-state-changed', (o, isOpen) => {
-            this._eventBlocker.visible = isOpen;
+            log('+++ Setting eventblocker reactive to ' + isOpen);
+            this._eventBlocker.reactive = isOpen;
 
             if (this._currentDialog) {
                 this._currentDialog.disconnect(this._currentDialogDestroyId);
@@ -827,7 +858,8 @@ class AppDisplay extends BaseAppView {
                 this._currentDialogDestroyId = dialog.connect('destroy', () => {
                     this._currentDialog = null;
                     this._currentDialogDestroyId = 0;
-                    this._eventBlocker.visible = false;
+            log('+++ Setting eventblocker reactive to ' + false);
+                    this._eventBlocker.reactive = false;
                 });
             }
             this._updateIconOpacities(isOpen);
@@ -962,7 +994,9 @@ class AppDisplay extends BaseAppView {
         DND.addDragMonitor(this._dragMonitor);
 
         this._bgAction.release();
+            log('++++++ _onDragBegin Setting eventblocker reactive to ' + false);
         this._eventBlocker.visible = false;
+        //this._eventBlocker.reactive = false;
     }
 
     _onDragMotion(dragEvent) {
@@ -988,33 +1022,60 @@ class AppDisplay extends BaseAppView {
         }
 
         this._eventBlocker.visible = this._currentDialog !== null;
+        //this._eventBlocker.reactive = this._currentDialog !== null;
+        log('+++ _onDragBegin Setting eventblocker reactive to ' + this._eventBlocker.reactive + ' currentDialog=' + this._currentDialog);
         this._resetOvershoot();
     }
 
     acceptDrop(source, actor, x, y) {
-        if (!super.acceptDrop(source, actor, x, y))
+        log('+++ AppDisplay::acceptDrop');
+        if (!super.acceptDrop(source, actor, x, y)) {
+            log('+++ AppDisplay::acceptDrop - cant accept');
             return false;
+        }
 
         if (this._currentDialog)
             this._currentDialog.popdown();
 
+        log('+++ AppDisplay::acceptDrop - accepted');
         return true;
     }
+    inhibitEventBlocker() {
+        return;
+        this._nEventBlockerInhibits++;
+        this._eventBlocker.visible = this._nEventBlockerInhibits == 0;
+    }
+
+    uninhibitEventBlocker() {
+        return;
+        if (this._nEventBlockerInhibits === 0)
+            throw new Error('Not inhibited');
+
+        this._nEventBlockerInhibits--;
+        this._eventBlocker.visible = this._nEventBlockerInhibits == 0;
+    }
+
 
     createFolder(apps, iconAtPosition) {
+        log('+++ AppDisplay::createFolder - apps=%s'.format(apps));
         let appItems = apps.map(id => this._items.get(id).app);
         let folderName = _findBestFolderName(appItems);
 
         let newFolderId =
             this._iconGridLayout.addFolder(folderName, iconAtPosition);
 
-        if (!newFolderId)
+        log('+++ AppDisplay::createFolder - newFolderId=%s'.format(newFolderId));
+        if (!newFolderId) {
+            log('+++ AppDisplay::createFolder - newFolderId=%s fail'.format(newFolderId));
             return false;
+        }
 
-        for (let app of apps)
+        for (let app of apps) {
+            log('+++ AppDisplay::createFolder - adding icon=%s to folder=%s'.format(app, newFolderId));
             this._iconGridLayout.appendIcon(app, newFolderId);
+        }
 
-        this.selectApp(newFolderId);
+        //this.selectApp(newFolderId);
 
         return true;
     }
@@ -1229,6 +1290,7 @@ class FolderView extends BaseAppView {
     }
 
     _canAccept(source) {
+        log('+++ FolderView::canAccept');
         if (!(source instanceof AppIcon))
             return false;
 
@@ -1523,6 +1585,8 @@ var FolderIcon = GObject.registerClass({
             dragMotion: this._onDragMotion.bind(this),
         };
         DND.addDragMonitor(this._dragMonitor);
+
+        this._parentView.inhibitEventBlocker();
     }
 
     _onDragMotion(dragEvent) {
@@ -1539,24 +1603,33 @@ var FolderIcon = GObject.registerClass({
     _onDragEnd() {
         this.remove_style_pseudo_class('drop');
         if (this._dragMonitor) {
+            this._parentView.uninhibitEventBlocker();
             DND.removeDragMonitor(this._dragMonitor);
             delete this._dragMonitor;
         }
     }
 
     _canAccept(source) {
-        if (!(source instanceof AppIcon))
+        log('+++ FolderIcon::canAccept');
+        if (!(source instanceof AppIcon)) {
+            log('+++ FolderIcon::canAccept - cant accept, not AppIcon');
             return false;
+        }
 
         let view = _getViewFromIcon(source);
-        if (!view || !(view instanceof AppDisplay))
+        if (!view || !(view instanceof AppDisplay)) {
+            log('+++ FolderIcon::canAccept - cant accept, not AppDisplay view=' + view);
             return false;
+        }
 
         const iconGridLayout = IconGridLayout.getDefault();
         let folderApps = iconGridLayout.getIcons(source.id);
-        if (folderApps.includes(source.id))
+        if (folderApps.includes(source.id)) {
+            log('+++ FolderIcon::canAccept - cant accept, folder apps ' + folderApps + ' already includes source.id=' + source.id);
             return false;
+        }
 
+        log('+++ FolderIcon::canAccept - accepted');
         return true;
     }
 
@@ -1571,9 +1644,13 @@ var FolderIcon = GObject.registerClass({
     }
 
     acceptDrop(source) {
-        if (!this._canAccept(source))
+        log('++++++ FolderIcon::acceptDrop');
+        if (!this._canAccept(source)) {
+            log('+++ FolderIcon::acceptDrop - cant accept :(');
             return false;
+        }
 
+        log('+++ FolderIcon::acceptDrop - accept');
         this.view.addApp(source.app);
         this._sync();
 
@@ -2091,7 +2168,14 @@ var AppIcon = GObject.registerClass({
         GLib.Source.set_name_by_id(this._menuTimeoutId, '[gnome-shell] this.popupMenu');
     }
 
+    vfunc_enter_event(crossingEvent) {
+        log('+++ AppDisplayIcon::vfunc_enter_event this=' + this);
+        let ret = super.vfunc_enter_event(crossingEvent);
+        return ret;
+    }
+
     vfunc_leave_event(crossingEvent) {
+        log('+++ AppDisplayIcon::vfunc_leave_event this=' + this);
         let ret = super.vfunc_leave_event(crossingEvent);
 
         this.fake_release();
@@ -2238,6 +2322,7 @@ var AppIcon = GObject.registerClass({
     }
 
     _canAccept(source) {
+        log('+++ AppDisplayIcon::canAccept');
         let view = _getViewFromIcon(source);
 
         return source != this &&
@@ -2310,15 +2395,24 @@ var AppIcon = GObject.registerClass({
     }
 
     acceptDrop(source) {
+        log('+++ AppDisplayIcon::acceptDrop');
         this._setHoveringByDnd(false);
 
-        if (!this._canAccept(source))
+        if (!this._canAccept(source)) {
+            log('++++++ AppDisplayIcon::acceptDrop - cant accept');
             return false;
+        }
 
         let view = _getViewFromIcon(this);
         let apps = [this.id, source.id];
 
-        return view.createFolder(apps, this.id);
+        log('++++++ AppDisplayIcon::acceptDrop - accepted, creating folder');
+        let ret = view.createFolder(apps, this.id);
+        if (ret)
+            log('++++++ AppDisplayIcon::acceptDrop - folder created');
+        else
+            log('++++++ AppDisplayIcon::acceptDrop - cant accept, failed to create folder');
+        return ret;
     }
 });
 
@@ -2510,17 +2604,22 @@ class AppCenterIcon extends AppIcon {
     }
 
     _canAccept(source) {
+        log('+++ AppCenterIcon::canAccept');
         return source instanceof ViewIcon;
     }
 
     acceptDrop(source) {
+        log('+++ AppCenterIcon::acceptDrop');
         this._setHoveringByDnd(false);
 
-        if (!this._canAccept(source))
+        if (!this._canAccept(source)) {
+            log('+++ AppCenterIcon::acceptDrop - cant accept');
             return false;
+        }
 
         const iconGridLayout = IconGridLayout.getDefault();
         iconGridLayout.removeIcon(source.id, true);
+        log('+++ AppCenterIcon::acceptDrop - accepted');
         return true;
     }
 });
