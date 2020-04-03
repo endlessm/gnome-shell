@@ -68,6 +68,7 @@ class BaseIcon extends St.Bin {
         this.set_child(this._box);
 
         this.iconSize = ICON_SIZE;
+        this._iconScale = 1;
         this._iconBin = new St.Bin({ x_align: Clutter.ActorAlign.CENTER });
 
         this._box.add_actor(this._iconBin);
@@ -132,17 +133,27 @@ class BaseIcon extends St.Bin {
         super.vfunc_style_changed();
         let node = this.get_theme_node();
 
+        let scale = this._iconScale;
         let size;
         if (this._setSizeManually) {
             size = this.iconSize;
         } else {
             let [found, len] = node.lookup_length('icon-size', false);
-            size = found ? len : ICON_SIZE;
+            if (found) {
+                // node.lookup_length() returns a scaled value, but we
+                // need unscaled
+                scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+                size = len / scale;
+            } else {
+                size = ICON_SIZE;
+            }
         }
 
-        if (this.iconSize == size && this._iconBin.child)
+        if (this.iconSize == size && this._iconBin.child &&
+            this._iconScale == scale)
             return;
 
+        this._iconScale = scale;
         this._createIconTexture(size);
     }
 
