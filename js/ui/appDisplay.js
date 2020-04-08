@@ -1761,6 +1761,7 @@ var AppFolderDialog = GObject.registerClass({
 
         this._folderNameLabel.text = newName;
         this._entry.text = newName;
+        this._source.update();
     }
 
     _switchActor(from, to) {
