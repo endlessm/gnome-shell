@@ -1804,6 +1804,7 @@ var AppFolderDialog = GObject.registerClass({
             return;
 
         this._dirInfo.create_custom_with_name(newFolderName);
+        this._syncFolderName();
     }
 
     _zoomAndFadeIn() {
