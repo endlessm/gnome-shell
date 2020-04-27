@@ -824,7 +824,7 @@ class AppDisplay extends BaseAppView {
     }
 
     addFolderDialog(dialog) {
-        this.add_child(dialog);
+        Main.layoutManager.overviewGroup.add_child(dialog);
         dialog.connect('open-state-changed', (o, isOpen) => {
             this._eventBlocker.reactive = isOpen;
 
