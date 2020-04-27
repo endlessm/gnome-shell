@@ -379,7 +379,7 @@ var BaseAppView = GObject.registerClass({
         this._lastDragLocation = dragLocation;
         this._lastIndex = index;
 
-        return DND.DragMotionResult.CONTINUE;
+        return DND.DragMotionResult.MOVE_DROP;
     }
 
     acceptDrop(source, _actor, x, y) {
