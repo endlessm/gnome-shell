@@ -242,7 +242,9 @@ var BaseAppView = GObject.registerClass({
         if (newPosition >= visibleItems.length)
             return -1;
 
-        let targetId = visibleItems[newPosition].id;
+        let targetId = null;
+        if (visibleItems[newPosition])
+            targetId = visibleItems[newPosition].id;
 
         let visibleIndex = visibleItems.indexOf(item);
         if (newPosition > visibleIndex)
