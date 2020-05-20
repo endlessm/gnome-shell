@@ -454,6 +454,7 @@ var WorkspacesDisplay = GObject.registerClass({
         this._keyPressEventId = 0;
         this._scrollTimeoutId = 0;
 
+        this._actualGeometry = null;
         this._fullGeometry = null;
         this._inWindowDrag = false;
 
@@ -694,8 +695,10 @@ var WorkspacesDisplay = GObject.registerClass({
 
         this._workspacesViews.forEach(v => v.show());
 
-        this._updateWorkspacesFullGeometry();
-        this._updateWorkspacesActualGeometry();
+        if (this._fullGeometry)
+            this._syncWorkspacesFullGeometry();
+        if (this._actualGeometry)
+            this._syncWorkspacesActualGeometry();
     }
 
     _getMonitorIndexForEvent(event) {
@@ -747,10 +750,10 @@ var WorkspacesDisplay = GObject.registerClass({
     // the sliding controls were never slid in at all.
     setWorkspacesFullGeometry(geom) {
         this._fullGeometry = geom;
-        this._updateWorkspacesFullGeometry();
+        this._syncWorkspacesFullGeometry();
     }
 
-    _updateWorkspacesFullGeometry() {
+    _syncWorkspacesFullGeometry() {
         if (!this._workspacesViews.length)
             return;
 
@@ -762,18 +765,21 @@ var WorkspacesDisplay = GObject.registerClass({
     }
 
     _updateWorkspacesActualGeometry() {
+        const [x, y] = this.get_transformed_position();
+        const width = this.allocation.get_width();
+        const height = this.allocation.get_height();
+
+        this._actualGeometry = { x, y, width, height };
+        this._syncWorkspacesActualGeometry();
+    }
+
+    _syncWorkspacesActualGeometry() {
         if (!this._workspacesViews.length)
             return;
 
-        let [x, y] = this.get_transformed_position();
-        let allocation = this.allocation;
-        let width = allocation.x2 - allocation.x1;
-        let height = allocation.y2 - allocation.y1;
-        let primaryGeometry = { x, y, width, height };
-
         let monitors = Main.layoutManager.monitors;
         for (let i = 0; i < monitors.length; i++) {
-            let geometry = i == this._primaryIndex ? primaryGeometry : monitors[i];
+            let geometry = i === this._primaryIndex ? this._actualGeometry : monitors[i];
             this._workspacesViews[i].setActualGeometry(geometry);
         }
     }
