@@ -824,7 +824,7 @@ class AppDisplay extends BaseAppView {
     }
 
     addFolderDialog(dialog) {
-        this.add_child(dialog);
+        Main.layoutManager.overviewGroup.add_child(dialog);
         dialog.connect('open-state-changed', (o, isOpen) => {
             this._eventBlocker.reactive = isOpen;
 
@@ -1987,6 +1987,8 @@ var AppFolderDialog = GObject.registerClass({
 
         if (!this._isOpen)
             return;
+
+        this.get_parent().set_child_above_sibling(this, null);
 
         this._needsZoomAndFade = true;
         this.show();
