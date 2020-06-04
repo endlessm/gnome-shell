@@ -11,6 +11,7 @@ const DND = imports.ui.dnd;
 const GrabHelper = imports.ui.grabHelper;
 const IconGrid = imports.ui.iconGrid;
 const IconGridLayout = imports.ui.iconGridLayout;
+const Layout = imports.ui.layout;
 const Main = imports.ui.main;
 const PageIndicators = imports.ui.pageIndicators;
 const ParentalControlsManager = imports.misc.parentalControlsManager;
@@ -1662,6 +1663,11 @@ var AppFolderDialog = GObject.registerClass({
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
+
+        this.add_constraint(new Layout.MonitorConstraint({
+            primary: true,
+            work_area: true,
+        }));
 
         this._source = source;
         this._dirInfo = dirInfo;
