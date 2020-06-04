@@ -468,13 +468,6 @@ class AppDisplay extends BaseAppView {
 
         this._grid.currentPage = 0;
         this._stack.add_actor(this._grid);
-        this._eventBlocker = new St.Widget({
-            x_expand: true,
-            y_expand: true,
-            reactive: false,
-            visible: true,
-        });
-        this._stack.add_actor(this._eventBlocker);
         this._nEventBlockerInhibits = 0;
 
         box.add_actor(this._stack);
@@ -494,8 +487,6 @@ class AppDisplay extends BaseAppView {
         if (params.addBackgroundAction) {
             Main.overview.addAction(this._bgAction);
             BackgroundMenu.addBackgroundMenuForAction(this._bgAction, Main.layoutManager);
-            this._eventBlocker.bind_property('reactive', this._bgAction,
-                'enabled', GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN);
         }
 
         this._appCenterIcon = null;
@@ -811,8 +802,6 @@ class AppDisplay extends BaseAppView {
     addFolderDialog(dialog) {
         Main.layoutManager.overviewGroup.add_child(dialog);
         dialog.connect('open-state-changed', (o, isOpen) => {
-            this._eventBlocker.reactive = isOpen;
-
             if (this._currentDialog) {
                 this._currentDialog.disconnect(this._currentDialogDestroyId);
                 this._currentDialogDestroyId = 0;
@@ -825,7 +814,6 @@ class AppDisplay extends BaseAppView {
                 this._currentDialogDestroyId = dialog.connect('destroy', () => {
                     this._currentDialog = null;
                     this._currentDialogDestroyId = 0;
-                    this._eventBlocker.reactive = false;
                 });
             }
             this._updateIconOpacities(isOpen);
@@ -1017,19 +1005,6 @@ class AppDisplay extends BaseAppView {
 
     get scrollView() {
         return this._scrollView;
-    }
-
-    inhibitEventBlocker() {
-        this._nEventBlockerInhibits++;
-        this._eventBlocker.visible = this._nEventBlockerInhibits == 0;
-    }
-
-    uninhibitEventBlocker() {
-        if (this._nEventBlockerInhibits === 0)
-            throw new Error('Not inhibited');
-
-        this._nEventBlockerInhibits--;
-        this._eventBlocker.visible = this._nEventBlockerInhibits == 0;
     }
 });
 
@@ -1546,8 +1521,6 @@ var FolderIcon = GObject.registerClass({
             dragMotion: this._onDragMotion.bind(this),
         };
         DND.addDragMonitor(this._dragMonitor);
-
-        this._parentView.inhibitEventBlocker();
     }
 
     _onDragMotion(dragEvent) {
@@ -1564,7 +1537,6 @@ var FolderIcon = GObject.registerClass({
     _onDragEnd() {
         this.remove_style_pseudo_class('drop');
         if (this._dragMonitor) {
-            this._parentView.uninhibitEventBlocker();
             DND.removeDragMonitor(this._dragMonitor);
             delete this._dragMonitor;
         }
