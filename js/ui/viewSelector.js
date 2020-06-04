@@ -319,7 +319,6 @@ class ViewsClone extends St.Widget {
         const appDisplayClone = new AppDisplay.AppDisplay({
             addBackgroundAction: false,
         });
-        appDisplayClone._eventBlocker.visible = true;
 
         let discoveryFeedButton = DiscoveryFeedButton.maybeCreateInactiveButton();
         let layoutManager = new ViewsDisplayLayout(entry, discoveryFeedButton, appDisplayClone, null);
