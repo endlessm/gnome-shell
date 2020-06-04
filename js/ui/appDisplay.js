@@ -1656,12 +1656,10 @@ var AppFolderDialog = GObject.registerClass({
     _init(source, dirInfo) {
         super._init({
             layout_manager: new Clutter.BinLayout(),
-            style_class: 'app-folder-dialog-container',
             visible: false,
             x_expand: true,
             y_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
+            reactive: true,
         });
 
         this.add_constraint(new Layout.MonitorConstraint({
@@ -1684,7 +1682,12 @@ var AppFolderDialog = GObject.registerClass({
             y_align: Clutter.ActorAlign.FILL,
             vertical: true,
         });
-        this.add_child(this._viewBox);
+        this.add_child(new St.Bin({
+            style_class: 'app-folder-dialog-container',
+            child: this._viewBox,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        }));
 
         this._addFolderNameEntry();
         this._viewBox.add_child(this._view);
