@@ -1652,10 +1652,9 @@ var AppFolderDialog = GObject.registerClass({
     Signals: {
         'open-state-changed': { param_types: [GObject.TYPE_BOOLEAN] },
     },
-}, class AppFolderDialog extends St.Widget {
+}, class AppFolderDialog extends St.Bin {
     _init(source, dirInfo) {
         super._init({
-            layout_manager: new Clutter.BinLayout(),
             visible: false,
             x_expand: true,
             y_expand: true,
@@ -1682,12 +1681,13 @@ var AppFolderDialog = GObject.registerClass({
             y_align: Clutter.ActorAlign.FILL,
             vertical: true,
         });
-        this.add_child(new St.Bin({
+
+        this.child = new St.Bin({
             style_class: 'app-folder-dialog-container',
             child: this._viewBox,
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
-        }));
+        });
 
         this._addFolderNameEntry();
         this._viewBox.add_child(this._view);
