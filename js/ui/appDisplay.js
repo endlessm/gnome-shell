@@ -1135,7 +1135,7 @@ class FolderView extends BaseAppView {
             x_expand: true,
             y_expand: true,
         }, {
-            minRows: 1,
+            minRows: 3,
         });
 
         this._dirInfo = dirInfo;
