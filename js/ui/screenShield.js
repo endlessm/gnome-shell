@@ -394,7 +394,7 @@ var ScreenShield = class {
         this._lockScreenGroup.hide();
 
         if (!Main.workspaceMonitor.hasVisibleWindows)
-            Main.overview.toggleApps();
+            Main.overview.showApps();
 
         if (this._dialog) {
             this._dialog.grab_key_focus();
@@ -607,7 +607,7 @@ var ScreenShield = class {
         this.actor.hide();
 
         if (!Main.workspaceMonitor.hasVisibleWindows)
-            Main.overview.toggleApps();
+            Main.overview.showApps();
 
         if (this._becameActiveId != 0) {
             this.idleMonitor.remove_watch(this._becameActiveId);
