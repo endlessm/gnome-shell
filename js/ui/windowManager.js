@@ -1444,28 +1444,18 @@ var WindowManager = class {
         actor.opacity = 255;
         actor.show();
 
-        if (SideComponent.isDiscoveryFeedWindow(actor.meta_window)) {
-            let endY = monitor.y - actor.height;
-            actor.ease({
-                y: endY,
-                duration: WINDOW_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => onComplete(shellwm, actor),
-            });
-        } else {
-            let endX;
-            if (actor.x <= monitor.x)
-                endX = monitor.x - actor.width;
-            else
-                endX = monitor.x + monitor.width;
+        let endX;
+        if (actor.x <= monitor.x)
+            endX = monitor.x - actor.width;
+        else
+            endX = monitor.x + monitor.width;
 
-            actor.ease({
-                x: endX,
-                duration: WINDOW_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => onComplete(shellwm, actor),
-            });
-        }
+        actor.ease({
+            x: endX,
+            duration: WINDOW_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => onComplete(shellwm, actor),
+        });
     }
 
     _minimizeWindow(shellwm, actor) {
@@ -1777,34 +1767,21 @@ var WindowManager = class {
             return;
         }
 
-        if (SideComponent.isDiscoveryFeedWindow(actor.meta_window)) {
-            // the DiscoveryFeed window will appear from the top center
-            let origY = actor.y;
-            actor.set_position(actor.x, monitor.y - actor.height);
-
-            actor.ease({
-                y: origY,
-                duration: WINDOW_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: this._mapWindowDone.bind(this),
-            });
+        let origX = actor.x;
+        if (origX === monitor.x) {
+            // the side bar will appear from the left side
+            actor.set_position(monitor.x - actor.width, actor.y);
         } else {
-            let origX = actor.x;
-            if (origX === monitor.x) {
-                // the side bar will appear from the left side
-                actor.set_position(monitor.x - actor.width, actor.y);
-            } else {
-                // ... from the right side
-                actor.set_position(monitor.x + monitor.width, actor.y);
-            }
-
-            actor.ease({
-                x: origX,
-                duration: WINDOW_ANIMATION_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: this._mapWindowDone.bind(this),
-            });
+            // ... from the right side
+            actor.set_position(monitor.x + monitor.width, actor.y);
         }
+
+        actor.ease({
+            x: origX,
+            duration: WINDOW_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: this._mapWindowDone.bind(this),
+        });
 
         actor.opacity = 255;
         actor.show();
