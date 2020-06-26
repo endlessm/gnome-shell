@@ -93,7 +93,6 @@ var kbdA11yDialog = null;
 var inputMethod = null;
 var introspectService = null;
 var locatePointer = null;
-var discoveryFeed = null;
 var paygManager = null;
 var customerSupport = null;
 var workspaceMonitor = null;
