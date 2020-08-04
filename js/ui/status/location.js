@@ -47,11 +47,13 @@ class Indicator extends PanelMenu.SystemIndicator {
     _init() {
         super._init();
 
+        this._cancellable = new Gio.Cancellable();
+
         this._settings = new Gio.Settings({ schema_id: LOCATION_SCHEMA });
-        this._settings.connect('changed::%s'.format(ENABLED),
-                               this._onMaxAccuracyLevelChanged.bind(this));
-        this._settings.connect('changed::%s'.format(MAX_ACCURACY_LEVEL),
-                               this._onMaxAccuracyLevelChanged.bind(this));
+        this._enabledChangedId = this._settings.connect('changed::%s'.format(ENABLED),
+                                                        this._onMaxAccuracyLevelChanged.bind(this));
+        this._maxAccuracyLevelChangedId = this._settings.connect('changed::%s'.format(MAX_ACCURACY_LEVEL),
+                                                                 this._onMaxAccuracyLevelChanged.bind(this));
 
         this._indicator = this._addIndicator();
         this._indicator.icon_name = 'find-location-symbolic';
@@ -73,11 +75,50 @@ class Indicator extends PanelMenu.SystemIndicator {
                                            0,
                                            this._connectToGeoclue.bind(this),
                                            this._onGeoclueVanished.bind(this));
-        Main.sessionMode.connect('updated', this._onSessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._onSessionUpdated.bind(this));
         this._onSessionUpdated();
         this._onMaxAccuracyLevelChanged();
         this._connectToGeoclue();
         this._connectToPermissionStore();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
+        if (this._enabledChangedId) {
+            this._settings.disconnect(this._enabledChangedId);
+            this._enabledChangedId = 0;
+        }
+
+        if (this._maxAccuracyLevelChangedId) {
+            this._settings.disconnect(this._maxAccuracyLevelChangedId);
+            this._maxAccuracyLevelChangedId = 0;
+        }
+
+        if (this._propertiesChangedId) {
+            this._managerProxy.disconnect(this._propertiesChangedId);
+            this._propertiesChangedId = 0;
+        }
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
+
+        if (this._watchId) {
+            Gio.bus_unwatch_name(this._watchId);
+            this._watchId = 0;
+        }
+
+        if (this._agent) {
+            this._agent.unexport();
+            this._agent = null;
+        }
     }
 
     get MaxAccuracyLevel() {
@@ -119,7 +160,8 @@ class Indicator extends PanelMenu.SystemIndicator {
         new GeoclueManager(Gio.DBus.system,
                            'org.freedesktop.GeoClue2',
                            '/org/freedesktop/GeoClue2/Manager',
-                           this._onManagerProxyReady.bind(this));
+                           this._onManagerProxyReady.bind(this),
+                           this._cancellable);
         return true;
     }
 
@@ -212,7 +254,8 @@ class Indicator extends PanelMenu.SystemIndicator {
 
     _connectToPermissionStore() {
         this._permStoreProxy = null;
-        new PermissionStore.PermissionStore(this._onPermStoreProxyReady.bind(this));
+        new PermissionStore.PermissionStore(this._onPermStoreProxyReady.bind(this),
+                                            this._cancellable);
     }
 
     _onPermStoreProxyReady(proxy, error) {
