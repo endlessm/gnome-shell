@@ -121,9 +121,30 @@ class EventsSection extends St.Button {
         this.child.add_child(this._eventsList);
 
         this._appSys = Shell.AppSystem.get_default();
-        this._appSys.connect('installed-changed',
+        this._installedChangedId = this._appSys.connect('installed-changed',
             this._appInstalledChanged.bind(this));
         this._appInstalledChanged();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._installedChangedId) {
+            this._appSys.disconnect(this._installedChangedId);
+            this._installedChangedId = 0;
+        }
+
+        if (this._eventSource) {
+            if (this._eventSourceChangedId) {
+                this._eventSource.disconnect(this._eventSourceChangedId);
+                this._eventSourceChangedId = 0;
+            }
+            if (this._eventSourceHasCalendarsId) {
+                this._eventSource.disconnect(this._eventSourceHasCalendarsId);
+                this._eventSourceHasCalendarsId = 0;
+            }
+            this._eventSource = null;
+        }
     }
 
     setDate(date) {
@@ -139,9 +160,21 @@ class EventsSection extends St.Button {
         if (!(eventSource instanceof Calendar.EventSourceBase))
             throw new Error('Event source is not valid type');
 
+        if (this._eventSource) {
+            if (this._eventSourceChangedId) {
+                this._eventSource.disconnect(this._eventSourceChangedId);
+                this._eventSourceChangedId = 0;
+            }
+            if (this._eventSourceHasCalendarsId) {
+                this._eventSource.disconnect(this._eventSourceHasCalendarsId);
+                this._eventSourceHasCalendarsId = 0;
+            }
+        }
+
         this._eventSource = eventSource;
-        this._eventSource.connect('changed', this._reloadEvents.bind(this));
-        this._eventSource.connect('notify::has-calendars',
+        this._eventSourceChangedId = this._eventSource.connect('changed',
+            this._reloadEvents.bind(this));
+        this._eventSourceHasCalendarsId = this._eventSource.connect('notify::has-calendars',
             this._sync.bind(this));
         this._sync();
     }
@@ -293,24 +326,59 @@ class WorldClocksSection extends St.Button {
         this.child = this._grid;
 
         this._clocksApp = null;
+        this._cancellable = new Gio.Cancellable();
         this._clocksProxy = new ClocksProxy(
             Gio.DBus.session,
             'org.gnome.clocks',
             '/org/gnome/clocks',
             this._onProxyReady.bind(this),
-            null /* cancellable */,
+            this._cancellable,
             Gio.DBusProxyFlags.DO_NOT_AUTO_START | Gio.DBusProxyFlags.GET_INVALIDATED_PROPERTIES);
 
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.shell.world-clocks',
         });
-        this._settings.connect('changed', this._clocksChanged.bind(this));
+        this._clocksChangedId = this._settings.connect('changed', this._clocksChanged.bind(this));
         this._clocksChanged();
 
         this._appSystem = Shell.AppSystem.get_default();
-        this._appSystem.connect('installed-changed',
+        this._installedChangedId = this._appSystem.connect('installed-changed',
             this._sync.bind(this));
         this._sync();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
+        if (this._proxyPropertiesChangedId) {
+            this._clocksProxy.disconnect(this._proxyPropertiesChangedId);
+            this._proxyPropertiesChangedId = 0;
+        }
+
+        if (this._installedChangedId) {
+            this._appSys.disconnect(this._installedChangedId);
+            this._installedChangedId = 0;
+        }
+
+        if (this._clocksChangedId) {
+            this._settings.disconnect(this._clocksChangedId);
+            this._clocksChangedId = 0;
+        }
+
+        if (this._clockNotifyId) {
+            this._clock.disconnect(this._clockNotifyId);
+            this._clockNotifyId = 0;
+        }
+
+        if (this._tzNotifyId) {
+            this._clock.disconnect(this._tzNotifyId);
+            this._tzNotifyId = 0;
+        }
     }
 
     vfunc_clicked() {
@@ -452,7 +520,7 @@ class WorldClocksSection extends St.Button {
             return;
         }
 
-        this._clocksProxy.connect('g-properties-changed',
+        this._proxyPropertiesChangedId = this._clocksProxy.connect('g-properties-changed',
             this._onClocksPropertiesChanged.bind(this));
         this._onClocksPropertiesChanged();
     }
@@ -510,8 +578,17 @@ class WeatherSection extends St.Button {
         layout.hookup_style(this._forecastGrid);
         box.add_child(this._forecastGrid);
 
-        this._weatherClient.connect('changed', this._sync.bind(this));
+        this._weatherChangedId = this._weatherClient.connect('changed', this._sync.bind(this));
         this._sync();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._weatherChangedId) {
+            this._weatherClient.disconnect(this._weatherChangedId);
+            this._weatherChangedId = 0;
+        }
     }
 
     vfunc_map() {
@@ -669,43 +746,70 @@ class MessagesIndicator extends St.Icon {
             y_align: Clutter.ActorAlign.CENTER,
         });
 
-        this._sources = [];
+        this._sources = {};
         this._count = 0;
 
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',
         });
-        this._settings.connect('changed::show-banners', this._sync.bind(this));
+        this._showBannersChangedId = this._settings.connect('changed::show-banners', this._sync.bind(this));
 
-        Main.messageTray.connect('source-added', this._onSourceAdded.bind(this));
-        Main.messageTray.connect('source-removed', this._onSourceRemoved.bind(this));
-        Main.messageTray.connect('queue-changed', this._updateCount.bind(this));
+        this._sourceAddedId = Main.messageTray.connect('source-added', this._onSourceAdded.bind(this));
+        this._sourceRemovedId = Main.messageTray.connect('source-removed', this._onSourceRemoved.bind(this));
+        this._queueChangedId = Main.messageTray.connect('queue-changed', this._updateCount.bind(this));
 
         let sources = Main.messageTray.getSources();
         sources.forEach(source => this._onSourceAdded(null, source));
 
         this._sync();
 
-        this.connect('destroy', () => {
-            this._settings.run_dispose();
-            this._settings = null;
-        });
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._showBannersChangedId) {
+            this._settings.disconnect(this._showBannersChangedId);
+            this._showBannersChangedId = 0;
+        }
+
+        if (this._sourceAddedId) {
+            Main.messageTray.disconnect(this._sourceAddedId);
+            this._sourceAddedId = 0;
+        }
+        if (this._sourceRemovedId) {
+            Main.messageTray.disconnect(this._sourceRemovedId);
+            this._sourceRemovedId = 0;
+        }
+        if (this._queueChangedId) {
+            Main.messageTray.disconnect(this._queueChangedId);
+            this._queueChangedId = 0;
+        }
+
+        for (let source in this._sources) {
+            let countChangedId = this._sources[source];
+            source.disconnect(countChangedId);
+        }
+        this._sources = {};
     }
 
     _onSourceAdded(tray, source) {
-        source.connect('notify::count', this._updateCount.bind(this));
-        this._sources.push(source);
+        let countChangedId = source.connect('notify::count', this._updateCount.bind(this));
+        this._sources[source] = countChangedId;
         this._updateCount();
     }
 
     _onSourceRemoved(tray, source) {
-        this._sources.splice(this._sources.indexOf(source), 1);
+        let countChangedId = this._sources[source];
+        if (countChangedId)
+            source.disconnect(countChangedId);
+        delete this._sources[source];
         this._updateCount();
     }
 
     _updateCount() {
         let count = 0;
-        this._sources.forEach(source => (count += source.unseenCount));
+        for (let source in this._sources)
+            count += source.unseenCount;
         this._count = count - Main.messageTray.queueCount;
 
         this._sync();
@@ -872,24 +976,39 @@ class DateMenuButton extends PanelMenu.Button {
 
         this._clock = new GnomeDesktop.WallClock();
         this._clock.bind_property('clock', this._clockDisplay, 'text', GObject.BindingFlags.SYNC_CREATE);
-        this._clock.connect('notify::timezone', this._updateTimeZone.bind(this));
+        this._tzNotifyId = this._clock.connect('notify::timezone', this._updateTimeZone.bind(this));
 
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
     }
 
-    _getEventSource() {
-        return new Calendar.DBusEventSource();
+    _onDestroy() {
+        super._onDestroy();
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
+
+        if (this._tzNotifyId) {
+            this._clock.disconnect(this._tzNotifyId);
+            this._tzNotifyId = 0;
+        }
+
+        if (this._eventSource) {
+            this._eventSource.destroy();
+            this._eventSource = null;
+        }
     }
 
     _setEventSource(eventSource) {
         if (this._eventSource)
             this._eventSource.destroy();
 
+        this._eventSource = eventSource;
+
         this._calendar.setEventSource(eventSource);
         this._eventsItem.setEventSource(eventSource);
-
-        this._eventSource = eventSource;
     }
 
     _updateTimeZone() {
@@ -905,7 +1024,7 @@ class DateMenuButton extends PanelMenu.Button {
         let eventSource;
         let showEvents = Main.sessionMode.showCalendarEvents;
         if (showEvents)
-            eventSource = this._getEventSource();
+            eventSource = new Calendar.DBusEventSource();
         else
             eventSource = new Calendar.EmptyEventSource();
 
