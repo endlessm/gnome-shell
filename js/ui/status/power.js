@@ -23,8 +23,8 @@ class Indicator extends PanelMenu.SystemIndicator {
         super._init();
 
         this._desktopSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
-        this._desktopSettings.connect('changed::%s'.format(SHOW_BATTERY_PERCENTAGE),
-                                      this._sync.bind(this));
+        this._settingsChangedId = this._desktopSettings.connect('changed::%s'.format(SHOW_BATTERY_PERCENTAGE),
+                                                                this._sync.bind(this));
 
         this._indicator = this._addIndicator();
         this._percentageLabel = new St.Label({ y_expand: true,
@@ -32,23 +32,49 @@ class Indicator extends PanelMenu.SystemIndicator {
         this.add_child(this._percentageLabel);
         this.add_style_class_name('power-status');
 
+        this._cancellable = new Gio.Cancellable();
         this._proxy = new PowerManagerProxy(Gio.DBus.system, BUS_NAME, OBJECT_PATH,
                                             (proxy, error) => {
                                                 if (error) {
                                                     log(error.message);
                                                     return;
                                                 }
-                                                this._proxy.connect('g-properties-changed',
-                                                                    this._sync.bind(this));
                                                 this._sync();
-                                            });
+                                            },
+                                            this._cancellable);
+        this._proxyPropertiesChangedId = this._proxy.connect('g-properties-changed',
+                                                             this._sync.bind(this));
 
         this._item = new PopupMenu.PopupSubMenuMenuItem("", true);
         this._item.menu.addSettingsAction(_("Power Settings"), 'gnome-power-panel.desktop');
         this.menu.addMenuItem(this._item);
 
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
+        if (this._settingsChangedId) {
+            this._desktopSettings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = 0;
+        }
+
+        if (this._proxyPropertiesChangedId) {
+            this._proxy.disconnect(this._proxyPropertiesChangedId);
+            this._proxyPropertiesChangedId = 0;
+        }
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
     }
 
     _sessionUpdated() {
