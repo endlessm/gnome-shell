@@ -39,8 +39,22 @@ class Indicator extends PanelMenu.SystemIndicator {
         });
         this._updateSessionSubMenu();
 
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
+
+        if (this._orientationLockIconChangedId) {
+            this._systemActions.disconnect(this._orientationLockIconChangedId);
+            this._orientationLockIconChangedId = 0;
+        }
     }
 
     _sessionUpdated() {
@@ -73,7 +87,7 @@ class Indicator extends PanelMenu.SystemIndicator {
                                           this._orientationLockItem,
                                           'visible',
                                           bindFlags);
-        this._systemActions.connect('notify::orientation-lock-icon', () => {
+        this._orientationLockIconChangedId = this._systemActions.connect('notify::orientation-lock-icon', () => {
             let iconName = this._systemActions.orientation_lock_icon;
             let labelText = this._systemActions.getName("lock-orientation");
 
