@@ -19,16 +19,18 @@ var Indicator = GObject.registerClass(
 class Indicator extends PanelMenu.SystemIndicator {
     _init() {
         super._init();
+        this._cancellable = new Gio.Cancellable();
         this._proxy = new BrightnessProxy(Gio.DBus.session, BUS_NAME, OBJECT_PATH,
                                           (proxy, error) => {
                                               if (error) {
                                                   log(error.message);
                                                   return;
                                               }
-
-                                              this._proxy.connect('g-properties-changed', this._sync.bind(this));
                                               this._sync();
-                                          });
+                                          },
+                                          this._cancellable);
+        this._proxyPropertiesChangedId = this._proxy.connect('g-properties-changed',
+                                                             this._sync.bind(this));
 
         this._item = new PopupMenu.PopupBaseMenuItem({ activate: false });
         this.menu.addMenuItem(this._item);
@@ -51,6 +53,20 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._item.connect('scroll-event', (actor, event) => {
             return this._slider.emit('scroll-event', event);
         });
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
+        if (this._proxyPropertiesChangedId) {
+            this._proxy.disconnect(this._proxyPropertiesChangedId);
+            this._proxyPropertiesChangedId = 0;
+        }
     }
 
     _sliderChanged() {
