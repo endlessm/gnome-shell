@@ -42,7 +42,10 @@ class ATIndicator extends PanelMenu.Button {
         this.add_child(this._hbox);
 
         this._a11ySettings = new Gio.Settings({ schema_id: A11Y_SCHEMA });
-        this._a11ySettings.connect('changed::%s'.format(KEY_ALWAYS_SHOW), this._queueSyncMenuVisibility.bind(this));
+        this._a11ySettingsChangedId = this._a11ySettings.connect('changed::%s'.format(KEY_ALWAYS_SHOW),
+                                                                 this._queueSyncMenuVisibility.bind(this));
+
+        this._settingsChangedIds = [];
 
         let highContrast = this._buildHCItem();
         this.menu.addMenuItem(highContrast);
@@ -78,6 +81,27 @@ class ATIndicator extends PanelMenu.Button {
         this.menu.addMenuItem(mouseKeys);
 
         this._syncMenuVisibility();
+    }
+
+    _onDestroy() {
+        super._onDestroy();
+
+        if (this._a11ySettingsChangedId) {
+            this._a11ySettings.disconnect(this._a11ySettingsChangedId);
+            this._a11ySettingsChangedId = null;
+        }
+
+        this._settingsChangedIds.forEach(pair => {
+            let settings = pair[0];
+            let sourceId = pair[1];
+            settings.disconnect(sourceId);
+        });
+        this._settingsChangedIds = [];
+
+        if (this._syncMenuVisibilityIdle) {
+            GLib.source_remove(this._syncMenuVisibilityIdle);
+            this._syncMenuVisibilityIdle = 0;
+        }
     }
 
     _syncMenuVisibility() {
@@ -118,11 +142,12 @@ class ATIndicator extends PanelMenu.Button {
             settings.is_writable(key),
             enabled => settings.set_boolean(key, enabled));
 
-        settings.connect('changed::%s'.format(key), () => {
+        let changedId = settings.connect('changed::%s'.format(key), () => {
             widget.setToggleState(settings.get_boolean(key));
 
             this._queueSyncMenuVisibility();
         });
+        this._settingsChangedIds.push([settings, changedId]);
 
         return widget;
     }
@@ -150,7 +175,7 @@ class ATIndicator extends PanelMenu.Button {
                 }
             });
 
-        interfaceSettings.connect('changed::%s'.format(KEY_GTK_THEME), () => {
+        let changedId = interfaceSettings.connect('changed::%s'.format(KEY_GTK_THEME), () => {
             let value = interfaceSettings.get_string(KEY_GTK_THEME);
             if (value == HIGH_CONTRAST_THEME) {
                 highContrast.setToggleState(true);
@@ -161,12 +186,14 @@ class ATIndicator extends PanelMenu.Button {
 
             this._queueSyncMenuVisibility();
         });
+        this._settingsChangedIds.push([interfaceSettings, changedId]);
 
-        interfaceSettings.connect('changed::%s'.format(KEY_ICON_THEME), () => {
+        changedId = interfaceSettings.connect('changed::%s'.format(KEY_ICON_THEME), () => {
             let value = interfaceSettings.get_string(KEY_ICON_THEME);
             if (value != HIGH_CONTRAST_THEME)
                 iconTheme = value;
         });
+        this._settingsChangedIds.push([interfaceSettings, changedId]);
 
         return highContrast;
     }
@@ -187,13 +214,14 @@ class ATIndicator extends PanelMenu.Button {
                 }
             });
 
-        settings.connect('changed::%s'.format(KEY_TEXT_SCALING_FACTOR), () => {
+        let changedId = settings.connect('changed::%s'.format(KEY_TEXT_SCALING_FACTOR), () => {
             factor = settings.get_double(KEY_TEXT_SCALING_FACTOR);
             let active = factor > 1.0;
             widget.setToggleState(active);
 
             this._queueSyncMenuVisibility();
         });
+        this._settingsChangedIds.push([settings, changedId]);
 
         return widget;
     }
