@@ -141,6 +141,11 @@ var AuthRobot = class {
     }
 
     close() {
+        if (this._enrollDevicesIdleId) {
+            GLib.source_remove(this._enrollDevicesIdleId);
+            this._enrollDevicesIdleId = 0;
+        }
+
         this.disconnectAll();
         this._client = null;
     }
@@ -184,11 +189,13 @@ var AuthRobot = class {
             return;
 
         this._enrolling = true;
-        GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                      this._enrollDevicesIdle.bind(this));
+        this._enrollDevicesIdleId = GLib.idle_add(GLib.PRIORITY_DEFAULT,
+            this._enrollDevicesIdle.bind(this));
     }
 
     _onEnrollDone(device, error) {
+        this._enrollDeviceDoneId = 0;
+
         if (error)
             this.emit('enroll-failed', device, error);
 
@@ -199,12 +206,14 @@ var AuthRobot = class {
         this._enrolling = this._devicesToEnroll.length > 0;
 
         if (this._enrolling) {
-            GLib.idle_add(GLib.PRIORITY_DEFAULT,
-                          this._enrollDevicesIdle.bind(this));
+            this._enrollDevicesIdleId = GLib.idle_add(GLib.PRIORITY_DEFAULT,
+                this._enrollDevicesIdle.bind(this));
         }
     }
 
     _enrollDevicesIdle() {
+        this._enrollDevicesIdleId = 0;
+
         let devices = this._devicesToEnroll;
 
         let dev = devices.shift();
@@ -237,12 +246,15 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._robot.connect('enroll-device', this._onEnrollDevice.bind(this));
         this._robot.connect('enroll-failed', this._onEnrollFailed.bind(this));
 
-        Main.sessionMode.connect('updated', this._sync.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sync.bind(this));
+
         this._sync();
 
         this._source = null;
         this._perm = null;
         this._createPermission();
+
+        this.connect('destroy', this._onDestroy.bind(this));
     }
 
     async _createPermission() {
@@ -256,6 +268,11 @@ class Indicator extends PanelMenu.SystemIndicator {
     _onDestroy() {
         this._robot.close();
         this._client.close();
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
     }
 
     _ensureSource() {
