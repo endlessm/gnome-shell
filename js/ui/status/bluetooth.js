@@ -26,16 +26,18 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._indicator.icon_name = 'bluetooth-active-symbolic';
         this._hadSetupDevices = global.settings.get_boolean(HAD_BLUETOOTH_DEVICES_SETUP);
 
+        this._cancellable = new Gio.Cancellable();
         this._proxy = new RfkillManagerProxy(Gio.DBus.session, BUS_NAME, OBJECT_PATH,
                                              (proxy, error) => {
                                                  if (error) {
                                                      log(error.message);
                                                      return;
                                                  }
-
                                                  this._sync();
-                                             });
-        this._proxy.connect('g-properties-changed', this._queueSync.bind(this));
+                                             },
+                                             this._cancellable);
+        this._proxyPropertiesChangedId = this._proxy.connect('g-properties-changed',
+                                                             this._queueSync.bind(this));
 
         this._item = new PopupMenu.PopupSubMenuMenuItem(_("Bluetooth"), true);
         this._item.icon.icon_name = 'bluetooth-active-symbolic';
@@ -54,11 +56,51 @@ class Indicator extends PanelMenu.SystemIndicator {
 
         this._client = new GnomeBluetooth.Client();
         this._model = this._client.get_model();
-        this._model.connect('row-deleted', this._queueSync.bind(this));
-        this._model.connect('row-changed', this._queueSync.bind(this));
-        this._model.connect('row-inserted', this._sync.bind(this));
-        Main.sessionMode.connect('updated', this._sync.bind(this));
+        this._rowDeletedId = this._model.connect('row-deleted', this._queueSync.bind(this));
+        this._rowChangedId = this._model.connect('row-changed', this._queueSync.bind(this));
+        this._rowInsertedId = this._model.connect('row-inserted', this._sync.bind(this));
+
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sync.bind(this));
         this._sync();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
+        if (this._proxyPropertiesChangedId) {
+            this._proxy.disconnect(this._proxyPropertiesChangedId);
+            this._proxyPropertiesChangedId = null;
+        }
+
+        if (this._rowDeletedId) {
+            this._model.disconnect(this._rowDeletedId);
+            this._rowDeletedId = 0;
+        }
+
+        if (this._rowChangedId) {
+            this._model.disconnect(this._rowChangedId);
+            this._rowChangedId = 0;
+        }
+
+        if (this._rowInsertedId) {
+            this._model.disconnect(this._rowInsertedId);
+            this._rowInsertedId = 0;
+        }
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
+
+        if (this._syncId) {
+            GLib.source_remove(this._syncId);
+            this._syncId = 0;
+        }
     }
 
     _setHadSetupDevices(value) {
