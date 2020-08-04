@@ -67,7 +67,7 @@ class Indicator extends PanelMenu.SystemIndicator {
         super._init();
 
         this._manager = getRfkillManager();
-        this._manager.connect('airplane-mode-changed', this._sync.bind(this));
+        this._airplaneModeChangedId = this._manager.connect('airplane-mode-changed', this._sync.bind(this));
 
         this._indicator = this._addIndicator();
         this._indicator.icon_name = 'airplane-mode-symbolic';
@@ -84,10 +84,24 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._item.menu.addSettingsAction(_("Network Settings"), 'gnome-network-panel.desktop');
         this.menu.addMenuItem(this._item);
 
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
 
         this._sync();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._airplaneModeChangedId) {
+            this._manager.disconnect(this._airplaneModeChangedId);
+            this._airplaneModeChangedId = 0;
+        }
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
     }
 
     _sessionUpdated() {
