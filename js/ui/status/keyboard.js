@@ -825,8 +825,6 @@ class InputSourceIndicator extends PanelMenu.Button {
     _init() {
         super._init(0.5, _("Keyboard"));
 
-        this.connect('destroy', this._onDestroy.bind(this));
-
         this._menuItems = {};
         this._indicatorLabels = {};
 
@@ -847,7 +845,7 @@ class InputSourceIndicator extends PanelMenu.Button {
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this._showLayoutItem = this.menu.addAction(_("Show Keyboard Layout"), this._showLayout.bind(this));
 
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
 
         this._inputSourceManager = getInputSourceManager();
@@ -855,10 +853,25 @@ class InputSourceIndicator extends PanelMenu.Button {
             this._inputSourceManager.connect('sources-changed', this._sourcesChanged.bind(this));
         this._inputSourceManagerCurrentSourceChangedId =
             this._inputSourceManager.connect('current-source-changed', this._currentSourceChanged.bind(this));
+        this._inputSourceChangedIds = [];
         this._inputSourceManager.reload();
     }
 
     _onDestroy() {
+        super._onDestroy();
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
+
+        this._inputSourceChangedIds.forEach(pair => {
+            let is = pair[0];
+            let sourceId = pair[1];
+            is.disconnect(sourceId);
+        });
+        this._inputSourceChangedIds = [];
+
         if (this._inputSourceManager) {
             this._inputSourceManager.disconnect(this._inputSourceManagerSourcesChangedId);
             this._inputSourceManager.disconnect(this._inputSourceManagerCurrentSourceChangedId);
@@ -895,10 +908,11 @@ class InputSourceIndicator extends PanelMenu.Button {
 
             this._menuItems[i] = menuItem;
             this._indicatorLabels[i] = indicatorLabel;
-            is.connect('changed', () => {
+            let changedId = is.connect('changed', () => {
                 menuItem.indicator.set_text(is.shortName);
                 indicatorLabel.set_text(is.shortName);
             });
+            this._inputSourceChangedIds.push([is, changedId]);
 
             this.menu.addMenuItem(menuItem, menuIndex++);
             this._container.add_actor(indicatorLabel);
