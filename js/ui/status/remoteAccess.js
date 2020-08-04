@@ -11,9 +11,9 @@ class RemoteAccessApplet extends PanelMenu.SystemIndicator {
     _init() {
         super._init();
 
-        let controller = global.backend.get_remote_access_controller();
+        this._controller = global.backend.get_remote_access_controller();
 
-        if (!controller)
+        if (!this._controller)
             return;
 
         // We can't possibly know about all types of screen sharing on X11, so
@@ -27,9 +27,18 @@ class RemoteAccessApplet extends PanelMenu.SystemIndicator {
         this._indicator = null;
         this._menuSection = null;
 
-        controller.connect('new-handle', (o, handle) => {
+        this._controllerNewHandleId = this._controller.connect('new-handle', (o, handle) => {
             this._onNewHandle(handle);
         });
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._controllerNewHandleId) {
+            this._controller.disconnect(this._controllerNewHandleId);
+            this._controllerNewHandleId = 0;
+        }
     }
 
     _ensureControls() {
