@@ -737,11 +737,12 @@ class NMWirelessDialog extends ModalDialog.ModalDialog {
         GLib.Source.set_name_by_id(this._scanTimeoutId, '[gnome-shell] this._onScanTimeout');
         this._onScanTimeout();
 
-        let id = Main.sessionMode.connect('updated', () => {
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', () => {
             if (Main.sessionMode.allowSettings)
                 return;
 
-            Main.sessionMode.disconnect(id);
+            Main.sessionMode.disconnect(this._sessionModeUpdatedid);
+            this._sessionModeUpdatedId = 0;
             this.close();
         });
 
@@ -773,6 +774,10 @@ class NMWirelessDialog extends ModalDialog.ModalDialog {
         if (this._scanTimeoutId) {
             GLib.source_remove(this._scanTimeoutId);
             this._scanTimeoutId = 0;
+        }
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedid);
+            this._sessionModeUpdatedId = 0;
         }
     }
 
@@ -1631,6 +1636,20 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._ctypes[NM.SETTING_VPN_SETTING_NAME] = NMConnectionCategory.VPN;
 
         this._getClient();
+
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
     }
 
     async _getClient() {
@@ -1680,7 +1699,7 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._client.connect('connection-added', this._connectionAdded.bind(this));
         this._client.connect('connection-removed', this._connectionRemoved.bind(this));
 
-        Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', this._sessionUpdated.bind(this));
         this._sessionUpdated();
     }
 
@@ -2033,6 +2052,7 @@ class Indicator extends PanelMenu.SystemIndicator {
         if (this._portalHelperProxy) {
             this._portalHelperProxy.AuthenticateRemote(path, '', timestamp);
         } else {
+            this._cancellable = new Gio.Cancellable();
             new PortalHelperProxy(Gio.DBus.session, 'org.gnome.Shell.PortalHelper',
                                   '/org/gnome/Shell/PortalHelper', (proxy, error) => {
                                       if (error) {
@@ -2044,7 +2064,8 @@ class Indicator extends PanelMenu.SystemIndicator {
                                       proxy.connectSignal('Done', this._portalHelperDone.bind(this));
 
                                       proxy.AuthenticateRemote(path, '', timestamp);
-                                  });
+                                  },
+                                  this._cancellable);
         }
 
         this._connectivityQueue.push(path);
