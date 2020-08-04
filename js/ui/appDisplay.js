@@ -1367,7 +1367,8 @@ var AppSearchProvider = class AppSearchProvider {
             let initializedId = this._parentalControlsManager.connect('app-filter-changed', () => {
                 if (this._parentalControlsManager.initialized) {
                     this._parentalControlsManager.disconnect(initializedId);
-                    this.getInitialResultSet(terms, callback, _cancellable);
+                    if (!_cancellable || !_cancellable.is_cancelled())
+                        this.getInitialResultSet(terms, callback, _cancellable);
                 }
             });
             return;
