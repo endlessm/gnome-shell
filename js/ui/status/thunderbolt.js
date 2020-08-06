@@ -51,6 +51,7 @@ const BOLT_DBUS_PATH = '/org/freedesktop/bolt';
 
 var Client = class {
     constructor() {
+        this._cancellable = new Gio.Cancellable();
         this._proxy = null;
         this.probing = false;
         this._getProxy();
@@ -66,9 +67,10 @@ var Client = class {
                 BOLT_DBUS_NAME,
                 BOLT_DBUS_PATH,
                 BOLT_DBUS_CLIENT_IFACE,
-                null);
+                this._cancellable);
         } catch (e) {
-            log('error creating bolt proxy: %s'.format(e.message));
+            if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))
+                log('error creating bolt proxy: %s'.format(e.message));
             return;
         }
         this._propsChangedId = this._proxy.connect('g-properties-changed', this._onPropertiesChanged.bind(this));
@@ -99,6 +101,11 @@ var Client = class {
 
     /* public methods */
     close() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
         if (!this._proxy)
             return;
 
@@ -235,6 +242,8 @@ class Indicator extends PanelMenu.SystemIndicator {
     _init() {
         super._init();
 
+        this._cancellable = new Gio.Cancellable();
+
         this._indicator = this._addIndicator();
         this._indicator.icon_name = 'thunderbolt-symbolic';
 
@@ -259,13 +268,20 @@ class Indicator extends PanelMenu.SystemIndicator {
 
     async _createPermission() {
         try {
-            this._perm = await Polkit.Permission.new('org.freedesktop.bolt.enroll', null, null);
+            this._perm = await Polkit.Permission.new('org.freedesktop.bolt.enroll', null,
+                this._cancellable);
         } catch (e) {
-            log('Failed to get PolKit permission: %s'.format(e.toString()));
+            if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))
+                log('Failed to get PolKit permission: %s'.format(e.toString()));
         }
     }
 
     _onDestroy() {
+        if (this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+        }
+
         this._robot.close();
         this._client.close();
 
