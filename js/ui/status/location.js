@@ -167,7 +167,8 @@ class Indicator extends PanelMenu.SystemIndicator {
 
     _onManagerProxyReady(proxy, error) {
         if (error != null) {
-            log(error.message);
+            if (!error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))
+                log(error.message);
             this._connecting = false;
             return;
         }
@@ -260,7 +261,8 @@ class Indicator extends PanelMenu.SystemIndicator {
 
     _onPermStoreProxyReady(proxy, error) {
         if (error != null) {
-            log(error.message);
+            if (!error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))
+                log(error.message);
             return;
         }
 
