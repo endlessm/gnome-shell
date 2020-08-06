@@ -30,7 +30,9 @@ class Indicator extends PanelMenu.SystemIndicator {
         this._proxy = new RfkillManagerProxy(Gio.DBus.session, BUS_NAME, OBJECT_PATH,
                                              (proxy, error) => {
                                                  if (error) {
-                                                     log(error.message);
+                                                     if (!error.matches(Gio.IOErrorEnum,
+                                                                        Gio.IOErrorEnum.CANCELLED))
+                                                         log(error.message);
                                                      return;
                                                  }
                                                  this._sync();
