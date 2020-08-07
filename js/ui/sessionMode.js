@@ -45,6 +45,8 @@ const _modes = {
         isGreeter: true,
         isPrimary: true,
         unlockDialog: imports.gdm.loginDialog.LoginDialog,
+        allowExtensions: true,
+        enabledExtensions: ['eos-panel@endlessm.com'],
         components: ['polkitAgent'],
         panel: {
             left: [],
@@ -57,6 +59,8 @@ const _modes = {
     'unlock-dialog': {
         isLocked: true,
         unlockDialog: undefined,
+        allowExtensions: true,
+        enabledExtensions: ['eos-panel@endlessm.com'],
         components: ['polkitAgent', 'telepathyClient'],
         panel: {
             left: [],
