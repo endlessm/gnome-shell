@@ -60,7 +60,7 @@ const _modes = {
         isLocked: true,
         unlockDialog: undefined,
         allowExtensions: true,
-        enabledExtensions: ['eos-panel@endlessm.com'],
+        enabledExtensions: ['eos-desktop@endlessm.com', 'eos-panel@endlessm.com'],
         components: ['polkitAgent', 'telepathyClient'],
         panel: {
             left: [],
