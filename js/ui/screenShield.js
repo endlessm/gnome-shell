@@ -140,6 +140,60 @@ export class ScreenShield extends Signals.EventEmitter {
         this._cursorTracker = global.backend.get_cursor_tracker();
 
         this._syncInhibitor();
+
+        Main.paygManager.connect('code-expired', () => {
+            this._clearCurrentDialog();
+            if (Main.sessionMode.isGreeter)
+                this.showDialog();
+            else
+                this.lock(true);
+        });
+        Main.paygManager.connect('expiry-time-changed', () => {
+            const userManager = AccountsService.UserManager.get_default();
+            const user = userManager.get_user(GLib.get_user_name());
+
+            // A new valid code has been introduced but the machine is
+            // not unlocked yet -> Make sure we stay in the locked state.
+            if (Main.paygManager.isLocked) {
+                this._clearCurrentDialog();
+                this.lock(false);
+                return;
+            }
+
+            // The time may have been extended using the tray applet from a
+            // logged in session.
+            if (!this._dialog)
+                return;
+
+            // Take the dialog instance and wait for the success message to be shown
+            this._dialog.connect('success-message-shown', () => {
+                // A new valid code unlocked the machine and user has no
+                // password set -> Go straight to the user's session.
+                if (user.password_mode == AccountsService.UserPasswordMode.NONE) {
+                    this.deactivate(false);
+                    return;
+                }
+
+                const paygExpectedMode = this._isGreeter ? 'gdm-unlock-dialog-payg' : 'unlock-dialog-payg';
+                if (Main.sessionMode.currentMode === paygExpectedMode) {
+                    // This is the most common case.
+                    Main.sessionMode.popMode(paygExpectedMode);
+                }
+
+                // The machine is unlocked but we still need to unlock the
+                // user's session with the password, so don't deactivate yet.
+                this._clearCurrentDialog();
+
+                this.showDialog();
+            });
+        });
+    }
+
+    _clearCurrentDialog() {
+        if (this._dialog) {
+            this._dialog.destroy();
+            this._dialog = null;
+        }
     }
 
     async _getLoginSession() {
@@ -188,6 +242,12 @@ export class ScreenShield extends Signals.EventEmitter {
             return;
 
         this._dialog.cancel();
+        if (this._isGreeter && !Main.paygManager.isLocked) {
+            // LoginDialog.cancel() will grab the key focus
+            // on its own, so ensure it stays on lock screen
+            // instead
+            this._dialog.grab_key_focus();
+        }
     }
 
     _becomeModal() {
@@ -271,7 +331,12 @@ export class ScreenShield extends Signals.EventEmitter {
             GLib.Source.set_name_by_id(this._lockTimeoutId, '[gnome-shell] this.lock');
         }
 
-        this._activateFade(this._longLightbox, STANDARD_FADE_TIME);
+        // Leave the screen on for the PAYG unlock code entry. It's difficult
+        // to distinguish the "lock due to credit expiration" case from the
+        // "lock due to idle timeout" one, and we don't want a blank screen in
+        // the former which includes right after the FBE.
+        if (!Main.paygManager.isLocked)
+            this._activateFade(this._longLightbox, STANDARD_FADE_TIME);
     }
 
     _activateFade(lightbox, time) {
@@ -323,6 +388,10 @@ export class ScreenShield extends Signals.EventEmitter {
         this.actor.show();
         this._isGreeter = Main.sessionMode.isGreeter;
         this._isLocked = true;
+
+        if (this._isGreeter && Main.paygManager.isLocked)
+            Main.sessionMode.pushMode('gdm-unlock-dialog-payg');
+
         this._ensureUnlockDialog(true);
     }
 
@@ -522,6 +591,10 @@ export class ScreenShield extends Signals.EventEmitter {
     _continueDeactivate(animate) {
         this._hideLockScreen(animate);
 
+        if (Main.sessionMode.currentMode === 'gdm-unlock-dialog-payg')
+            Main.sessionMode.popMode('gdm-unlock-dialog-payg');
+        if (Main.sessionMode.currentMode === 'unlock-dialog-payg')
+            Main.sessionMode.popMode('unlock-dialog-payg');
         if (Main.sessionMode.currentMode === 'unlock-dialog')
             Main.sessionMode.popMode('unlock-dialog');
 
@@ -581,6 +654,10 @@ export class ScreenShield extends Signals.EventEmitter {
         this._setActive(false);
         this._setLocked(false);
         global.set_runtime_state(LOCKED_STATE_STR, null);
+
+        // Sanity check, in case we made it this far while being locked
+        if (Main.paygManager.isLocked)
+            this.lock(false);
     }
 
     activate(animate) {
@@ -590,17 +667,29 @@ export class ScreenShield extends Signals.EventEmitter {
         if (!this._ensureUnlockDialog(true))
             return;
 
-        this.actor.show();
+        this._isGreeter = Main.sessionMode.isGreeter;
+        if (!this._isGreeter) {
+            const userManager = AccountsService.UserManager.get_default();
+            const user = userManager.get_user(GLib.get_user_name());
 
-        if (Main.sessionMode.currentMode !== 'unlock-dialog') {
-            this._isGreeter = Main.sessionMode.isGreeter;
-            if (!this._isGreeter)
+            if (Main.sessionMode.currentMode !== 'unlock-dialog' &&
+                Main.sessionMode.currentMode !== 'unlock-dialog-payg' &&
+                user.password_mode !== AccountsService.UserPasswordMode.NONE)
                 Main.sessionMode.pushMode('unlock-dialog');
+
+            if (Main.sessionMode.currentMode !== 'unlock-dialog-payg' &&
+                Main.paygManager.isLocked) {
+                Main.sessionMode.pushMode('unlock-dialog-payg');
+                this._clearCurrentDialog();
+                this._ensureUnlockDialog(true);
+            }
         }
+
+        this.actor.show();
 
         this._resetLockScreen({
             animateLockScreen: animate,
-            fadeToBlack: true,
+            fadeToBlack: Main.sessionMode.currentMode != 'unlock-dialog-payg',
         });
         // We used to set isActive and emit active-changed here,
         // but now we do that from lockScreenShown, which means
@@ -635,7 +724,11 @@ export class ScreenShield extends Signals.EventEmitter {
     }
 
     lock(animate) {
-        if (this._lockSettings.get_boolean(DISABLE_LOCK_KEY)) {
+        // This does not make sense outside of the user's session for PAYG
+        if (Main.sessionMode.isGreeter && Main.paygManager.isLocked)
+            return;
+
+        if (this._lockSettings.get_boolean(DISABLE_LOCK_KEY) && !Main.paygManager.isLocked) {
             log('Screen lock is locked down, not locking'); // lock, lock - who's there?
             return;
         }
@@ -655,16 +748,20 @@ export class ScreenShield extends Signals.EventEmitter {
 
         const lock = this._isGreeter
             ? true
-            : user.password_mode !== AccountsService.UserPasswordMode.NONE;
+            : Main.paygManager.isLocked || (user.password_mode !== AccountsService.UserPasswordMode.NONE);
         this._setLocked(lock);
     }
 
     // If the previous shell crashed, and gnome-session restarted us, then re-lock
     lockIfWasLocked() {
-        if (!this._settings.get_boolean(LOCK_ENABLED_KEY))
+        // We need to add some extra checks for PAYG becasue we don't want to
+        // end up loging the screen for not regular sessions (e.g. initial-setup).
+        const shouldLockForPayg = Main.paygManager.isLocked && Main.sessionMode.hasOverview;
+
+        if (!this._settings.get_boolean(LOCK_ENABLED_KEY) && !shouldLockForPayg)
             return;
         const wasLocked = global.get_runtime_state('b', LOCKED_STATE_STR);
-        if (wasLocked === null)
+        if (wasLocked === null && !shouldLockForPayg)
             return;
         const laters = global.compositor.get_laters();
         laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
