@@ -601,6 +601,10 @@ class QuickSettings extends PanelMenu.Button {
         this._addItemsBefore(this._autoRotate.quickSettingsItems, sibling);
         this._addItemsBefore(this._unsafeMode.quickSettingsItems, sibling);
 
+        if (this._payg)
+            this._addItemsBefore(this._payg.quickSettingsItems,
+                sibling, N_QUICK_SETTINGS_COLUMNS);
+
         // append background apps
         this._backgroundApps.quickSettingsItems.forEach(
             item => this.menu.addItem(item, N_QUICK_SETTINGS_COLUMNS));
