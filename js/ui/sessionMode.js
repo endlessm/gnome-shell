@@ -4,6 +4,7 @@ import * as Signals from '../misc/signals.js';
 import * as FileUtils from '../misc/fileUtils.js';
 
 import {LoginDialog}  from '../gdm/loginDialog.js';
+import {PaygUnlockDialog} from '../ui/paygUnlockDialog.js';
 import {UnlockDialog} from '../ui/unlockDialog.js';
 
 import * as Config from '../misc/config.js';
@@ -64,6 +65,11 @@ const _modes = {
         panelStyle: 'login-screen',
     },
 
+    'gdm-unlock-dialog-payg': {
+        parentMode: 'gdm',
+        unlockDialog: PaygUnlockDialog,
+    },
+
     'unlock-dialog': {
         isLocked: true,
         unlockDialog: undefined,
@@ -76,6 +82,16 @@ const _modes = {
             right: ['dwellClick', 'a11y', 'keyboard', 'quickSettings'],
         },
         panelStyle: 'unlock-screen',
+    },
+
+    'unlock-dialog-payg': {
+        parentMode: 'unlock-dialog',
+        unlockDialog: PaygUnlockDialog,
+        panel: {
+            left: [],
+            center: [],
+            right: ['dwellClick', 'a11y', 'keyboard', 'quickSettings'],
+        },
     },
 
     'user': {
