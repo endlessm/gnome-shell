@@ -355,6 +355,7 @@ class QuickSettings extends PanelMenu.Button {
             this._bluetooth = null;
 
         this._system = new imports.ui.status.system.Indicator();
+        this._payg = new imports.ui.status.payg.Indicator();
         this._volume = new imports.ui.status.volume.Indicator();
         this._brightness = new imports.ui.status.brightness.Indicator();
         this._remoteAccess = new imports.ui.status.remoteAccess.RemoteAccessApplet();
@@ -378,6 +379,8 @@ class QuickSettings extends PanelMenu.Button {
         this._indicators.add_child(this._powerProfiles);
         if (this._bluetooth)
             this._indicators.add_child(this._bluetooth);
+        if (this._payg)
+            this._indicators.add_child(this._payg);
         this._indicators.add_child(this._rfkill);
         this._indicators.add_child(this._autoRotate);
         this._indicators.add_child(this._volume);
@@ -387,6 +390,8 @@ class QuickSettings extends PanelMenu.Button {
         this._addItems(this._system.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
         this._addItems(this._volume.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
         this._addItems(this._brightness.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
+        if (this._payg)
+            this._addItems(this._payg.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
 
         this._addItems(this._remoteAccess.quickSettingsItems);
         this._addItems(this._thunderbolt.quickSettingsItems);
