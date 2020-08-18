@@ -29,6 +29,7 @@ const Overview = imports.ui.overview;
 const PadOsd = imports.ui.padOsd;
 const Panel = imports.ui.panel;
 const Params = imports.misc.params;
+const PaygManager = imports.misc.paygManager;
 const RunDialog = imports.ui.runDialog;
 const WelcomeDialog = imports.ui.welcomeDialog;
 const Layout = imports.ui.layout;
@@ -93,6 +94,7 @@ var inputMethod = null;
 var introspectService = null;
 var locatePointer = null;
 var customerSupport = null;
+var paygManager = null;
 let _startDate;
 let _defaultCssStylesheet = null;
 let _cssStylesheet = null;
@@ -213,6 +215,10 @@ function _initializeUI() {
     magnifier = new Magnifier.Magnifier();
     locatePointer = new LocatePointer.LocatePointer();
 
+    // The ScreenShield depends on the PaygManager, so this
+    // module needs to be initialized first.
+    paygManager = new PaygManager.PaygManager();
+
     // Centralized handling of things specific to customer support.
     customerSupport = new CustomerSupport.CustomerSupport();
 
@@ -271,7 +277,17 @@ function _initializeUI() {
 
     if (sessionMode.isGreeter && screenShield) {
         layoutManager.connect('startup-prepared', () => {
-            screenShield.showDialog();
+            // We can't show the login dialog (which is managed by the
+            // screenshield) until the PaygManager is initializd, since
+            // we need to check whether the machine is PAYG-locked first.
+            if (paygManager.initialized) {
+                screenShield.showDialog();
+            } else {
+                const paygManagerId = paygManager.connect('initialized', () => {
+                    screenShield.showDialog();
+                    paygManager.disconnect(paygManagerId);
+                });
+            }
         });
     }
 
