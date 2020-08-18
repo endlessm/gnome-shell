@@ -33,6 +33,7 @@ import * as BacklightStatus from './status/backlight.js';
 import * as ThunderboltStatus from './status/thunderbolt.js';
 import * as AutoRotateStatus from './status/autoRotate.js';
 import * as BackgroundAppsStatus from './status/backgroundApps.js';
+import * as PaygStatus from './status/payg.js';
 
 import {DateMenuButton} from './dateMenu.js';
 import {ATIndicator} from './status/accessibility.js';
@@ -534,6 +535,7 @@ class QuickSettings extends PanelMenu.Button {
         }
 
         this._system = new SystemStatus.Indicator();
+        this._payg = new PaygStatus.Indicator();
         this._camera = new CameraStatus.Indicator();
         this._volumeOutput = new VolumeStatus.OutputIndicator();
         this._volumeInput = new VolumeStatus.InputIndicator();
@@ -568,6 +570,8 @@ class QuickSettings extends PanelMenu.Button {
         this._indicators.add_child(this._powerProfiles);
         if (this._bluetooth)
             this._indicators.add_child(this._bluetooth);
+        if (this._payg)
+            this._indicators.add_child(this._payg);
         this._indicators.add_child(this._rfkill);
         this._indicators.add_child(this._autoRotate);
         this._indicators.add_child(this._volumeOutput);
@@ -584,6 +588,9 @@ class QuickSettings extends PanelMenu.Button {
             sibling, N_QUICK_SETTINGS_COLUMNS);
         this._addItemsBefore(this._brightness.quickSettingsItems,
             sibling, N_QUICK_SETTINGS_COLUMNS);
+        if (this._payg)
+            this._addItemsBefore(this._payg.quickSettingsItems,
+                sibling, N_QUICK_SETTINGS_COLUMNS);
 
         this._addItemsBefore(this._camera.quickSettingsItems, sibling);
         this._addItemsBefore(this._remoteAccess.quickSettingsItems, sibling);
