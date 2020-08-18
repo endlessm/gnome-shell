@@ -26,6 +26,7 @@ import * as OsdMonitorLabeler from './osdMonitorLabeler.js';
 import * as Overview from './overview.js';
 import * as PadOsd from './padOsd.js';
 import * as Panel from './panel.js';
+import * as PaygManager from '../misc/paygManager.js';
 import * as RunDialog from './runDialog.js';
 import * as WelcomeDialog from './welcomeDialog.js';
 import * as Layout from './layout.js';
@@ -98,6 +99,7 @@ export let breakManagerDispatcher = null;
 export let timeLimitsManager = null;
 export let timeLimitsDispatcher = null;
 export let customerSupport = null;
+export let paygManager = null;
 
 let _startDate;
 let _defaultCssStylesheet = null;
@@ -234,6 +236,10 @@ async function _initializeUI() {
     magnifier = new Magnifier.Magnifier();
     locatePointer = new LocatePointer.LocatePointer();
 
+    // The ScreenShield depends on the PaygManager, so this
+    // module needs to be initialized first.
+    paygManager = new PaygManager.PaygManager();
+
     // Centralized handling of things specific to customer support.
     customerSupport = new CustomerSupport.CustomerSupport();
 
@@ -335,7 +341,17 @@ async function _initializeUI() {
 
     if (sessionMode.isGreeter && screenShield) {
         layoutManager.connect('startup-prepared', () => {
-            screenShield.showDialog();
+            // We can't show the login dialog (which is managed by the
+            // screenshield) until the PaygManager is initializd, since
+            // we need to check whether the machine is PAYG-locked first.
+            if (paygManager.initialized) {
+                screenShield.showDialog();
+            } else {
+                const paygManagerId = paygManager.connect('initialized', () => {
+                    screenShield.showDialog();
+                    paygManager.disconnect(paygManagerId);
+                });
+            }
         });
     }
 
