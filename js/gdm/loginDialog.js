@@ -627,6 +627,10 @@ export const LoginDialog = GObject.registerClass({
         // focus later
         Main.layoutManager.connectObject('startup-complete',
             this._updateDisableUserList.bind(this), this);
+
+        // With PAYG machines this class can be created AFTER the startup process.
+        if (!Main.layoutManager.startingUp)
+            this._updateDisableUserList();
     }
 
     _getBannerAllocation(dialogBox) {
