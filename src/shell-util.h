@@ -118,4 +118,6 @@ GPid shell_util_spawn_async (const char          *working_directory,
                              GSpawnFlags          flags,
                              GError             **error);
 
+gint64 shell_util_get_boottime (void);
+
 G_END_DECLS
