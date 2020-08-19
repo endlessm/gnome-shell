@@ -35,7 +35,7 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
     _init() {
         super._init();
 
-        this._paygManager = new PaygManager.PaygManager();
+        this._paygManager = Main.paygManager;
         this._indicator = this._addIndicator();
         this._item = new PopupMenu.PopupSubMenuMenuItem('', true);
         this._paygNotifier = new Payg.PaygNotifier();
@@ -44,18 +44,24 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
         });
         this.menu.addMenuItem(this._item);
 
-        // show this status applet if PAYG is enabled and fill in
-        // "determining time..." label and icon
-        this._sync();
+        this._paygItem = new PopupMenu.PopupSubMenuMenuItem('', true);
+        this._paygItem.setSensitive(false);
+        this.menu.addMenuItem(this._paygItem);
 
-        // fill in current values as soon as _paygManager is initialized
-        this._updateTimeRemainingAndSyncWhenReady();
+        this._paygManagerInitializedId = 0;
+        if (!this._paygManager.initialized) {
+            this._paygManagerInitializedId = this._paygManager.connect('initialized', () => {
+                this._sync();
+                this._paygManager.disconnect(this._paygManagerInitializedId);
+                this._paygManagerInitializedId = 0;
+            });
+        }
 
         // update immediately when the user extends their time (so they don't
         // have to wait for the up to REFRESH_TIME_SECS seconds which would
         // likely be long enough that they might worry something went wrong)
         this._expiryTimeChangedId = this._paygManager.connect('expiry-time-changed', () => {
-            this._updateTimeRemainingAndSyncWhenReady();
+            this._sync();
         });
 
         // refresh the displayed icon and "time remaining" label periodically
@@ -64,21 +70,35 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
             REFRESH_TIME_SECS,
             () => this._timeoutRefresh());
         GLib.Source.set_name_by_id(this._timeoutRefreshId, '[gnome-shell] this._timeoutRefresh');
-    }
 
-    _timeoutRefresh() {
-        this._updateTimeRemainingAndSyncWhenReady();
-        return GLib.SOURCE_CONTINUE;
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated',
+            this._sync.bind(this));
+
+        this.connect('destroy', this._onDestroy.bind(this));
+
+        this._sync();
     }
 
     _onDestroy() {
-        super._onDestroy();
+        if (this._paygManagerInitializedId > 0) {
+            this._paygManager.disconnect(this._paygManagerInitializedId);
+            this._paygManagerInitializedId = 0;
+        }
 
-        if (this._expiryTimeChangedId !== 0)
+        if (this._expiryTimeChangedId > 0) {
             this._paygManager.disconnect(this._expiryTimeChangedId);
+            this._expiryTimeChangedId = 0;
+        }
 
-        if (this._timeoutRefreshId !== 0)
+        if (this._timeoutRefreshId > 0) {
             GLib.source_remove(this._timeoutRefreshId);
+            this._timeoutRefreshId = 0;
+        }
+
+        if (this._sessionModeUpdatedId > 0) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
+        }
     }
 
     _getMenuGicon() {
@@ -113,40 +133,25 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
         return Payg.timeToString(seconds);
     }
 
+    _timeoutRefresh() {
+        this._sync();
+        return GLib.SOURCE_CONTINUE;
+    }
+
     _sync() {
         const sensitive = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter && this._paygManager.enabled;
         this.menu.setSensitive(sensitive);
+
         this._item.actor.visible = this._indicator.visible = this._paygManager.enabled;
         this._item.label.text = this._getTimeRemainingString();
         this._item.icon.gicon = this._getMenuGicon();
         this._indicator.gicon = this._item.icon.gicon;
-    }
 
-    _updateTimeRemainingAndSyncWhenReady() {
-        // We can't use the PaygManager until it's initialized
-        if (this._paygManager.initialized) {
-            this._sync();
-        } else {
-            const paygManagerId = this._paygManager.connect('initialized', () => {
-                this._sync();
-                this._initializeAccountIDMenu();
-                this._paygManager.disconnect(paygManagerId);
-            });
-        }
-    }
-
-    // Differently from the remaining time counter, we just want to show the account ID
-    // when the backend properly supports it.
-    _initializeAccountIDMenu() {
-        if (this._verifyValidAccountID()) {
-            this._paygItem = new PopupMenu.PopupSubMenuMenuItem('', true);
-            this._paygItem.setSensitive(false);
-            this._paygItem.actor.visible = this._indicator.visible = this._paygManager.enabled;
-            this._paygItem.label.text = _('Account ID: %s').format(this._paygManager.accountID);
-            this._paygItem.icon.gicon = this._getMenuGicon();
-
-            this.menu.addMenuItem(this._paygItem);
-        }
+        // Differently from the remaining time counter, we just want to show the account ID
+        // when the backend properly supports it.
+        this._paygItem.actor.visible = this._paygManager.enabled && this._verifyValidAccountID();
+        this._paygItem.label.text = _('Account ID: %s').format(this._paygManager.accountID);
+        this._paygItem.icon.gicon = this._item.icon.gicon;
     }
 
     _verifyValidAccountID() {
