@@ -165,6 +165,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             y_expand: true,
             y_align: Clutter.ActorAlign.END,
         });
+        firstTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         updatesLayout.attach(firstTitle, 0, 1, 1, 1);
 
         let secondTitle = new St.Label({
@@ -175,6 +176,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             y_expand: true,
             y_align: Clutter.ActorAlign.END,
         });
+        secondTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         updatesLayout.attach(secondTitle, 2, 1, 1, 1);
 
         // Subtitle label
