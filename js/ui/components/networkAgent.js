@@ -141,63 +141,31 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
     }
 
     _addMeteredConnectionToggle(connection, contentBox) {
-        let updatesLayout = new Clutter.GridLayout({ orientation: Clutter.Orientation.VERTICAL });
-        let updatesTable = new St.Widget({
-            style_class: 'network-dialog-secret-table',
-            layout_manager: updatesLayout,
-        });
-        updatesLayout.hookup_style(updatesTable);
-
-        // Separator
-        let separator = new St.Widget({
-            style_class: 'popup-separator-menu-item',
+        const updatesLayout = new St.BoxLayout({
             x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
+            vertical: true,
+        });
+
+        const titleLayout = new St.BoxLayout({
+            x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER,
             y_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        updatesLayout.attach(separator, 0, 0, 3, 1);
 
-        let firstTitle = new St.Label({
+        const firstTitle = new St.Label({
             text: _('Limited Data'),
-            style_class: 'message-dialog-title',
+            style_class: 'message-dialog-subtitle',
             x_expand: true,
             x_align: Clutter.ActorAlign.END,
             y_expand: true,
-            y_align: Clutter.ActorAlign.END,
-        });
-        firstTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        updatesLayout.attach(firstTitle, 0, 1, 1, 1);
-
-        let secondTitle = new St.Label({
-            text: _('Unlimited Data'),
-            style_class: 'message-dialog-title',
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START,
-            y_expand: true,
-            y_align: Clutter.ActorAlign.END,
-        });
-        secondTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        updatesLayout.attach(secondTitle, 2, 1, 1, 1);
-
-        // Subtitle label
-        this._updatesSubtitle = new St.Label({
-            style_class: 'message-dialog-body',
-            text: _('Enable if your connection has limits on how much you can download.'),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
-
-        Object.assign(this._updatesSubtitle.clutter_text, {
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
-            ellipsize: Pango.EllipsizeMode.NONE,
-            line_alignment: Pango.Alignment.CENTER,
-            line_wrap: true,
-            line_wrap_mode: Pango.WrapMode.WORD_CHAR,
-        });
-
-        updatesLayout.attach(this._updatesSubtitle, 0, 2, 3, 1);
+        firstTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        titleLayout.add_child(firstTitle);
 
         // Toggle button (checked means both "Automatic Updates enabled" and
         // "unmetered connection", and vice-versa)
@@ -206,25 +174,49 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             toggle_mode: true,
             visible: true,
             reactive: true,
-            y_align: Clutter.ActorAlign.START,
+            y_align: Clutter.ActorAlign.CENTER,
             y_expand: true,
         });
-
         this._updatesToggle.add_style_class_name('metered-data-switch');
+        titleLayout.add_child(this._updatesToggle);
 
-        updatesLayout.attach(this._updatesToggle, 1, 1, 1, 1);
-        updatesTable.visible = true;
+        const secondTitle = new St.Label({
+            text: _('Unlimited Data'),
+            style_class: 'message-dialog-subtitle',
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START,
+            y_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        secondTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        titleLayout.add_child(secondTitle);
+
+        updatesLayout.add_child(titleLayout);
+
+        // Subtitle label
+        this._updatesDescription = new St.Label({
+            style_class: 'message-dialog-description',
+            text: _('Enable if your connection has limits on how much you can download.'),
+            x_expand: true,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._updatesDescription.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._updatesDescription.clutter_text.line_wrap = true;
+
+        updatesLayout.add_child(this._updatesDescription);
 
         this._updatesToggle.connect('notify::checked', () => {
             if (!this._updatesToggle.checked)
-                this._updatesSubtitle.text = _('Enable if your connection has limits on how much you can download.');
+                this._updatesDescription.text = _('Enable if your connection has limits on how much you can download.');
             else
-                this._updatesSubtitle.text = _('This connection doesn\'t have limits on how much you can download.');
+                this._updatesDescription.text = _('This connection doesn\'t have limits on how much you can download.');
         });
 
         this._updatesToggle.checked = this._getDefaultMeteredValue(connection);
 
-        contentBox.add_child(updatesTable);
+        contentBox.add_child(updatesLayout);
     }
 
     _getDefaultMeteredValue(connection) {
