@@ -23,6 +23,7 @@ var DEFAULT_BUTTON_WELL_ANIMATION_TIME = 300;
 var MESSAGE_FADE_OUT_ANIMATION_TIME = 500;
 
 const _RESET_CODE_LENGTH = 7;
+const _PASSWORD_RESET_SERVER = 'pwreset.endlessos.org';
 
 var AuthPromptMode = {
     UNLOCK_ONLY: 0,
@@ -691,10 +692,10 @@ var AuthPrompt = GObject.registerClass({
         // Translators: During a password reset, prompt for the "secret code" provided by customer support.
         this.setQuestion(_('Enter unlock code'));
         this.setMessage(
-            // Translators: Password reset. The first %s is a verification code and the second is an email.
-            _('Please inform customer support of your verification code %s by emailing %s. Customer support will use the verification code to provide you with an unlock code, which you can enter here.').format(
-                this._passwordResetCode,
-                Main.customerSupport.customerSupportEmail));
+            // Translators: The first %s is the password reset website URL and the second is a verification code.
+            _('Please open %s in a web browser, and enter the verification code %s. The service will provide you with an unlock code, which you can enter here.').format(
+                _PASSWORD_RESET_SERVER,
+                this._passwordResetCode));
     }
 
     _maybeShowPasswordResetButton() {
