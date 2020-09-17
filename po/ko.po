@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-17 17:11+0100\n"
-"PO-Revision-Date: 2020-04-24 13:19+0000\n"
-"Last-Translator: Vicki Niu <vicki@endlessm.com>\n"
+"POT-Creation-Date: 2020-09-17 10:25+0100\n"
+"PO-Revision-Date: 2020-09-17 09:26+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Korean (http://www.transifex.com/endless-os/gnome-shell/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -583,16 +583,16 @@ msgid ""
 "to enable it again"
 msgstr "확장을 제거한 다음 다시 사용하려면 다시 다운로드해야 합니다"
 
-#: js/extensionPrefs/js/main.js:148 js/gdm/authPrompt.js:189
-#: js/ui/audioDeviceSelection.js:57 js/ui/components/networkAgent.js:115
-#: js/ui/components/polkitAgent.js:139 js/ui/endSessionDialog.js:374
+#: js/extensionPrefs/js/main.js:148 js/gdm/authPrompt.js:196
+#: js/ui/audioDeviceSelection.js:57 js/ui/components/networkAgent.js:135
+#: js/ui/components/polkitAgent.js:156 js/ui/endSessionDialog.js:374
 #: js/ui/extensionDownloader.js:188 js/ui/paygUnlockDialog.js:262
-#: js/ui/shellMountOperation.js:376 js/ui/shellMountOperation.js:386
+#: js/ui/shellMountOperation.js:387 js/ui/shellMountOperation.js:397
 #: js/ui/status/network.js:913 js/ui/forceAppExitDialog.js:79
 msgid "Cancel"
 msgstr "취소"
 
-#: js/extensionPrefs/js/main.js:149 js/ui/appDisplay.js:2499
+#: js/extensionPrefs/js/main.js:149 js/ui/appDisplay.js:2506
 msgid "Remove"
 msgstr "제거"
 
@@ -676,40 +676,39 @@ msgstr "대단히 죄송합니다. 설치한 확장 기능의 목록을 가져�
 msgid "Log Out…"
 msgstr "로그아웃…"
 
-#: js/gdm/authPrompt.js:131
+#: js/gdm/authPrompt.js:137
 msgid "Show password hint"
 msgstr ""
 
-#: js/gdm/authPrompt.js:148
+#: js/gdm/authPrompt.js:154
 msgid "Forgot password?"
 msgstr ""
 
 #. Cisco LEAP
-#: js/gdm/authPrompt.js:303 js/ui/components/networkAgent.js:363
-#: js/ui/components/networkAgent.js:379 js/ui/components/networkAgent.js:403
-#: js/ui/components/networkAgent.js:424 js/ui/components/networkAgent.js:444
-#: js/ui/components/networkAgent.js:454 js/ui/components/polkitAgent.js:277
-#: js/ui/shellMountOperation.js:326
+#: js/gdm/authPrompt.js:310 js/ui/components/networkAgent.js:381
+#: js/ui/components/networkAgent.js:397 js/ui/components/networkAgent.js:421
+#: js/ui/components/networkAgent.js:442 js/ui/components/networkAgent.js:462
+#: js/ui/components/networkAgent.js:472 js/ui/components/polkitAgent.js:294
+#: js/ui/shellMountOperation.js:328
 msgid "Password"
 msgstr "암호"
 
 #. Translators: During a password reset, prompt for the "secret code" provided
 #. by customer support.
-#: js/gdm/authPrompt.js:680
+#: js/gdm/authPrompt.js:687
 msgid "Enter unlock code"
 msgstr ""
 
-#. Translators: Password reset. The first %s is a verification code and the
-#. second is an email.
-#: js/gdm/authPrompt.js:683
+#. Translators: The first %s is the password reset website URL and the second
+#. is a verification code.
+#: js/gdm/authPrompt.js:690
 #, javascript-format
 msgid ""
-"Please inform customer support of your verification code %s by emailing %s. "
-"Customer support will use the verification code to provide you with an "
-"unlock code, which you can enter here."
+"Please open %s in a web browser, and enter the verification code %s. The "
+"service will provide you with an unlock code, which you can enter here."
 msgstr ""
 
-#: js/gdm/authPrompt.js:762
+#: js/gdm/authPrompt.js:769
 msgid "Your unlock code was incorrect. Please try again."
 msgstr ""
 
@@ -731,8 +730,8 @@ msgstr "(예를 들어, 사용자 또는 %s)"
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
 #. (and don't even care of which one)
-#: js/gdm/loginDialog.js:920 js/ui/components/networkAgent.js:399
-#: js/ui/components/networkAgent.js:422 js/ui/components/networkAgent.js:440
+#: js/gdm/loginDialog.js:920 js/ui/components/networkAgent.js:417
+#: js/ui/components/networkAgent.js:440 js/ui/components/networkAgent.js:458
 msgid "Username"
 msgstr "사용자 이름"
 
@@ -988,20 +987,20 @@ msgid "Grant Access"
 msgstr "접근 허용"
 
 #. Translators: This is the heading of a list of open windows
-#: js/ui/appDisplay.js:2390 js/ui/panel.js:78
+#: js/ui/appDisplay.js:2397 js/ui/panel.js:78
 msgid "Open Windows"
 msgstr "열린 창"
 
-#: js/ui/appDisplay.js:2410 js/ui/panel.js:85
+#: js/ui/appDisplay.js:2417 js/ui/panel.js:85
 msgid "New Window"
 msgstr "새 창"
 
-#: js/ui/appDisplay.js:2421
+#: js/ui/appDisplay.js:2428
 msgid "Launch using Dedicated Graphics Card"
 msgstr "지정한 그래픽 카드를 사용해 시작"
 
 #. Add the "Remove from desktop" menu item at the end.
-#: js/ui/appDisplay.js:2443
+#: js/ui/appDisplay.js:2450
 msgid "Remove from desktop"
 msgstr ""
 
@@ -1206,113 +1205,113 @@ msgstr "설치한 버전의 udisks는 PIM 설정을 지원하지 않습니다"
 msgid "Open with %s"
 msgstr "%s 프로그램으로 열기"
 
-#: js/ui/components/networkAgent.js:97
+#: js/ui/components/networkAgent.js:117
 msgid ""
 "Alternatively you can connect by pushing the “WPS” button on your router."
 msgstr "다른 방법으로 라우터의 “WPS” 단추를 눌러서 연결할 수 있습니다."
 
-#: js/ui/components/networkAgent.js:109 js/ui/status/network.js:223
+#: js/ui/components/networkAgent.js:129 js/ui/status/network.js:223
 #: js/ui/status/network.js:314 js/ui/status/network.js:916
 msgid "Connect"
 msgstr "연결"
 
-#: js/ui/components/networkAgent.js:141
+#: js/ui/components/networkAgent.js:160
 msgid "Limited Data"
 msgstr ""
 
-#: js/ui/components/networkAgent.js:151
+#: js/ui/components/networkAgent.js:184
 msgid "Unlimited Data"
 msgstr ""
 
-#: js/ui/components/networkAgent.js:163 js/ui/components/networkAgent.js:198
+#: js/ui/components/networkAgent.js:199 js/ui/components/networkAgent.js:212
 msgid "Enable if your connection has limits on how much you can download."
 msgstr ""
 
-#: js/ui/components/networkAgent.js:200
+#: js/ui/components/networkAgent.js:214
 msgid "This connection doesn't have limits on how much you can download."
 msgstr ""
 
-#: js/ui/components/networkAgent.js:369
+#: js/ui/components/networkAgent.js:387
 msgid "Key"
 msgstr "키"
 
-#: js/ui/components/networkAgent.js:407 js/ui/components/networkAgent.js:430
+#: js/ui/components/networkAgent.js:425 js/ui/components/networkAgent.js:448
 msgid "Private key password"
 msgstr "개인 키 암호"
 
-#: js/ui/components/networkAgent.js:428
+#: js/ui/components/networkAgent.js:446
 msgid "Identity"
 msgstr "신원"
 
-#: js/ui/components/networkAgent.js:442
+#: js/ui/components/networkAgent.js:460
 msgid "Service"
 msgstr "서비스"
 
-#: js/ui/components/networkAgent.js:471
+#: js/ui/components/networkAgent.js:489
 #, javascript-format
 msgid "Enter the Wi-Fi password for “%s”"
 msgstr ""
 
-#: js/ui/components/networkAgent.js:476 js/ui/components/networkAgent.js:851
+#: js/ui/components/networkAgent.js:494 js/ui/components/networkAgent.js:869
 msgid "Wired 802.1X authentication"
 msgstr "유선 802.1X 인증"
 
-#: js/ui/components/networkAgent.js:478
+#: js/ui/components/networkAgent.js:496
 msgid "Network name"
 msgstr "네트워크 이름"
 
-#: js/ui/components/networkAgent.js:483 js/ui/components/networkAgent.js:855
+#: js/ui/components/networkAgent.js:501 js/ui/components/networkAgent.js:873
 msgid "DSL authentication"
 msgstr "인증이 필요합니다"
 
-#: js/ui/components/networkAgent.js:490 js/ui/components/networkAgent.js:860
+#: js/ui/components/networkAgent.js:508 js/ui/components/networkAgent.js:878
 msgid "PIN code required"
 msgstr "PIN 코드가 필요합니다"
 
-#: js/ui/components/networkAgent.js:491 js/ui/components/networkAgent.js:861
+#: js/ui/components/networkAgent.js:509 js/ui/components/networkAgent.js:879
 msgid "PIN code is needed for the mobile broadband device"
 msgstr "휴대전화 네트워크 장치를 사용하려면 PIN 코드가 필요합니다"
 
-#: js/ui/components/networkAgent.js:492
+#: js/ui/components/networkAgent.js:510
 msgid "PIN"
 msgstr "PIN"
 
-#: js/ui/components/networkAgent.js:499 js/ui/components/networkAgent.js:846
-#: js/ui/components/networkAgent.js:867
+#: js/ui/components/networkAgent.js:517 js/ui/components/networkAgent.js:864
+#: js/ui/components/networkAgent.js:885
 msgid "Authentication required"
 msgstr "인증 필요"
 
-#: js/ui/components/networkAgent.js:500 js/ui/components/networkAgent.js:852
-#: js/ui/components/networkAgent.js:856 js/ui/components/networkAgent.js:868
-#: js/ui/components/networkAgent.js:872
+#: js/ui/components/networkAgent.js:518 js/ui/components/networkAgent.js:870
+#: js/ui/components/networkAgent.js:874 js/ui/components/networkAgent.js:886
+#: js/ui/components/networkAgent.js:890
 #, javascript-format
 msgid "A password is required to connect to “%s”."
 msgstr "“%s”에 연결하려면 암호가 필요합니다."
 
-#: js/ui/components/networkAgent.js:835 js/ui/status/network.js:1691
+#: js/ui/components/networkAgent.js:853 js/ui/status/network.js:1691
 msgid "Network Manager"
 msgstr "네트워크 관리"
 
-#: js/ui/components/networkAgent.js:847
+#: js/ui/components/networkAgent.js:865
 #, javascript-format
 msgid ""
 "Passwords or encryption keys are required to access the wireless network "
 "“%s”."
 msgstr "“%s” 무선 네트워크에 연결하려면 암호 또는 암호화 키가 필요합니다."
 
-#: js/ui/components/networkAgent.js:871
+#: js/ui/components/networkAgent.js:889
 msgid "VPN password"
 msgstr "VPN 암호"
 
-#: js/ui/components/polkitAgent.js:39
+#: js/ui/components/polkitAgent.js:41
 msgid "Authentication Required"
 msgstr "인증이 필요합니다"
 
-#: js/ui/components/polkitAgent.js:80
+#: js/ui/components/polkitAgent.js:82
 msgid "Administrator"
 msgstr "관리자"
 
-#: js/ui/components/polkitAgent.js:142
+#: js/ui/components/polkitAgent.js:159
 msgid "Authenticate"
 msgstr "인증"
 
@@ -1320,7 +1319,7 @@ msgstr "인증"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:254 js/ui/shellMountOperation.js:402
+#: js/ui/components/polkitAgent.js:271 js/ui/shellMountOperation.js:413
 msgid "Sorry, that didn’t work. Please try again."
 msgstr "죄송합니다. 동작하지 않았습니다. 다시 시도하십시오."
 
@@ -1332,7 +1331,7 @@ msgstr "죄송합니다. 동작하지 않았습니다. 다시 시도하십시오
 msgid "%s is now known as %s"
 msgstr "%s의 대화명이 이제 %s입니다"
 
-#: js/ui/ctrlAltTab.js:21 js/ui/viewSelector.js:606
+#: js/ui/ctrlAltTab.js:21 js/ui/viewSelector.js:605
 msgid "Windows"
 msgstr "창"
 
@@ -1854,7 +1853,7 @@ msgstr ""
 msgid "Unlock Machine"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:287 js/ui/shellMountOperation.js:380
+#: js/ui/paygUnlockDialog.js:287 js/ui/shellMountOperation.js:391
 msgid "Unlock"
 msgstr "잠금 풀기"
 
@@ -1953,36 +1952,36 @@ msgid "%s second has been added to your Pay As You Go credit."
 msgid_plural "%s seconds have been added to your Pay As You Go credit."
 msgstr[0] ""
 
-#: js/ui/payg.js:648
+#: js/ui/payg.js:649
 #, javascript-format
 msgid "%s minute has been added to your Pay As You Go credit."
 msgid_plural "%s minutes have been added to your Pay As You Go credit."
 msgstr[0] ""
 
-#: js/ui/payg.js:655
+#: js/ui/payg.js:657
 #, javascript-format
 msgid "%s hour has been added to your Pay As You Go credit."
 msgid_plural "%s hours have been added to your Pay As You Go credit."
 msgstr[0] ""
 
-#: js/ui/payg.js:662
+#: js/ui/payg.js:665
 #, javascript-format
 msgid "%s day has been added to your Pay As You Go credit."
 msgid_plural "%s days have been added to your Pay As You Go credit."
 msgstr[0] ""
 
-#: js/ui/payg.js:669
+#: js/ui/payg.js:673
 #, javascript-format
 msgid "%s month has been added to your Pay As You Go credit."
 msgid_plural "%s months have been added to your Pay As You Go credit."
 msgstr[0] ""
 
-#: js/ui/payg.js:676
+#: js/ui/payg.js:681
 msgid "1 year has been added to your Pay As You Go credit."
 msgstr ""
 
 #. Unlock permanently message
-#: js/ui/payg.js:679
+#: js/ui/payg.js:684
 msgid "You have successfully unlocked your Endless Machine"
 msgstr ""
 
@@ -2002,7 +2001,7 @@ msgstr "웨일랜드에서는 다시 시작 기능을 사용할 수 없습니다
 msgid "Restarting…"
 msgstr "다시 시작하는 중…"
 
-#: js/ui/screenShield.js:254
+#: js/ui/screenShield.js:257
 msgid "GNOME needs to lock the screen"
 msgstr "그놈에서 화면을 잠궈야 합니다"
 
@@ -2012,11 +2011,11 @@ msgstr "그놈에서 화면을 잠궈야 합니다"
 #. Just tell him to stop using this app
 #. XXX: another option is to kick the user into the gdm login
 #. screen, where we're not affected by grabs
-#: js/ui/screenShield.js:295 js/ui/screenShield.js:674
+#: js/ui/screenShield.js:298 js/ui/screenShield.js:691
 msgid "Unable to lock"
 msgstr "잠글 수 없습니다"
 
-#: js/ui/screenShield.js:296 js/ui/screenShield.js:675
+#: js/ui/screenShield.js:299 js/ui/screenShield.js:692
 msgid "Lock was blocked by an application"
 msgstr "프로그램이 잠금을 막았습니다"
 
@@ -2061,51 +2060,51 @@ msgstr ""
 msgid "Caps lock is on."
 msgstr "Caps lock이 켜져 있습니다."
 
-#: js/ui/shellMountOperation.js:285
+#: js/ui/shellMountOperation.js:287
 msgid "Hidden Volume"
 msgstr "숨겨진 볼륨"
 
-#: js/ui/shellMountOperation.js:288
+#: js/ui/shellMountOperation.js:290
 msgid "Windows System Volume"
 msgstr "윈도우 시스템 볼륨"
 
-#: js/ui/shellMountOperation.js:291
+#: js/ui/shellMountOperation.js:293
 msgid "Uses Keyfiles"
 msgstr "keyfiles 사용"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:298
+#: js/ui/shellMountOperation.js:300
 #, javascript-format
 msgid ""
 "To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead."
 msgstr "keyfiles를 사용하는 볼륨의 잠금을 해제하려면, 대신 <i>%s</i> 유틸리티를 사용하십시오."
 
-#: js/ui/shellMountOperation.js:306
+#: js/ui/shellMountOperation.js:308
 msgid "PIM Number"
 msgstr "PIM 번호"
 
-#: js/ui/shellMountOperation.js:365
+#: js/ui/shellMountOperation.js:376
 msgid "Remember Password"
 msgstr "암호 저장"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:391
+#: js/ui/shellMountOperation.js:402
 #, javascript-format
 msgid "Open %s"
 msgstr "%s 프로그램 열기"
 
-#: js/ui/shellMountOperation.js:423
+#: js/ui/shellMountOperation.js:436
 msgid "The PIM must be a number or empty."
 msgstr "PIM은 숫자거나 비어 있어야 합니다."
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:469
+#: js/ui/shellMountOperation.js:482
 #, javascript-format
 msgid "Unable to start %s"
 msgstr "%s 프로그램을 시작할 수 없습니다"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:471
+#: js/ui/shellMountOperation.js:484
 #, javascript-format
 msgid "Couldn’t find the %s application"
 msgstr "%s 프로그램을 찾을 수 없습니다"
@@ -2242,11 +2241,11 @@ msgstr "보조 누르기"
 msgid "Dwell Click"
 msgstr "머무르면 누르기"
 
-#: js/ui/status/keyboard.js:826
+#: js/ui/status/keyboard.js:878
 msgid "Keyboard"
 msgstr "키보드"
 
-#: js/ui/status/keyboard.js:848
+#: js/ui/status/keyboard.js:902
 msgid "Show Keyboard Layout"
 msgstr "키보드 배치 표시"
 
@@ -2523,11 +2522,15 @@ msgstr ""
 msgid "Getting time…"
 msgstr ""
 
-#: js/ui/status/payg.js:90
+#: js/ui/status/payg.js:94
+msgid "Subscription expired"
+msgstr ""
+
+#: js/ui/status/payg.js:96
 msgid "Less than 1 minute"
 msgstr ""
 
-#: js/ui/status/payg.js:124
+#: js/ui/status/payg.js:130
 #, javascript-format
 msgid "Account ID: %s"
 msgstr ""
@@ -2692,7 +2695,7 @@ msgstr "창 잠금 풀기"
 msgid "Log in as another user"
 msgstr "다른 사용자로 로그인"
 
-#: js/ui/viewSelector.js:610
+#: js/ui/viewSelector.js:609
 msgid "Applications"
 msgstr "프로그램"
 
