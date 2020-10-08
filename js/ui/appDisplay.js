@@ -2195,7 +2195,8 @@ var AppFolderDialog = GObject.registerClass({
             coordinate: Clutter.BindCoordinate.SIZE,
         }));
 
-        this._folder.connect('changed::name', () => this._syncFolderName());
+        this._folderNameChangedId = this._folder.connect(
+            'changed::name', () => this._syncFolderName());
         this._syncFolderName();
     }
 
@@ -2359,6 +2360,11 @@ var AppFolderDialog = GObject.registerClass({
         if (this._sourceMappedId) {
             this._source.disconnect(this._sourceMappedId);
             this._sourceMappedId = 0;
+        }
+
+        if (this._folderChangedId) {
+            this._folder.disconnect(this._folderNameChangedId);
+            this._folderNameChangedId = 0;
         }
 
         this._removePopdownTimeout();
