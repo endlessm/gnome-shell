@@ -861,9 +861,16 @@ var PageManager = GObject.registerClass({
         this._updatingPages = false;
         this._loadPages();
 
-        global.settings.connect('changed::app-picker-layout',
+        this._appPickerLayoutChangedId = global.settings.connect(
+            'changed::app-picker-layout',
             this._loadPages.bind(this));
+    }
 
+    destroy() {
+        if (this._appPickerLayoutChangedId > 0) {
+            global.settings.disconnect(this._appPickerLayoutChangedId);
+            this._appPickerLayoutChangedId = 0;
+        }
     }
 
     _loadPages() {
@@ -977,6 +984,8 @@ class AppDisplay extends BaseAppView {
 
     _onDestroy() {
         super._onDestroy();
+
+        this._pageManager.destroy();
 
         if (this._scrollTimeoutId !== 0) {
             GLib.source_remove(this._scrollTimeoutId);
