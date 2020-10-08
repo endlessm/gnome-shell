@@ -991,6 +991,12 @@ class AppDisplay extends BaseAppView {
             GLib.source_remove(this._scrollTimeoutId);
             this._scrollTimeoutId = 0;
         }
+
+        if (this._currentDialog && this._currentDialogDestroyId) {
+            this._currentDialog.disconnect(this._currentDialogDestroyId);
+            this._currentDialog = null;
+            this._currentDialogDestroyId = 0;
+        }
     }
 
     vfunc_map() {
