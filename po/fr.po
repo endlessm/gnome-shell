@@ -19,14 +19,15 @@
 # Pablo Martin-Gomez <pablo.martin-gomez@laposte.net>, 2010
 # Pierre Henry <pierrehenry73@yahoo.fr>, 2012
 # Roddy Shuler <roddy@stanfordalumni.org>, 2014-2018
+# Thibault Martin <mail@thibaultmart.in>, 2020
 # Will Thompson <wjt@endlessos.org>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:50+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: French (http://www.transifex.com/endless-os/gnome-shell/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -86,7 +87,7 @@ msgid ""
 " should be loaded. Any extension that wants to be loaded needs to be in this"
 " list. You can also manipulate this list with the EnableExtension and "
 "DisableExtension D-Bus methods on org.gnome.Shell."
-msgstr "Les extensions GNOME Shell ont une propriété UUID. Cette clé énumère les extensions qui doivent être chargées. Toute extension qui voudrait être chargée doit être ajoutée dans cette liste. Vous pouvez aussi manipuler cette liste avec les méthodes DBus EnableExtension et DisableExtension de org.gnome.Shell."
+msgstr "Les extensions Shell de GNOME ont une propriété UUID. Cette clé énumère les extensions qui doivent être chargées. Toute extension qui voudrait être chargée doit être ajoutée dans cette liste. Vous pouvez aussi manipuler cette liste avec les méthodes DBus EnableExtension et DisableExtension de org.gnome.Shell."
 
 #: data/org.gnome.shell.gschema.xml.in:33
 msgid "UUIDs of extensions to force disabling"
@@ -99,7 +100,7 @@ msgid ""
 "also manipulate this list with the EnableExtension and DisableExtension "
 "D-Bus methods on org.gnome.Shell. This key takes precedence over the "
 "“enabled-extensions” setting."
-msgstr "Les extensions GNOME Shell ont une propriété UUID. Cette clé énumère les extensions qui doivent être désactivées, même si elles sont chargées dans le mode actuel. Vous pouvez aussi manipuler cette liste avec les méthodes DBus EnableExtension et DisableExtension de org.gnome.Shell. Cette clé est prioritaire sur la clé « enabled-extensions »."
+msgstr "Les extensions Shell de GNOME ont une propriété UUID. Cette clé énumère les extensions qui doivent être désactivées, même si elles sont chargées dans le mode actuel. Vous pouvez aussi manipuler cette liste avec les méthodes DBus EnableExtension et DisableExtension de org.gnome.Shell. Cette clé est prioritaire sur la clé « enabled-extensions »."
 
 #: data/org.gnome.shell.gschema.xml.in:44
 msgid "Disable user extensions"
@@ -120,7 +121,7 @@ msgid ""
 "GNOME Shell will only load extensions that claim to support the current "
 "running version. Enabling this option will disable this check and try to "
 "load all extensions regardless of the versions they claim to support."
-msgstr "GNOME Shell charge uniquement les extensions annonçant leur gestion de la version en cours. Activer cette option désactive cette vérification et essaie de charger toutes les extensions, sans considérer les versions qu’elles annoncent prendre en charge."
+msgstr "Shell de GNOME charge uniquement les extensions annonçant leur gestion de la version en cours. Activer cette option désactive cette vérification et essaie de charger toutes les extensions, sans considérer les versions qu’elles annoncent prendre en charge."
 
 #: data/org.gnome.shell.gschema.xml.in:61
 msgid "List of desktop file IDs for favorite applications"
@@ -198,7 +199,7 @@ msgstr "Active l’API D-Bus, qui permet d’introspecter l’état d’applicat
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Disposition du sélecteur d’applications"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -206,7 +207,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Disposition du sélecteur d’applications. Chaque entrée du tableau est une page. Les pages sont stockées dans l’ordre dans lequel elles apparaissent dans Shell de GNOME. Chaque page contient une paire « identifiant d’application » → « données ». Actuellement, les valeurs suivantes sont stockées comme « données » : • « position » : la position de l’icône de l’application sur la page"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -362,7 +363,7 @@ msgstr "Attacher les dialogues modaux à leur fenêtre parente"
 #: data/org.gnome.shell.gschema.xml.in:331
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
-msgstr "Cette clé prend le pas sur la clé dans org.gnome.mutter lorsque GNOME Shell est lancé."
+msgstr "Cette clé prend le pas sur la clé dans org.gnome.mutter lorsque Shell de GNOME est lancé."
 
 #: data/org.gnome.shell.gschema.xml.in:306
 msgid "Enable edge tiling when dropping windows on screen edges"
@@ -503,7 +504,7 @@ msgstr "Éteindre"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "éteindre;fermer;débrancher;arrêter;stop"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -515,7 +516,7 @@ msgstr "Redémarrer"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "redémarrer;rallumer;reboot;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -741,7 +742,7 @@ msgstr "Accorder l’accès"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Dossier sans nom"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -754,11 +755,11 @@ msgstr "Nouvelle fenêtre"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Démarrer en utilisant la carte graphique intégrée"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Démarrer en utilisant la carte graphique dédiée"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -1113,7 +1114,7 @@ msgstr "%A %e %B %Y"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-d %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
@@ -1143,11 +1144,11 @@ msgstr "Aucun évènement"
 
 #: js/ui/dateMenu.js:348
 msgid "Add world clocks…"
-msgstr "Ajouter des horloges locales…"
+msgstr "Ajouter des horloges mondiales…"
 
 #: js/ui/dateMenu.js:349
 msgid "World Clocks"
-msgstr "Horloges locales"
+msgstr "Horloges mondiales"
 
 #: js/ui/dateMenu.js:629
 msgid "Loading…"
@@ -1167,7 +1168,7 @@ msgstr "Météo"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Choisir un emplacement pour la météo…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1234,7 +1235,7 @@ msgstr "Redémarrer"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Installer les mises à jour et redémarrer"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1294,7 +1295,7 @@ msgstr "%s %s sera installé après le redémarrage. L’installation d’une mi
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Batterie faible : veuillez vous brancher avant d’installer les mises à jour."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1307,7 +1308,7 @@ msgstr "D’autres utilisateurs sont connectés"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Options de démarrage"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1536,7 +1537,7 @@ msgstr "Vue d’ensemble"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Saisissez votre recherche"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1824,8 +1825,8 @@ msgstr "Aucun résultat."
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d de plus"
+msgstr[1] "%d de plus"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -2636,11 +2637,11 @@ msgstr "Si vous enlevez cette extension, vous devrez recommencer son télécharg
 
 #: subprojects/extensions-app/js/main.js:150
 msgid "Remove"
-msgstr "Supprimer"
+msgstr "Enlever"
 
 #: subprojects/extensions-app/js/main.js:182
 msgid "translator-credits"
-msgstr "Mathieu Bridon <bochecha@fedoraproject.org>\nPablo Martin-Gomez <pablo.martin-gomez@laposte.net>\nBruno Brouard <annoa.b@gmail.com>\nCyril Arnaud <cyril dot arnaud at gmail dot com>\nLuc Guillemin <luc.guillemin@gmail.com>\nLuc Pionchon <pionchon.luc@gmail.com>\nPierre Henry <pierrehenry73@yahoo.fr>\nAlexandre Franke <alexandre.franke@gmail.com>\nMathieu Stumpf <psychoslave@culture-libre.org>\nAlain Lojewski <allomervan@gmail.com>\nErwan Georget <egeorget@opmbx.org>\nJulien Humbert <julroy67@gmail.com>\nClaude Paroz <claude@2xlibre.net>\nCharles Monzat <charles.monzat@free.fr>"
+msgstr "Mathieu Bridon <bochecha@fedoraproject.org>\nPablo Martin-Gomez <pablo.martin-gomez@laposte.net>\nBruno Brouard <annoa.b@gmail.com>\nCyril Arnaud <cyril dot arnaud at gmail dot com>\nLuc Guillemin <luc.guillemin@gmail.com>\nLuc Pionchon <pionchon.luc@gmail.com>\nPierre Henry <pierrehenry73@yahoo.fr>\nAlexandre Franke <alexandre.franke@gmail.com>\nMathieu Stumpf <psychoslave@culture-libre.org>\nAlain Lojewski <allomervan@gmail.com>\nErwan Georget <egeorget@opmbx.org>\nJulien Humbert <julroy67@gmail.com>\nClaude Paroz <claude@2xlibre.net>\nCharles Monzat <charles.monzat@free.fr>\nThibault Martin <thibaultamartin@gnome.org>"
 
 #: subprojects/extensions-app/js/main.js:314
 #, javascript-format
@@ -2651,11 +2652,11 @@ msgstr[1] "%d extensions seront mises à jour à la prochaine connexion."
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "Cette extension est incompatible avec votre version de GNOME"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "L’extension a rencontré un problème"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2725,7 +2726,7 @@ msgstr "Nous sommes désolés, mais il n’est pas possible d’obtenir la liste
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Mises à jour d’extensions prêtes"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2766,11 +2767,11 @@ msgstr "L’UUID est un identifiant globalement unique pour votre extension.\nSo
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Sélectionnez un des modèles disponibles :\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Modèle"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2794,11 +2795,11 @@ msgstr "Une description courte de ce que fait l’extension"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "MODÈLE"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Le modèle à utiliser pour la nouvelle extension"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2823,13 +2824,13 @@ msgstr "Les champs UUID, nom et description sont obligatoires"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Erreur lors de la connexion à Shell de GNOME\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "L’extension « %s » n’existe pas\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2861,7 +2862,7 @@ msgstr "Activer une extension"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "L’extension « %s » n’existe pas\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -2975,7 +2976,7 @@ msgstr "Plus d’un répertoire source indiqué"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "L’extension « %s » n’a pas de préférences\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -2988,12 +2989,12 @@ msgstr "Réinitialiser une extension"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Impossible de désinstaller les extensions système\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "Impossible de désinstaller « %s »\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -3001,12 +3002,12 @@ msgstr "Désinstaller une extension"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Ne pas afficher les messages d’erreur"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Impossible de se connecter à Shell de GNOME"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3102,19 +3103,19 @@ msgstr "Utilisez « %s » pour obtenir une aide détaillée.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Basique"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Une extension vide"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Indicateur"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Ajouter une icône dans la barre supérieure"
 
 #. translators:
 #. * The number of sound outputs on a particular device

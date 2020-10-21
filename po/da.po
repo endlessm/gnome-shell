@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
+"PO-Revision-Date: 2020-10-21 13:51+0000\n"
 "Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Danish (http://www.transifex.com/endless-os/gnome-shell/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -185,7 +185,7 @@ msgstr "Aktiverer et D-Bus-API, som tillader introspektion af shell'ens programt
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Layout af programvælgeren"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -193,7 +193,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Layout af programvælgeren. Hver indgang i tabellen er en side. Sider gemmes i den rækkefølge, de optræder i GNOME Shell. Hver side indeholder et par af “program-id” → 'data'. Aktuelt gemmes følgende værdier som 'data': • “placering”: programikonets placering på siden"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -490,7 +490,7 @@ msgstr "Sluk"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "sluk;luk ned;stands;stop"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -502,7 +502,7 @@ msgstr "Genstart"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "reboot;genstart;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -728,7 +728,7 @@ msgstr "Giv adgang"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Unavngivet mappe"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -741,11 +741,11 @@ msgstr "Nyt vindue"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Start med integreret grafikkort"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Start med særskilt grafikkort"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -1100,7 +1100,7 @@ msgstr "%A %-d. %B %Y"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-d. %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
@@ -1154,7 +1154,7 @@ msgstr "Vejr"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Vælg en placering for vejr …"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1221,7 +1221,7 @@ msgstr "Genstart"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Installér opdateringer og genstart"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1281,7 +1281,7 @@ msgstr "%s %s vil blive installeret efter genstart. Installering af opgradering 
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Lavt batteriniveau: Tilslut strøm før installation af opdateringer."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1294,7 +1294,7 @@ msgstr "Andre brugere er logget ind"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Bootindstillinger"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1523,7 +1523,7 @@ msgstr "Oversigt"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Skriv for at søge"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1811,8 +1811,8 @@ msgstr "Ingen resultater."
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mere"
+msgstr[1] "%d mere"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -1945,11 +1945,11 @@ msgstr[1] "%d forbundet"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr ""
+msgstr "Bluetooth fra"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr ""
+msgstr "Bluetooth til"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -2604,7 +2604,7 @@ msgstr "GNOME-projektet"
 msgid ""
 "GNOME Extensions handles updating extensions, configuring extension "
 "preferences and removing or disabling unwanted extensions."
-msgstr ""
+msgstr "GNOME Udvidelser håndterer opdatering af udvidelser, konfigurering af deres indstillinger og fjernelse eller deaktivering af uønskede udvidelser."
 
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:7
 msgid "Configure GNOME Shell Extensions"
@@ -2638,11 +2638,11 @@ msgstr[1] "%d udvidelser vil blive opdateret ved næste login."
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "Denne udvidelse er ikke kompatibel med denne version af GNOME"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "Udvidelsen havde en fejl"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2712,7 +2712,7 @@ msgstr "Vi beklager meget, men det var ikke muligt at hente listen over installe
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Opdateringer til udvidelser er klar"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2753,11 +2753,11 @@ msgstr "Uuid er en globalt unik identifikator til din udvidelse.\nDet skal udfor
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Vælg en af de tilgængelige skabeloner:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Skabelon"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2781,11 +2781,11 @@ msgstr "En kort beskrivelse af hvad udvidelsen gør"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "SKABELON"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Skabelonen der skal bruges til den nye udvidelse"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2810,13 +2810,13 @@ msgstr "Uuid, navn og beskrivelse er påkrævet"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Kunne ikke forbinde til GNOME Shell\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "Udvidelsen “%s” findes ikke\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2848,7 +2848,7 @@ msgstr "Aktivér en udvidelse"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "Udvidelsen “%s” findes ikke\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -2962,7 +2962,7 @@ msgstr "Der er angivet mere end én kildemappe"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "Udvidelsen “%s” har ingen indstillinger\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -2975,12 +2975,12 @@ msgstr "Nulstil en udvidelse"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Kan ikke afinstallere systemudvidelser\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "Kunne ikke afinstallere “%s”\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -2988,12 +2988,12 @@ msgstr "Afinstallér en udvidelse"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Udskriv ikke fejlmeddelelser"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Kunne ikke forbinde til GNOME Shell"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3089,19 +3089,19 @@ msgstr "Brug “%s” for at få detaljeret hjælp.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Simpel"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "En tom udvidelse"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Indikator"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Tilføj et ikon til toppanelet"
 
 #. translators:
 #. * The number of sound outputs on a particular device

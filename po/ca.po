@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:51+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/endless-os/gnome-shell/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -150,7 +150,7 @@ msgstr "Aquesta clau sobreescriu l'ocultació automàtica de l'element de menú 
 #: data/org.gnome.shell.gschema.xml.in:93
 msgid ""
 "Whether to remember password for mounting encrypted or remote filesystems"
-msgstr "Si s'han de recordar les contrasenyes dels punts de muntatge encriptats o els sistemes de fitxers remots"
+msgstr "Si s'han de recordar les contrasenyes dels punts de muntatge xifrat o els sistemes de fitxers remots"
 
 #: data/org.gnome.shell.gschema.xml.in:94
 msgid ""
@@ -158,7 +158,7 @@ msgid ""
 "filesystem is mounted. If the password can be saved for future use a "
 "“Remember Password” checkbox will be present. This key sets the default "
 "state of the checkbox."
-msgstr "El GNOME Shell us demanarà la contrasenya quan es munti un dispositiu encriptat o un sistema de fitxers remot. Si es pot desar la contrasenya per a utilitzar-la en el futur, es mostrarà la casella de selecció «Recorda la contrasenya». Aquesta clau estableix el valor per defecte d'aquesta casella de selecció."
+msgstr "El GNOME Shell us demanarà la contrasenya quan es munti un dispositiu xifrat o un sistema de fitxers remot. Si es pot desar la contrasenya per a utilitzar-la en el futur, es mostrarà la casella de selecció «Recorda la contrasenya». Aquesta clau estableix el valor per defecte d'aquesta casella de selecció."
 
 #: data/org.gnome.shell.gschema.xml.in:103
 msgid ""
@@ -185,7 +185,7 @@ msgstr "Habilita una API D-BUS que permet la introspecció de l'estat de l'aplic
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Disposició del selector d'aplicacions"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -193,7 +193,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Disposició del selector d'aplicacions. Cada entrada de la matriu és una pàgina. Les pàgines s'emmagatzemen en l'ordre en què apareixen al GNOME Shell. Cada pàgina conté un «id de l'aplicació» → parell de «dades». Actualment els valors següents s'emmagatzemen com a «dades»: • «posició» la posició de la icona de l'aplicació a la pàgina"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -490,19 +490,19 @@ msgstr "Apaga"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "apaga;atura;reinicia"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
 msgctxt "search-result"
 msgid "Restart"
-msgstr "Torna a iniciar"
+msgstr "Reinicia"
 
 #. Translators: A list of keywords that match the restart action, separated by
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "reinicia;reinici;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -728,7 +728,7 @@ msgstr "Permet l'accés"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Carpeta sense nom"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -741,11 +741,11 @@ msgstr "Finestra nova"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Inicia usant una targeta gràfica integrada"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Inicia usant una targeta gràfica discreta"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -997,7 +997,7 @@ msgstr "Cal autenticació"
 msgid ""
 "Passwords or encryption keys are required to access the wireless network "
 "“%s”."
-msgstr "Per accedir a la xarxa sense fil «%s» calen les contrasenyes o les claus d'encriptació."
+msgstr "Per a accedir a la xarxa sense fil «%s» calen les contrasenyes o les claus de xifratge."
 
 #: js/ui/components/networkAgent.js:495 js/ui/components/networkAgent.js:865
 msgid "Wired 802.1X authentication"
@@ -1028,7 +1028,7 @@ msgstr "PIN"
 #: js/ui/components/networkAgent.js:886
 #, javascript-format
 msgid "A password is required to connect to “%s”."
-msgstr "Cal introduir una contrasenya per connectar-vos a «%s»."
+msgstr "Cal introduir una contrasenya per a connectar-vos a «%s»."
 
 #: js/ui/components/networkAgent.js:849 js/ui/status/network.js:1718
 msgid "Network Manager"
@@ -1100,7 +1100,7 @@ msgstr "%A, %-e %B de %Y"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-d %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
@@ -1154,7 +1154,7 @@ msgstr "El temps"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Trieu una ubicació pel temps…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1221,7 +1221,7 @@ msgstr "Reinici"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Instal·la les actualitzacions i reinicia"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1281,7 +1281,7 @@ msgstr "%s %s s'instal·larà després del reinici. Una actualització de la ins
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Hi ha poca bateria. Connecteu l'ordinador a la xarxa elèctrica abans d'instal·lar les actualitzacions."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1294,7 +1294,7 @@ msgstr "Altres usuaris tenen la sessió oberta"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Opcions d'arrencada"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1523,7 +1523,7 @@ msgstr "Vista general"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Teclegeu per a cercar"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1771,7 +1771,7 @@ msgstr "Executa una ordre"
 
 #: js/ui/runDialog.js:73
 msgid "Press ESC to close"
-msgstr "Premeu Esc per tancar"
+msgstr "Premeu Esc per a tancar"
 
 #: js/ui/runDialog.js:238
 msgid "Restart is not available on Wayland"
@@ -1811,8 +1811,8 @@ msgstr "No s'ha trobat cap resultat."
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d més"
+msgstr[1] "%d més"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -1941,15 +1941,15 @@ msgstr "Paràmetres del Bluetooth"
 msgid "%d Connected"
 msgid_plural "%d Connected"
 msgstr[0] "%d connectat"
-msgstr[1] "%d connectats"
+msgstr[1] "%d Connectats"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr ""
+msgstr "Bluetooth desactivat"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr ""
+msgstr "Bluetooth activat"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -2130,7 +2130,7 @@ msgstr "La xarxa sense fil està desactivada"
 
 #: js/ui/status/network.js:847
 msgid "Wi-Fi needs to be turned on in order to connect to a network."
-msgstr "S'ha d'activar la xarxa sense fil per poder-se connectar a una xarxa."
+msgstr "S'ha d'activar la xarxa sense fil per a poder-se connectar a una xarxa."
 
 #: js/ui/status/network.js:848
 msgid "Turn On Wi-Fi"
@@ -2150,7 +2150,7 @@ msgstr "Cap xarxa"
 
 #: js/ui/status/network.js:928 js/ui/status/rfkill.js:108
 msgid "Use hardware switch to turn off"
-msgstr "Utilitza l'interruptor de maquinari per desactivar-la"
+msgstr "Utilitza l'interruptor de maquinari per a desactivar-la"
 
 #: js/ui/status/network.js:1205
 msgid "Select Network"
@@ -2296,7 +2296,7 @@ msgstr "Queden %d∶%02d (%d %%)"
 #: js/ui/status/power.js:91
 #, javascript-format
 msgid "%d∶%02d Until Full (%d %%)"
-msgstr "%d∶%02d per completar la càrrega (%d %%)"
+msgstr "%d∶%02d per a completar la càrrega (%d %%)"
 
 #: js/ui/status/power.js:139 js/ui/status/power.js:141
 #, javascript-format
@@ -2638,11 +2638,11 @@ msgstr[1] "%d extensions seran actualitzades la següent vegada que entreu."
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "L'extensió és incompatible amb la versió actual del GNOME"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "L'extensió ha tingut un error"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2679,7 +2679,7 @@ msgstr "Quant a les extensions"
 msgid ""
 "To find and add extensions, visit <a "
 "href=\"https://extensions.gnome.org\">extensions.gnome.org</a>."
-msgstr "Per visitar i afegir extensions, visiteu <a href=\"https://extensions.gnome.org\">extensions.gnome.org</a>."
+msgstr "Per a visitar i afegir extensions, visiteu <a href=\"https://extensions.gnome.org\">extensions.gnome.org</a>."
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:35
 msgid "Warning"
@@ -2712,7 +2712,7 @@ msgstr "No s'ha pogut obtenir la llista d'extensions instal·lades. Assegureu-vo
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Les actualitzacions d'extensions preparades"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2753,11 +2753,11 @@ msgstr "L'UUID és un identificador únic global per l'extensió\nHa de tenir el
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Trieu una de les plantilles disponibles:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Plantilla"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2781,11 +2781,11 @@ msgstr "Una descripció curta del que fa l'extensió"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "PLANTILLA"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "La plantilla a usar per a l'extensió nova"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2810,13 +2810,13 @@ msgstr "Calen l'UUID, el nom i la descripció"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Ha fallat la connexió amb el GNOME Shell\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "L'extensió «%s» no existeix\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2848,7 +2848,7 @@ msgstr "Habilita una extensió"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "L'extensió «%s» no existeix\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -2962,7 +2962,7 @@ msgstr "S'han especificat més d'un directori font"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "L'extensió «%s» no té preferències\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -2975,12 +2975,12 @@ msgstr "Reinicia una extensió"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "No es poden desinstal·lar les extensions del sistema\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "No s'ha pogut desinstal·lar «%s»\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -2988,12 +2988,12 @@ msgstr "Desinstal·la una extensió"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "No imprimeixis els missatges d'error"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Ha fallat la connexió amb el GNOME Shell"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3089,19 +3089,19 @@ msgstr "Feu servir «%s» per a obtenir ajuda detallada.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Pla"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Una extensió buida"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Indicador"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Afegeix una icona a la barra superior"
 
 #. translators:
 #. * The number of sound outputs on a particular device

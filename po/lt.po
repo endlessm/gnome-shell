@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:52+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/endless-os/gnome-shell/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -185,7 +185,7 @@ msgstr "Įjungia D-Bus sąsają, kuri leidžia nagrinėti apvalkalo programos b�
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Programų pasirinkimo išdėstymas"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -193,7 +193,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Programų pasirinkimo išdėstymas. Kiekvienas įrašas masyve yra puslapis. Puslapiai yra įrašomi tokia tvarka, kokia jie matomi GNOME apvalkale. Kiekviename puslapyje yra pora „programos id“ → „duomenys“. Šiuo metu tokios vertės yra įrašomos kaip „duomenys“: • “position”: programos piktogramos padėtis puslapyje"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -490,7 +490,7 @@ msgstr "Išjungti"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "išjungti;perleisti;perkrauti;sustabdyti"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -502,7 +502,7 @@ msgstr "Perleisti"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "perleisti;paleisti iš naujo;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -740,7 +740,7 @@ msgstr "Suteikti prieigą"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Nepavadintas aplankas"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -753,11 +753,11 @@ msgstr "Naujas langas"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Paleisti naudojant integruotą grafikos kortą"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Paleisti naudojant konkrečią grafikos kortą"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -1112,18 +1112,18 @@ msgstr "%A, %Y m. %B %d d."
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%B %-d"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
 #: js/ui/dateMenu.js:154
 msgctxt "calendar heading"
 msgid "%B %-d %Y"
-msgstr "%Y %B %-d."
+msgstr "%Y %B %-d"
 
 #: js/ui/dateMenu.js:160
 msgid "Today"
-msgstr "šiandien"
+msgstr "Šiandien"
 
 #: js/ui/dateMenu.js:164
 msgid "Tomorrow"
@@ -1166,7 +1166,7 @@ msgstr "Orai"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Pasirinkite orų vietą…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1239,7 +1239,7 @@ msgstr "Paleisti iš naujo"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Įdiegti atnaujinimus ir perleisti"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1303,7 +1303,7 @@ msgstr "%s %s bus įdiegta po perleidimo. Sistemos atnaujinimas gali ilgai užtr
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Senka baterijos energija: įjunkite į elektros tinklą prieš įdiegdami atnaujinimus."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1316,7 +1316,7 @@ msgstr "Yra prisijungusių kitų naudotojų"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Įkėlimo parametrai"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1545,7 +1545,7 @@ msgstr "Apžvalga"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Rašykite, ko ieškote"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1991,11 +1991,11 @@ msgstr[3] "%d prijungta"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr ""
+msgstr "Bluetooth išjungtas"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr ""
+msgstr "Bluetooth įjungtas"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -2490,7 +2490,7 @@ msgstr "Programos"
 
 #: js/ui/viewSelector.js:205
 msgid "Search"
-msgstr "Paieška"
+msgstr "Ieškoti"
 
 #: js/ui/windowAttentionHandler.js:20
 #, javascript-format
@@ -2658,7 +2658,7 @@ msgstr "GNOME projektas"
 msgid ""
 "GNOME Extensions handles updating extensions, configuring extension "
 "preferences and removing or disabling unwanted extensions."
-msgstr ""
+msgstr "GNOME Plėtiniai atnaujina plėtinius, konfigūruoja jų nustatymus bei šalina arba išjungia nepageidaujamus plėtinius."
 
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:7
 msgid "Configure GNOME Shell Extensions"
@@ -2694,11 +2694,11 @@ msgstr[3] ""
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "Plėtinys yra nesuderinamas su dabartine GNOME versija"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "Plėtinyje kilo klaida"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2768,7 +2768,7 @@ msgstr "Atsiprašome, bet nepavyko gauti įdiegtų plėtinių sąrašo. Įsitiki
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Plėtinių atnaujinimai paruošti"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2809,11 +2809,11 @@ msgstr "UUID yra visuotinai unikalus identifikatorius jūsų plėtiniui.\nJis tu
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Pasirinkite vieną iš šablonų:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Šablonas"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2837,11 +2837,11 @@ msgstr "Trumpas aprašymas, ką daro plėtinys"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "ŠABLONAS"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Šablonas naujam plėtiniui"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2866,13 +2866,13 @@ msgstr "UUID, pavadinimas ir aprašymas yra būtini"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Nepavyko prisijungti prie GNOME apvalkalo\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "Plėtinio „%s“ nėra\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2904,7 +2904,7 @@ msgstr "Išjungti plėtinį"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "Plėtinio „%s“ nėra\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -3018,7 +3018,7 @@ msgstr "Nurodytas daugiau nei vienas kodo aplankas"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "Plėtinys „%s“ neturi nustatymų\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -3031,12 +3031,12 @@ msgstr "Atstatyti plėtinį"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Negalima pašalinti sisteminių plėtinių\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "Nepavyko pašalinti „%s“\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -3044,12 +3044,12 @@ msgstr "Išdiegti plėtinį"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Nespausdinti klaidų pranešimų"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Nepavyko prisijungti prie GNOME apvalkalo"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3145,19 +3145,19 @@ msgstr "Detalesnį žinyną gausite panaudoję „%s“.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Grynasis"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Tuščias plėtinys"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Indikatorius"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Pridėti piktogramą prie viršutinės juostos"
 
 #. translators:
 #. * The number of sound outputs on a particular device

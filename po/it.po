@@ -7,7 +7,7 @@
 # Gianvito Cavasoli <gianvito@gmx.it>, 2016
 # Luca Ferretti <elle.uca@infinito.it>, 2010-2014
 # Luca Ferretti <lferrett@gnome.org>, 2010-2013
-# Milo Casagrande <milo@milo.name>, 2009-2010,2012-2019
+# Milo Casagrande <milo@milo.name>, 2009-2010,2012-2020
 # Milo Casagrande <milo@milo.name>, 2009, 2010, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019., 2020
 # Milo Casagrande <milo@ubuntu.com>, 2009-2010,2012
 msgid ""
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:53+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Italian (http://www.transifex.com/endless-os/gnome-shell/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -188,7 +188,7 @@ msgstr "Abilita un'API D-Bus che permette di eseguire l'introspezione dello stat
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Disposizione del selettore app"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -196,7 +196,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Disposizione del selettore app. Le voci nell'array sono delle pagine, ogni pagina è archiviata nell'ordine con cui appare nella GNOME Shell. Ogni pagina contiene coppie \"application id\" → \"data\". Attualmente, i seguenti valori sono archiviati come \"data\": • \"position\": la posizione dell'icona applicazione nella pagina"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -315,7 +315,7 @@ msgstr "Configura come le finestre vengono mostrate nel selettore. Valori consen
 msgid ""
 "If true, only windows from the current workspace are shown in the switcher. "
 "Otherwise, all windows are included."
-msgstr "Se impostata a vero, nel selettore sono mostrate solo le finestre dello spazio di lavoro attualmente in uso. In caso contrario sono incluse tutte le finestre."
+msgstr "Se impostata a VERO, nel selettore sono mostrate solo le finestre dello spazio di lavoro attualmente in uso. In caso contrario sono incluse tutte le finestre."
 
 #: data/org.gnome.shell.gschema.xml.in:265
 msgid "Locations"
@@ -493,7 +493,7 @@ msgstr "Spegni"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "spegni;arresta;ferma;stop;riavvia;"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -505,7 +505,7 @@ msgstr "Riavvia"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "riavvia;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -731,7 +731,7 @@ msgstr "Consenti accesso"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Cartella senza nome"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -744,11 +744,11 @@ msgstr "Nuova finestra"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Lancia utilizzando scheda grafica integrata"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Lancia utilizzando scheda grafica discreta"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -1089,7 +1089,7 @@ msgstr "Dash"
 #. * "February 17 2015".
 #: js/ui/dateMenu.js:79
 msgid "%B %-d %Y"
-msgstr "%e %B %Y"
+msgstr "%-e %B %Y"
 
 #. Translators: This is the accessible name of the date button shown
 #. * below the time in the shell; it should combine the weekday and the
@@ -1103,14 +1103,14 @@ msgstr "%A %e %B %Y"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-e %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
 #: js/ui/dateMenu.js:154
 msgctxt "calendar heading"
 msgid "%B %-d %Y"
-msgstr "%e %B %Y"
+msgstr "%-e %B %Y"
 
 #: js/ui/dateMenu.js:160
 msgid "Today"
@@ -1157,7 +1157,7 @@ msgstr "Meteo"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Seleziona una posizione…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1224,7 +1224,7 @@ msgstr "Riavvia"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Installa aggiornamenti e riavvia"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1284,7 +1284,7 @@ msgstr "%s %s verrà installato dopo il riavvio. L'installazione potrebbe richie
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Batteria quasi scarica: collegare alla rete elettrica prima di installare gli aggiornamenti."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1297,7 +1297,7 @@ msgstr "Altri utenti sono collegati"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Opzioni di avvio"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1526,7 +1526,7 @@ msgstr "Panoramica"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Digita per cercare"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1814,8 +1814,8 @@ msgstr "Nessun risultato."
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d altro"
+msgstr[1] "%d altri"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -1948,11 +1948,11 @@ msgstr[1] "%d collegati"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr "Bluetooth disabilitato"
+msgstr "Bluetooth spento"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr "Bluetooth attivo"
+msgstr "Bluetooth acceso"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -2641,11 +2641,11 @@ msgstr[1] "%d estensioni verranno aggiornate al prossimo accesso."
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "L'estensione non è compatibile con la versione attuale di GNOME"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "L'estensione ha causato un errore"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2715,7 +2715,7 @@ msgstr "Impossibile recuperare l'elenco delle estensioni installate. Assicurarsi
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Disponibili aggiornamenti estensioni"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2756,11 +2756,11 @@ msgstr "Uno UUID è un identificativo globale univoco per l'estensione.\nDovrebb
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Scegliere uno dei modelli disponibili:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Modello"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2784,11 +2784,11 @@ msgstr "Una breve descrizione di cosa fa l'estensione"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "MODELLO"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Il modello da usare per la nuova estensione"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2813,13 +2813,13 @@ msgstr "Sono richiesti UUID, nome e descrizione"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Collegamento a GNOME Shell non riuscito\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "L'estensione «%s» non esiste\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2851,7 +2851,7 @@ msgstr "Abilita un'estensione"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "L'estensione «%s» non esiste\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -2965,7 +2965,7 @@ msgstr "È stata specificata più di una directory di sorgenti"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "L'estensione «%s» non ha preferenze\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -2978,12 +2978,12 @@ msgstr "Ripristina un'estensione"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Impossibile rimuovere estensioni di sistema\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "Rimozione di «%s» non riuscita\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -2991,12 +2991,12 @@ msgstr "Rimuove un'estensione"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Non stampa messaggi di errore"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Collegamento a GNOME Shell non riuscito"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3092,19 +3092,19 @@ msgstr "Usare «%s» per maggiori informazioni.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Semplice"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Un'estensione vuota"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Indicatore"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Aggiunge un'icona alla barra superiore"
 
 #. translators:
 #. * The number of sound outputs on a particular device

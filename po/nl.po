@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
+"PO-Revision-Date: 2020-10-21 13:52+0000\n"
 "Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/endless-os/gnome-shell/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -188,7 +188,7 @@ msgstr "Schakelt een D-Bus-API in die u de mogelijkheid biedt een introspectie u
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Weergave van de toepassingskiezer"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -196,7 +196,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Weergave van de toepassingskiezer. Elke ingave in de array is een pagina. Pagina’s worden opgeslagen in de volgorde waarin ze in Gnome Shell voorkomen. Elke pagina bevat een paar ‘toepassings-ID’ → ‘data’. Momenteel worden de huidige waarden opgeslagen als ‘data’: • “position”: de positie van het toepassingspictogram op de pagina"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -493,7 +493,7 @@ msgstr "Uitschakelen"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "power off;shutdown;halt;stop;uitschakelen;uitzetten;stoppen"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -505,7 +505,7 @@ msgstr "Herstarten"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "reboot;restart;herstarten;heropstarten;opnieuw opstarten;opnieuw starten;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -731,12 +731,12 @@ msgstr "Toegang verlenen"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Naamloze map"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
 msgid "Open Windows"
-msgstr "Vensters openen"
+msgstr "Open vensters"
 
 #: js/ui/appDisplay.js:2889 js/ui/panel.js:82
 msgid "New Window"
@@ -744,11 +744,11 @@ msgstr "Nieuw venster"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Met geïntegreerde grafische kaart opstarten"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Met discrete grafische kaart opstarten"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -1103,14 +1103,14 @@ msgstr "%A %e %B %Y"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-d %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
 #: js/ui/dateMenu.js:154
 msgctxt "calendar heading"
 msgid "%B %-d %Y"
-msgstr "%-d %B %Y"
+msgstr "%-d %B"
 
 #: js/ui/dateMenu.js:160
 msgid "Today"
@@ -1157,7 +1157,7 @@ msgstr "Weer"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Selecteer weerlocatie…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1224,7 +1224,7 @@ msgstr "Opnieuw opstarten"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Updates installeren en herstarten"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1284,7 +1284,7 @@ msgstr "%s %s zal de herstart worden geïnstalleerd. De installatie van de upgra
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "De batterij is bijna leeg: sluit de adapter aan alvorens de installatie te starten."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1297,7 +1297,7 @@ msgstr "Er zijn andere gebruikers aangemeld"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Opstartopties"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1526,7 +1526,7 @@ msgstr "Overzicht"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Typ om te zoeken"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1589,7 +1589,7 @@ msgstr "Systeem"
 
 #: js/ui/panel.js:830
 msgid "Top Bar"
-msgstr "Bovenbalk"
+msgstr "Menubalk"
 
 #: js/ui/paygUnlockDialog.js:92
 msgid "Your Pay As You Go usage credit has expired."
@@ -1814,8 +1814,8 @@ msgstr "Geen resultaten."
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d meer"
+msgstr[1] "%d meer"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -1948,11 +1948,11 @@ msgstr[1] "%d verbonden apparaten"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr ""
+msgstr "Bluetooth uit"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr ""
+msgstr "Bluetooth aan"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -2607,7 +2607,7 @@ msgstr "Het Gnome-project"
 msgid ""
 "GNOME Extensions handles updating extensions, configuring extension "
 "preferences and removing or disabling unwanted extensions."
-msgstr ""
+msgstr "Gnome Uitbreidingen staat in voor het bijwerken van uitbreidingen, hun voorkeuren te configureren of ongewenste uitbreidingen te verwijderen of uit te schakelen."
 
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:7
 msgid "Configure GNOME Shell Extensions"
@@ -2641,11 +2641,11 @@ msgstr[1] "%d uitbreidingen worden bijgewerkt bij de volgende aanmelding."
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "De uitbreiding is incompatibel met de huidige Gnome-versie"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "De uitbreiding heeft een fout ondervonden"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2715,7 +2715,7 @@ msgstr "Sorry, we konden de lijst met geïnstalleerde uitbreidingen niet verkrij
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Uitbreidingsupdates zijn klaar"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2756,11 +2756,11 @@ msgstr "De UUID is een unieke identificatie voor uw uitbreiding.\nDit moet in he
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Kies een van de beschikbare sjablonen:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Sjabloon"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2784,11 +2784,11 @@ msgstr "Een korte beschrijving van wat de uitbreiding doet"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "SJABLOON"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Het te gebruiken sjabloon voor de nieuwe uitbreiding"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2813,13 +2813,13 @@ msgstr "UUID, naam en beschrijving zijn vereist"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Verbinden met Gnome Shell mislukt\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "Uitbreiding ‘%s’ bestaat niet\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2851,7 +2851,7 @@ msgstr "Schakel een uitbreiding in"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "Uitbreiding ‘%s’ bestaat niet\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -2965,7 +2965,7 @@ msgstr "Meer dan één bronmap opgegeven"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "Uitbreiding ‘%s’ heeft geen voorkeuren\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -2978,12 +2978,12 @@ msgstr "Stel een uitbreiding opnieuw in"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Kan systeemuitbreidingen niet verwijderen\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "Kan ‘%s’ niet verwijderen\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -2991,12 +2991,12 @@ msgstr "Verwijder een uitbreiding"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Foutberichten niet tonen"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Verbinden met Gnome Shell mislukt"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3092,19 +3092,19 @@ msgstr "Gebruik ‘%s’ voor gedetailleerde hulp.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Normaal"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Een lege uitbreiding"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Indicator"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Voeg een pictogram toe aan de bovenste balk"
 
 #. translators:
 #. * The number of sound outputs on a particular device

@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:51+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/endless-os/gnome-shell/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -73,11 +73,11 @@ msgid ""
 " should be loaded. Any extension that wants to be loaded needs to be in this"
 " list. You can also manipulate this list with the EnableExtension and "
 "DisableExtension D-Bus methods on org.gnome.Shell."
-msgstr "GNOME Shell 擴充套件有 UUID 屬性；這個設定鍵列出了應載入的擴充套件。任何要載入的擴充套件都要出現在這個清單中。您也可以用 org.gnome.Shell 中的 EnableExtension 和 DisableExtension D-Bus 方法來操作這個清單。"
+msgstr "GNOME Shell 擴充套件有 UUID 屬性；這個設定鍵列出應載入的擴充套件。任何要載入的擴充套件都要出現在這個清單中。您也可以用 org.gnome.Shell 中的 EnableExtension 和 DisableExtension D-Bus 方法來操作這個清單。"
 
 #: data/org.gnome.shell.gschema.xml.in:33
 msgid "UUIDs of extensions to force disabling"
-msgstr "要強制停用的擴充 UUIDs"
+msgstr "強制停用的擴充套件 UUID"
 
 #: data/org.gnome.shell.gschema.xml.in:34
 msgid ""
@@ -86,7 +86,7 @@ msgid ""
 "also manipulate this list with the EnableExtension and DisableExtension "
 "D-Bus methods on org.gnome.Shell. This key takes precedence over the "
 "“enabled-extensions” setting."
-msgstr "GNOME Shell 擴充有 UUID 屬性；此金鑰列出應被停用的擴充，包含在當前模式中正在使用之項目。您也可用 org.gnome.Shell 上的 EnableExtension 及 DisableExtension D-Bus 方式調整清單。此金鑰優先於「啟用-擴充」設定。"
+msgstr "GNOME Shell 擴充套件有 UUID 屬性；這個設定鍵列出應停用的擴充套件，即使它是做為目前模式的一部分載入的。您也可以用 org.gnome.Shell 中的 EnableExtension 和 DisableExtension D-Bus 方法來操作這個清單。這個設定鍵會優先於「enabled-extensions」設定值。"
 
 #: data/org.gnome.shell.gschema.xml.in:44
 msgid "Disable user extensions"
@@ -158,7 +158,7 @@ msgid ""
 "filesystem is mounted. If the password can be saved for future use a "
 "“Remember Password” checkbox will be present. This key sets the default "
 "state of the checkbox."
-msgstr "當掛載加密裝置或遠端檔案系統時會要求密碼。如果密碼可以被儲存以供未來使用時會顯示「記住密碼」。這個設定鍵設定了勾選盒的預設狀態。"
+msgstr "當掛載加密裝置或遠端檔案系統時會要求密碼。如果密碼可以被儲存以供未來使用時會顯示「記住密碼」。這個設定鍵設定勾選盒的預設狀態。"
 
 #: data/org.gnome.shell.gschema.xml.in:103
 msgid ""
@@ -320,15 +320,15 @@ msgstr "位置"
 
 #: data/org.gnome.shell.gschema.xml.in:266
 msgid "The locations to show in world clocks"
-msgstr "世界時鐘裡顯示的地點"
+msgstr "要在世界時鐘顯示的位置"
 
 #: data/org.gnome.shell.gschema.xml.in:276
 msgid "Automatic location"
-msgstr "自動地點"
+msgstr "自動位置"
 
 #: data/org.gnome.shell.gschema.xml.in:277
 msgid "Whether to fetch the current location or not"
-msgstr "是否要取得當前地點"
+msgstr "是否取得目前位置"
 
 #: data/org.gnome.shell.gschema.xml.in:284
 msgid "Location"
@@ -336,7 +336,7 @@ msgstr "位置"
 
 #: data/org.gnome.shell.gschema.xml.in:285
 msgid "The location for which to show a forecast"
-msgstr "顯示預測的地點"
+msgstr "要顯示哪個區域的天氣預報"
 
 #: data/org.gnome.shell.gschema.xml.in:297
 msgid "Attach modal dialog to the parent window"
@@ -374,14 +374,14 @@ msgstr "網路登入"
 #: js/dbusServices/extensions/ui/extension-prefs-dialog.ui:36
 #: subprojects/extensions-app/data/ui/extensions-window.ui:224
 msgid "Something’s gone wrong"
-msgstr "有地方出錯了"
+msgstr "有地方出錯"
 
 #: js/dbusServices/extensions/ui/extension-prefs-dialog.ui:48
 msgid ""
 "We’re very sorry, but there’s been a problem: the settings for this "
 "extension can’t be displayed. We recommend that you report the issue to the "
 "extension authors."
-msgstr "我們非常抱歉，發生了這個問題：無法顯示此擴充套件的設定。我們建議您回報此議題給擴充套件作者知曉。"
+msgstr "我們非常抱歉發生這個問題：無法顯示此擴充套件的設定。我們建議您回報此議題給擴充套件作者知曉。"
 
 #: js/dbusServices/extensions/ui/extension-prefs-dialog.ui:82
 msgid "Technical Details"
@@ -469,7 +469,7 @@ msgstr "登入視窗"
 
 #: js/gdm/util.js:355
 msgid "Authentication error"
-msgstr "核對錯誤"
+msgstr "身分核對錯誤"
 
 #. We don't show fingerprint messages directly since it's
 #. not the main auth service. Instead we use the messages
@@ -526,7 +526,7 @@ msgstr "登出"
 #. semicolons
 #: js/misc/systemActions.js:109
 msgid "logout;log out;sign off"
-msgstr "登出；登出；登出"
+msgstr "logout;log out;sign off;登出"
 
 #. Translators: The name of the suspend action in search
 #: js/misc/systemActions.js:114
@@ -722,12 +722,12 @@ msgstr "授予存取權限"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "未命名資料夾"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
 msgid "Open Windows"
-msgstr "開啟 Windows"
+msgstr "開啟視窗"
 
 #: js/ui/appDisplay.js:2889 js/ui/panel.js:82
 msgid "New Window"
@@ -928,11 +928,11 @@ msgstr "外部裝置已拔除"
 
 #: js/ui/components/automountManager.js:208
 msgid "Unable to unlock volume"
-msgstr "無法解鎖卷宗"
+msgstr "無法解鎖磁碟區"
 
 #: js/ui/components/automountManager.js:209
 msgid "The installed udisks version does not support the PIM setting"
-msgstr "安裝的 udisks 版本不支援 PIM 設定"
+msgstr "安裝的 udisks 版本不支援設定 PIM"
 
 #: js/ui/components/autorunManager.js:332
 #, javascript-format
@@ -984,7 +984,7 @@ msgstr "服務"
 #: js/ui/components/networkAgent.js:490 js/ui/components/networkAgent.js:518
 #: js/ui/components/networkAgent.js:860 js/ui/components/networkAgent.js:881
 msgid "Authentication required"
-msgstr "要求核對"
+msgstr "要求核對身分"
 
 #: js/ui/components/networkAgent.js:491 js/ui/components/networkAgent.js:861
 #, javascript-format
@@ -995,7 +995,7 @@ msgstr "需要密碼或是加密金鑰來存取無線網路「%s」。"
 
 #: js/ui/components/networkAgent.js:495 js/ui/components/networkAgent.js:865
 msgid "Wired 802.1X authentication"
-msgstr "有線網路 802.1X 核對"
+msgstr "有線網路 802.1X 身分核對"
 
 #: js/ui/components/networkAgent.js:497
 msgid "Network name"
@@ -1003,7 +1003,7 @@ msgstr "網路名稱"
 
 #: js/ui/components/networkAgent.js:502 js/ui/components/networkAgent.js:869
 msgid "DSL authentication"
-msgstr "DSL 核對"
+msgstr "DSL 身分核對"
 
 #: js/ui/components/networkAgent.js:509 js/ui/components/networkAgent.js:874
 msgid "PIN code required"
@@ -1015,7 +1015,7 @@ msgstr "這個行動寬頻裝置需要 PIN 碼"
 
 #: js/ui/components/networkAgent.js:511
 msgid "PIN"
-msgstr "PIN："
+msgstr "PIN 碼"
 
 #: js/ui/components/networkAgent.js:519 js/ui/components/networkAgent.js:866
 #: js/ui/components/networkAgent.js:870 js/ui/components/networkAgent.js:882
@@ -1034,7 +1034,7 @@ msgstr "VPN 密碼"
 
 #: js/ui/components/polkitAgent.js:41
 msgid "Authentication Required"
-msgstr "要求核對"
+msgstr "要求核對身分"
 
 #: js/ui/components/polkitAgent.js:82
 msgid "Administrator"
@@ -1042,7 +1042,7 @@ msgstr "管理員"
 
 #: js/ui/components/polkitAgent.js:161
 msgid "Authenticate"
-msgstr "核對"
+msgstr "核對身分"
 
 #. Translators: "that didn't work" refers to the fact that the
 #. * requested authentication was not gained; this can happen
@@ -1148,7 +1148,7 @@ msgstr "天氣"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "選擇天氣位置…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1512,7 +1512,7 @@ msgstr "概覽"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "輸入以搜尋"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1790,7 +1790,7 @@ msgstr "沒有結果。"
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] ""
+msgstr[0] "其他 %d 項"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -1814,26 +1814,26 @@ msgstr "已開啟大寫鎖定。"
 
 #: js/ui/shellMountOperation.js:287
 msgid "Hidden Volume"
-msgstr "隱藏的音量"
+msgstr "隱藏磁碟區"
 
 #: js/ui/shellMountOperation.js:290
 msgid "Windows System Volume"
-msgstr "Windows 系統音量"
+msgstr "Windows 系統磁碟區"
 
 #: js/ui/shellMountOperation.js:293
 msgid "Uses Keyfiles"
-msgstr "使用密鑰"
+msgstr "使用 Keyfiles"
 
 #. Translators: %s is the Disks application
 #: js/ui/shellMountOperation.js:300
 #, javascript-format
 msgid ""
 "To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead."
-msgstr "如要解鎖使用密鑰的卷宗，請改為使用<i>%s</i> 功能。"
+msgstr "如要解鎖使用 keyfiles 的磁碟區，請改用 <i>%s</i> 工具。"
 
 #: js/ui/shellMountOperation.js:308
 msgid "PIM Number"
-msgstr "PIM 號碼"
+msgstr "PIM 碼"
 
 #: js/ui/shellMountOperation.js:376
 msgid "Remember Password"
@@ -1847,7 +1847,7 @@ msgstr "開啟 %s"
 
 #: js/ui/shellMountOperation.js:436
 msgid "The PIM must be a number or empty."
-msgstr "PIM 須為數字或留白。"
+msgstr "PIM 必須是數字或空白。"
 
 #. Translators: %s is the Disks application
 #: js/ui/shellMountOperation.js:478
@@ -1859,7 +1859,7 @@ msgstr "無法啟動 %s"
 #: js/ui/shellMountOperation.js:480
 #, javascript-format
 msgid "Couldn’t find the %s application"
-msgstr "無法找到 %s 應用程式"
+msgstr "找不到 %s 應用程式"
 
 #: js/ui/status/accessibility.js:35
 msgid "Accessibility"
@@ -1922,11 +1922,11 @@ msgstr[0] "%d 已連線"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr "藍牙已關閉"
+msgstr "藍牙關閉"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr "藍牙已開啟"
+msgstr "藍牙開啟"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -1934,11 +1934,11 @@ msgstr "亮度"
 
 #: js/ui/status/dwellClick.js:13
 msgid "Single Click"
-msgstr "單擊"
+msgstr "按一下"
 
 #: js/ui/status/dwellClick.js:18
 msgid "Double Click"
-msgstr "雙點擊"
+msgstr "按兩下"
 
 #: js/ui/status/dwellClick.js:23
 msgid "Drag"
@@ -1946,11 +1946,11 @@ msgstr "拖曳"
 
 #: js/ui/status/dwellClick.js:28
 msgid "Secondary Click"
-msgstr "二次點擊"
+msgstr "右鍵"
 
 #: js/ui/status/dwellClick.js:37
 msgid "Dwell Click"
-msgstr "停留點擊"
+msgstr "替代點選"
 
 #: js/ui/status/keyboard.js:878
 msgid "Keyboard"
@@ -2040,7 +2040,7 @@ msgstr "正連線到 %s"
 #: js/ui/status/network.js:470
 #, javascript-format
 msgid "%s Requires Authentication"
-msgstr "%s 需要核對"
+msgstr "%s 需要核對身分"
 
 #. Translators: this is for devices that require some kind of firmware or
 #. kernel
@@ -2157,7 +2157,7 @@ msgstr "連線中…"
 #. or password
 #: js/ui/status/network.js:1447
 msgid "authentication required"
-msgstr "要求核對"
+msgstr "要求核對身分"
 
 #: js/ui/status/network.js:1449
 msgid "connection failed"
@@ -2298,7 +2298,7 @@ msgstr "鎖定"
 
 #: js/ui/status/system.js:116
 msgid "Power Off / Log Out"
-msgstr "關閉電源／登出"
+msgstr "關閉電源/登出"
 
 #: js/ui/status/system.js:119
 msgid "Suspend"
@@ -2555,7 +2555,7 @@ msgstr "密碼不能為空白"
 
 #: src/shell-polkit-authentication-agent.c:344
 msgid "Authentication dialog was dismissed by the user"
-msgstr "核對對話盒被使用者取消了"
+msgstr "身分核對對話盒被使用者取消"
 
 #: subprojects/extensions-app/data/metainfo/org.gnome.Extensions.metainfo.xml.in:5
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:4
@@ -2577,7 +2577,7 @@ msgstr "GNOME 專案"
 msgid ""
 "GNOME Extensions handles updating extensions, configuring extension "
 "preferences and removing or disabling unwanted extensions."
-msgstr "GNOME 擴充套件處理更新擴充功能、設定擴充功能偏好，以及移除或停用不需要的擴充功能。"
+msgstr "GNOME 擴充套件，能處理擴充套件的更新、調整擴充套件偏好設定、移除或停用不想用的擴充套件等。"
 
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:7
 msgid "Configure GNOME Shell Extensions"
@@ -2586,7 +2586,7 @@ msgstr "設定 GNOME Shell 擴充套件"
 #: subprojects/extensions-app/js/main.js:145
 #, javascript-format
 msgid "Remove “%s”?"
-msgstr "移除“%s”？"
+msgstr "移除「%s」？"
 
 #: subprojects/extensions-app/js/main.js:146
 msgid ""
@@ -2600,7 +2600,7 @@ msgstr "移除"
 
 #: subprojects/extensions-app/js/main.js:182
 msgid "translator-credits"
-msgstr "參與的譯者"
+msgstr "Cheng-Chia Tseng <pswo10680@gmail.com>, 2020."
 
 #: subprojects/extensions-app/js/main.js:314
 #, javascript-format
@@ -2641,7 +2641,7 @@ msgstr "移除…"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:8
 msgid "Help"
-msgstr "說明"
+msgstr "求助"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:12
 msgid "About Extensions"
@@ -2680,11 +2680,11 @@ msgstr "沒有已安裝的擴充套件"
 msgid ""
 "We’re very sorry, but it was not possible to get the list of installed "
 "extensions. Make sure you are logged into GNOME and try again."
-msgstr "我們非常抱歉，但無法取得已安裝擴充的清單。確保您有登入 GNOME 並再試一次。"
+msgstr "非常抱歉，但無法取得已安裝擴充套件的清單。請確定您已登入 GNOME 後重試。"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "擴充套件更新準備就緒"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2701,7 +2701,7 @@ msgstr "已成功在 %s 建立新擴充套件。\n"
 msgid ""
 "Name should be a very short (ideally descriptive) string.\n"
 "Examples are: %s"
-msgstr "名稱應為非常短（最好是敘述性）的字串。\n例如：%s"
+msgstr "名稱應是非常短（理想上是描述性的）字串。\n範例：%s"
 
 #: subprojects/extensions-tool/src/command-create.c:305
 #: subprojects/extensions-tool/src/main.c:238
@@ -2713,27 +2713,27 @@ msgstr "名稱"
 msgid ""
 "Description is a single-sentence explanation of what your extension does.\n"
 "Examples are: %s"
-msgstr "敘述為解釋該擴充功能的單一句子。\n例如：%s"
+msgstr "描述是解釋您擴充套件作用的一句話。\n範例：%s"
 
 #: subprojects/extensions-tool/src/command-create.c:339
 #, c-format
 msgid ""
 "UUID is a globally-unique identifier for your extension.\n"
 "This should be in the format of an email address (clicktofocus@janedoe.example.com)\n"
-msgstr "UUID 是您的擴充之通用唯一識別碼。\n其格式應像 email 位址一樣 (clicktofocus@janedoe.example.com)\n"
+msgstr "UUID 是您擴充套件的全域唯一識別碼。\n格式應該如電子信箱位址 (clicktofocus@janedoe.example.com)\n"
 
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "選擇可用模本其中之一：\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "模本"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
-msgstr "新擴充的唯一識別碼"
+msgstr "新擴充套件的唯一識別碼"
 
 #: subprojects/extensions-tool/src/command-create.c:438
 msgid "NAME"
@@ -2741,40 +2741,40 @@ msgstr "NAME"
 
 #: subprojects/extensions-tool/src/command-create.c:439
 msgid "The user-visible name of the new extension"
-msgstr "新擴充的用戶可見名稱"
+msgstr "使用者看得到的新擴充套件名稱"
 
 #: subprojects/extensions-tool/src/command-create.c:441
 msgid "DESCRIPTION"
-msgstr "敘述"
+msgstr "DESCRIPTION"
 
 #: subprojects/extensions-tool/src/command-create.c:443
 msgid "A short description of what the extension does"
-msgstr "擴充功能作用的簡短描述"
+msgstr "簡短描述這擴充套件的作用"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "TEMPLATE"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "新擴充套件所要使用的模本"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
-msgstr "以互動方式輸入擴充功能資訊"
+msgstr "互動式輸入擴充套件資訊"
 
 #: subprojects/extensions-tool/src/command-create.c:461
 msgid "Create a new extension"
-msgstr "創造新擴充"
+msgstr "建立新擴充套件"
 
 #: subprojects/extensions-tool/src/command-create.c:479
 #: subprojects/extensions-tool/src/command-list.c:172
 msgid "Unknown arguments"
-msgstr "未知的引數"
+msgstr "未知參數"
 
 #: subprojects/extensions-tool/src/command-create.c:504
 msgid "UUID, name and description are required"
-msgstr "UUID、名稱與敘述為必要"
+msgstr "UUID、名稱及描述皆必填"
 
 #: subprojects/extensions-tool/src/command-disable.c:46
 #: subprojects/extensions-tool/src/command-enable.c:46
@@ -2782,17 +2782,17 @@ msgstr "UUID、名稱與敘述為必要"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "無法連接到 GNOME Shell\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "「%s」擴充套件不存在\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
-msgstr "停用一項擴充"
+msgstr "停用擴充套件"
 
 #: subprojects/extensions-tool/src/command-disable.c:119
 #: subprojects/extensions-tool/src/command-enable.c:119
@@ -2801,7 +2801,7 @@ msgstr "停用一項擴充"
 #: subprojects/extensions-tool/src/command-reset.c:76
 #: subprojects/extensions-tool/src/command-uninstall.c:104
 msgid "No UUID given"
-msgstr "未給定 UUID"
+msgstr "未提供 UUID"
 
 #: subprojects/extensions-tool/src/command-disable.c:124
 #: subprojects/extensions-tool/src/command-enable.c:124
@@ -2810,61 +2810,61 @@ msgstr "未給定 UUID"
 #: subprojects/extensions-tool/src/command-reset.c:81
 #: subprojects/extensions-tool/src/command-uninstall.c:109
 msgid "More than one UUID given"
-msgstr "給定多於一個 UUID"
+msgstr "提供多於一個 UUID"
 
 #: subprojects/extensions-tool/src/command-enable.c:101
 msgid "Enable an extension"
-msgstr "啟用一個擴充"
+msgstr "啟用擴充套件"
 
 #: subprojects/extensions-tool/src/command-info.c:59
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "「%s」擴充套件不存在\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
-msgstr "顯示擴充資訊"
+msgstr "顯示擴充套件資訊"
 
 #: subprojects/extensions-tool/src/command-install.c:173
 msgid "Overwrite an existing extension"
-msgstr "覆寫一個現有的擴充功能"
+msgstr "覆蓋現存擴充套件"
 
 #: subprojects/extensions-tool/src/command-install.c:175
 msgid "EXTENSION_BUNDLE"
-msgstr "擴充＿包"
+msgstr "擴充套件組合"
 
 #: subprojects/extensions-tool/src/command-install.c:184
 msgid "Install an extension bundle"
-msgstr "安裝一個擴充包"
+msgstr "安裝擴充套件組合"
 
 #: subprojects/extensions-tool/src/command-install.c:202
 msgid "No extension bundle specified"
-msgstr "未指定擴充包"
+msgstr "未指定擴充套件組合"
 
 #: subprojects/extensions-tool/src/command-install.c:208
 msgid "More than one extension bundle specified"
-msgstr "已指定一個以上擴充套件"
+msgstr "指定多於一個擴充套件組合"
 
 #: subprojects/extensions-tool/src/command-list.c:128
 msgid "Show user-installed extensions"
-msgstr "顯示用戶安裝的擴充"
+msgstr "顯示使用者安裝的擴充套件"
 
 #: subprojects/extensions-tool/src/command-list.c:131
 msgid "Show system-installed extensions"
-msgstr "顯示由系統安裝的擴充"
+msgstr "顯示系統安裝的擴充套件"
 
 #: subprojects/extensions-tool/src/command-list.c:134
 msgid "Show enabled extensions"
-msgstr "顯示啟用的擴充功能"
+msgstr "顯示啟用的擴充套件"
 
 #: subprojects/extensions-tool/src/command-list.c:137
 msgid "Show disabled extensions"
-msgstr "顯示停用的擴充"
+msgstr "顯示停用的擴充套件"
 
 #: subprojects/extensions-tool/src/command-list.c:140
 msgid "Show extensions with preferences"
-msgstr "顯示擴充與選項"
+msgstr "顯示有偏好設定的擴充套件"
 
 #: subprojects/extensions-tool/src/command-list.c:143
 msgid "Show extensions with updates"
@@ -2872,27 +2872,27 @@ msgstr "顯示有更新的擴充套件"
 
 #: subprojects/extensions-tool/src/command-list.c:146
 msgid "Print extension details"
-msgstr "列印擴充細節"
+msgstr "輸出擴充套件的詳細資訊"
 
 #: subprojects/extensions-tool/src/command-list.c:154
 msgid "List installed extensions"
-msgstr "列出已安裝的擴充"
+msgstr "列出已安裝的擴充套件"
 
 #: subprojects/extensions-tool/src/command-pack.c:450
 msgid "FILE"
-msgstr "FILE"
+msgstr "檔案"
 
 #: subprojects/extensions-tool/src/command-pack.c:451
 msgid "Additional source to include in the bundle"
-msgstr "要加入群組的額外來源"
+msgstr "要包進組合的其他來源"
 
 #: subprojects/extensions-tool/src/command-pack.c:454
 msgid "SCHEMA"
-msgstr "綱要"
+msgstr "基模"
 
 #: subprojects/extensions-tool/src/command-pack.c:455
 msgid "A GSettings schema that should be included"
-msgstr "應包含一個 GSettings 綱要"
+msgstr "應包含的 GSettings 基模"
 
 #: subprojects/extensions-tool/src/command-pack.c:457
 #: subprojects/extensions-tool/src/command-pack.c:468
@@ -2901,71 +2901,71 @@ msgstr "目錄"
 
 #: subprojects/extensions-tool/src/command-pack.c:459
 msgid "The directory where translations are found"
-msgstr "找到翻譯的目錄"
+msgstr "翻譯的尋找目錄"
 
 #: subprojects/extensions-tool/src/command-pack.c:461
 msgid "DOMAIN"
-msgstr "網域"
+msgstr "領域"
 
 #: subprojects/extensions-tool/src/command-pack.c:463
 msgid "The gettext domain to use for translations"
-msgstr "用來翻譯的 gettext 網域"
+msgstr "用於翻譯的 gettext 領域"
 
 #: subprojects/extensions-tool/src/command-pack.c:466
 msgid "Overwrite an existing pack"
-msgstr "覆寫一個現存封包"
+msgstr "覆蓋既存套件"
 
 #: subprojects/extensions-tool/src/command-pack.c:470
 msgid "The directory where the pack should be created"
-msgstr "封包應被創建的目錄"
+msgstr "應建立套件的目錄"
 
 #: subprojects/extensions-tool/src/command-pack.c:472
 msgid "SOURCE_DIRECTORY"
-msgstr "來源＿目錄"
+msgstr "來源目錄"
 
 #: subprojects/extensions-tool/src/command-pack.c:481
 msgid "Create an extension bundle"
-msgstr "創造擴充組"
+msgstr "建立擴充套件組合"
 
 #: subprojects/extensions-tool/src/command-pack.c:501
 msgid "More than one source directory specified"
-msgstr "指定了多於一個來源目錄"
+msgstr "指定多於一個來源目錄"
 
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "「%s」擴充套件沒有偏好設定\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
-msgstr "開啟擴充功能喜好設定"
+msgstr "開啟擴充套件的偏好設定"
 
 #: subprojects/extensions-tool/src/command-reset.c:58
 msgid "Reset an extension"
-msgstr "重設擴充"
+msgstr "重設擴充套件"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "無法解除安裝系統的擴充套件\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "無法解除安裝「%s」\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
-msgstr "解除安裝一項擴充"
+msgstr "解除安裝擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "無法列出錯誤訊息"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "無法連接至 GNOME Shell"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -2973,7 +2973,7 @@ msgstr "路徑"
 
 #: subprojects/extensions-tool/src/main.c:247
 msgid "URL"
-msgstr "URL"
+msgstr "網址"
 
 #: subprojects/extensions-tool/src/main.c:250
 msgid "Original author"
@@ -2981,29 +2981,29 @@ msgstr "原始作者"
 
 #: subprojects/extensions-tool/src/main.c:256
 msgid "State"
-msgstr "州"
+msgstr "狀態"
 
 #: subprojects/extensions-tool/src/main.c:290
 msgid "“version” takes no arguments"
-msgstr "「版本」未採用引數"
+msgstr "「版本」沒有參數"
 
 #: subprojects/extensions-tool/src/main.c:292
 #: subprojects/extensions-tool/src/main.c:312
 msgid "Usage:"
-msgstr "使用方式："
+msgstr "用法："
 
 #: subprojects/extensions-tool/src/main.c:295
 msgid "Print version information and exit."
-msgstr "列印版本資訊並離開。"
+msgstr "輸出版本資訊後離開。"
 
 #: subprojects/extensions-tool/src/main.c:310
 #: subprojects/extensions-tool/src/main.c:313
 msgid "COMMAND"
-msgstr "COMMAND"
+msgstr "指令"
 
 #: subprojects/extensions-tool/src/main.c:313
 msgid "[ARGS…]"
-msgstr "[ARGS…]"
+msgstr "[參數...]"
 
 #: subprojects/extensions-tool/src/main.c:315
 msgid "Commands:"
@@ -3011,69 +3011,69 @@ msgstr "指令："
 
 #: subprojects/extensions-tool/src/main.c:316
 msgid "Print help"
-msgstr "列印說明"
+msgstr "輸出說明"
 
 #: subprojects/extensions-tool/src/main.c:318
 msgid "Enable extension"
-msgstr "容許擴充"
+msgstr "啟用擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:319
 msgid "Disable extension"
-msgstr "停用擴充"
+msgstr "停用擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:320
 msgid "Reset extension"
-msgstr "重設擴充"
+msgstr "重設擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:321
 msgid "Uninstall extension"
-msgstr "解除安裝擴充"
+msgstr "解除安裝擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:322
 msgid "List extensions"
-msgstr "列出擴充"
+msgstr "列出擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:323
 #: subprojects/extensions-tool/src/main.c:324
 msgid "Show extension info"
-msgstr "顯示擴充資訊"
+msgstr "顯示擴充套件資訊"
 
 #: subprojects/extensions-tool/src/main.c:325
 msgid "Open extension preferences"
-msgstr "開啟擴充選項"
+msgstr "開啟擴充套件偏好設定"
 
 #: subprojects/extensions-tool/src/main.c:326
 msgid "Create extension"
-msgstr "建立擴充功能"
+msgstr "建立擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:327
 msgid "Package extension"
-msgstr "封裝擴充功能"
+msgstr "軟體包擴充套件"
 
 #: subprojects/extensions-tool/src/main.c:328
 msgid "Install extension bundle"
-msgstr "安裝擴充包"
+msgstr "安裝擴充套件組合"
 
 #: subprojects/extensions-tool/src/main.c:330
 #, c-format
 msgid "Use “%s” to get detailed help.\n"
-msgstr "使用 “%s” 獲得詳細協助。\n"
+msgstr "使用「%s」取得詳細說明。\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "空白"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "空白擴充套件"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "指示器"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "在頂端列中加入一個圖示"
 
 #. translators:
 #. * The number of sound outputs on a particular device

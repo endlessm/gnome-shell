@@ -23,8 +23,8 @@ msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:50+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Turkish (http://www.transifex.com/endless-os/gnome-shell/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,7 +84,7 @@ msgid ""
 " should be loaded. Any extension that wants to be loaded needs to be in this"
 " list. You can also manipulate this list with the EnableExtension and "
 "DisableExtension D-Bus methods on org.gnome.Shell."
-msgstr "GNOME Kabuğu uzantılarında UUID adlı bir özellik bulunur; bu anahtar, yüklenmesi gereken uzantıları listeler. Yüklenmesi istenen her tür uzantının bu listede olması gerekir. Ayrıca bu listeyi, org.gnome.Shell üzerindeki EnableExtension ve DisableExtension DBus yöntemleri ile de değiştirebilirsiniz."
+msgstr "GNOME Kabuğu uzantılarında UUID adında özellik bulunur; bu anahtar, yüklenmesi gereken uzantıları listeler. Yüklenmesi istenen her tür uzantının bu listede olması gerekir. Ayrıca bu listeyi, org.gnome.Shell üzerindeki EnableExtension ve DisableExtension DBus yöntemleri ile de değiştirebilirsiniz."
 
 #: data/org.gnome.shell.gschema.xml.in:33
 msgid "UUIDs of extensions to force disabling"
@@ -97,7 +97,7 @@ msgid ""
 "also manipulate this list with the EnableExtension and DisableExtension "
 "D-Bus methods on org.gnome.Shell. This key takes precedence over the "
 "“enabled-extensions” setting."
-msgstr "GNOME Kabuğu uzantılarında UUID adlı bir özellik bulunur; bu anahtar, geçerli kipin bir parçası olarak yüklenmiş olsa bile devre dışı bırakılması gereken uzantıları listeler. Bu listeyi, org.gnome.Shell üzerindeki EnableExtension ve DisableExtension D-Bus yöntemleriyle de değiştirebilirsiniz. Bu anahtar “enabled-extensions” ayarına göre önceliklidir."
+msgstr "GNOME Kabuğu uzantılarında UUID adında özellik bulunur; bu anahtar, geçerli kipin parçası olarak yüklenmiş olsa bile devre dışı bırakılması gereken uzantıları listeler. Bu listeyi, org.gnome.Shell üzerindeki EnableExtension ve DisableExtension D-Bus yöntemleriyle de değiştirebilirsiniz. Bu anahtar “enabled-extensions” ayarına göre önceliklidir."
 
 #: data/org.gnome.shell.gschema.xml.in:44
 msgid "Disable user extensions"
@@ -169,7 +169,7 @@ msgid ""
 "filesystem is mounted. If the password can be saved for future use a "
 "“Remember Password” checkbox will be present. This key sets the default "
 "state of the checkbox."
-msgstr "Kabuk, şifreli bir aygıt ya da uzak dosya sistemi bağlandığında parola isteyecek. Eğer parola gelecekte kullanılmak üzere kaydedilebiliyorsa, “Parolayı Anımsa” onay kutusu sunulacak. Bu anahtar, onay kutusunun öntanımlı durumunu belirler."
+msgstr "Kabuk, şifreli aygıt ya da uzak dosya sistemi bağlandığında parola isteyecek. Eğer parola gelecekte kullanılmak üzere kaydedilebiliyorsa, “Parolayı Anımsa” onay kutusu sunulacak. Bu anahtar, onay kutusunun öntanımlı durumunu belirler."
 
 #: data/org.gnome.shell.gschema.xml.in:103
 msgid ""
@@ -182,7 +182,7 @@ msgid ""
 "powered, or if there were devices set up associated with the default "
 "adapter. This will be reset if the default adapter is ever seen not to have "
 "devices associated to it."
-msgstr "Kabuk, yalnızca gücü açık bir Bluetooth bağdaştırıcı varsa ya da öntanımlı bağdaştırıcı ile ilişkili olarak ayarlanmış aygıtlar varsa bir Bluetooth menü ögesi gösterecektir. Eğer öntanımlı bağdaştırıcıyla ilşkili aygıtların olmadığı görülecek olursa bu durum sıfırlanacaktır."
+msgstr "Kabuk, yalnızca gücü açık Bluetooth bağdaştırıcı varsa ya da öntanımlı bağdaştırıcı ile ilişkili olarak ayarlanmış aygıtlar varsa Bluetooth menü ögesi gösterecektir. Eğer öntanımlı bağdaştırıcıyla ilişkili aygıtların olmadığı görülecek olursa bu durum sıfırlanacaktır."
 
 #: data/org.gnome.shell.gschema.xml.in:113
 msgid "Enable introspection API"
@@ -192,11 +192,11 @@ msgstr "İçgözlem APIʼsını etkinleştir"
 msgid ""
 "Enables a D-Bus API that allows to introspect the application state of the "
 "shell."
-msgstr "Kabuğun uygulama durumunu gözden geçirmeyi sağlayan bir D-Bus APIʼsını etkinleştirir."
+msgstr "Kabuğun uygulama durumunu gözden geçirmeyi sağlayan D-Bus APIʼsını etkinleştirir."
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Uygulama seçicinin düzeni"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -204,7 +204,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Uygulama seçicinin düzeni. Dizideki her girdi bir sayfadır. Sayfalar GNOME Kabuğu’nda göründüğü sırayla depolanır. Her sayfa bir “application id” → 'data' çifti içerir. Şimdilik şu değerler 'data' olarak depolanır: • “position”: sayfadaki uygulama simgesinin konumu"
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -317,7 +317,7 @@ msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
 "are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only” "
 "(shows only the application icon) or “both”."
-msgstr "Pencerelerin değiştiricideki gösterim biçimini yapılandırır. Uygun olasılıklar; “thumbnail-only” (pencerenin küçük bir resmini gösterir), “app-icon-only” (yalnızca uygulama simgesini gösterir) ya da “both” (her ikisi) değerleridir."
+msgstr "Pencerelerin değiştiricideki gösterim biçimini yapılandırır. Uygun olasılıklar; “thumbnail-only” (pencerenin küçük resmini gösterir), “app-icon-only” (yalnızca uygulama simgesini gösterir) ya da “both” (her ikisi) değerleridir."
 
 #: data/org.gnome.shell.gschema.xml.in:255
 msgid ""
@@ -501,7 +501,7 @@ msgstr "Bilgisayarı Kapat"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "gücü kapat;bilgisayarı kapat;duraklat;durdur"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -513,7 +513,7 @@ msgstr "Yeniden Başlat"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "yeniden önyükle;yeniden başlat;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -739,7 +739,7 @@ msgstr "Erişime İzin Ver"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Adsız Klasör"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -752,11 +752,11 @@ msgstr "Yeni Pencere"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Tümleşik Ekran Kartıyla Başlat"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Ayrık Ekran Kartıyla Başlat"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -919,13 +919,13 @@ msgstr "Temizle"
 #: js/ui/closeDialog.js:42
 #, javascript-format
 msgid "“%s” is not responding."
-msgstr "“%s” yanıt vermiyor."
+msgstr "“%s” yanıtlamıyor."
 
 #: js/ui/closeDialog.js:43
 msgid ""
 "You may choose to wait a short while for it to continue or force the "
 "application to quit entirely."
-msgstr "Devam etmesi için bir süre bekleyebilir ya da uygulamayı tümüyle kapanmaya zorlayabilirsiniz."
+msgstr "Devam etmesi için bekleyebilir ya da uygulamayı tümüyle kapanmaya zorlayabilirsiniz."
 
 #: js/ui/closeDialog.js:70
 msgid "Force Quit"
@@ -1111,7 +1111,7 @@ msgstr "%e %B %Y %A"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-d %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
@@ -1165,7 +1165,7 @@ msgstr "Hava Durumu"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Hava durumu konumu seç…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1232,7 +1232,7 @@ msgstr "Bilgisayarı Yeniden Başlat"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Güncelleştirmeleri Kur ve Yeniden Başlat"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1292,7 +1292,7 @@ msgstr "Bilgisayarınız yeniden başladıktan sonra %s %s kurulacak. Yükseltme
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Düşük pil gücü: lütfen güncelleştirmeleri kurmadan önce fişi takın."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1305,7 +1305,7 @@ msgstr "Diğer kullanıcılar oturum açmış"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Önyükleme Seçenekleri"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1336,12 +1336,12 @@ msgstr "Kur"
 
 #: js/ui/extensionDownloader.js:204
 msgid "Install Extension"
-msgstr "Uzantı Yükle"
+msgstr "Uzantı Kur"
 
 #: js/ui/extensionDownloader.js:205
 #, javascript-format
 msgid "Download and install “%s” from extensions.gnome.org?"
-msgstr "extensions.gnome.org üstünden “%s” uzantısı indirilip kurulsun mu?"
+msgstr "“%s” uzantısı extensions.gnome.org üstünden indirilip kurulsun mu?"
 
 #: js/ui/extensionSystem.js:254
 msgid "Extension Updates Available"
@@ -1534,7 +1534,7 @@ msgstr "Genel Görünüm"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "Aramak için yaz"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1570,7 +1570,7 @@ msgstr "Yok"
 
 #: js/ui/padOsd.js:845
 msgid "Press a button to configure"
-msgstr "Yapılandırmak için bir düğmeye bas"
+msgstr "Yapılandırmak için düğmeye bas"
 
 #: js/ui/padOsd.js:846
 msgid "Press Esc to exit"
@@ -2141,7 +2141,7 @@ msgstr "Kablosuz Ağ Kapalı"
 
 #: js/ui/status/network.js:847
 msgid "Wi-Fi needs to be turned on in order to connect to a network."
-msgstr "Bir ağa bağlanmak için kablosuz ağın açık olması gerekir."
+msgstr "Ağa bağlanmak için kablosuz ağın açık olması gerekir."
 
 #: js/ui/status/network.js:848
 msgid "Turn On Wi-Fi"
@@ -2378,7 +2378,7 @@ msgstr "Yetkisiz Thunderbolt aygıtı"
 #: js/ui/status/thunderbolt.js:330
 msgid ""
 "New device has been detected and needs to be authorized by an administrator."
-msgstr "Yeni aygıt saptandı ve bir yönetici tarafından yetkilendirilmesi gerekiyor."
+msgstr "Yeni aygıt saptandı ve yönetici tarafından yetkilendirilmesi gerekiyor."
 
 #: js/ui/status/thunderbolt.js:336
 msgid "Thunderbolt authorization error"
@@ -2567,7 +2567,7 @@ msgstr "Oturum açma ekranında GDM tarafından kullanılan kip"
 
 #: src/main.c:470
 msgid "Use a specific mode, e.g. “gdm” for login screen"
-msgstr "Oturum açma ekranı için -“gdm” gibi- özel bir kip kullan"
+msgstr "Oturum açma ekranı için -“gdm” gibi- özel kip kullan"
 
 #: src/main.c:476
 msgid "List possible modes"
@@ -2634,7 +2634,7 @@ msgstr "Uzantıyı kaldırırsanız, yeniden etkinleştirmek istediğinizde yeni
 
 #: subprojects/extensions-app/js/main.js:150
 msgid "Remove"
-msgstr "Kaldır"
+msgstr "Sil"
 
 #: subprojects/extensions-app/js/main.js:182
 msgid "translator-credits"
@@ -2649,11 +2649,11 @@ msgstr[1] ""
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "Uzantı, geçerli GNOME sürümüyle uyumsuz"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "Uzantıda hata oluştu"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2723,7 +2723,7 @@ msgstr "Maalesef, yüklü uzantıların listesi alınamadı. GNOME'da oturum aç
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Uzantı Güncellemeleri Hazır"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2740,7 +2740,7 @@ msgstr "Yeni uzantı %s içinde oluşturuldu.\n"
 msgid ""
 "Name should be a very short (ideally descriptive) string.\n"
 "Examples are: %s"
-msgstr "Ad çok kısa (ideal olarak açıklayıcı) bir dizge olmalıdır.\nÖrnekler: %s"
+msgstr "Ad çok kısa (ideal olarak açıklayıcı) dizge olmalıdır.\nÖrnekler: %s"
 
 #: subprojects/extensions-tool/src/command-create.c:305
 #: subprojects/extensions-tool/src/main.c:238
@@ -2764,11 +2764,11 @@ msgstr "UUID, uzantınız için genel ve benzersiz tanımlayıcıdır.\nE-posta 
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Uygun şablonlardan birini seçin:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Şablon"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2792,11 +2792,11 @@ msgstr "Uzantının ne yaptığına dair kısa açıklama"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "ŞABLON"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Yeni uzantı için kullanılacak şablon"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2821,13 +2821,13 @@ msgstr "UUID, ad ve açıklama gereklidir"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "GNOME Kabuğu’na bağlanılamadı\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "“%s” uzantısı yok\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2859,7 +2859,7 @@ msgstr "Uzantı etkinleştir"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "“%s” uzantısı yok\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -2875,7 +2875,7 @@ msgstr "UZANTI_DEMETİ"
 
 #: subprojects/extensions-tool/src/command-install.c:184
 msgid "Install an extension bundle"
-msgstr "Uzantı demeti yükle"
+msgstr "Uzantı demeti kur"
 
 #: subprojects/extensions-tool/src/command-install.c:202
 msgid "No extension bundle specified"
@@ -2973,7 +2973,7 @@ msgstr "Birden çok kaynak dizin belirtildi"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "“%s” uzantısının tercihleri yok\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -2986,12 +2986,12 @@ msgstr "Uzantıyı sıfırla"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Sistem uzantıları kaldırılamaz\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "“%s” kaldırılamadı\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -2999,12 +2999,12 @@ msgstr "Uzantı kaldır"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Hata iletilerini yazdırma"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "GNOME Kabuğu’na bağlanılamadı"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3091,7 +3091,7 @@ msgstr "Uzantıyı paketle"
 
 #: subprojects/extensions-tool/src/main.c:328
 msgid "Install extension bundle"
-msgstr "Uzantı demetini yükle"
+msgstr "Uzantı demetini kur"
 
 #: subprojects/extensions-tool/src/main.c:330
 #, c-format
@@ -3100,19 +3100,19 @@ msgstr "Ayrıntılı yardım almak için “%s” kullanın.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Düz"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Boş uzantı"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Belirteç"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Üst çubuğa simge ekle"
 
 #. translators:
 #. * The number of sound outputs on a particular device

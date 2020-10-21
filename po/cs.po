@@ -8,14 +8,14 @@
 # Andre Klapper <ak-47@gmx.net>, 2009
 # Marek Černocký <marek@manet.cz>, 2012-2020
 # MICHAL D. <black23@gmail.com>, 2017
-# Petr Kovar <pknbe@volny.cz>, 2009-2012,2014-2015
+# Petr Kovar <pknbe@volny.cz>, 2009-2012,2014-2015,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-19 00:25+0000\n"
-"PO-Revision-Date: 2020-10-12 00:25+0000\n"
-"Last-Translator: Roddy Shuler <roddy@stanfordalumni.org>\n"
+"PO-Revision-Date: 2020-10-21 13:51+0000\n"
+"Last-Translator: Will Thompson <wjt@endlessos.org>\n"
 "Language-Team: Czech (http://www.transifex.com/endless-os/gnome-shell/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -127,7 +127,7 @@ msgstr "Stránka ve výběru aplikace"
 
 #: data/org.gnome.shell.gschema.xml.in:70
 msgid "Index of the currently selected view in the application picker."
-msgstr "Číslo aktuálně zvolené stránky ve výběru aplikací."
+msgstr "Číslo aktuálně zvolené stránky ve výběru aplikace."
 
 #: data/org.gnome.shell.gschema.xml.in:76
 msgid "History for command (Alt-F2) dialog"
@@ -187,7 +187,7 @@ msgstr "Povolit API na sběrnici D-Bus, které umožňuje introspekci stavu apli
 
 #: data/org.gnome.shell.gschema.xml.in:121
 msgid "Layout of the app picker"
-msgstr ""
+msgstr "Rozvržení výběru aplikace"
 
 #: data/org.gnome.shell.gschema.xml.in:122
 msgid ""
@@ -195,7 +195,7 @@ msgid ""
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
+msgstr "Rozvržení výběru aplikace. Jednotlivé položky pole představují stránky. Stránky jsou v pořadí, v jakém se objeví v GNOME Shellu. Každá stránka obsahuje pár „id aplikace“ → „data“. V současnosti se jako „data“ ukládají následující hodnoty: • „pozice“: pozice ikony aplikace na stránce."
 
 #: data/org.gnome.shell.gschema.xml.in:134
 msgid "Whether password reset is allowed"
@@ -234,7 +234,7 @@ msgstr "Klávesová zkratka otevírající přehled"
 
 #: data/org.gnome.shell.gschema.xml.in:166
 msgid "Keybinding to open the Activities Overview."
-msgstr "Klávesová zkratka sloužící k otevření přehledu činností"
+msgstr "Klávesová zkratka sloužící k otevření přehledu činností."
 
 #: data/org.gnome.shell.gschema.xml.in:172
 msgid "Keybinding to toggle the visibility of the notification list"
@@ -291,7 +291,7 @@ msgstr "Přepnout do aplikace 9"
 #: data/org.gnome.shell.gschema.xml.in:227
 #: data/org.gnome.shell.gschema.xml.in:254
 msgid "Limit switcher to current workspace."
-msgstr "Omezit přepínání jen na aktuální plochu"
+msgstr "Omezit přepínání jen na aktuální plochu."
 
 #: data/org.gnome.shell.gschema.xml.in:228
 msgid ""
@@ -301,7 +301,7 @@ msgstr "Je-li zapnuto, objeví se v přepínači aplikací jen ty, co jsou na ak
 
 #: data/org.gnome.shell.gschema.xml.in:245
 msgid "The application icon mode."
-msgstr "Režim ikon aplikací"
+msgstr "Režim ikon aplikací."
 
 #: data/org.gnome.shell.gschema.xml.in:246
 msgid ""
@@ -351,7 +351,7 @@ msgstr "Modální dialogová okna připojovat k rodičovskému oknu"
 #: data/org.gnome.shell.gschema.xml.in:331
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
-msgstr "Když běží GNOME Shell, tento klíč přepíše klíč v org.gnome.mutter"
+msgstr "Když běží GNOME Shell, tento klíč přepíše klíč v org.gnome.mutter."
 
 #: data/org.gnome.shell.gschema.xml.in:306
 msgid "Enable edge tiling when dropping windows on screen edges"
@@ -492,7 +492,7 @@ msgstr "Vypnout"
 #. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
+msgstr "vypnout;vypnutí;zastavit;stopnout;"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -504,7 +504,7 @@ msgstr "Restartovat"
 #. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
-msgstr ""
+msgstr "restart;restartování;restartovat;reboot;znovu zavést systém;zavedení systému;natažení systému;"
 
 #. Translators: The name of the lock screen action in search
 #: js/misc/systemActions.js:98
@@ -742,7 +742,7 @@ msgstr "Schválit přístup"
 
 #: js/ui/appDisplay.js:1346
 msgid "Unnamed Folder"
-msgstr ""
+msgstr "Nepojmenovaná složka"
 
 #. Translators: This is the heading of a list of open windows
 #: js/ui/appDisplay.js:2870 js/ui/panel.js:75
@@ -755,11 +755,11 @@ msgstr "Nové okno"
 
 #: js/ui/appDisplay.js:2905
 msgid "Launch using Integrated Graphics Card"
-msgstr ""
+msgstr "Spustit pomocí integrované grafické karty"
 
 #: js/ui/appDisplay.js:2906
 msgid "Launch using Discrete Graphics Card"
-msgstr ""
+msgstr "Spustit pomocí samostatné grafické karty"
 
 #: js/ui/appDisplay.js:2934 js/ui/dash.js:239
 msgid "Remove from Favorites"
@@ -1114,14 +1114,14 @@ msgstr "%A, %e. %B %Y"
 #: js/ui/dateMenu.js:151
 msgctxt "calendar heading"
 msgid "%B %-d"
-msgstr ""
+msgstr "%-d. %B"
 
 #. Translators: Shown on calendar heading when selected day occurs on
 #. different year
 #: js/ui/dateMenu.js:154
 msgctxt "calendar heading"
 msgid "%B %-d %Y"
-msgstr "%e. %B %Y"
+msgstr "%-e. %B %Y"
 
 #: js/ui/dateMenu.js:160
 msgid "Today"
@@ -1168,7 +1168,7 @@ msgstr "Počasí"
 
 #: js/ui/dateMenu.js:653
 msgid "Select weather location…"
-msgstr ""
+msgstr "Vybrat místo pro počasí…"
 
 #: js/ui/endSessionDialog.js:39
 #, javascript-format
@@ -1212,7 +1212,7 @@ msgstr "Vypnutí"
 #: js/ui/endSessionDialog.js:63
 msgctxt "title"
 msgid "Install Updates & Power Off"
-msgstr "Nainstalovat aktualizace a vypnout"
+msgstr "Nainstalování aktualizací a vypnutí"
 
 #: js/ui/endSessionDialog.js:66
 #, javascript-format
@@ -1241,7 +1241,7 @@ msgstr "Restart"
 #: js/ui/endSessionDialog.js:82
 msgctxt "title"
 msgid "Install Updates & Restart"
-msgstr ""
+msgstr "Nainstalování aktualizací a restart"
 
 #: js/ui/endSessionDialog.js:85
 #, javascript-format
@@ -1260,7 +1260,7 @@ msgstr "Restartovat"
 #: js/ui/endSessionDialog.js:101
 msgctxt "title"
 msgid "Restart & Install Updates"
-msgstr "Restartovat a nainstalovat aktualizace"
+msgstr "Restart a nainstalování aktualizací"
 
 #: js/ui/endSessionDialog.js:104
 #, javascript-format
@@ -1291,7 +1291,7 @@ msgstr "Po nainstalování aktualizací vypnout"
 #: js/ui/endSessionDialog.js:121
 msgctxt "title"
 msgid "Restart & Install Upgrade"
-msgstr "Restartovat a nainstalovat povýšení"
+msgstr "Restart a nainstalování povýšení"
 
 #. Translators: This is the text displayed for system upgrades in the
 #. shut down dialog. First %s gets replaced with the distro name and
@@ -1305,7 +1305,7 @@ msgstr "Verze %2s distribuce %1s bude nainstalována po restartu. Instalace pov�
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
+msgstr "Nízký stav baterie: před instalací prosím připojte k napájení."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1318,7 +1318,7 @@ msgstr "Jsou přihlášeni jiní uživatelé"
 #: js/ui/endSessionDialog.js:467
 msgctxt "button"
 msgid "Boot Options"
-msgstr ""
+msgstr "Volby zavedení systému"
 
 #. Translators: Remote here refers to a remote session, like a ssh login
 #: js/ui/endSessionDialog.js:685
@@ -1547,7 +1547,7 @@ msgstr "Přehled"
 #. characters.
 #: js/ui/overview.js:108
 msgid "Type to search"
-msgstr ""
+msgstr "vyhledávejte psaním"
 
 #: js/ui/padOsd.js:96
 msgid "New shortcut…"
@@ -1993,11 +1993,11 @@ msgstr[3] "%d připojených"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
-msgstr ""
+msgstr "Bluetooth je vypnuto"
 
 #: js/ui/status/bluetooth.js:154
 msgid "Bluetooth On"
-msgstr ""
+msgstr "Bluetooth je zapnuto"
 
 #: js/ui/status/brightness.js:39
 msgid "Brightness"
@@ -2660,7 +2660,7 @@ msgstr "Projekt GNOME"
 msgid ""
 "GNOME Extensions handles updating extensions, configuring extension "
 "preferences and removing or disabling unwanted extensions."
-msgstr ""
+msgstr "Aplikace Rozšíření GNOME umožňuje aktualizaci a nastavení předvoleb rozšíření a odstranění nebo vypnutí nechtěných rozšíření."
 
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:7
 msgid "Configure GNOME Shell Extensions"
@@ -2696,11 +2696,11 @@ msgstr[3] ""
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
-msgstr ""
+msgstr "Rozšíření není kompatibilní s aktuální verzí GNOME"
 
 #: subprojects/extensions-app/js/main.js:464
 msgid "The extension had an error"
-msgstr ""
+msgstr "V rozšíření se vyskytla chyba"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:109
 #: subprojects/extensions-tool/src/command-create.c:325
@@ -2731,7 +2731,7 @@ msgstr "Nápověda"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:12
 msgid "About Extensions"
-msgstr "O rozšířeních"
+msgstr "O aplikaci Rozšíření"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:27
 msgid ""
@@ -2770,7 +2770,7 @@ msgstr "Bohužel, ale není možné získat seznam nainstalovaných rozšířen�
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:273
 msgid "Extension Updates Ready"
-msgstr ""
+msgstr "Jsou připravené aktualizace rozšíření"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:289
 msgid "Log Out…"
@@ -2811,11 +2811,11 @@ msgstr "UUID je globálně jedinečnou identifikací vašeho rozšíření.\nMě
 #: subprojects/extensions-tool/src/command-create.c:366
 #, c-format
 msgid "Choose one of the available templates:\n"
-msgstr ""
+msgstr "Zvolte jednu z dostupných šablon:\n"
 
 #: subprojects/extensions-tool/src/command-create.c:380
 msgid "Template"
-msgstr ""
+msgstr "Šablona"
 
 #: subprojects/extensions-tool/src/command-create.c:435
 msgid "The unique identifier of the new extension"
@@ -2839,11 +2839,11 @@ msgstr "Krátký popis toho, co rozšíření vlastně dělá"
 
 #: subprojects/extensions-tool/src/command-create.c:446
 msgid "TEMPLATE"
-msgstr ""
+msgstr "ŠABLONA"
 
 #: subprojects/extensions-tool/src/command-create.c:447
 msgid "The template to use for the new extension"
-msgstr ""
+msgstr "Šablona, která se má použít pro nové rozšíření"
 
 #: subprojects/extensions-tool/src/command-create.c:453
 msgid "Enter extension information interactively"
@@ -2868,13 +2868,13 @@ msgstr "Jsou vyžadovány UUID, název a popis"
 #: subprojects/extensions-tool/src/command-list.c:64
 #, c-format
 msgid "Failed to connect to GNOME Shell\n"
-msgstr ""
+msgstr "Selhalo připojení ke GNOME Shellu\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:53
 #: subprojects/extensions-tool/src/command-enable.c:53
 #, c-format
 msgid "Extension “%s” does not exist\n"
-msgstr ""
+msgstr "Rozšíření „%s“ neexistuje\n"
 
 #: subprojects/extensions-tool/src/command-disable.c:101
 msgid "Disable an extension"
@@ -2906,7 +2906,7 @@ msgstr "Povolit rozšíření"
 #: subprojects/extensions-tool/src/main.c:155
 #, c-format
 msgid "Extension “%s” doesn't exist\n"
-msgstr ""
+msgstr "Rozšíření „%s“ neexistuje\n"
 
 #: subprojects/extensions-tool/src/command-info.c:85
 msgid "Show extensions info"
@@ -3020,7 +3020,7 @@ msgstr "Bylo zadáno více zdrojových složek naráz"
 #: subprojects/extensions-tool/src/command-prefs.c:47
 #, c-format
 msgid "Extension “%s” doesn't have preferences\n"
-msgstr ""
+msgstr "Rozšíření „%s“ nemá žádné předvolby\n"
 
 #: subprojects/extensions-tool/src/command-prefs.c:79
 msgid "Opens extension preferences"
@@ -3033,12 +3033,12 @@ msgstr "Uvést rozšíření od výchozího stavu"
 #: subprojects/extensions-tool/src/command-uninstall.c:49
 #, c-format
 msgid "Cannot uninstall system extensions\n"
-msgstr ""
+msgstr "Systémové rozšíření odinstalovat nelze\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:64
 #, c-format
 msgid "Failed to uninstall “%s”\n"
-msgstr ""
+msgstr "Selhala odinstalace „%s“\n"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:86
 msgid "Uninstall an extension"
@@ -3046,12 +3046,12 @@ msgstr "Odinstalovat rozšíření"
 
 #: subprojects/extensions-tool/src/main.c:72
 msgid "Do not print error messages"
-msgstr ""
+msgstr "Nevypisovat chybové zprávy"
 
 #: subprojects/extensions-tool/src/main.c:146
 #, c-format
 msgid "Failed to connect to GNOME Shell"
-msgstr ""
+msgstr "Selhalo připojení ke GNOME Shellu"
 
 #: subprojects/extensions-tool/src/main.c:244
 msgid "Path"
@@ -3093,7 +3093,7 @@ msgstr "[ARGUMENTY…]"
 
 #: subprojects/extensions-tool/src/main.c:315
 msgid "Commands:"
-msgstr "Příkazy"
+msgstr "Příkazy:"
 
 #: subprojects/extensions-tool/src/main.c:316
 msgid "Print help"
@@ -3147,19 +3147,19 @@ msgstr "Použijte „%s“ k vypsání podrobné nápovědy.\n"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:4
 msgid "Plain"
-msgstr ""
+msgstr "Holá aplikace"
 
 #: subprojects/extensions-tool/src/templates/00-plain.desktop.in:5
 msgid "An empty extension"
-msgstr ""
+msgstr "Prázdné rozšíření"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:4
 msgid "Indicator"
-msgstr ""
+msgstr "Ukazatel"
 
 #: subprojects/extensions-tool/src/templates/indicator.desktop.in:5
 msgid "Add an icon to the top bar"
-msgstr ""
+msgstr "Přidá ikonu na horní lištu"
 
 #. translators:
 #. * The number of sound outputs on a particular device
