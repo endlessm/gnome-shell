@@ -1,7 +1,8 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported AppDisplay, AppSearchProvider */
 
-const { Clutter, Gio, GLib, GObject, Graphene, Meta, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Graphene, Meta,
+    Pango, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
 const AppFavorites = imports.ui.appFavorites;
@@ -30,6 +31,9 @@ var SCROLL_TIMEOUT_TIME = 150;
 
 var APP_ICON_SCALE_IN_TIME = 500;
 var APP_ICON_SCALE_IN_DELAY = 700;
+
+var APP_ICON_TITLE_EXPAND_TIME = 250;
+var APP_ICON_TITLE_COLLAPSE_TIME = 150;
 
 const FOLDER_DIALOG_ANIMATION_TIME = 200;
 
@@ -1441,16 +1445,19 @@ var AppSearchProvider = class AppSearchProvider {
     }
 
     createResultObject(resultMeta) {
-        if (resultMeta.id.endsWith('.desktop'))
-            return new AppIcon(this._appSys.lookup_app(resultMeta['id']));
-        else
+        if (resultMeta.id.endsWith('.desktop')) {
+            return new AppIcon(this._appSys.lookup_app(resultMeta['id']), {
+                expandTitleOnHover: false,
+            });
+        } else {
             return new SystemActionIcon(this, resultMeta);
+        }
     }
 };
 
 var AppViewItem = GObject.registerClass(
 class AppViewItem extends St.Button {
-    _init(params = {}, isDraggable = true) {
+    _init(params = {}, isDraggable = true, expandTitleOnHover = true) {
         super._init({
             pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
             reactive: true,
@@ -1470,6 +1477,8 @@ class AppViewItem extends St.Button {
 
         this._otherIconIsHovering = false;
 
+        if (expandTitleOnHover)
+            this.connect('notify::hover', this._onHover.bind(this));
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
@@ -1484,6 +1493,35 @@ class AppViewItem extends St.Button {
                 Main.overview.endItemDrag(this);
             this._draggable = null;
         }
+    }
+
+    _onHover() {
+        if (!this.icon.label)
+            return;
+
+        const { label } = this.icon;
+        const { clutterText } = label;
+        const layout = clutterText.get_layout();
+        if (!layout.is_wrapped() && !layout.is_ellipsized())
+            return;
+
+        label.remove_transition('allocation');
+
+        const id = label.connect('notify::allocation', () => {
+            label.restore_easing_state();
+            label.disconnect(id);
+        });
+
+        const { hover } = this;
+        label.save_easing_state();
+        label.set_easing_duration(hover
+            ? APP_ICON_TITLE_EXPAND_TIME
+            : APP_ICON_TITLE_COLLAPSE_TIME);
+        clutterText.set({
+            line_wrap: hover,
+            line_wrap_mode: hover ? Pango.WrapMode.WORD_CHAR : Pango.WrapMode.NONE,
+            ellipsize: hover ? Pango.EllipsizeMode.NONE : Pango.EllipsizeMode.END,
+        });
     }
 
     _onDragBegin() {
@@ -2536,8 +2574,10 @@ var AppIcon = GObject.registerClass({
         const appIconParams = Params.parse(iconParams, { isDraggable: true }, true);
         const isDraggable = appIconParams['isDraggable'];
         delete iconParams['isDraggable'];
+        const expandTitleOnHover = appIconParams['expandTitleOnHover'];
+        delete iconParams['expandTitleOnHover'];
 
-        super._init({ style_class: 'app-well-app' }, isDraggable);
+        super._init({ style_class: 'app-well-app' }, isDraggable, expandTitleOnHover);
 
         this.app = app;
         this._id = app.get_id();
