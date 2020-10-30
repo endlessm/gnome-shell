@@ -2903,6 +2903,8 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
 
         this._source = source;
 
+        this._parentalControlsManager = ParentalControlsManager.getDefault();
+
         this.actor.add_style_class_name('app-well-menu');
 
         // Chain our visibility and lifecycle to that of the source
@@ -2983,7 +2985,8 @@ var AppIconMenu = class AppIconMenu extends PopupMenu.PopupMenu {
                 });
             }
 
-            let canFavorite = global.settings.is_writable('favorite-apps');
+            let canFavorite = global.settings.is_writable('favorite-apps') &&
+                              this._parentalControlsManager.shouldShowApp(this._source.app.app_info);
 
             if (canFavorite) {
                 this._appendSeparator();
