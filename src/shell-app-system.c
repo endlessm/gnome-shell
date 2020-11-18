@@ -33,6 +33,27 @@
  */
 #define SHELL_APP_IS_OPEN_EVENT "b5e11a3d-13f8-4219-84fd-c9ba0bf3d1f0"
 
+/* Additional key used to map a renamed desktop file to its previous name.
+ * For instance, org.gnome.Totem.desktop contains:
+ *
+ *   X-Endless-Alias=totem
+ *
+ * (without the .desktop suffix).
+ */
+#define X_ENDLESS_ALIAS_KEY     "X-Endless-Alias"
+
+/* Additional key listing 0 or more previous names for an application. This is
+ * added by flatpak-builder when the manifest contains a rename-desktop-file
+ * key, and by Endless-specific tools to migrate from an app in our eos-apps
+ * repository to the same app with a different ID on Flathub. For example,
+ * org.inkscape.Inkscape.desktop contains:
+ *
+ *   X-Flatpak-RenamedFrom=inkscape.desktop;
+ *
+ * (with the .desktop suffix).
+ */
+#define X_FLATPAK_RENAMED_FROM_KEY "X-Flatpak-RenamedFrom"
+
 /* Vendor prefixes are something that can be preprended to a .desktop
  * file name.  Undo this.
  */
@@ -50,6 +71,7 @@ enum {
 enum {
   APP_STATE_CHANGED,
   INSTALLED_CHANGED,
+  APP_INFO_CHANGED,
   LAST_SIGNAL
 };
 
@@ -66,12 +88,15 @@ struct _ShellAppSystem
 
 struct _ShellAppSystemPrivate {
   GHashTable *running_apps;
+  GHashTable *starting_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
   GList *installed_apps;
 
   guint rescan_icons_timeout_id;
   guint n_rescan_retries;
+
+  GHashTable *alias_to_id;
 };
 
 static void shell_app_system_finalize (GObject *object);
@@ -98,6 +123,56 @@ static void shell_app_system_class_init(ShellAppSystemClass *klass)
                   0,
                   NULL, NULL, NULL,
 		  G_TYPE_NONE, 0);
+
+  signals[APP_INFO_CHANGED] =
+    g_signal_new ("app-info-changed",
+                  SHELL_TYPE_APP_SYSTEM,
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 1,
+                  SHELL_TYPE_APP);
+}
+
+static void
+add_aliases (ShellAppSystem  *self,
+             GDesktopAppInfo *info)
+{
+  ShellAppSystemPrivate *priv = self->priv;
+  const char *id = g_app_info_get_id (G_APP_INFO (info));
+  const char *alias;
+  g_autofree char **renamed_from_list = NULL;
+  size_t i;
+
+  alias = g_desktop_app_info_get_string (info, X_ENDLESS_ALIAS_KEY);
+  if (alias != NULL)
+    {
+      char *desktop_alias = g_strconcat (alias, ".desktop", NULL);
+      g_hash_table_insert (priv->alias_to_id, desktop_alias, g_strdup (id));
+    }
+
+  renamed_from_list = g_desktop_app_info_get_string_list (info, X_FLATPAK_RENAMED_FROM_KEY, NULL);
+  for (i = 0; renamed_from_list != NULL && renamed_from_list[i] != NULL; i++)
+    {
+      g_hash_table_insert (priv->alias_to_id,
+                           g_steal_pointer (&renamed_from_list[i]),
+                           g_strdup (id));
+    }
+}
+
+static void
+scan_alias_to_id (ShellAppSystem *self)
+{
+  ShellAppSystemPrivate *priv = self->priv;
+  GList *apps, *l;
+
+  g_hash_table_remove_all (priv->alias_to_id);
+
+  apps = g_app_info_get_all ();
+  for (l = apps; l != NULL; l = l->next)
+    add_aliases (self, G_DESKTOP_APP_INFO (l->data));
+
+  g_list_free_full (apps, g_object_unref);
 }
 
 static void
@@ -131,11 +206,53 @@ scan_startup_wm_class_to_id (ShellAppSystem *self)
     }
 }
 
+/**
+ * shell_app_system_app_info_equal:
+ * @one: (transfer none): a #GDesktopAppInfo
+ * @two: (transfer none): a possibly-different #GDesktopAppInfo
+ *
+ * Returns %TRUE if @one and @two can be treated as equal. Compared to
+ * g_app_info_equal(), which just compares app IDs, this function also compares
+ * fields of interest to the shell: icon, name, description, executable, and
+ * should_show().
+ *
+ * Returns: %TRUE if @one and @two are equivalent; %FALSE otherwise
+ */
+gboolean
+shell_app_system_app_info_equal (GDesktopAppInfo *one,
+                                 GDesktopAppInfo *two)
+{
+  GAppInfo *one_info, *two_info;
+
+  g_return_val_if_fail (G_IS_DESKTOP_APP_INFO (one), FALSE);
+  g_return_val_if_fail (G_IS_DESKTOP_APP_INFO (two), FALSE);
+
+  one_info = G_APP_INFO (one);
+  two_info = G_APP_INFO (two);
+
+  return
+    g_app_info_equal (one_info, two_info) &&
+    g_app_info_should_show (one_info) == g_app_info_should_show (two_info) &&
+    g_strcmp0 (g_desktop_app_info_get_filename (one),
+               g_desktop_app_info_get_filename (two)) == 0 &&
+    g_strcmp0 (g_app_info_get_executable (one_info),
+               g_app_info_get_executable (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_commandline (one_info),
+               g_app_info_get_commandline (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_name (one_info),
+               g_app_info_get_name (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_description (one_info),
+               g_app_info_get_description (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_display_name (one_info),
+               g_app_info_get_display_name (two_info)) == 0 &&
+    g_icon_equal (g_app_info_get_icon (one_info),
+                  g_app_info_get_icon (two_info));
+}
+
 static gboolean
 app_is_stale (ShellApp *app)
 {
   GDesktopAppInfo *info, *old;
-  GAppInfo *old_info, *new_info;
   gboolean is_unchanged;
 
   if (shell_app_is_window_backed (app))
@@ -147,35 +264,70 @@ app_is_stale (ShellApp *app)
     return TRUE;
 
   old = shell_app_get_app_info (app);
-  old_info = G_APP_INFO (old);
-  new_info = G_APP_INFO (info);
 
-  is_unchanged =
-    g_app_info_should_show (old_info) == g_app_info_should_show (new_info) &&
-    strcmp (g_desktop_app_info_get_filename (old),
-            g_desktop_app_info_get_filename (info)) == 0 &&
-    g_strcmp0 (g_app_info_get_executable (old_info),
-               g_app_info_get_executable (new_info)) == 0 &&
-    g_strcmp0 (g_app_info_get_commandline (old_info),
-               g_app_info_get_commandline (new_info)) == 0 &&
-    strcmp (g_app_info_get_name (old_info),
-            g_app_info_get_name (new_info)) == 0 &&
-    g_strcmp0 (g_app_info_get_description (old_info),
-               g_app_info_get_description (new_info)) == 0 &&
-    strcmp (g_app_info_get_display_name (old_info),
-            g_app_info_get_display_name (new_info)) == 0 &&
-    g_icon_equal (g_app_info_get_icon (old_info),
-                  g_app_info_get_icon (new_info));
+  is_unchanged = shell_app_system_app_info_equal (old, info);
 
   return !is_unchanged;
 }
 
-static gboolean
-stale_app_remove_func (gpointer key,
-                       gpointer value,
-                       gpointer user_data)
+static GDesktopAppInfo *
+get_new_desktop_app_info_from_app (ShellApp *app)
 {
-  return app_is_stale (value);
+  const char *id;
+
+  if (shell_app_is_window_backed (app))
+    return NULL;
+
+  /* If g_app_info_delete() was called, such as when a custom desktop
+   * icon is removed, the desktop ID of the underlying GDesktopAppInfo
+   * will be set to NULL.
+   * So we explicitly check for that case and mark the app as stale.
+   * See https://git.gnome.org/browse/glib/tree/gio/gdesktopappinfo.c?h=glib-2-44&id=2.44.0#n3682
+   */
+  id = shell_app_get_id (app);
+  if (id == NULL)
+    return NULL;
+
+  return g_desktop_app_info_new (id);
+}
+
+static gboolean
+app_info_changed (ShellApp        *app,
+                  GDesktopAppInfo *desk_new_info)
+{
+  GDesktopAppInfo *desk_app_info = shell_app_get_app_info (app);
+
+  if (!desk_app_info)
+    return TRUE;
+
+  return !shell_app_system_app_info_equal (desk_app_info, desk_new_info);
+}
+
+static void
+remove_or_update_app_from_info (ShellAppSystem *self)
+{
+  GHashTableIter iter;
+  ShellApp *app;
+
+  g_hash_table_iter_init (&iter, self->priv->id_to_app);
+  while (g_hash_table_iter_next (&iter, NULL, (gpointer) &app))
+    {
+      g_autoptr(GDesktopAppInfo) app_info = NULL;
+
+      if (app_is_stale (app))
+        {
+          /* App is stale, we remove it */
+          g_hash_table_iter_remove (&iter);
+          continue;
+        }
+
+      app_info = get_new_desktop_app_info_from_app (app);
+      if (app_info_changed (app, app_info))
+        {
+          _shell_app_set_app_info (app, app_info);
+          g_signal_emit (self, signals[APP_INFO_CHANGED], 0, app);
+        }
+    }
 }
 
 static gboolean
@@ -224,9 +376,11 @@ installed_changed (ShellAppCache  *cache,
                    ShellAppSystem *self)
 {
   rescan_icon_theme (self);
+  scan_alias_to_id (self);
+
   scan_startup_wm_class_to_id (self);
 
-  g_hash_table_foreach_remove (self->priv->id_to_app, stale_app_remove_func, NULL);
+  remove_or_update_app_from_info (self);
 
   g_signal_emit (self, signals[INSTALLED_CHANGED], 0, NULL);
 }
@@ -240,11 +394,13 @@ shell_app_system_init (ShellAppSystem *self)
   self->priv = priv = shell_app_system_get_instance_private (self);
 
   priv->running_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
+  priv->starting_apps = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) g_object_unref, NULL);
   priv->id_to_app = g_hash_table_new_full (g_str_hash, g_str_equal,
                                            NULL,
                                            (GDestroyNotify)g_object_unref);
 
   priv->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  priv->alias_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
   cache = shell_app_cache_get_default ();
   g_signal_connect (cache, "changed", G_CALLBACK (installed_changed), self);
@@ -258,10 +414,12 @@ shell_app_system_finalize (GObject *object)
   ShellAppSystemPrivate *priv = self->priv;
 
   g_hash_table_destroy (priv->running_apps);
+  g_hash_table_destroy (priv->starting_apps);
   g_hash_table_destroy (priv->id_to_app);
   g_hash_table_destroy (priv->startup_wm_class_to_id);
   g_list_free_full (priv->installed_apps, g_object_unref);
   g_clear_handle_id (&priv->rescan_icons_timeout_id, g_source_remove);
+  g_hash_table_destroy (priv->alias_to_id);
 
   G_OBJECT_CLASS (shell_app_system_parent_class)->finalize (object);
 }
@@ -307,6 +465,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 
   app = _shell_app_new (info);
   g_hash_table_insert (priv->id_to_app, (char *) shell_app_get_id (app), app);
+
   return app;
 }
 
@@ -342,6 +501,38 @@ shell_app_system_lookup_heuristic_basename (ShellAppSystem *system,
     }
 
   return NULL;
+}
+
+/**
+ * shell_app_system_lookup_alias:
+ * @system: a #ShellAppSystem
+ * @alias: alternative application id
+ *
+ * Find a valid application corresponding to a given
+ * alias string, or %NULL if none.
+ *
+ * Returns: (transfer none): A #ShellApp for @alias
+ */
+ShellApp *
+shell_app_system_lookup_alias (ShellAppSystem *system,
+                               const char     *alias)
+{
+  ShellApp *result;
+  const char *id;
+
+  g_return_val_if_fail (alias != NULL, NULL);
+
+  result = shell_app_system_lookup_app (system, alias);
+  if (result != NULL)
+    return result;
+
+  id = g_hash_table_lookup (system->priv->alias_to_id, alias);
+  if (id == NULL)
+    return NULL;
+
+  result = shell_app_system_lookup_app (system, id);
+
+  return result;
 }
 
 /**
@@ -444,10 +635,32 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
                                             g_variant_new_string (app_info_id));
         }
       g_hash_table_insert (self->priv->running_apps, g_object_ref (app), NULL);
+      g_hash_table_remove (self->priv->starting_apps, app);
       break;
     case SHELL_APP_STATE_STARTING:
+      g_hash_table_insert (self->priv->starting_apps, g_object_ref (app), NULL);
       break;
     case SHELL_APP_STATE_STOPPED:
+      /* Applications associated to multiple .desktop files (e.g. gnome-control-center)
+       * will create different ShellApp instances during the startup process when not
+       * launched via the main .desktop file: one initial instance for the .desktop file
+       * originally launched (that will end up in the starting_apps table) and a different
+       * one associated to the main .desktop file for the application.
+       *
+       * Thus, we can not rely on the initial ShellApp being removed from the starting_apps
+       * table in the SHELL_APP_STATE_RUNNING case above because the instance will be different
+       * than the one being added to running_apps, resulting in a rogue ShellApp instance being
+       * kept forever in the starting_apps table, that will confuse the shell.
+       *
+       * The solution is to make sure that we remove that rogue ShellApp instance from the
+       * starting_apps table, if needed, when moving to SHELL_APP_STATE_STOPPED, since that
+       * state change will be enforced from _shell_app_handle_startup_sequence() for this kind
+       * of apps launched from a secondary .desktop file, before moving the real ShellApp instance
+       * into the running state.
+       */
+      if (g_hash_table_contains (self->priv->starting_apps, app))
+        g_hash_table_remove (self->priv->starting_apps, app);
+
       if (g_hash_table_remove (self->priv->running_apps, app) && app_info_id != NULL)
         {
           emtr_event_recorder_record_stop (emtr_event_recorder_get_default (),
@@ -476,12 +689,20 @@ GSList *
 shell_app_system_get_running (ShellAppSystem *self)
 {
   gpointer key, value;
-  GSList *ret;
+  GSList *ret = NULL;
   GHashTableIter iter;
 
   g_hash_table_iter_init (&iter, self->priv->running_apps);
 
   ret = NULL;
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      ShellApp *app = key;
+
+      ret = g_slist_prepend (ret, app);
+    }
+
+  g_hash_table_iter_init (&iter, self->priv->starting_apps);
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
       ShellApp *app = key;
@@ -533,4 +754,10 @@ GList *
 shell_app_system_get_installed (ShellAppSystem *self)
 {
   return shell_app_cache_get_all (shell_app_cache_get_default ());
+}
+
+gboolean
+shell_app_system_has_starting_apps (ShellAppSystem *self)
+{
+  return g_hash_table_size (self->priv->starting_apps) > 0;
 }
