@@ -1,8 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported ViewSelector */
 
-const { EosMetrics, Clutter, Gio,
-        GLib, GObject, Meta, Shell, St } = imports.gi;
+const { Clutter, Gio, GObject, Meta, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
 const AppDisplay = imports.ui.appDisplay;
@@ -17,22 +16,6 @@ const IconGrid = imports.ui.iconGrid;
 
 const SHELL_KEYBINDINGS_SCHEMA = 'org.gnome.shell.keybindings';
 var PINCH_GESTURE_THRESHOLD = 0.7;
-
-const SEARCH_ACTIVATION_TIMEOUT = 50;
-
-const SEARCH_METRIC_INACTIVITY_TIMEOUT_SECONDS = 3;
-
-// Occurs when a user initiates a search from the desktop. The payload, with
-// type `(us)`, consists of an enum value from the DesktopSearchProvider enum
-// telling what kind of search was requested; followed by the search query.
-const EVENT_DESKTOP_SEARCH = 'b02266bc-b010-44b2-ae0f-8f116ffa50eb';
-
-// Represents the various search providers that can be used for searching from
-// the desktop. Keep in sync with the corresponding enum in
-// https://github.com/endlessm/eos-analytics/tree/master/src/main/java/com/endlessm/postprocessing/query/SearchQuery.java.
-const DesktopSearchProvider = {
-    MY_COMPUTER: 0,
-};
 
 var ViewPage = {
     WINDOWS: 1,
@@ -193,8 +176,6 @@ var ViewSelector = GObject.registerClass({
             new WorkspacesView.WorkspacesDisplay(workspaceAdjustment);
         this._workspacesPage = this._addPage(this._workspacesDisplay,
                                              _("Windows"), 'focus-windows-symbolic');
-
-        this._localSearchMetricTimeoutId = 0;
 
         this.appDisplay = new AppDisplay.AppDisplay();
         this._appsPage = this._addPage(this.appDisplay,
@@ -534,24 +515,11 @@ var ViewSelector = GObject.registerClass({
         return this._text.text == this._entry.get_text();
     }
 
-    _recordDesktopSearchMetric(query, searchProvider) {
-        const eventRecorder = EosMetrics.EventRecorder.get_default();
-        const auxiliaryPayload = new GLib.Variant('(us)', [searchProvider, query]);
-        eventRecorder.record_event(EVENT_DESKTOP_SEARCH, auxiliaryPayload);
-    }
-
     _onTextChanged() {
         let terms = getTermsForSearchString(this._entry.get_text());
 
         this._searchActive = terms.length > 0;
         this._searchResults.setTerms(terms);
-
-        // Cancel previous metric recording in case the user deleted what
-        // they wrote (or cancelled the search) and left it at that.
-        if (this._localSearchMetricTimeoutId > 0) {
-            GLib.source_remove(this._localSearchMetricTimeoutId);
-            this._localSearchMetricTimeoutId = 0;
-        }
 
         if (this._searchActive) {
             this._showPage(this._searchPage);
@@ -562,21 +530,6 @@ var ViewSelector = GObject.registerClass({
                 this._iconClickedId = this._entry.connect('secondary-icon-clicked',
                                                           this.reset.bind(this));
             }
-
-            // Since the search is live, only record a metric a few seconds after
-            // the user has stopped typing.
-            this._localSearchMetricTimeoutId = GLib.timeout_add_seconds(
-                GLib.PRIORITY_DEFAULT,
-                SEARCH_METRIC_INACTIVITY_TIMEOUT_SECONDS,
-                () => {
-                    const query = terms.join(' ');
-                    if (query !== '') {
-                        this._recordDesktopSearchMetric(query,
-                            DesktopSearchProvider.MY_COMPUTER);
-                    }
-                    this._localSearchMetricTimeoutId = 0;
-                    return GLib.SOURCE_REMOVE;
-                });
         } else {
             if (this._iconClickedId > 0) {
                 this._entry.disconnect(this._iconClickedId);
