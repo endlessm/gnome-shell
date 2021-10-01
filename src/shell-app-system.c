@@ -91,6 +91,7 @@ struct _ShellAppSystemPrivate {
   GHashTable *starting_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
+  GHashTable *aggregate_timers;
   GList *installed_apps;
 
   guint rescan_icons_timeout_id;
@@ -401,6 +402,7 @@ shell_app_system_init (ShellAppSystem *self)
 
   priv->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   priv->alias_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  priv->aggregate_timers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   cache = shell_app_cache_get_default ();
   g_signal_connect (cache, "changed", G_CALLBACK (installed_changed), self);
@@ -417,6 +419,7 @@ shell_app_system_finalize (GObject *object)
   g_hash_table_destroy (priv->starting_apps);
   g_hash_table_destroy (priv->id_to_app);
   g_hash_table_destroy (priv->startup_wm_class_to_id);
+  g_hash_table_destroy (priv->aggregate_timers);
   g_list_free_full (priv->installed_apps, g_object_unref);
   g_clear_handle_id (&priv->rescan_icons_timeout_id, g_source_remove);
   g_hash_table_destroy (priv->alias_to_id);
@@ -618,7 +621,6 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
 {
   ShellAppState state = shell_app_get_state (app);
 
-  g_autofree gchar *app_address = g_strdup_printf ("%p", app);
   GDesktopAppInfo *app_info = shell_app_get_app_info (app);
   const gchar *app_info_id = NULL;
   if (app_info != NULL)
@@ -627,12 +629,19 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
   switch (state)
     {
     case SHELL_APP_STATE_RUNNING:
-      if (app_info_id != NULL)
+      if (app_info_id != NULL &&
+          !g_hash_table_contains (self->priv->aggregate_timers, app_info_id))
         {
-          emtr_event_recorder_record_start (emtr_event_recorder_get_default (),
-                                            SHELL_APP_IS_OPEN_EVENT,
-                                            g_variant_new_string (app_address),
-                                            g_variant_new_string (app_info_id));
+          g_autoptr(EmtrAggregateTimer) aggregate_timer = NULL;
+
+          aggregate_timer =
+            emtr_event_recorder_start_aggregate_timer (emtr_event_recorder_get_default (),
+                                                       SHELL_APP_IS_OPEN_EVENT,
+                                                       g_variant_new_string (app_info_id),
+                                                       g_variant_new_string (app_info_id));
+          g_hash_table_insert (self->priv->aggregate_timers,
+                               g_strdup (app_info_id),
+                               g_steal_pointer (&aggregate_timer));
         }
       g_hash_table_insert (self->priv->running_apps, g_object_ref (app), NULL);
       g_hash_table_remove (self->priv->starting_apps, app);
@@ -662,12 +671,7 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
         g_hash_table_remove (self->priv->starting_apps, app);
 
       if (g_hash_table_remove (self->priv->running_apps, app) && app_info_id != NULL)
-        {
-          emtr_event_recorder_record_stop (emtr_event_recorder_get_default (),
-                                           SHELL_APP_IS_OPEN_EVENT,
-                                           g_variant_new_string (app_address),
-                                           NULL);
-        }
+        g_hash_table_remove (self->priv->aggregate_timers, app_info_id);
       break;
     default:
       g_warn_if_reached();
