@@ -25,13 +25,10 @@
 #define RESCAN_TIMEOUT_MS 2500
 #define MAX_RESCAN_RETRIES 6
 
-/* Occurs when an application visible to the shell is opened or closed. The
- * payload varies depending on whether it is given as an opening event or a
- * closed event. If it is an opening event, the payload is a human-readable
- * application name. If it is a closing event, the payload is empty. The key
- * used is a pointer to the corresponding ShellApp.
+/* The event id for starting an aggregate timer for each app. The payload is
+ * the app id.
  */
-#define SHELL_APP_IS_OPEN_EVENT "b5e11a3d-13f8-4219-84fd-c9ba0bf3d1f0"
+#define DAILY_APP_USAGE_EVENT "49d0451a-f706-4f50-81d2-70cc0ec923a4"
 
 /* Additional key used to map a renamed desktop file to its previous name.
  * For instance, org.gnome.Totem.desktop contains:
@@ -636,7 +633,7 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
 
           aggregate_timer =
             emtr_event_recorder_start_aggregate_timer (emtr_event_recorder_get_default (),
-                                                       SHELL_APP_IS_OPEN_EVENT,
+                                                       DAILY_APP_USAGE_EVENT,
                                                        g_variant_new_string (app_info_id),
                                                        g_variant_new_string (app_info_id));
           g_hash_table_insert (self->priv->aggregate_timers,
