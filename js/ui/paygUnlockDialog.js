@@ -112,7 +112,7 @@ var PaygUnlockDialog = GObject.registerClass({
 
         const promptLabel = new St.Label({
             style_class: 'unlock-dialog-payg-label',
-            text: _('Enter a new keycode to unlock your computer:'),
+            text: _('Enter a new 14-digit keycode to unlock your computer:'),
             x_align: Clutter.ActorAlign.START,
         });
         promptLabel.clutter_text.line_wrap = true;
