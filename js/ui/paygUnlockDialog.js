@@ -112,7 +112,7 @@ var PaygUnlockDialog = GObject.registerClass({
 
         const promptLabel = new St.Label({
             style_class: 'unlock-dialog-payg-label',
-            text: _('Enter a new code to unlock your computer:'),
+            text: _('Enter a new keycode to unlock your computer:'),
             x_align: Clutter.ActorAlign.START,
         });
         promptLabel.clutter_text.line_wrap = true;
@@ -135,7 +135,7 @@ var PaygUnlockDialog = GObject.registerClass({
 
         // Use image-specific instructions if present, or the fallback text otherwise.
         const instructionsLine1 = Main.customerSupport.paygInstructionsLine1
-            ? Main.customerSupport.paygInstructionsLine1 : _('Don’t have an unlock code? That’s OK!');
+            ? Main.customerSupport.paygInstructionsLine1 : _('Don’t have an unlock keycode? That’s OK!');
 
         const helpLineMain = new St.Label({
             style_class: 'unlock-dialog-payg-help-main',
@@ -156,11 +156,11 @@ var PaygUnlockDialog = GObject.registerClass({
         } else if (Main.customerSupport.paygContactName && Main.customerSupport.paygContactNumber) {
             // The second possible override is to use the template text below
             // with the contact's name and phone number, if BOTH are present.
-            instructionsLine2 = _('Talk to your sales representative to purchase a new code. Call or text %s at %s')
+            instructionsLine2 = _('Talk to your sales representative to purchase a new keycode. Call or text %s at %s')
                 .format(Main.customerSupport.paygContactName, Main.customerSupport.paygContactNumber);
         } else {
             // No overrides present, default to fallback text.
-            instructionsLine2 = _('Talk to your sales representative to purchase a new code.');
+            instructionsLine2 = _('Talk to your sales representative to purchase a new keycode.');
         }
 
         const helpLineSub = new St.Label({
