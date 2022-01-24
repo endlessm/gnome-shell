@@ -38,8 +38,8 @@ const SPINNER_ANIMATION_TIME_MSECS = 300;
 var SPINNER_ICON_SIZE_PIXELS = 16;
 
 const NOTIFICATION_TITLE_TEXT = _('Pay As You Go');
-const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _('Enter an unlock keycode to extend the time before your credit has expired.');
-const NOTIFICATION_DETAILED_FORMAT_STRING = _('Subscription runs out in %s.');
+const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _('Enter an unlock keycode to extend the time before your credit expires.');
+const NOTIFICATION_DETAILED_FORMAT_STRING = _('Subscription expires in %s.');
 
 var UnlockStatus = {
     NOT_VERIFYING: 0,
