@@ -38,7 +38,7 @@ const SPINNER_ANIMATION_TIME_MSECS = 300;
 var SPINNER_ICON_SIZE_PIXELS = 16;
 
 const NOTIFICATION_TITLE_TEXT = _('Pay As You Go');
-const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _('Enter an unlock code to extend the time before your credit has expired.');
+const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _('Enter an unlock keycode to extend the time before your credit has expired.');
 const NOTIFICATION_DETAILED_FORMAT_STRING = _('Subscription runs out in %s.');
 
 var UnlockStatus = {
@@ -258,11 +258,11 @@ var PaygUnlockUi = GObject.registerClass({
 
         // Common errors after this point.
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
-            this.setErrorMessage(_('Invalid code. Please try again.'));
+            this.setErrorMessage(_('Invalid keycode. Please try again.'));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
-            this.setErrorMessage(_('Code already used. Please enter a new code.'));
+            this.setErrorMessage(_('Keycode already used. Please enter a new keycode.'));
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
-            this.setErrorMessage(_('Time exceeded while verifying the code'));
+            this.setErrorMessage(_('Time exceeded while verifying the keycode'));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.SHOW_ACCOUNT_ID)) {
             this.setErrorMessage(_('Your Pay As You Go Account ID is: %s').format(Main.paygManager.accountID));
         } else {
@@ -448,7 +448,7 @@ var PaygUnlockWidget = GObject.registerClass({
             child: new St.Label({
                 x_expand: true,
                 x_align: Clutter.ActorAlign.CENTER,
-                text: _('Apply Code'),
+                text: _('Apply Keycode'),
             }),
         });
         box.add_child(label);
@@ -739,7 +739,7 @@ class PaygNotifier extends GObject.Object {
         const source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
 
-        // by default, this notification is for early entry of an unlock code
+        // by default, this notification is for early entry of an unlock keycode
         let messageText = NOTIFICATION_EARLY_CODE_ENTRY_TEXT;
         let urgency = MessageTray.Urgency.NORMAL;
         let userInitiated = false;
