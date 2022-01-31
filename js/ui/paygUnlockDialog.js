@@ -222,7 +222,7 @@ var PaygUnlockDialog = GObject.registerClass({
             this._resetScreen();
         });
 
-        this._idleMonitor = Meta.IdleMonitor.get_core();
+        this._idleMonitor = global.backend.get_core_idle_monitor();
         this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIMEOUT_SECS * MSEC_PER_SEC, this._onCancelled.bind(this));
 
         this.updateSensitivity();
