@@ -569,7 +569,6 @@ _shell_app_system_notify_app_state_changed (ShellAppSystem *self,
           aggregate_timer =
             emtr_event_recorder_start_aggregate_timer (emtr_event_recorder_get_default (),
                                                        DAILY_APP_USAGE_EVENT,
-                                                       g_variant_new_string (app_info_id),
                                                        g_variant_new_string (app_info_id));
           g_hash_table_insert (self->priv->aggregate_timers,
                                g_strdup (app_info_id),
