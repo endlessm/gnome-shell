@@ -37,10 +37,6 @@ const SPINNER_ANIMATION_DELAY_MSECS = 1000;
 const SPINNER_ANIMATION_TIME_MSECS = 300;
 var SPINNER_ICON_SIZE_PIXELS = 16;
 
-const NOTIFICATION_TITLE_TEXT = _('Pay As You Go');
-const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _('Enter a 14-digit keycode to extend the time before your credit expires.');
-const NOTIFICATION_DETAILED_FORMAT_STRING = _('Subscription expires in %s.');
-
 var UnlockStatus = {
     NOT_VERIFYING: 0,
     VERIFYING: 1,
@@ -740,14 +736,18 @@ class PaygNotifier extends GObject.Object {
         Main.messageTray.add(source);
 
         // by default, this notification is for early entry of an unlock keycode
-        let messageText = NOTIFICATION_EARLY_CODE_ENTRY_TEXT;
+        let codeLength = Main.paygManager.codeLength;
+        let messageText = Gettext.ngettext(
+            'Enter a new keycode (%s character) to extend the time before your credit expires.',
+            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
+            codeLength).format(codeLength);
         let urgency = MessageTray.Urgency.NORMAL;
         let userInitiated = false;
 
         // in case this is a "only X time left" warning notification
         if (secondsLeft >= 0) {
             const timeLeft = timeToString(secondsLeft);
-            messageText = NOTIFICATION_DETAILED_FORMAT_STRING.format(timeLeft);
+            messageText = _('Subscription expires in %s.').format(timeLeft);
             urgency = MessageTray.Urgency.HIGH;
         } else {
             userInitiated = true;
@@ -755,7 +755,7 @@ class PaygNotifier extends GObject.Object {
 
         this._notification = new ApplyCodeNotification(
             source,
-            NOTIFICATION_TITLE_TEXT,
+            _('Pay As You Go'),
             messageText);
 
         if (userInitiated)

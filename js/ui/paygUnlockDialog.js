@@ -29,6 +29,8 @@ const Animation = imports.ui.animation;
 const Main = imports.ui.main;
 const LayoutManager = imports.ui.layout;
 
+const Gettext = imports.gettext;
+
 const MSEC_PER_SEC = 1000;
 
 // The timeout before going back automatically to the lock screen
@@ -110,9 +112,12 @@ var PaygUnlockDialog = GObject.registerClass({
         });
         paygEnterCodeBox.add_child(promptBox);
 
+        let codeLength = Main.paygManager.codeLength;
         const promptLabel = new St.Label({
             style_class: 'unlock-dialog-payg-label',
-            text: _('Enter a new 14-digit keycode to unlock your computer:'),
+            text: Gettext.ngettext('Enter a new keycode (%s character) to unlock your computer:',
+                                   'Enter a new keycode (%s characters) to unlock your computer:',
+                                   codeLength).format(codeLength),
             x_align: Clutter.ActorAlign.START,
         });
         promptLabel.clutter_text.line_wrap = true;
