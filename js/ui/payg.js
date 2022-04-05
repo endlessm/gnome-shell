@@ -38,7 +38,11 @@ const SPINNER_ANIMATION_TIME_MSECS = 300;
 var SPINNER_ICON_SIZE_PIXELS = 16;
 
 const NOTIFICATION_TITLE_TEXT = _('Pay As You Go');
-const NOTIFICATION_EARLY_CODE_ENTRY_TEXT = _('Enter a 14-digit keycode to extend the time before your credit expires.');
+
+// These will be passed to ngettext to get pluralized translations
+const NOTIFICATION_EARLY_CODE_ENTRY_TEXT_1 = 'Enter a new keycode (%s character) to extend the time before your credit expires.';
+const NOTIFICATION_EARLY_CODE_ENTRY_TEXT_N = 'Enter a new keycode (%s characters) to extend the time before your credit expires.';
+
 const NOTIFICATION_DETAILED_FORMAT_STRING = _('Subscription expires in %s.');
 
 var UnlockStatus = {
@@ -740,7 +744,10 @@ class PaygNotifier extends GObject.Object {
         Main.messageTray.add(source);
 
         // by default, this notification is for early entry of an unlock keycode
-        let messageText = NOTIFICATION_EARLY_CODE_ENTRY_TEXT;
+        let codeLength = Main.paygManager.codeLength
+        let messageText = Gettext.ngettext(NOTIFICATION_EARLY_CODE_ENTRY_TEXT_1,
+                                           NOTIFICATION_EARLY_CODE_ENTRY_TEXT_N,
+                                           codeLength).format(codeLength)
         let urgency = MessageTray.Urgency.NORMAL;
         let userInitiated = false;
 
