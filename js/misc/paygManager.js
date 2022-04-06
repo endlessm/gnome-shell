@@ -389,6 +389,10 @@ var PaygManager = GObject.registerClass({
         return this._proxy.CodeFormatSuffix;
     }
 
+    get codeLength() {
+        return this._proxy.CodeLength;
+    }
+
     get enabled() {
         return this._enabled;
     }
