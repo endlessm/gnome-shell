@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-02 12:20+0000\n"
-"PO-Revision-Date: 2022-02-02 12:20+0000\n"
-"Last-Translator: endlessmobile_build <admin@endlessos.org>\n"
+"POT-Creation-Date: 2022-04-13 11:19+0000\n"
+"PO-Revision-Date: 2013-11-02 06:45+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Kashmiri (http://www.transifex.com/endless-os/gnome-shell/language/ks/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -402,7 +402,7 @@ msgstr ""
 #: js/gdm/authPrompt.js:198 js/ui/audioDeviceSelection.js:58
 #: js/ui/components/networkAgent.js:139 js/ui/components/polkitAgent.js:157
 #: js/ui/endSessionDialog.js:438 js/ui/extensionDownloader.js:194
-#: js/ui/paygUnlockDialog.js:261 js/ui/shellMountOperation.js:387
+#: js/ui/paygUnlockDialog.js:266 js/ui/shellMountOperation.js:387
 #: js/ui/shellMountOperation.js:397 js/ui/status/network.js:940
 #: subprojects/extensions-app/js/main.js:149
 msgid "Cancel"
@@ -1584,21 +1584,24 @@ msgstr ""
 msgid "Top Bar"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:92
+#: js/ui/paygUnlockDialog.js:94
 msgid "Your Pay As You Go usage credit has expired."
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:115
-msgid "Enter a new 14-digit keycode to unlock your computer:"
-msgstr ""
+#: js/ui/paygUnlockDialog.js:118
+#, javascript-format
+msgid "Enter a new keycode (%s character) to unlock your computer:"
+msgid_plural "Enter a new keycode (%s characters) to unlock your computer:"
+msgstr[0] ""
+msgstr[1] ""
 
-#: js/ui/paygUnlockDialog.js:138
+#: js/ui/paygUnlockDialog.js:143
 msgid "Don’t have an unlock keycode? That’s OK!"
 msgstr ""
 
 #. The second possible override is to use the template text below
 #. with the contact's name and phone number, if BOTH are present.
-#: js/ui/paygUnlockDialog.js:159
+#: js/ui/paygUnlockDialog.js:164
 #, javascript-format
 msgid ""
 "Talk to your sales representative to purchase a new keycode. Call or text %s"
@@ -1606,73 +1609,59 @@ msgid ""
 msgstr ""
 
 #. No overrides present, default to fallback text.
-#: js/ui/paygUnlockDialog.js:163
+#: js/ui/paygUnlockDialog.js:168
 msgid "Talk to your sales representative to purchase a new keycode."
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:187
+#: js/ui/paygUnlockDialog.js:192
 #, javascript-format
 msgid "Pay As You Go Account ID: %s"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:197
+#: js/ui/paygUnlockDialog.js:202
 msgid "Unlock Machine"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:286 js/ui/shellMountOperation.js:391
+#: js/ui/paygUnlockDialog.js:291 js/ui/shellMountOperation.js:391
 msgid "Unlock"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:393
+#: js/ui/paygUnlockDialog.js:398
 msgid "Success!"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:417
+#: js/ui/paygUnlockDialog.js:422
 msgid "Remaining time cleared!"
 msgstr ""
 
-#: js/ui/paygUnlockDialog.js:418
+#: js/ui/paygUnlockDialog.js:423
 msgid "OK!"
 msgstr ""
 
-#: js/ui/payg.js:40
-msgid "Pay As You Go"
-msgstr ""
-
-#: js/ui/payg.js:41
-msgid ""
-"Enter a 14-digit keycode to extend the time before your credit expires."
-msgstr ""
-
-#: js/ui/payg.js:42
-#, javascript-format
-msgid "Subscription expires in %s."
-msgstr ""
-
-#: js/ui/payg.js:236
+#: js/ui/payg.js:232
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:240
+#: js/ui/payg.js:236
 msgid "Too many attempts. Try again in a few seconds."
 msgstr ""
 
-#: js/ui/payg.js:261
+#: js/ui/payg.js:257
 msgid "Invalid keycode. Please try again."
 msgstr ""
 
-#: js/ui/payg.js:263
+#: js/ui/payg.js:259
 msgid "Keycode already used. Please enter a new keycode."
 msgstr ""
 
-#: js/ui/payg.js:265
+#: js/ui/payg.js:261
 msgid "Time exceeded while verifying the keycode"
 msgstr ""
 
-#: js/ui/payg.js:267
+#: js/ui/payg.js:263
 #, javascript-format
 msgid "Your Pay As You Go Account ID is: %s"
 msgstr ""
@@ -1681,84 +1670,104 @@ msgstr ""
 #. explicitly,
 #. since that should not happen), but still we need to show something to the
 #. user.
-#: js/ui/payg.js:271
+#: js/ui/payg.js:267
 msgid "Unknown error"
 msgstr ""
 
-#: js/ui/payg.js:451
+#: js/ui/payg.js:447
 msgid "Apply Keycode"
 msgstr ""
 
-#: js/ui/payg.js:642
+#: js/ui/payg.js:638
 #, javascript-format
 msgid "%s second"
 msgid_plural "%s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:646 js/ui/payg.js:656
+#: js/ui/payg.js:642 js/ui/payg.js:652
 #, javascript-format
 msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:650 js/ui/payg.js:667
+#: js/ui/payg.js:646 js/ui/payg.js:663
 #, javascript-format
 msgid "%s hour"
 msgid_plural "%s hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:661
+#: js/ui/payg.js:657
 #, javascript-format
 msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:677
+#: js/ui/payg.js:673
 #, javascript-format
 msgid "%s second has been added to your Pay As You Go credit."
 msgid_plural "%s seconds have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:685
+#: js/ui/payg.js:681
 #, javascript-format
 msgid "%s minute has been added to your Pay As You Go credit."
 msgid_plural "%s minutes have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:693
+#: js/ui/payg.js:689
 #, javascript-format
 msgid "%s hour has been added to your Pay As You Go credit."
 msgid_plural "%s hours have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:701
+#: js/ui/payg.js:697
 #, javascript-format
 msgid "%s day has been added to your Pay As You Go credit."
 msgid_plural "%s days have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:709
+#: js/ui/payg.js:705
 #, javascript-format
 msgid "%s month has been added to your Pay As You Go credit."
 msgid_plural "%s months have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ui/payg.js:717
+#: js/ui/payg.js:713
 msgid "1 year has been added to your Pay As You Go credit."
 msgstr ""
 
 #. Unlock permanently message
-#: js/ui/payg.js:720
+#: js/ui/payg.js:716
 msgid "You have successfully unlocked your Endless Machine"
+msgstr ""
+
+#: js/ui/payg.js:741
+#, javascript-format
+msgid ""
+"Enter a new keycode (%s character) to extend the time before your credit "
+"expires."
+msgid_plural ""
+"Enter a new keycode (%s characters) to extend the time before your credit "
+"expires."
+msgstr[0] ""
+msgstr[1] ""
+
+#: js/ui/payg.js:750
+#, javascript-format
+msgid "Subscription expires in %s."
+msgstr ""
+
+#: js/ui/payg.js:758
+msgid "Pay As You Go"
 msgstr ""
 
 #: js/ui/runDialog.js:58
