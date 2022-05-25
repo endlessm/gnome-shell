@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-13 11:19+0000\n"
+"POT-Creation-Date: 2022-05-25 11:19+0000\n"
 "PO-Revision-Date: 2013-11-02 06:45+0000\n"
 "Last-Translator: Thibault Martin <mail@thibaultmart.in>, 2020\n"
 "Language-Team: French (http://www.transifex.com/endless-os/gnome-shell/language/fr/)\n"
@@ -33,7 +33,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: data/50-gnome-shell-system.xml:6
 msgid "System"
@@ -607,6 +607,7 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "Il y a %d minute"
 msgstr[1] "Il y a %d minutes"
+msgstr[2] "Il y a %d minutes"
 
 #: js/misc/util.js:187
 #, javascript-format
@@ -614,6 +615,7 @@ msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "Il y a %d heure"
 msgstr[1] "Il y a %d heures"
+msgstr[2] "Il y a %d heures"
 
 #: js/misc/util.js:191 js/ui/dateMenu.js:162
 msgid "Yesterday"
@@ -625,6 +627,7 @@ msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "Il y a %d jour"
 msgstr[1] "Il y a %d jours"
+msgstr[2] "Il y a %d jours"
 
 #: js/misc/util.js:197
 #, javascript-format
@@ -632,6 +635,7 @@ msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] "Il y a %d semaine"
 msgstr[1] "Il y a %d semaines"
+msgstr[2] "Il y a %d semaines"
 
 #: js/misc/util.js:201
 #, javascript-format
@@ -639,6 +643,7 @@ msgid "%d month ago"
 msgid_plural "%d months ago"
 msgstr[0] "Il y a %d mois"
 msgstr[1] "Il y a %d mois"
+msgstr[2] "Il y a %d mois"
 
 #: js/misc/util.js:204
 #, javascript-format
@@ -646,6 +651,7 @@ msgid "%d year ago"
 msgid_plural "%d years ago"
 msgstr[0] "Il y a %d an"
 msgstr[1] "Il y a %d ans"
+msgstr[2] "Il y a %d ans"
 
 #. Translators: Time in 24h format
 #: js/misc/util.js:237
@@ -1187,6 +1193,7 @@ msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] "%s sera déconnecté automatiquement dans %d seconde."
 msgstr[1] "%s sera déconnecté automatiquement dans %d secondes."
+msgstr[2] "%s sera déconnecté automatiquement dans %d secondes."
 
 #: js/ui/endSessionDialog.js:49
 #, javascript-format
@@ -1194,6 +1201,7 @@ msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
 msgstr[0] "Vous allez être déconnecté automatiquement dans %d seconde."
 msgstr[1] "Vous allez être déconnecté automatiquement dans %d secondes."
+msgstr[2] "Vous allez être déconnecté automatiquement dans %d secondes."
 
 #: js/ui/endSessionDialog.js:56
 msgctxt "button"
@@ -1216,6 +1224,7 @@ msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] "Cet ordinateur s’éteindra automatiquement dans %d seconde."
 msgstr[1] "Cet ordinateur s’éteindra automatiquement dans %d secondes."
+msgstr[2] "Cet ordinateur s’éteindra automatiquement dans %d secondes."
 
 #: js/ui/endSessionDialog.js:70 js/ui/endSessionDialog.js:89
 msgctxt "checkbox"
@@ -1243,6 +1252,7 @@ msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
 msgstr[0] "Cet ordinateur redémarrera automatiquement dans %d seconde."
 msgstr[1] "Cet ordinateur redémarrera automatiquement dans %d secondes."
+msgstr[2] "Cet ordinateur redémarrera automatiquement dans %d secondes."
 
 #: js/ui/endSessionDialog.js:93
 msgctxt "button"
@@ -1262,6 +1272,7 @@ msgid_plural ""
 "The system will automatically restart and install updates in %d seconds."
 msgstr[0] "Le système redémarrera automatiquement dans %d seconde."
 msgstr[1] "Le système redémarrera automatiquement dans %d secondes."
+msgstr[2] "Le système redémarrera automatiquement dans %d secondes."
 
 #: js/ui/endSessionDialog.js:111 js/ui/endSessionDialog.js:132
 msgctxt "button"
@@ -1612,6 +1623,7 @@ msgid "Enter a new keycode (%s character) to unlock your computer:"
 msgid_plural "Enter a new keycode (%s characters) to unlock your computer:"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: js/ui/paygUnlockDialog.js:143
 msgid "Don’t have an unlock keycode? That’s OK!"
@@ -1662,6 +1674,7 @@ msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
 msgstr[0] "Nombre de tentatives dépassé. Réessayer dans %s minutes."
 msgstr[1] "Nombre de tentatives dépassé. Réessayer dans %s minutes."
+msgstr[2] "Nombre de tentatives dépassé. Réessayer dans %s minutes."
 
 #: js/ui/payg.js:236
 msgid "Too many attempts. Try again in a few seconds."
@@ -1702,6 +1715,7 @@ msgid "%s second"
 msgid_plural "%s seconds"
 msgstr[0] "%s seconde"
 msgstr[1] "%s secondes"
+msgstr[2] "%s secondes"
 
 #: js/ui/payg.js:642 js/ui/payg.js:652
 #, javascript-format
@@ -1709,6 +1723,7 @@ msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] "%s minute"
 msgstr[1] "%s minutes"
+msgstr[2] "%s minutes"
 
 #: js/ui/payg.js:646 js/ui/payg.js:663
 #, javascript-format
@@ -1716,6 +1731,7 @@ msgid "%s hour"
 msgid_plural "%s hours"
 msgstr[0] "%s heure"
 msgstr[1] "%s heures"
+msgstr[2] "%s heures"
 
 #: js/ui/payg.js:657
 #, javascript-format
@@ -1723,6 +1739,7 @@ msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] "%s jour"
 msgstr[1] "%s jours"
+msgstr[2] "%s jours"
 
 #: js/ui/payg.js:673
 #, javascript-format
@@ -1730,6 +1747,7 @@ msgid "%s second has been added to your Pay As You Go credit."
 msgid_plural "%s seconds have been added to your Pay As You Go credit."
 msgstr[0] "%s seconde a été ajoutée à votre crédit « payez au fur et à mesure »."
 msgstr[1] "%s secondes ont été ajoutées à votre crédit « payez au fur et à mesure »."
+msgstr[2] "%s secondes ont été ajoutées à votre crédit « payez au fur et à mesure »."
 
 #: js/ui/payg.js:681
 #, javascript-format
@@ -1737,6 +1755,7 @@ msgid "%s minute has been added to your Pay As You Go credit."
 msgid_plural "%s minutes have been added to your Pay As You Go credit."
 msgstr[0] "%s minute a été ajoutée à votre crédit « payez au fur et à mesure »."
 msgstr[1] "%s minutes ont été ajoutées à votre crédit « payez au fur et à mesure »."
+msgstr[2] "%s minutes ont été ajoutées à votre crédit « payez au fur et à mesure »."
 
 #: js/ui/payg.js:689
 #, javascript-format
@@ -1744,6 +1763,7 @@ msgid "%s hour has been added to your Pay As You Go credit."
 msgid_plural "%s hours have been added to your Pay As You Go credit."
 msgstr[0] "%s heure a été ajoutée à votre crédit « payez au fur et à mesure »."
 msgstr[1] "%s heures ont été ajoutées à votre crédit « payez au fur et à mesure »."
+msgstr[2] "%s heures ont été ajoutées à votre crédit « payez au fur et à mesure »."
 
 #: js/ui/payg.js:697
 #, javascript-format
@@ -1751,6 +1771,7 @@ msgid "%s day has been added to your Pay As You Go credit."
 msgid_plural "%s days have been added to your Pay As You Go credit."
 msgstr[0] "%s jour a été ajouté à votre crédit « payez au fur et à mesure »."
 msgstr[1] "%s jours ont été ajoutés à votre crédit « payez au fur et à mesure »."
+msgstr[2] "%s jours ont été ajoutés à votre crédit « payez au fur et à mesure »."
 
 #: js/ui/payg.js:705
 #, javascript-format
@@ -1758,6 +1779,7 @@ msgid "%s month has been added to your Pay As You Go credit."
 msgid_plural "%s months have been added to your Pay As You Go credit."
 msgstr[0] "%s mois a été ajouté à votre crédit « payez au fur et à mesure »."
 msgstr[1] "%s mois ont été ajoutés à votre crédit « payez au fur et à mesure »."
+msgstr[2] "%s mois ont été ajoutés à votre crédit « payez au fur et à mesure »."
 
 #: js/ui/payg.js:713
 msgid "1 year has been added to your Pay As You Go credit."
@@ -1778,6 +1800,7 @@ msgid_plural ""
 "expires."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: js/ui/payg.js:750
 #, javascript-format
@@ -1836,6 +1859,7 @@ msgid "%d more"
 msgid_plural "%d more"
 msgstr[0] "%d de plus"
 msgstr[1] "%d de plus"
+msgstr[2] "%d de plus"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
@@ -1965,6 +1989,7 @@ msgid "%d Connected"
 msgid_plural "%d Connected"
 msgstr[0] "%d connecté"
 msgstr[1] "%d connectés"
+msgstr[2] "%d connectés"
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
@@ -2231,6 +2256,7 @@ msgid "%s Wired Connection"
 msgid_plural "%s Wired Connections"
 msgstr[0] "%s connexion filaire."
 msgstr[1] "%s connexions filaires."
+msgstr[2] "%s connexions filaires."
 
 #: js/ui/status/network.js:1621
 #, javascript-format
@@ -2238,6 +2264,7 @@ msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
 msgstr[0] "%s connexion Wi-Fi."
 msgstr[1] "%s connexions Wi-Fi."
+msgstr[2] "%s connexions Wi-Fi."
 
 #: js/ui/status/network.js:1625
 #, javascript-format
@@ -2245,6 +2272,7 @@ msgid "%s Modem Connection"
 msgid_plural "%s Modem Connections"
 msgstr[0] "%s connexion à un modem."
 msgstr[1] "%s connexions à des modems."
+msgstr[2] "%s connexions à des modems."
 
 #: js/ui/status/network.js:1759
 msgid "Connection failed"
@@ -2489,6 +2517,7 @@ msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
 msgstr[0] "Les paramètres seront restaurés dans %d seconde"
 msgstr[1] "Les paramètres seront restaurés dans %d secondes"
+msgstr[2] "Les paramètres seront restaurés dans %d secondes"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
@@ -2658,6 +2687,7 @@ msgid "%d extension will be updated on next login."
 msgid_plural "%d extensions will be updated on next login."
 msgstr[0] "%d extension sera mise à jour à la prochaine connexion."
 msgstr[1] "%d extensions seront mises à jour à la prochaine connexion."
+msgstr[2] "%d extensions seront mises à jour à la prochaine connexion."
 
 #: subprojects/extensions-app/js/main.js:461
 msgid "The extension is incompatible with the current GNOME version"
@@ -3134,6 +3164,7 @@ msgid "%u Output"
 msgid_plural "%u Outputs"
 msgstr[0] "%u sortie"
 msgstr[1] "%u sorties"
+msgstr[2] "%u sorties"
 
 #. translators:
 #. * The number of sound inputs on a particular device
@@ -3143,6 +3174,7 @@ msgid "%u Input"
 msgid_plural "%u Inputs"
 msgstr[0] "%u entrée"
 msgstr[1] "%u entrées"
+msgstr[2] "%u entrées"
 
 #: subprojects/gvc/gvc-mixer-control.c:2867
 msgid "System Sounds"
