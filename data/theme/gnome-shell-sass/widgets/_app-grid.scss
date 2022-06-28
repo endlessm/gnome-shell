@@ -158,8 +158,19 @@ $app_grid_fg_color: #fff;
   }
 }
 
-.page-navigation-arrow > StIcon {
-  margin: 6px;
-  width: 24px;
-  height: 24px;
+.page-navigation-arrow {
+  &  > StIcon {
+    margin: 6px;
+    padding: 18px;
+    width: 24px;
+    height: 24px;
+    border-radius: 99px;
+  }
+
+  &:insensitive > StIcon { @include button(undecorated, $tc:$osd_fg_color, $c:$osd_bg_color);}
+  &:focus > StIcon { @include button(focus, $tc:$osd_fg_color, $c:$osd_bg_color);}
+  &:hover > StIcon { @include button(hover, $tc:$osd_fg_color, $c:$osd_bg_color);}
+  &:active > StIcon { @include button(active, $tc:$osd_fg_color, $c:$osd_bg_color);}
+  &:outlined > StIcon { @include button(checked, $tc:$osd_fg_color, $c:$osd_bg_color);}
+  &:checked > StIcon { @include button(checked, $tc:$osd_fg_color, $c:$osd_bg_color);}
 }
