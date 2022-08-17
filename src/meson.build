@@ -62,7 +62,6 @@ gnome_shell_deps = [
   polkit_dep,
   gcr_dep,
   libsystemd_dep,
-  eosmetrics_dep,
   xkbcommon_dep,
 ]
 
