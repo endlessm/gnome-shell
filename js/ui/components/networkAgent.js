@@ -4,6 +4,7 @@
 const { Clutter, Gio, GLib, GObject, NM, Pango, Shell, St } = imports.gi;
 const Signals = imports.signals;
 
+const CheckBox = imports.ui.checkBox;
 const Keyboard = imports.ui.status.keyboard;
 const Dialog = imports.ui.dialog;
 const Main = imports.ui.main;
@@ -113,7 +114,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
 
         // Add the Automatic Updates actors on non-VPN connections
         if (this._settingName !== 'vpn')
-            this._addMeteredConnectionToggle(connection, contentBox);
+            this._addMeteredConnectionCheck(connection, contentBox);
 
         if (flags & NM.SecretAgentGetSecretsFlags.WPS_PBC_ACTIVE) {
             let descriptionLabel = new St.Label({
@@ -143,83 +144,34 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         this._updateOkButton();
     }
 
-    _addMeteredConnectionToggle(connection, contentBox) {
-        const updatesLayout = new St.BoxLayout({
+    _addMeteredConnectionCheck(connection, contentBox) {
+        const meteredDataBox = new St.BoxLayout({
+            style_class: 'metered-data-section',
             x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
             y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
             vertical: true,
         });
 
-        const titleLayout = new St.BoxLayout({
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
-            y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
-        });
+        this._updatesCheckBox =
+            new CheckBox.CheckBox(_('Limited data plan connection'));
+        meteredDataBox.add_child(this._updatesCheckBox);
 
-        const firstTitle = new St.Label({
-            text: _('Limited Data'),
-            style_class: 'message-dialog-subtitle',
-            x_expand: true,
-            x_align: Clutter.ActorAlign.END,
-            y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-        firstTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        titleLayout.add_child(firstTitle);
-
-        // Toggle button (checked means both "Automatic Updates enabled" and
-        // "unmetered connection", and vice-versa)
-        this._updatesToggle = new St.Button({
-            style_class: 'toggle-switch',
-            toggle_mode: true,
-            visible: true,
-            reactive: true,
-            y_align: Clutter.ActorAlign.CENTER,
-            y_expand: true,
-        });
-        this._updatesToggle.add_style_class_name('metered-data-switch');
-        titleLayout.add_child(this._updatesToggle);
-
-        const secondTitle = new St.Label({
-            text: _('Unlimited Data'),
-            style_class: 'message-dialog-subtitle',
+        // Subtitle label
+        const description = new St.Label({
+            style_class: 'message-dialog-description',
+            text: _('Select if your connection has data limits or can incur charges.'),
             x_expand: true,
             x_align: Clutter.ActorAlign.START,
             y_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        secondTitle.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        titleLayout.add_child(secondTitle);
+        description.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        description.clutter_text.line_wrap = true;
+        meteredDataBox.add_child(description);
 
-        updatesLayout.add_child(titleLayout);
+        this._updatesCheckBox.checked = !this._getDefaultMeteredValue(connection);
 
-        // Subtitle label
-        this._updatesDescription = new St.Label({
-            style_class: 'message-dialog-description',
-            text: _('Enable if your connection has limits on how much you can download.'),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
-            y_expand: true,
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-        this._updatesDescription.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._updatesDescription.clutter_text.line_wrap = true;
-
-        updatesLayout.add_child(this._updatesDescription);
-
-        this._updatesToggle.connect('notify::checked', () => {
-            if (!this._updatesToggle.checked)
-                this._updatesDescription.text = _('Enable if your connection has limits on how much you can download.');
-            else
-                this._updatesDescription.text = _('This connection doesn\'t have limits on how much you can download.');
-        });
-
-        this._updatesToggle.checked = this._getDefaultMeteredValue(connection);
-
-        contentBox.add_child(updatesLayout);
+        contentBox.add_child(meteredDataBox);
     }
 
     _getDefaultMeteredValue(connection) {
@@ -280,7 +232,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
 
             // Update the Automatic Updates values
             if (this._settingName !== 'vpn')
-                this._updateMeteredSetting(!this._updatesToggle.checked);
+                this._updateMeteredSetting(this._updatesCheckBox.checked);
 
             this.close(global.get_current_time());
         }

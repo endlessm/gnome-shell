@@ -147,14 +147,26 @@ $success_time_payg_color: #02b842;
 
 // Metered Data
 
-.metered-data-switch {
-  width: 48px;
-  background-image: url("resource:///org/gnome/shell/theme/toggle-off-hc.svg");
-  &:checked { background-image: url("resource:///org/gnome/shell/theme/toggle-on-hc.svg"); }
-}
+.prompt-dialog .metered-data-section {
+  StLabel {
+    text-align: left;
+  }
 
-.message-dialog-content {
-  .message-dialog-subtitle {
-    font-weight: bold;
+  StLabel:rtl {
+    text-align: right;
+  }
+
+  .check-box StLabel {
+      font-weight: bold;
+  }
+
+  .message-dialog-description {
+    margin-left: 24px;
+    padding-left: .8em;
+  }
+
+  .message-dialog-description:rtl {
+    margin-right: 24px;
+    padding-right: .8em;
   }
 }
