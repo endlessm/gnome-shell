@@ -44,7 +44,7 @@ class WelcomeDialog extends ModalDialog.ModalDialog {
             return version ? `${name} ${version}` : name;
 
         const [majorVersion] = Config.PACKAGE_VERSION.split('.');
-        return _('GNOME %s').format(majorVersion);
+        return _('Endless OS %s').format(majorVersion);
     }
 
     _buildLayout() {
