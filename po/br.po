@@ -1,22 +1,21 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Translation copyright holder
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-shell package.
-#
+# 
 # Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-07 16:00-0700\n"
-"PO-Revision-Date: 2017-06-18 05:51+0000\n"
-"Last-Translator: Roddy Shuler <roddy@endlessm.com>\n"
-"Language-Team: Breton (http://www.transifex.com/endless-mobile-inc/gnome-"
-"shell/language/br/)\n"
-"Language: br\n"
+"POT-Creation-Date: 2022-12-08 00:12+0000\n"
+"PO-Revision-Date: 2013-11-02 06:45+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Breton (http://www.transifex.com/endless-os/gnome-shell/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: br\n"
+"Plural-Forms: nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > 19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 && n % 1000000 == 0) ? 3 : 4);\n"
 
 #: data/50-gnome-shell-launchers.xml:6
 msgid "Launchers"
@@ -60,7 +59,7 @@ msgstr ""
 
 #: data/50-gnome-shell-system.xml:6
 msgid "System"
-msgstr ""
+msgstr "Reizhiad [Rummad]"
 
 #: data/50-gnome-shell-system.xml:9
 msgid "Show the notification list"
@@ -106,9 +105,9 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:24
 msgid ""
-"GNOME Shell extensions have a UUID property; this key lists extensions which "
-"should be loaded. Any extension that wants to be loaded needs to be in this "
-"list. You can also manipulate this list with the EnableExtension and "
+"GNOME Shell extensions have a UUID property; this key lists extensions which"
+" should be loaded. Any extension that wants to be loaded needs to be in this"
+" list. You can also manipulate this list with the EnableExtension and "
 "DisableExtension D-Bus methods on org.gnome.Shell."
 msgstr ""
 
@@ -118,11 +117,11 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:34
 msgid ""
-"GNOME Shell extensions have a UUID property; this key lists extensions which "
-"should be disabled, even if loaded as part of the current mode. You can also "
-"manipulate this list with the EnableExtension and DisableExtension D-Bus "
-"methods on org.gnome.Shell. This key takes precedence over the “enabled-"
-"extensions” setting."
+"GNOME Shell extensions have a UUID property; this key lists extensions which"
+" should be disabled, even if loaded as part of the current mode. You can "
+"also manipulate this list with the EnableExtension and DisableExtension "
+"D-Bus methods on org.gnome.Shell. This key takes precedence over the "
+"“enabled-extensions” setting."
 msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:44
@@ -152,15 +151,16 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:62
 msgid ""
-"The applications corresponding to these identifiers will be displayed in the "
-"favorites area."
+"The applications corresponding to these identifiers will be displayed in the"
+" favorites area."
 msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:69
 msgid "History for command (Alt-F2) dialog"
 msgstr ""
 
-#. Translators: looking glass is a debugger and inspector tool, see https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
+#. Translators: looking glass is a debugger and inspector tool, see
+#. https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
 #: data/org.gnome.shell.gschema.xml.in:74
 msgid "History for the looking glass dialog"
 msgstr ""
@@ -171,8 +171,8 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:79
 msgid ""
-"This key overrides the automatic hiding of the “Log out” menu item in single-"
-"user, single-session situations."
+"This key overrides the automatic hiding of the “Log out” menu item in "
+"single-user, single-session situations."
 msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:86
@@ -207,8 +207,8 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:107
 msgid ""
-"This key determines for which version the “Welcome to GNOME” dialog was last "
-"shown. An empty string represents the oldest possible version, and a huge "
+"This key determines for which version the “Welcome to GNOME” dialog was last"
+" shown. An empty string represents the oldest possible version, and a huge "
 "number will represent versions that do not exist yet. This huge number can "
 "be used to effectively disable the dialog."
 msgstr ""
@@ -232,10 +232,11 @@ msgstr ""
 #: data/org.gnome.shell.gschema.xml.in:154
 msgid ""
 "This key controls whether to show the \"Forgot Password?\" button on the "
-"login screen. 'default' tells GNOME Shell to use the vendor default setting. "
-"'enable' and 'disable' can be used to explicitly enable or disable the reset "
-"button, respectively. Note that it only makes sense to set this key for the "
-"Debian-gdm user; changing it for your own user account will have no effect."
+"login screen. 'default' tells GNOME Shell to use the vendor default setting."
+" 'enable' and 'disable' can be used to explicitly enable or disable the "
+"reset button, respectively. Note that it only makes sense to set this key "
+"for the Debian-gdm user; changing it for your own user account will have no "
+"effect."
 msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:169
@@ -346,8 +347,8 @@ msgstr ""
 #: data/org.gnome.shell.gschema.xml.in:279
 msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
-"are “thumbnail-only” (shows a thumbnail of the window), “app-icon-"
-"only” (shows only the application icon) or “both”."
+"are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only” "
+"(shows only the application icon) or “both”."
 msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:288
@@ -374,7 +375,7 @@ msgstr ""
 
 #: data/org.gnome.shell.gschema.xml.in:317
 msgid "Location"
-msgstr ""
+msgstr "Lec'hiadur"
 
 #: data/org.gnome.shell.gschema.xml.in:318
 msgid "The location for which to show a forecast"
@@ -452,7 +453,7 @@ msgstr ""
 #: js/ui/shellMountOperation.js:397 js/ui/status/network.js:978
 #: subprojects/extensions-app/js/main.js:183
 msgid "Cancel"
-msgstr ""
+msgstr "Nullañ"
 
 #. Cisco LEAP
 #: js/gdm/authPrompt.js:359 js/ui/components/networkAgent.js:337
@@ -463,12 +464,14 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#. Translators: During a password reset, prompt for the "secret code" provided by customer support.
+#. Translators: During a password reset, prompt for the "secret code" provided
+#. by customer support.
 #: js/gdm/authPrompt.js:781
 msgid "Enter unlock code"
 msgstr ""
 
-#. Translators: The first %s is the password reset website URL and the second is a verification code.
+#. Translators: The first %s is the password reset website URL and the second
+#. is a verification code.
 #: js/gdm/authPrompt.js:784
 #, javascript-format
 msgid ""
@@ -501,7 +504,7 @@ msgstr ""
 #: js/gdm/loginDialog.js:930 js/ui/components/networkAgent.js:373
 #: js/ui/components/networkAgent.js:396 js/ui/components/networkAgent.js:414
 msgid "Username"
-msgstr ""
+msgstr "Anv an arveriad"
 
 #: js/gdm/loginDialog.js:1283
 msgid "Login Window"
@@ -518,7 +521,8 @@ msgid "(or swipe finger across reader)"
 msgstr ""
 
 #. Translators: this message is shown below the password entry field
-#. to indicate the user can place their finger on the fingerprint reader instead
+#. to indicate the user can place their finger on the fingerprint reader
+#. instead
 #: js/gdm/util.js:594
 msgid "(or place finger on reader)"
 msgstr ""
@@ -529,7 +533,8 @@ msgctxt "search-result"
 msgid "Power Off"
 msgstr ""
 
-#. Translators: A list of keywords that match the power-off action, separated by semicolons
+#. Translators: A list of keywords that match the power-off action, separated
+#. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
 msgstr ""
@@ -540,7 +545,8 @@ msgctxt "search-result"
 msgid "Restart"
 msgstr ""
 
-#. Translators: A list of keywords that match the restart action, separated by semicolons
+#. Translators: A list of keywords that match the restart action, separated by
+#. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
 msgstr ""
@@ -551,7 +557,8 @@ msgctxt "search-result"
 msgid "Lock Screen"
 msgstr ""
 
-#. Translators: A list of keywords that match the lock screen action, separated by semicolons
+#. Translators: A list of keywords that match the lock screen action,
+#. separated by semicolons
 #: js/misc/systemActions.js:101
 msgid "lock screen"
 msgstr ""
@@ -562,7 +569,8 @@ msgctxt "search-result"
 msgid "Log Out"
 msgstr ""
 
-#. Translators: A list of keywords that match the logout action, separated by semicolons
+#. Translators: A list of keywords that match the logout action, separated by
+#. semicolons
 #: js/misc/systemActions.js:109
 msgid "logout;log out;sign off"
 msgstr ""
@@ -573,7 +581,8 @@ msgctxt "search-result"
 msgid "Suspend"
 msgstr ""
 
-#. Translators: A list of keywords that match the suspend action, separated by semicolons
+#. Translators: A list of keywords that match the suspend action, separated by
+#. semicolons
 #: js/misc/systemActions.js:117
 msgid "suspend;sleep"
 msgstr ""
@@ -584,12 +593,14 @@ msgctxt "search-result"
 msgid "Switch User"
 msgstr ""
 
-#. Translators: A list of keywords that match the switch user action, separated by semicolons
+#. Translators: A list of keywords that match the switch user action,
+#. separated by semicolons
 #: js/misc/systemActions.js:125
 msgid "switch user"
 msgstr ""
 
-#. Translators: A list of keywords that match the lock orientation action, separated by semicolons
+#. Translators: A list of keywords that match the lock orientation action,
+#. separated by semicolons
 #: js/misc/systemActions.js:132
 msgid "lock orientation;unlock orientation;screen;rotation"
 msgstr ""
@@ -629,6 +640,9 @@ msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/misc/util.js:188
 #, javascript-format
@@ -636,6 +650,9 @@ msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/misc/util.js:192 js/ui/dateMenu.js:163
 msgid "Yesterday"
@@ -647,6 +664,9 @@ msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/misc/util.js:198
 #, javascript-format
@@ -654,6 +674,9 @@ msgid "%d week ago"
 msgid_plural "%d weeks ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/misc/util.js:202
 #, javascript-format
@@ -661,6 +684,9 @@ msgid "%d month ago"
 msgid_plural "%d months ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/misc/util.js:205
 #, javascript-format
@@ -668,6 +694,9 @@ msgid "%d year ago"
 msgid_plural "%d years ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #. Translators: Time in 24h format
 #: js/misc/util.js:238
@@ -791,7 +820,7 @@ msgstr ""
 
 #: js/ui/appMenu.js:96
 msgid "Quit"
-msgstr ""
+msgstr "Kuitaat"
 
 #: js/ui/appMenu.js:163 js/ui/dash.js:245
 msgid "Remove from Favorites"
@@ -839,9 +868,10 @@ msgstr ""
 
 #: js/ui/backgroundMenu.js:17
 msgid "Settings"
-msgstr ""
+msgstr "Arventennoù"
 
-#. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0" (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
+#. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0"
+#. (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
 #: js/ui/calendar.js:35
 msgctxt "calendar-no-work"
 msgid "06"
@@ -851,7 +881,6 @@ msgstr ""
 #. *
 #. * NOTE: These grid abbreviations are always shown together
 #. * and in order, e.g. "S M T W T F S".
-#.
 #: js/ui/calendar.js:61
 msgctxt "grid sunday"
 msgid "S"
@@ -898,7 +927,6 @@ msgstr ""
 #. * standalone, when this is a month of the current year.
 #. * "%OB" is the new format specifier introduced in glibc 2.27,
 #. * in most cases you should not change it.
-#.
 #: js/ui/calendar.js:400
 msgid "%OB"
 msgstr ""
@@ -911,7 +939,6 @@ msgstr ""
 #. * "%OB" is the new format specifier introduced in glibc 2.27,
 #. * in most cases you should not use the old "%B" here unless you
 #. * absolutely know what you are doing.
-#.
 #: js/ui/calendar.js:410
 msgid "%OB %Y"
 msgstr ""
@@ -1092,7 +1119,8 @@ msgstr ""
 msgid "Sorry, that didn’t work. Please try again."
 msgstr ""
 
-#. Translators: this is the other person changing their old IM name to their new
+#. Translators: this is the other person changing their old IM name to their
+#. new
 #. IM name.
 #: js/ui/components/telepathyClient.js:822
 #, javascript-format
@@ -1117,7 +1145,6 @@ msgstr ""
 #. * shown - it is shown just below the time in the top bar (e.g.,
 #. * "Tue 9:29 AM").  The string itself should become a full date, e.g.,
 #. * "February 17 2015".
-#.
 #: js/ui/dateMenu.js:79
 msgid "%B %-d %Y"
 msgstr ""
@@ -1125,18 +1152,19 @@ msgstr ""
 #. Translators: This is the accessible name of the date button shown
 #. * below the time in the shell; it should combine the weekday and the
 #. * date, e.g. "Tuesday February 17 2015".
-#.
 #: js/ui/dateMenu.js:86
 msgid "%A %B %e %Y"
 msgstr ""
 
-#. Translators: Shown on calendar heading when selected day occurs on current year
+#. Translators: Shown on calendar heading when selected day occurs on current
+#. year
 #: js/ui/dateMenu.js:152
 msgctxt "calendar heading"
 msgid "%B %-d"
 msgstr ""
 
-#. Translators: Shown on calendar heading when selected day occurs on different year
+#. Translators: Shown on calendar heading when selected day occurs on
+#. different year
 #: js/ui/dateMenu.js:155
 msgctxt "calendar heading"
 msgid "%B %-d %Y"
@@ -1152,7 +1180,6 @@ msgstr ""
 
 #. Translators: Shown in calendar event list for all day events
 #. * Keep it short, best if you can use less then 10 characters
-#.
 #: js/ui/dateMenu.js:181
 msgctxt "event list time"
 msgid "All Day"
@@ -1207,6 +1234,9 @@ msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/endSessionDialog.js:49
 #, javascript-format
@@ -1214,6 +1244,9 @@ msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/endSessionDialog.js:56
 msgctxt "button"
@@ -1236,6 +1269,9 @@ msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/endSessionDialog.js:70 js/ui/endSessionDialog.js:89
 msgctxt "checkbox"
@@ -1263,6 +1299,9 @@ msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/endSessionDialog.js:93
 msgctxt "button"
@@ -1276,11 +1315,15 @@ msgstr ""
 
 #: js/ui/endSessionDialog.js:104
 #, javascript-format
-msgid "The system will automatically restart and install updates in %d second."
+msgid ""
+"The system will automatically restart and install updates in %d second."
 msgid_plural ""
 "The system will automatically restart and install updates in %d seconds."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/endSessionDialog.js:111 js/ui/endSessionDialog.js:132
 msgctxt "button"
@@ -1411,8 +1454,8 @@ msgstr ""
 
 #: js/ui/kbdA11yDialog.js:34
 msgid ""
-"You just held down the Shift key for 8 seconds. This is the shortcut for the "
-"Slow Keys feature, which affects the way your keyboard works."
+"You just held down the Shift key for 8 seconds. This is the shortcut for the"
+" Slow Keys feature, which affects the way your keyboard works."
 msgstr ""
 
 #: js/ui/kbdA11yDialog.js:40
@@ -1487,7 +1530,7 @@ msgstr ""
 #. * The device has been disabled
 #: js/ui/lookingGlass.js:756 subprojects/gvc/gvc-mixer-control.c:1900
 msgid "Disabled"
-msgstr ""
+msgstr "Diweredekaet"
 
 #: js/ui/lookingGlass.js:758
 #: subprojects/extensions-app/data/ui/extension-row.ui:158
@@ -1550,7 +1593,7 @@ msgstr ""
 
 #: js/ui/overviewControls.js:392
 msgid "Applications"
-msgstr ""
+msgstr "Arloadoù"
 
 #: js/ui/overview.js:58
 msgid "Undo"
@@ -1564,7 +1607,7 @@ msgstr ""
 
 #: js/ui/padOsd.js:95
 msgid "New shortcut…"
-msgstr ""
+msgstr "Berradenn nevez..."
 
 #: js/ui/padOsd.js:142
 msgid "Application defined"
@@ -1592,7 +1635,7 @@ msgstr ""
 
 #: js/ui/padOsd.js:758 js/ui/padOsd.js:875
 msgid "None"
-msgstr ""
+msgstr "Hini ebet"
 
 #: js/ui/padOsd.js:829
 msgid "Press a button to configure"
@@ -1615,7 +1658,7 @@ msgstr ""
 #: js/ui/panel.js:556
 msgctxt "System menu in the top bar"
 msgid "System"
-msgstr ""
+msgstr "Reizhiad [Rummad]"
 
 #: js/ui/panel.js:679
 msgid "Top Bar"
@@ -1631,6 +1674,9 @@ msgid "Enter a new keycode (%s character) to unlock your computer:"
 msgid_plural "Enter a new keycode (%s characters) to unlock your computer:"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/paygUnlockDialog.js:143
 msgid "Don’t have an unlock keycode? That’s OK!"
@@ -1641,8 +1687,8 @@ msgstr ""
 #: js/ui/paygUnlockDialog.js:164
 #, javascript-format
 msgid ""
-"Talk to your sales representative to purchase a new keycode. Call or text %s "
-"at %s"
+"Talk to your sales representative to purchase a new keycode. Call or text %s"
+" at %s"
 msgstr ""
 
 #. No overrides present, default to fallback text.
@@ -1681,6 +1727,9 @@ msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:236
 msgid "Too many attempts. Try again in a few seconds."
@@ -1703,11 +1752,13 @@ msgstr ""
 msgid "Your Pay As You Go Account ID is: %s"
 msgstr ""
 
-#. We don't consider any other error here (and we don't consider DISABLED explicitly,
-#. since that should not happen), but still we need to show something to the user.
+#. We don't consider any other error here (and we don't consider DISABLED
+#. explicitly,
+#. since that should not happen), but still we need to show something to the
+#. user.
 #: js/ui/payg.js:267
 msgid "Unknown error"
-msgstr ""
+msgstr "Fazi dianav"
 
 #: js/ui/payg.js:447
 msgid "Apply Keycode"
@@ -1719,6 +1770,9 @@ msgid "%s second"
 msgid_plural "%s seconds"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:642 js/ui/payg.js:652
 #, javascript-format
@@ -1726,6 +1780,9 @@ msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:646 js/ui/payg.js:663
 #, javascript-format
@@ -1733,6 +1790,9 @@ msgid "%s hour"
 msgid_plural "%s hours"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:657
 #, javascript-format
@@ -1740,6 +1800,9 @@ msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:673
 #, javascript-format
@@ -1747,6 +1810,9 @@ msgid "%s second has been added to your Pay As You Go credit."
 msgid_plural "%s seconds have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:681
 #, javascript-format
@@ -1754,6 +1820,9 @@ msgid "%s minute has been added to your Pay As You Go credit."
 msgid_plural "%s minutes have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:689
 #, javascript-format
@@ -1761,6 +1830,9 @@ msgid "%s hour has been added to your Pay As You Go credit."
 msgid_plural "%s hours have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:697
 #, javascript-format
@@ -1768,6 +1840,9 @@ msgid "%s day has been added to your Pay As You Go credit."
 msgid_plural "%s days have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:705
 #, javascript-format
@@ -1775,6 +1850,9 @@ msgid "%s month has been added to your Pay As You Go credit."
 msgid_plural "%s months have been added to your Pay As You Go credit."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:713
 msgid "1 year has been added to your Pay As You Go credit."
@@ -1795,6 +1873,9 @@ msgid_plural ""
 "expires."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/payg.js:750
 #, javascript-format
@@ -1829,7 +1910,6 @@ msgstr ""
 #. screenshield. The user is probably very upset at this
 #. point, but any application using global grabs is broken
 #. Just tell him to stop using this app
-#.
 #. XXX: another option is to kick the user into the gdm login
 #. screen, where we're not affected by grabs
 #: js/ui/screenShield.js:318 js/ui/screenShield.js:720
@@ -1842,7 +1922,7 @@ msgstr ""
 
 #: js/ui/screenshot.js:155
 msgid "Screenshot taken"
-msgstr ""
+msgstr "skrammad tennet"
 
 #: js/ui/search.js:825
 msgid "Searching…"
@@ -1858,14 +1938,17 @@ msgid "%d more"
 msgid_plural "%d more"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/searchController.js:87
 msgid "Search"
-msgstr ""
+msgstr "Klask"
 
 #: js/ui/shellEntry.js:20
 msgid "Copy"
-msgstr ""
+msgstr "Eilañ"
 
 #: js/ui/shellEntry.js:25
 msgid "Paste"
@@ -1914,7 +1997,7 @@ msgstr ""
 #: js/ui/shellMountOperation.js:402
 #, javascript-format
 msgid "Open %s"
-msgstr ""
+msgstr "Digeriñ %s"
 
 #: js/ui/shellMountOperation.js:436
 msgid "The PIM must be a number or empty."
@@ -1938,7 +2021,7 @@ msgstr ""
 
 #: js/ui/status/accessibility.js:48
 msgid "Zoom"
-msgstr ""
+msgstr "Zoumañ"
 
 #: js/ui/status/accessibility.js:55
 msgid "Screen Reader"
@@ -1978,7 +2061,7 @@ msgstr ""
 
 #: js/ui/status/bluetooth.js:40
 msgid "Bluetooth"
-msgstr ""
+msgstr "Bluetooth"
 
 #: js/ui/status/bluetooth.js:49 js/ui/status/network.js:652
 msgid "Bluetooth Settings"
@@ -1991,6 +2074,9 @@ msgid "%d Connected"
 msgid_plural "%d Connected"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
@@ -2026,7 +2112,7 @@ msgstr ""
 
 #: js/ui/status/keyboard.js:881
 msgid "Keyboard"
-msgstr ""
+msgstr "Klavier"
 
 #: js/ui/status/keyboard.js:900
 msgid "Show Keyboard Layout"
@@ -2086,7 +2172,8 @@ msgstr ""
 msgid "%s Connected"
 msgstr ""
 
-#. Translators: this is for network devices that are physically present but are not
+#. Translators: this is for network devices that are physically present but
+#. are not
 #. under NetworkManager's control (and thus cannot be used in the menu);
 #. %s is a network identifier
 #: js/ui/status/network.js:463
@@ -2106,20 +2193,23 @@ msgstr ""
 msgid "%s Connecting"
 msgstr ""
 
-#. Translators: this is for network connections that require some kind of key or password; %s is a network identifier
+#. Translators: this is for network connections that require some kind of key
+#. or password; %s is a network identifier
 #: js/ui/status/network.js:476
 #, javascript-format
 msgid "%s Requires Authentication"
 msgstr ""
 
-#. Translators: this is for devices that require some kind of firmware or kernel
+#. Translators: this is for devices that require some kind of firmware or
+#. kernel
 #. module, which is missing; %s is a network identifier
 #: js/ui/status/network.js:484
 #, javascript-format
 msgid "Firmware Missing For %s"
 msgstr ""
 
-#. Translators: this is for a network device that cannot be activated (for example it
+#. Translators: this is for a network device that cannot be activated (for
+#. example it
 #. is disabled by rfkill, or it has no coverage; %s is a network identifier
 #: js/ui/status/network.js:488
 #, javascript-format
@@ -2221,7 +2311,8 @@ msgstr ""
 msgid "connecting…"
 msgstr ""
 
-#. Translators: this is for network connections that require some kind of key or password
+#. Translators: this is for network connections that require some kind of key
+#. or password
 #: js/ui/status/network.js:1509
 msgid "authentication required"
 msgstr ""
@@ -2252,6 +2343,9 @@ msgid "%s Wired Connection"
 msgid_plural "%s Wired Connections"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/status/network.js:1682
 #, javascript-format
@@ -2259,6 +2353,9 @@ msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/status/network.js:1686
 #, javascript-format
@@ -2266,6 +2363,9 @@ msgid "%s Modem Connection"
 msgid_plural "%s Modem Connections"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: js/ui/status/network.js:1830
 msgid "Connection failed"
@@ -2448,28 +2548,24 @@ msgstr ""
 
 #. Translators: this is for display mirroring i.e. cloning.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:17
 msgid "Mirror"
 msgstr ""
 
 #. Translators: this is for the desktop spanning displays.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:22
 msgid "Join Displays"
 msgstr ""
 
 #. Translators: this is for using only an external display.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:27
 msgid "External Only"
 msgstr ""
 
 #. Translators: this is for using only the laptop display.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:32
 msgid "Built-in Only"
 msgstr ""
@@ -2524,7 +2620,6 @@ msgstr ""
 
 #. Translators: this and the following message should be limited in length,
 #. to avoid ellipsizing the labels.
-#.
 #: js/ui/windowManager.js:72
 msgid "Revert Settings"
 msgstr ""
@@ -2539,13 +2634,16 @@ msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
 #: js/ui/windowManager.js:550
 #, javascript-format
 msgid "%d × %d"
-msgstr ""
+msgstr "%d × %d"
 
 #: js/ui/windowMenu.js:27
 msgid "Hide"
@@ -2638,7 +2736,7 @@ msgstr ""
 #: src/shell-app.c:298
 msgctxt "program"
 msgid "Unknown"
-msgstr ""
+msgstr "Dianav"
 
 #: src/shell-app.c:549
 #, c-format
@@ -2705,7 +2803,7 @@ msgstr ""
 
 #: subprojects/extensions-app/js/main.js:216
 msgid "translator-credits"
-msgstr ""
+msgstr "Launchpad Contributions:\n  Alan https://launchpad.net/~alan-monfort\n  Gwenael https://launchpad.net/~bedbrezhoneg\n  Jérémy Le Floc'h https://launchpad.net/~jeremy-lefloch"
 
 #: subprojects/extensions-app/js/main.js:344
 #, javascript-format
@@ -2713,6 +2811,9 @@ msgid "%d extension will be updated on next login."
 msgid_plural "%d extensions will be updated on next login."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: subprojects/extensions-app/js/main.js:494
 msgid "The extension is incompatible with the current GNOME version"
@@ -2726,7 +2827,7 @@ msgstr ""
 #: subprojects/extensions-tool/src/command-create.c:322
 #: subprojects/extensions-tool/src/main.c:241
 msgid "Description"
-msgstr ""
+msgstr "Deskrivadur"
 
 #: subprojects/extensions-app/data/ui/extension-row.ui:104
 #: subprojects/extensions-tool/src/main.c:253
@@ -2747,7 +2848,7 @@ msgstr ""
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:7
 msgid "Help"
-msgstr ""
+msgstr "Skoazell"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:11
 msgid "About Extensions"
@@ -2755,8 +2856,8 @@ msgstr ""
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:27
 msgid ""
-"To find and add extensions, visit <a href=\"https://extensions.gnome.org"
-"\">extensions.gnome.org</a>."
+"To find and add extensions, visit <a "
+"href=\"https://extensions.gnome.org\">extensions.gnome.org</a>."
 msgstr ""
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:34
@@ -2812,7 +2913,7 @@ msgstr ""
 #: subprojects/extensions-tool/src/command-create.c:302
 #: subprojects/extensions-tool/src/main.c:238
 msgid "Name"
-msgstr ""
+msgstr "Anv"
 
 #: subprojects/extensions-tool/src/command-create.c:316
 #, c-format
@@ -2825,8 +2926,7 @@ msgstr ""
 #, c-format
 msgid ""
 "UUID is a globally-unique identifier for your extension.\n"
-"This should be in the format of an email address (clicktofocus@janedoe."
-"example.com)\n"
+"This should be in the format of an email address (clicktofocus@janedoe.example.com)\n"
 msgstr ""
 
 #: subprojects/extensions-tool/src/command-create.c:363
@@ -3081,7 +3181,7 @@ msgstr ""
 
 #: subprojects/extensions-tool/src/main.c:247
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: subprojects/extensions-tool/src/main.c:250
 msgid "Original author"
@@ -3107,7 +3207,7 @@ msgstr ""
 #: subprojects/extensions-tool/src/main.c:310
 #: subprojects/extensions-tool/src/main.c:313
 msgid "COMMAND"
-msgstr ""
+msgstr "ARC'HAD"
 
 #: subprojects/extensions-tool/src/main.c:313
 msgid "[ARGS…]"
@@ -3191,6 +3291,9 @@ msgid "%u Output"
 msgid_plural "%u Outputs"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #. translators:
 #. * The number of sound inputs on a particular device
@@ -3200,7 +3303,10 @@ msgid "%u Input"
 msgid_plural "%u Inputs"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #: subprojects/gvc/gvc-mixer-control.c:2867
 msgid "System Sounds"
-msgstr ""
+msgstr "Reizhiad sonioù"
