@@ -94,6 +94,15 @@ schema = configure_file(
 )
 install_data('00_org.gnome.shell.gschema.override', install_dir: schemadir)
 
+overrides_reset_conf = configuration_data()
+overrides_reset_conf.set('libexecdir', libexecdir)
+overrides_reset = configure_file(
+  input: 'gnome-shell-overrides-reset.desktop.in',
+  output: 'gnome-shell-overrides-reset.desktop',
+  configuration: overrides_reset_conf,
+  install_dir: autostartdir,
+)
+
 if have_systemd
   unitconf = configuration_data()
   unitconf.set('bindir', bindir)
