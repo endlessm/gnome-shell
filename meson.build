@@ -303,7 +303,6 @@ subdir('js')
 subdir('src')
 subdir('po')
 subdir('data')
-subdir('tools')
 
 if get_option('tests')
   subdir('tests')
