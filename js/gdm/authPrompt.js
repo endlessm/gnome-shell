@@ -869,7 +869,10 @@ var AuthPrompt = GObject.registerClass({
         const userManager = AccountsService.UserManager.get_default();
         const user = userManager.get_user(this._username);
 
-        this.setMessage(user.get_password_hint());
+        this.setMessage(
+            GdmUtil.PASSWORD_SERVICE_NAME,
+            user.get_password_hint(),
+            GdmUtil.MessageType.HINT);
         this._displayingPasswordHint = true;
         this._passwordHintButton.hide();
         this._maybeShowPasswordResetButton();
