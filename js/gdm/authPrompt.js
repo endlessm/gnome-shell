@@ -780,10 +780,12 @@ var AuthPrompt = GObject.registerClass({
         // Translators: During a password reset, prompt for the "secret code" provided by customer support.
         this.setQuestion(_('Enter unlock code'));
         this.setMessage(
+            GdmUtil.PASSWORD_SERVICE_NAME,
             // Translators: The first %s is the password reset website URL and the second is a verification code.
             _('Please open %s in a web browser, and enter the verification code %s. The service will provide you with an unlock code, which you can enter here.').format(
                 _PASSWORD_RESET_SERVER,
-                this._passwordResetCode));
+                this._passwordResetCode),
+            GdmUtil.MessageType.INFO);
     }
 
     _maybeShowPasswordResetButton() {
@@ -867,7 +869,10 @@ var AuthPrompt = GObject.registerClass({
         const userManager = AccountsService.UserManager.get_default();
         const user = userManager.get_user(this._username);
 
-        this.setMessage(user.get_password_hint());
+        this.setMessage(
+            GdmUtil.PASSWORD_SERVICE_NAME,
+            user.get_password_hint(),
+            GdmUtil.MessageType.HINT);
         this._displayingPasswordHint = true;
         this._passwordHintButton.hide();
         this._maybeShowPasswordResetButton();
