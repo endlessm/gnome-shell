@@ -19,15 +19,17 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 /* exported PaygUnlockCodeEntry, PaygUnlockUi, PaygUnlockWidget, PaygNotifier,
-     ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
+     PaygAddCreditDialog, ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
      successMessage */
 
 const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
 
 const Animation = imports.ui.animation;
+const Dialog = imports.ui.dialog;
 const Gettext = imports.gettext;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const ModalDialog = imports.ui.modalDialog;
 const PaygManager = imports.misc.paygManager;
 
 const SUCCESS_DELAY_SECONDS = 3;
@@ -609,6 +611,54 @@ var ApplyCodeNotification = GObject.registerClass({
             return;
 
         super.activate();
+    }
+});
+
+var PaygAddCreditDialog = GObject.registerClass(
+class PaygAddCreditDialog extends ModalDialog.ModalDialog {
+    _init() {
+        /* We want to be able to open the dialog multiple times per session
+         * without making the caller instatiate a new object before every call,
+         * so we need to disable destroyOnClose */
+        super._init({ styleClass: 'payg-add-credit-dialog',
+                      destroyOnClose: false });
+        this._buildLayout();
+    }
+
+    _buildLayout() {
+        const title = _('Pay As You Go');
+        let codeLength = Main.paygManager.codeLength;
+        let description = Gettext.ngettext(
+            'Enter a new keycode (%s character) to extend the time before your credit expires.',
+            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
+            codeLength).format(codeLength);
+
+        this._content = new Dialog.MessageDialogContent({ title, description });
+
+        let entry = new St.Entry({
+            can_focus: true,
+            x_expand: true,
+        });
+        entry.clutter_text.connect('activate', this._apply.bind(this));
+        this._content.add_child(entry);
+
+        this.contentLayout.add_child(this._content);
+
+        /* Add buttons */
+        this._cancelButton = this.addButton({ label: _('Cancel'),
+            action: () => {
+                this.close();
+            },
+            key: Clutter.KEY_Escape });
+
+        this._applyButton = this.addButton({ label: _('Apply Keycode'),
+            action: () => {
+                this._apply();
+            }});
+    }
+
+    _apply() {
+        this.close();
     }
 });
 
