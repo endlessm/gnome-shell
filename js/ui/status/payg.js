@@ -54,6 +54,11 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
                 this._sync();
                 this._paygManager.disconnect(this._paygManagerInitializedId);
                 this._paygManagerInitializedId = 0;
+
+                this._paygAddCreditDialog = new Payg.PaygAddCreditDialog();
+                this._item.menu.addAction(_('Add credit…'), () => {
+                    this._paygAddCreditDialog.open();
+                });
             });
         }
 
@@ -80,6 +85,11 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
     }
 
     _onDestroy() {
+        if (this._paygAddCreditDialog != null) {
+            this._paygAddCreditDialog.destroy();
+            this._paygAddCreditDialog = null;
+        }
+
         if (this._paygManagerInitializedId > 0) {
             this._paygManager.disconnect(this._paygManagerInitializedId);
             this._paygManagerInitializedId = 0;
