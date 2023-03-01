@@ -19,15 +19,17 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 /* exported PaygUnlockCodeEntry, PaygUnlockUi, PaygUnlockWidget, PaygNotifier,
-     ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
+     PaygAddCreditDialog, ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
      successMessage */
 
 const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
 
 const Animation = imports.ui.animation;
+const Dialog = imports.ui.dialog;
 const Gettext = imports.gettext;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const ModalDialog = imports.ui.modalDialog;
 const PaygManager = imports.misc.paygManager;
 
 const SUCCESS_DELAY_SECONDS = 3;
@@ -397,17 +399,17 @@ var PaygUnlockWidget = GObject.registerClass({
             entrySpinnerBox.add_child(suffix);
         }
 
-        this._buttonBox = new St.BoxLayout({
+        this._widgetBox = new St.BoxLayout({
             style_class: 'notification-actions',
             x_expand: true,
             vertical: true,
         });
-        global.focus_manager.add_group(this._buttonBox);
-        this._buttonBox.add_child(entrySpinnerBox);
+        global.focus_manager.add_group(this._widgetBox);
+        this._widgetBox.add_child(entrySpinnerBox);
 
         this._applyButton = this._createApplyButton();
         this._applyButton.connect('clicked', this.startVerifyingCode.bind(this));
-        this._buttonBox.add_child(this._applyButton);
+        this._widgetBox.add_child(this._applyButton);
 
         this.updateSensitivity();
     }
@@ -436,25 +438,12 @@ var PaygUnlockWidget = GObject.registerClass({
     }
 
     _createApplyButton() {
-        const box = new St.BoxLayout();
-
-        const label = new St.Bin({
-            x_expand: true,
-            child: new St.Label({
-                x_expand: true,
-                x_align: Clutter.ActorAlign.CENTER,
-                text: _('Apply Keycode'),
-            }),
-        });
-        box.add_child(label);
-
         const button = new St.Button({
-            child: box,
             x_expand: true,
             button_mask: St.ButtonMask.ONE,
-            style_class: 'hotplug-notification-item button',
+            style_class: 'modal-dialog-linked-button',
+            label: _('Apply Keycode'),
         });
-
         return button;
     }
 
@@ -506,8 +495,12 @@ var PaygUnlockWidget = GObject.registerClass({
         return this._applyButton;
     }
 
-    get buttonBox() {
-        return this._buttonBox;
+    get widgetBox() {
+        return this._widgetBox;
+    }
+
+    get codeEntry() {
+        return this._codeEntry;
     }
 
 });
@@ -567,7 +560,7 @@ var ApplyCodeNotification = GObject.registerClass({
         this._unlockWidget = new PaygUnlockWidget();
         this._codeAddedId = this._unlockWidget.connect('code-added', this._onCodeAdded.bind(this));
         this._codeRejectedId = this._unlockWidget.connect('code-rejected', this._onCodeRejected.bind(this));
-        this._banner.setActionArea(this._unlockWidget.buttonBox);
+        this._banner.setActionArea(this._unlockWidget.widgetBox);
 
         return this._banner;
     }
@@ -609,6 +602,44 @@ var ApplyCodeNotification = GObject.registerClass({
             return;
 
         super.activate();
+    }
+});
+
+var PaygAddCreditDialog = GObject.registerClass(
+class PaygAddCreditDialog extends ModalDialog.ModalDialog {
+    _init() {
+        /* We want to be able to open the dialog multiple times per session
+         * without making the caller instatiate a new object before every call,
+         * so we need to disable destroyOnClose */
+        super._init({ styleClass: 'payg-add-credit-dialog',
+                      destroyOnClose: false });
+
+        this.verificationStatus = UnlockStatus.NOT_VERIFYING;
+
+        this._buildLayout();
+    }
+
+    _buildLayout() {
+        const title = _('Pay As You Go');
+        let codeLength = Main.paygManager.codeLength;
+        let description = Gettext.ngettext(
+            'Enter a new keycode (%s character) to extend the time before your credit expires.',
+            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
+            codeLength).format(codeLength);
+
+        this._content = new Dialog.MessageDialogContent({ title, description });
+
+        this._unlockWidget = new PaygUnlockWidget();
+        //super.connect('closed', this._unlockWidget.entryReset.bind(this._unlockWidget));
+        this._content.add_child(this._unlockWidget);
+
+        this.contentLayout.add_child(this._content);
+
+        /* Add PaygUnlockWidget's widgetBox to the modal dialog */
+        this.buttonLayout.add_actor(this._unlockWidget.widgetBox);
+
+        /* we want key focus to be in the entry field when this dialog is shown */
+        this.setInitialKeyFocus(this._unlockWidget.codeEntry);
     }
 });
 
