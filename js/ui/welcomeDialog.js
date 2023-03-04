@@ -1,7 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported WelcomeDialog */
 
-const { Clutter, GObject, Shell, St } = imports.gi;
+const { Clutter, EosMetrics, GLib, GObject, Shell, St } = imports.gi;
 
 const Config = imports.misc.config;
 const Dialog = imports.ui.dialog;
@@ -12,6 +12,8 @@ var DialogResponse = {
     NO_THANKS: 0,
     TAKE_TOUR: 1,
 };
+
+const TOUR_RESPONSE_EVENT = '140643be-fe47-4b4b-985b-d16f8f3973a9';
 
 var WelcomeDialog = GObject.registerClass(
 class WelcomeDialog extends ModalDialog.ModalDialog {
@@ -51,6 +53,9 @@ class WelcomeDialog extends ModalDialog.ModalDialog {
     }
 
     _sendResponse(response) {
+        let payload = new GLib.Variant('b', response == DialogResponse.TAKE_TOUR);
+        EosMetrics.EventRecorder.get_default().record_event(TOUR_RESPONSE_EVENT, payload);
+
         if (response === DialogResponse.TAKE_TOUR) {
             this._tourAppInfo.launch(0, -1, Shell.AppLaunchGpu.APP_PREF);
             Main.overview.hide();
