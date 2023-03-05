@@ -155,6 +155,15 @@ var GnomeShell = class {
             return;
         }
 
+        const appSys = Shell.AppSystem.get_default();
+        if (appSys.lookup_app(id) === null) {
+            invocation.return_error_literal(
+                Gio.DBusError,
+                Gio.DBusError.FILE_NOT_FOUND,
+                `No application with ID ${id}`);
+            return;
+        }
+
         Main.overview.selectApp(id);
         invocation.return_value(null);
     }
