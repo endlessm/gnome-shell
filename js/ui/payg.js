@@ -24,12 +24,11 @@
 
 const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
 
-const PaygManager = imports.misc.paygManager;
-
-const Gettext = imports.gettext;
 const Animation = imports.ui.animation;
+const Gettext = imports.gettext;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const PaygManager = imports.misc.paygManager;
 
 const SUCCESS_DELAY_SECONDS = 3;
 
