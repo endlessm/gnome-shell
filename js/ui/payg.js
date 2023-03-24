@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 //
-// Copyright (C) 2018-2020 Endless OS Foundation LLC
+// Copyright (C) 2018-2023 Endless OS Foundation LLC
 //
 // Licensed under the GNU General Public License Version 2
 //
