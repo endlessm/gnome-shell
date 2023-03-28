@@ -1,25 +1,23 @@
-# Polish translation for gnome-shell.
-# Copyright © 2009-2021 the gnome-shell authors.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-shell package.
-# Piotr Drąg <piotrdrag@gmail.com>, 2009-2021.
-# Tomasz Dominikowski <dominikowski@gmail.com>, 2009.
-# Wojciech Szczęsny <wszczesny@aviary.pl>, 2013.
-# Aviary.pl <community-poland@mozilla.org>, 2009-2021.
-#
+# 
+# Translators:
+# Tomasz Dominikowski <dominikowski@gmail.com>, 2009
+# Wojciech Szczęsny <wszczesny@aviary.pl>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-shell/issues\n"
-"POT-Creation-Date: 2021-11-04 17:29+0000\n"
-"PO-Revision-Date: 2021-11-06 14:25+0100\n"
-"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
-"Language-Team: Polish <community-poland@mozilla.org>\n"
-"Language: pl\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-28 19:03+0000\n"
+"PO-Revision-Date: 2013-11-02 06:45+0000\n"
+"Last-Translator: Wojciech Szczęsny <wszczesny@aviary.pl>, 2013\n"
+"Language-Team: Polish (http://www.transifex.com/endless-os/gnome-shell/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #: data/50-gnome-shell-launchers.xml:6
 msgid "Launchers"
@@ -93,372 +91,326 @@ msgstr "Powłoka środowiska GNOME"
 msgid "Window management and application launching"
 msgstr "Zarządzanie oknami i uruchamianiem programów"
 
-#: data/org.gnome.shell.gschema.xml.in:6
+#: data/org.gnome.shell.gschema.xml.in:13
 msgid "Enable internal tools useful for developers and testers from Alt-F2"
-msgstr ""
-"Włącza wewnętrzne narzędzia przydatne programistom i testerom w oknie "
-"dialogowym Alt-F2"
+msgstr "Włącza wewnętrzne narzędzia przydatne programistom i testerom w oknie dialogowym Alt-F2"
 
-#: data/org.gnome.shell.gschema.xml.in:9
+#: data/org.gnome.shell.gschema.xml.in:16
 msgid ""
 "Allows access to internal debugging and monitoring tools using the Alt-F2 "
 "dialog."
-msgstr ""
-"Umożliwia dostęp do wewnętrznych narzędzi debugowania i monitorowania, "
-"używając okna dialogowego Alt-F2."
+msgstr "Umożliwia dostęp do wewnętrznych narzędzi debugowania i monitorowania, używając okna dialogowego Alt-F2."
 
-#: data/org.gnome.shell.gschema.xml.in:16
+#: data/org.gnome.shell.gschema.xml.in:23
 msgid "UUIDs of extensions to enable"
 msgstr "Lista UUID rozszerzeń do włączenia"
 
-#: data/org.gnome.shell.gschema.xml.in:17
+#: data/org.gnome.shell.gschema.xml.in:24
 msgid ""
-"GNOME Shell extensions have a UUID property; this key lists extensions which "
-"should be loaded. Any extension that wants to be loaded needs to be in this "
-"list. You can also manipulate this list with the EnableExtension and "
+"GNOME Shell extensions have a UUID property; this key lists extensions which"
+" should be loaded. Any extension that wants to be loaded needs to be in this"
+" list. You can also manipulate this list with the EnableExtension and "
 "DisableExtension D-Bus methods on org.gnome.Shell."
-msgstr ""
-"Rozszerzenia powłoki GNOME mają własność UUID; ten klucz zawiera "
-"rozszerzenia, które mają zostać wczytane. Każde rozszerzenie, które ma "
-"zostać wczytane, musi znajdować się na tej liście. Można także manipulować "
-"tą listą za pomocą metod EnableExtension i DisableExtension usługi D-Bus na "
-"org.gnome.Shell."
+msgstr "Rozszerzenia powłoki GNOME mają własność UUID; ten klucz zawiera rozszerzenia, które mają zostać wczytane. Każde rozszerzenie, które ma zostać wczytane, musi znajdować się na tej liście. Można także manipulować tą listą za pomocą metod EnableExtension i DisableExtension usługi D-Bus na org.gnome.Shell."
 
-#: data/org.gnome.shell.gschema.xml.in:26
+#: data/org.gnome.shell.gschema.xml.in:33
 msgid "UUIDs of extensions to force disabling"
 msgstr "Lista UUID rozszerzeń do wymuszenia wyłączenia"
 
-#: data/org.gnome.shell.gschema.xml.in:27
+#: data/org.gnome.shell.gschema.xml.in:34
 msgid ""
-"GNOME Shell extensions have a UUID property; this key lists extensions which "
-"should be disabled, even if loaded as part of the current mode. You can also "
-"manipulate this list with the EnableExtension and DisableExtension D-Bus "
-"methods on org.gnome.Shell. This key takes precedence over the “enabled-"
-"extensions” setting."
-msgstr ""
-"Rozszerzenia powłoki GNOME mają własność UUID; ten klucz zawiera "
-"rozszerzenia, które mają zostać wyłączone, nawet jeśli zostały wczytane jako "
-"część obecnego trybu. Każde rozszerzenie, które ma zostać wczytane, musi "
-"znajdować się na tej liście. Można także manipulować tą listą za pomocą "
-"metod EnableExtension i DisableExtension usługi D-Bus na org.gnome.Shell. "
-"Ten klucz jest przetwarzany przed ustawieniem „enabled-extensions”."
+"GNOME Shell extensions have a UUID property; this key lists extensions which"
+" should be disabled, even if loaded as part of the current mode. You can "
+"also manipulate this list with the EnableExtension and DisableExtension "
+"D-Bus methods on org.gnome.Shell. This key takes precedence over the "
+"“enabled-extensions” setting."
+msgstr "Rozszerzenia powłoki GNOME mają własność UUID; ten klucz zawiera rozszerzenia, które mają zostać wyłączone, nawet jeśli zostały wczytane jako część obecnego trybu. Każde rozszerzenie, które ma zostać wczytane, musi znajdować się na tej liście. Można także manipulować tą listą za pomocą metod EnableExtension i DisableExtension usługi D-Bus na org.gnome.Shell. Ten klucz jest przetwarzany przed ustawieniem „enabled-extensions”."
 
-#: data/org.gnome.shell.gschema.xml.in:37
+#: data/org.gnome.shell.gschema.xml.in:44
 msgid "Disable user extensions"
 msgstr "Wyłączenie rozszerzeń użytkownika"
 
-#: data/org.gnome.shell.gschema.xml.in:38
+#: data/org.gnome.shell.gschema.xml.in:45
 msgid ""
 "Disable all extensions the user has enabled without affecting the “enabled-"
 "extension” setting."
-msgstr ""
-"Wyłączenie wszystkich rozszerzeń włączonych przez użytkownika bez zmiany "
-"ustawienia „enabled-extension”."
+msgstr "Wyłączenie wszystkich rozszerzeń włączonych przez użytkownika bez zmiany ustawienia „enabled-extension”."
 
-#: data/org.gnome.shell.gschema.xml.in:45
+#: data/org.gnome.shell.gschema.xml.in:52
 msgid "Disables the validation of extension version compatibility"
 msgstr "Wyłącza sprawdzanie zgodności wersji rozszerzeń"
 
-#: data/org.gnome.shell.gschema.xml.in:46
+#: data/org.gnome.shell.gschema.xml.in:53
 msgid ""
 "GNOME Shell will only load extensions that claim to support the current "
 "running version. Enabling this option will disable this check and try to "
 "load all extensions regardless of the versions they claim to support."
-msgstr ""
-"Powłoka GNOME będzie wczytywała tylko rozszerzenia, które obsługują obecnie "
-"uruchomioną wersję. Włączenie tej opcji wyłączy sprawdzanie zgodności "
-"i spowoduje próbę wczytania wszystkich rozszerzeń, niezależnie od wersji, "
-"jakie obsługują."
+msgstr "Powłoka GNOME będzie wczytywała tylko rozszerzenia, które obsługują obecnie uruchomioną wersję. Włączenie tej opcji wyłączy sprawdzanie zgodności i spowoduje próbę wczytania wszystkich rozszerzeń, niezależnie od wersji, jakie obsługują."
 
-#: data/org.gnome.shell.gschema.xml.in:54
+#: data/org.gnome.shell.gschema.xml.in:61
 msgid "List of desktop file IDs for favorite applications"
 msgstr "Lista identyfikatorów plików .desktop ulubionych programów"
 
-#: data/org.gnome.shell.gschema.xml.in:55
-msgid ""
-"The applications corresponding to these identifiers will be displayed in the "
-"favorites area."
-msgstr ""
-"Programy odpowiadające tym identyfikatorom będą wyświetlane w obszarze "
-"ulubionych."
-
 #: data/org.gnome.shell.gschema.xml.in:62
+msgid ""
+"The applications corresponding to these identifiers will be displayed in the"
+" favorites area."
+msgstr "Programy odpowiadające tym identyfikatorom będą wyświetlane w obszarze ulubionych."
+
+#: data/org.gnome.shell.gschema.xml.in:69
 msgid "History for command (Alt-F2) dialog"
 msgstr "Historia okna dialogowego poleceń (Alt-F2)"
 
-#. Translators: looking glass is a debugger and inspector tool, see https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
-#: data/org.gnome.shell.gschema.xml.in:67
+#. Translators: looking glass is a debugger and inspector tool, see
+#. https://wiki.gnome.org/Projects/GnomeShell/LookingGlass
+#: data/org.gnome.shell.gschema.xml.in:74
 msgid "History for the looking glass dialog"
 msgstr "Historia okna dialogowego „Looking Glass”"
 
-#: data/org.gnome.shell.gschema.xml.in:71
+#: data/org.gnome.shell.gschema.xml.in:78
 msgid "Always show the “Log out” menu item in the user menu."
 msgstr "Wyświetlanie elementu menu „Wyloguj się” w menu użytkownika."
 
-#: data/org.gnome.shell.gschema.xml.in:72
-msgid ""
-"This key overrides the automatic hiding of the “Log out” menu item in single-"
-"user, single-session situations."
-msgstr ""
-"Ten klucz zastępuje automatyczne ukrywanie elementu menu „Wyloguj się” "
-"w sytuacji, gdy istnieje tylko jeden użytkownik i jedna sesja."
-
 #: data/org.gnome.shell.gschema.xml.in:79
 msgid ""
-"Whether to remember password for mounting encrypted or remote filesystems"
-msgstr ""
-"Określa, czy pamiętać hasła do montowania zaszyfrowanych lub zdalnych "
-"systemów plików"
+"This key overrides the automatic hiding of the “Log out” menu item in "
+"single-user, single-session situations."
+msgstr "Ten klucz zastępuje automatyczne ukrywanie elementu menu „Wyloguj się” w sytuacji, gdy istnieje tylko jeden użytkownik i jedna sesja."
 
-#: data/org.gnome.shell.gschema.xml.in:80
+#: data/org.gnome.shell.gschema.xml.in:86
+msgid ""
+"Whether to remember password for mounting encrypted or remote filesystems"
+msgstr "Określa, czy pamiętać hasła do montowania zaszyfrowanych lub zdalnych systemów plików"
+
+#: data/org.gnome.shell.gschema.xml.in:87
 msgid ""
 "The shell will request a password when an encrypted device or a remote "
 "filesystem is mounted. If the password can be saved for future use a "
 "“Remember Password” checkbox will be present. This key sets the default "
 "state of the checkbox."
-msgstr ""
-"Powłoka poprosi o hasło podczas montowania zaszyfrowanego urządzenia lub "
-"zdalnego systemu plików. Jeśli hasło może zostać zapisane do późniejszego "
-"użycia, to obecne będzie pole wyboru „Zapamiętanie hasła”. Ten klucz ustawia "
-"domyślną wartość tego pola."
+msgstr "Powłoka poprosi o hasło podczas montowania zaszyfrowanego urządzenia lub zdalnego systemu plików. Jeśli hasło może zostać zapisane do późniejszego użycia, to obecne będzie pole wyboru „Zapamiętanie hasła”. Ten klucz ustawia domyślną wartość tego pola."
 
-#: data/org.gnome.shell.gschema.xml.in:89
+#: data/org.gnome.shell.gschema.xml.in:96
 msgid ""
 "Whether the default Bluetooth adapter had set up devices associated to it"
 msgstr "Czy domyślny adapter Bluetooth ma powiązane ustawione urządzenia"
 
-#: data/org.gnome.shell.gschema.xml.in:90
+#: data/org.gnome.shell.gschema.xml.in:97
 msgid ""
 "The shell will only show a Bluetooth menu item if a Bluetooth adapter is "
 "powered, or if there were devices set up associated with the default "
 "adapter. This will be reset if the default adapter is ever seen not to have "
 "devices associated to it."
-msgstr ""
-"Powłoka będzie wyświetlała menu Bluetooth tylko, jeśli adapter Bluetooth "
-"jest włączony lub są ustawione urządzenia powiązane z domyślnym adapterem. "
-"Zostanie to przywrócone, kiedy tylko domyślny adapter nie będzie miał "
-"żadnych powiązanych urządzeń."
+msgstr "Powłoka będzie wyświetlała menu Bluetooth tylko, jeśli adapter Bluetooth jest włączony lub są ustawione urządzenia powiązane z domyślnym adapterem. Zostanie to przywrócone, kiedy tylko domyślny adapter nie będzie miał żadnych powiązanych urządzeń."
 
-#: data/org.gnome.shell.gschema.xml.in:99
+#: data/org.gnome.shell.gschema.xml.in:106
 msgid "The last version the “Welcome to GNOME” dialog was shown for"
 msgstr "Ostatnia wersja, dla której wyświetlono okno „Witamy w GNOME”"
 
-#: data/org.gnome.shell.gschema.xml.in:100
+#: data/org.gnome.shell.gschema.xml.in:107
 msgid ""
-"This key determines for which version the “Welcome to GNOME” dialog was last "
-"shown. An empty string represents the oldest possible version, and a huge "
+"This key determines for which version the “Welcome to GNOME” dialog was last"
+" shown. An empty string represents the oldest possible version, and a huge "
 "number will represent versions that do not exist yet. This huge number can "
 "be used to effectively disable the dialog."
-msgstr ""
-"Ten klucz określa, dla której wersji ostatnio wyświetlono okno „Witamy "
-"w GNOME”. Pusty ciąg oznacza najstarszą możliwą wersję, a wielka liczba "
-"będzie oznaczać wersje, które jeszcze nie istnieją. Ta wielka liczba może "
-"być używana do wyłączenia tego okna."
+msgstr "Ten klucz określa, dla której wersji ostatnio wyświetlono okno „Witamy w GNOME”. Pusty ciąg oznacza najstarszą możliwą wersję, a wielka liczba będzie oznaczać wersje, które jeszcze nie istnieją. Ta wielka liczba może być używana do wyłączenia tego okna."
 
-#: data/org.gnome.shell.gschema.xml.in:133
+#: data/org.gnome.shell.gschema.xml.in:140
 msgid "Layout of the app picker"
 msgstr "Układ ekranu wyboru programu"
 
-#: data/org.gnome.shell.gschema.xml.in:134
+#: data/org.gnome.shell.gschema.xml.in:141
 msgid ""
 "Layout of the app picker. Each entry in the array is a page. Pages are "
 "stored in the order they appear in GNOME Shell. Each page contains an "
 "“application id” → 'data' pair. Currently, the following values are stored "
 "as 'data': • “position”: the position of the application icon in the page"
-msgstr ""
-"Układ ekranu wyboru programu. Każdy wpis w macierzy to strona. Strony są "
-"przechowywane w kolejności, w jakiej są wyświetlane w powłoce GNOME. Każda "
-"strona zawiera parę „identyfikator programu” → „data”. Obecnie następujące "
-"wartości są przechowywane jako „data”: • „position”: położenie ikony "
-"programu na stronie"
+msgstr "Układ ekranu wyboru programu. Każdy wpis w macierzy to strona. Strony są przechowywane w kolejności, w jakiej są wyświetlane w powłoce GNOME. Każda strona zawiera parę „identyfikator programu” → „data”. Obecnie następujące wartości są przechowywane jako „data”: • „position”: położenie ikony programu na stronie"
 
-#: data/org.gnome.shell.gschema.xml.in:149
+#: data/org.gnome.shell.gschema.xml.in:153
+msgid "Whether password reset is allowed"
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:154
+msgid ""
+"This key controls whether to show the \"Forgot Password?\" button on the "
+"login screen. 'default' tells GNOME Shell to use the vendor default setting."
+" 'enable' and 'disable' can be used to explicitly enable or disable the "
+"reset button, respectively. Note that it only makes sense to set this key "
+"for the Debian-gdm user; changing it for your own user account will have no "
+"effect."
+msgstr ""
+
+#: data/org.gnome.shell.gschema.xml.in:169
 msgid "Keybinding to open the application menu"
 msgstr "Skrót do otwarcia menu programu"
 
-#: data/org.gnome.shell.gschema.xml.in:150
+#: data/org.gnome.shell.gschema.xml.in:170
 msgid "Keybinding to open the application menu."
 msgstr "Skrót do otwarcia menu programu."
 
-#: data/org.gnome.shell.gschema.xml.in:156
-#: data/org.gnome.shell.gschema.xml.in:163
+#: data/org.gnome.shell.gschema.xml.in:176
+#: data/org.gnome.shell.gschema.xml.in:183
 msgid "Keybinding to shift between overview states"
 msgstr "Skrót do przełączenia między stanami ekranu podglądu"
 
-#: data/org.gnome.shell.gschema.xml.in:157
+#: data/org.gnome.shell.gschema.xml.in:177
 msgid "Keybinding to shift between session, window picker and app grid"
-msgstr ""
-"Skrót do przełączenia między sesją, ekranem wyboru okna i siatką programów"
+msgstr "Skrót do przełączenia między sesją, ekranem wyboru okna i siatką programów"
 
-#: data/org.gnome.shell.gschema.xml.in:164
+#: data/org.gnome.shell.gschema.xml.in:184
 msgid "Keybinding to shift between app grid, window picker and session"
-msgstr ""
-"Skrót do przełączenia między siatką programów, ekranem wyboru okna i sesją"
+msgstr "Skrót do przełączenia między siatką programów, ekranem wyboru okna i sesją"
 
-#: data/org.gnome.shell.gschema.xml.in:170
+#: data/org.gnome.shell.gschema.xml.in:190
 msgid "Keybinding to open the “Show Applications” view"
 msgstr "Skrót do otwarcia widoku „Wyświetl programy”"
 
-#: data/org.gnome.shell.gschema.xml.in:171
+#: data/org.gnome.shell.gschema.xml.in:191
 msgid ""
 "Keybinding to open the “Show Applications” view of the Activities Overview."
 msgstr "Skrót do otwarcia widoku „Wyświetl programy” ekranu podglądu."
 
-#: data/org.gnome.shell.gschema.xml.in:178
+#: data/org.gnome.shell.gschema.xml.in:198
 msgid "Keybinding to open the overview"
 msgstr "Skrót do otwarcia ekranu podglądu"
 
-#: data/org.gnome.shell.gschema.xml.in:179
+#: data/org.gnome.shell.gschema.xml.in:199
 msgid "Keybinding to open the Activities Overview."
 msgstr "Skrót do otwarcia ekranu podglądu."
 
-#: data/org.gnome.shell.gschema.xml.in:185
+#: data/org.gnome.shell.gschema.xml.in:205
 msgid "Keybinding to toggle the visibility of the notification list"
 msgstr "Skrót do przełączenia widoczności listy powiadomień"
 
-#: data/org.gnome.shell.gschema.xml.in:186
+#: data/org.gnome.shell.gschema.xml.in:206
 msgid "Keybinding to toggle the visibility of the notification list."
 msgstr "Skrót do przełączenia widoczności listy powiadomień."
 
-#: data/org.gnome.shell.gschema.xml.in:192
+#: data/org.gnome.shell.gschema.xml.in:212
 msgid "Keybinding to focus the active notification"
 msgstr "Skrót do aktywacji bieżącego powiadomienia"
 
-#: data/org.gnome.shell.gschema.xml.in:193
+#: data/org.gnome.shell.gschema.xml.in:213
 msgid "Keybinding to focus the active notification."
 msgstr "Skrót do aktywacji bieżącego powiadomienia."
 
-#: data/org.gnome.shell.gschema.xml.in:199
+#: data/org.gnome.shell.gschema.xml.in:219
 msgid "Switch to application 1"
 msgstr "Przełączenie na 1. program"
 
-#: data/org.gnome.shell.gschema.xml.in:203
+#: data/org.gnome.shell.gschema.xml.in:223
 msgid "Switch to application 2"
 msgstr "Przełączenie na 2. program"
 
-#: data/org.gnome.shell.gschema.xml.in:207
+#: data/org.gnome.shell.gschema.xml.in:227
 msgid "Switch to application 3"
 msgstr "Przełączenie na 3. program"
 
-#: data/org.gnome.shell.gschema.xml.in:211
+#: data/org.gnome.shell.gschema.xml.in:231
 msgid "Switch to application 4"
 msgstr "Przełączenie na 4. program"
 
-#: data/org.gnome.shell.gschema.xml.in:215
+#: data/org.gnome.shell.gschema.xml.in:235
 msgid "Switch to application 5"
 msgstr "Przełączenie na 5. program"
 
-#: data/org.gnome.shell.gschema.xml.in:219
+#: data/org.gnome.shell.gschema.xml.in:239
 msgid "Switch to application 6"
 msgstr "Przełączenie na 6. program"
 
-#: data/org.gnome.shell.gschema.xml.in:223
+#: data/org.gnome.shell.gschema.xml.in:243
 msgid "Switch to application 7"
 msgstr "Przełączenie na 7. program"
 
-#: data/org.gnome.shell.gschema.xml.in:227
+#: data/org.gnome.shell.gschema.xml.in:247
 msgid "Switch to application 8"
 msgstr "Przełączenie na 8. program"
 
-#: data/org.gnome.shell.gschema.xml.in:231
+#: data/org.gnome.shell.gschema.xml.in:251
 msgid "Switch to application 9"
 msgstr "Przełączenie na 9. program"
 
-#: data/org.gnome.shell.gschema.xml.in:240
-#: data/org.gnome.shell.gschema.xml.in:267
+#: data/org.gnome.shell.gschema.xml.in:260
+#: data/org.gnome.shell.gschema.xml.in:287
 msgid "Limit switcher to current workspace."
 msgstr "Ograniczenie przełącznika do bieżącego obszaru roboczego."
 
-#: data/org.gnome.shell.gschema.xml.in:241
+#: data/org.gnome.shell.gschema.xml.in:261
 msgid ""
 "If true, only applications that have windows on the current workspace are "
 "shown in the switcher. Otherwise, all applications are included."
-msgstr ""
-"Jeśli wynosi wartość „true”, to tylko programy mające okna na bieżącym "
-"obszarze roboczym są wyświetlane w przełączniku. W przeciwnym przypadku "
-"wszystkie programy są załączone."
+msgstr "Jeśli wynosi wartość „true”, to tylko programy mające okna na bieżącym obszarze roboczym są wyświetlane w przełączniku. W przeciwnym przypadku wszystkie programy są załączone."
 
-#: data/org.gnome.shell.gschema.xml.in:258
+#: data/org.gnome.shell.gschema.xml.in:278
 msgid "The application icon mode."
 msgstr "Tryb ikon programów."
 
-#: data/org.gnome.shell.gschema.xml.in:259
+#: data/org.gnome.shell.gschema.xml.in:279
 msgid ""
 "Configures how the windows are shown in the switcher. Valid possibilities "
-"are “thumbnail-only” (shows a thumbnail of the window), “app-icon-"
-"only” (shows only the application icon) or “both”."
-msgstr ""
-"Konfiguruje, jak wyświetlać okna w przełączniku. Prawidłowe wartości to "
-"„thumbnail-only” (wyświetla miniaturę okna), „app-icon-only” (wyświetla "
-"tylko ikonę programu) lub „both” (wyświetla oba)."
+"are “thumbnail-only” (shows a thumbnail of the window), “app-icon-only” "
+"(shows only the application icon) or “both”."
+msgstr "Konfiguruje, jak wyświetlać okna w przełączniku. Prawidłowe wartości to „thumbnail-only” (wyświetla miniaturę okna), „app-icon-only” (wyświetla tylko ikonę programu) lub „both” (wyświetla oba)."
 
-#: data/org.gnome.shell.gschema.xml.in:268
+#: data/org.gnome.shell.gschema.xml.in:288
 msgid ""
 "If true, only windows from the current workspace are shown in the switcher. "
 "Otherwise, all windows are included."
-msgstr ""
-"Jeśli wynosi wartość „true”, to tylko okna z bieżącego obszaru roboczego są "
-"wyświetlane w przełączniku. W przeciwnym przypadku wszystkie okna są "
-"załączone."
+msgstr "Jeśli wynosi wartość „true”, to tylko okna z bieżącego obszaru roboczego są wyświetlane w przełączniku. W przeciwnym przypadku wszystkie okna są załączone."
 
-#: data/org.gnome.shell.gschema.xml.in:278
+#: data/org.gnome.shell.gschema.xml.in:298
 msgid "Locations"
 msgstr "Położenia"
 
-#: data/org.gnome.shell.gschema.xml.in:279
+#: data/org.gnome.shell.gschema.xml.in:299
 msgid "The locations to show in world clocks"
 msgstr "Położenia wyświetlane w zegarze światowym"
 
-#: data/org.gnome.shell.gschema.xml.in:289
+#: data/org.gnome.shell.gschema.xml.in:309
 msgid "Automatic location"
 msgstr "Automatyczne położenie"
 
-#: data/org.gnome.shell.gschema.xml.in:290
+#: data/org.gnome.shell.gschema.xml.in:310
 msgid "Whether to fetch the current location or not"
 msgstr "Czy ustalać obecne położenie"
 
-#: data/org.gnome.shell.gschema.xml.in:297
+#: data/org.gnome.shell.gschema.xml.in:317
 msgid "Location"
 msgstr "Położenie"
 
-#: data/org.gnome.shell.gschema.xml.in:298
+#: data/org.gnome.shell.gschema.xml.in:318
 msgid "The location for which to show a forecast"
 msgstr "Położenie, dla którego wyświetlać prognozę pogody"
 
-#: data/org.gnome.shell.gschema.xml.in:310
+#: data/org.gnome.shell.gschema.xml.in:330
 msgid "Attach modal dialog to the parent window"
 msgstr "Dołączanie modalnych okien dialogowych do okien nadrzędnych"
 
-#: data/org.gnome.shell.gschema.xml.in:311
-#: data/org.gnome.shell.gschema.xml.in:320
-#: data/org.gnome.shell.gschema.xml.in:328
-#: data/org.gnome.shell.gschema.xml.in:336
-#: data/org.gnome.shell.gschema.xml.in:344
+#: data/org.gnome.shell.gschema.xml.in:331
+#: data/org.gnome.shell.gschema.xml.in:340
+#: data/org.gnome.shell.gschema.xml.in:348
+#: data/org.gnome.shell.gschema.xml.in:356
+#: data/org.gnome.shell.gschema.xml.in:364
 msgid ""
 "This key overrides the key in org.gnome.mutter when running GNOME Shell."
-msgstr ""
-"Ten klucz zastępuje klucz w „org.gnome.mutter”, kiedy uruchomiona jest "
-"powłoka GNOME."
+msgstr "Ten klucz zastępuje klucz w „org.gnome.mutter”, kiedy uruchomiona jest powłoka GNOME."
 
-#: data/org.gnome.shell.gschema.xml.in:319
+#: data/org.gnome.shell.gschema.xml.in:339
 msgid "Enable edge tiling when dropping windows on screen edges"
-msgstr ""
-"Włączenie kafelkowania przy krawędziach podczas przenoszenia okien do "
-"krawędzi ekranu"
+msgstr "Włączenie kafelkowania przy krawędziach podczas przenoszenia okien do krawędzi ekranu"
 
-#: data/org.gnome.shell.gschema.xml.in:327
+#: data/org.gnome.shell.gschema.xml.in:347
 msgid "Workspaces are managed dynamically"
 msgstr "Dynamiczne zarządzanie obszarami roboczymi"
 
-#: data/org.gnome.shell.gschema.xml.in:335
+#: data/org.gnome.shell.gschema.xml.in:355
 msgid "Workspaces only on primary monitor"
 msgstr "Obszary robocze tylko na pierwszym monitorze"
 
-#: data/org.gnome.shell.gschema.xml.in:343
+#: data/org.gnome.shell.gschema.xml.in:363
 msgid "Delay focus changes in mouse mode until the pointer stops moving"
-msgstr ""
-"Opóźnienie zmiany aktywności w trybie myszy do momentu, w którym kursor się "
-"zatrzymuje"
+msgstr "Opóźnienie zmiany aktywności w trybie myszy do momentu, w którym kursor się zatrzymuje"
 
 #: data/org.gnome.Shell.PortalHelper.desktop.in.in:3
 msgid "Network Login"
@@ -474,9 +426,7 @@ msgid ""
 "We’re very sorry, but there’s been a problem: the settings for this "
 "extension can’t be displayed. We recommend that you report the issue to the "
 "extension authors."
-msgstr ""
-"Wystąpił problem: nie można wyświetlić ustawień tego rozszerzenia. Zalecamy "
-"zgłoszenie problemu autorom rozszerzenia."
+msgstr "Wystąpił problem: nie można wyświetlić ustawień tego rozszerzenia. Zalecamy zgłoszenie problemu autorom rozszerzenia."
 
 #: js/dbusServices/extensions/ui/extension-prefs-dialog.ui:64
 msgid "Technical Details"
@@ -490,22 +440,50 @@ msgstr "Strona WWW"
 msgid "Visit extension homepage"
 msgstr "Otwiera stronę WWW rozszerzenia"
 
-#: js/gdm/authPrompt.js:141 js/ui/audioDeviceSelection.js:61
-#: js/ui/components/networkAgent.js:110 js/ui/components/polkitAgent.js:138
-#: js/ui/endSessionDialog.js:438 js/ui/extensionDownloader.js:228
-#: js/ui/shellMountOperation.js:376 js/ui/shellMountOperation.js:386
-#: js/ui/status/network.js:978 subprojects/extensions-app/js/main.js:183
+#: js/gdm/authPrompt.js:143
+msgid "Show password hint"
+msgstr ""
+
+#: js/gdm/authPrompt.js:160
+msgid "Forgot password?"
+msgstr ""
+
+#: js/gdm/authPrompt.js:202 js/ui/audioDeviceSelection.js:61
+#: js/ui/components/networkAgent.js:139 js/ui/components/polkitAgent.js:157
+#: js/ui/endSessionDialog.js:438 js/ui/extensionDownloader.js:240
+#: js/ui/paygUnlockDialog.js:266 js/ui/shellMountOperation.js:387
+#: js/ui/shellMountOperation.js:397 js/ui/status/network.js:978
+#: subprojects/extensions-app/js/main.js:183
 msgid "Cancel"
 msgstr "Anuluj"
 
 #. Cisco LEAP
-#: js/gdm/authPrompt.js:285 js/ui/components/networkAgent.js:209
-#: js/ui/components/networkAgent.js:225 js/ui/components/networkAgent.js:249
-#: js/ui/components/networkAgent.js:270 js/ui/components/networkAgent.js:290
-#: js/ui/components/networkAgent.js:300 js/ui/components/polkitAgent.js:275
-#: js/ui/shellMountOperation.js:326
+#: js/gdm/authPrompt.js:359 js/ui/components/networkAgent.js:337
+#: js/ui/components/networkAgent.js:353 js/ui/components/networkAgent.js:377
+#: js/ui/components/networkAgent.js:398 js/ui/components/networkAgent.js:418
+#: js/ui/components/networkAgent.js:428 js/ui/components/polkitAgent.js:294
+#: js/ui/shellMountOperation.js:328
 msgid "Password"
 msgstr "Hasło"
+
+#. Translators: During a password reset, prompt for the "secret code" provided
+#. by customer support.
+#: js/gdm/authPrompt.js:784
+msgid "Enter unlock code"
+msgstr ""
+
+#. Translators: The first %s is the password reset website URL and the second
+#. is a verification code.
+#: js/gdm/authPrompt.js:788
+#, javascript-format
+msgid ""
+"Please open %s in a web browser, and enter the verification code %s. The "
+"service will provide you with an unlock code, which you can enter here."
+msgstr ""
+
+#: js/gdm/authPrompt.js:868
+msgid "Your unlock code was incorrect. Please try again."
+msgstr ""
 
 #: js/gdm/loginDialog.js:317
 msgid "Choose Session"
@@ -517,7 +495,7 @@ msgstr "Inny użytkownik?"
 
 #. Translators: this message is shown below the username entry field
 #. to clue the user in on how to login to the local network realm
-#: js/gdm/loginDialog.js:921
+#: js/gdm/loginDialog.js:925
 #, javascript-format
 msgid "(e.g., user or %s)"
 msgstr "(np. użytkownik lub %s)"
@@ -525,28 +503,29 @@ msgstr "(np. użytkownik lub %s)"
 #. TTLS and PEAP are actually much more complicated, but this complication
 #. is not visible here since we only care about phase2 authentication
 #. (and don't even care of which one)
-#: js/gdm/loginDialog.js:926 js/ui/components/networkAgent.js:245
-#: js/ui/components/networkAgent.js:268 js/ui/components/networkAgent.js:286
+#: js/gdm/loginDialog.js:930 js/ui/components/networkAgent.js:373
+#: js/ui/components/networkAgent.js:396 js/ui/components/networkAgent.js:414
 msgid "Username"
 msgstr "Nazwa użytkownika"
 
-#: js/gdm/loginDialog.js:1279
+#: js/gdm/loginDialog.js:1285
 msgid "Login Window"
 msgstr "Okno logowania"
 
-#: js/gdm/util.js:430
+#: js/gdm/util.js:427
 msgid "Authentication error"
 msgstr "Błąd uwierzytelniania"
 
 #. Translators: this message is shown below the password entry field
 #. to indicate the user can swipe their finger on the fingerprint reader
-#: js/gdm/util.js:589
+#: js/gdm/util.js:586
 msgid "(or swipe finger across reader)"
 msgstr "(lub przeciągnięcie palca przez czytnik)"
 
 #. Translators: this message is shown below the password entry field
-#. to indicate the user can place their finger on the fingerprint reader instead
-#: js/gdm/util.js:594
+#. to indicate the user can place their finger on the fingerprint reader
+#. instead
+#: js/gdm/util.js:591
 msgid "(or place finger on reader)"
 msgstr "(lub umieszczenie palca na czytniku)"
 
@@ -556,12 +535,11 @@ msgctxt "search-result"
 msgid "Power Off"
 msgstr "Wyłącz komputer"
 
-#. Translators: A list of keywords that match the power-off action, separated by semicolons
+#. Translators: A list of keywords that match the power-off action, separated
+#. by semicolons
 #: js/misc/systemActions.js:85
 msgid "power off;shutdown;halt;stop"
-msgstr ""
-"wyłącz komputer;wyłączanie komputera;zakończ;power off;shutdown;halt;stop;"
-"zatrzymaj"
+msgstr "wyłącz komputer;wyłączanie komputera;zakończ;power off;shutdown;halt;stop;zatrzymaj"
 
 #. Translators: The name of the restart action in search
 #: js/misc/systemActions.js:90
@@ -569,7 +547,8 @@ msgctxt "search-result"
 msgid "Restart"
 msgstr "Uruchom ponownie"
 
-#. Translators: A list of keywords that match the restart action, separated by semicolons
+#. Translators: A list of keywords that match the restart action, separated by
+#. semicolons
 #: js/misc/systemActions.js:93
 msgid "reboot;restart;"
 msgstr "uruchom ponownie;restartuj;zrestartuj;reboot;restart;"
@@ -580,12 +559,11 @@ msgctxt "search-result"
 msgid "Lock Screen"
 msgstr "Zablokuj ekran"
 
-#. Translators: A list of keywords that match the lock screen action, separated by semicolons
+#. Translators: A list of keywords that match the lock screen action,
+#. separated by semicolons
 #: js/misc/systemActions.js:101
 msgid "lock screen"
-msgstr ""
-"zablokuj ekran;zablokowanie ekranu;blokowanie ekranu;blokada ekranu;lock "
-"screen"
+msgstr "zablokuj ekran;zablokowanie ekranu;blokowanie ekranu;blokada ekranu;lock screen"
 
 #. Translators: The name of the logout action in search
 #: js/misc/systemActions.js:106
@@ -593,7 +571,8 @@ msgctxt "search-result"
 msgid "Log Out"
 msgstr "Wyloguj się"
 
-#. Translators: A list of keywords that match the logout action, separated by semicolons
+#. Translators: A list of keywords that match the logout action, separated by
+#. semicolons
 #: js/misc/systemActions.js:109
 msgid "logout;log out;sign off"
 msgstr "wyloguj się;wylogowanie;logout;log out;sign off"
@@ -604,7 +583,8 @@ msgctxt "search-result"
 msgid "Suspend"
 msgstr "Uśpij"
 
-#. Translators: A list of keywords that match the suspend action, separated by semicolons
+#. Translators: A list of keywords that match the suspend action, separated by
+#. semicolons
 #: js/misc/systemActions.js:117
 msgid "suspend;sleep"
 msgstr "uśpij;uśpienie;wstrzymaj;wstrzymanie;suspend;sleep"
@@ -615,18 +595,17 @@ msgctxt "search-result"
 msgid "Switch User"
 msgstr "Przełącz użytkownika"
 
-#. Translators: A list of keywords that match the switch user action, separated by semicolons
+#. Translators: A list of keywords that match the switch user action,
+#. separated by semicolons
 #: js/misc/systemActions.js:125
 msgid "switch user"
 msgstr "przełącz użytkownika;przełączanie użytkowników;switch user"
 
-#. Translators: A list of keywords that match the lock orientation action, separated by semicolons
+#. Translators: A list of keywords that match the lock orientation action,
+#. separated by semicolons
 #: js/misc/systemActions.js:132
 msgid "lock orientation;unlock orientation;screen;rotation"
-msgstr ""
-"zablokuj orientację;zablokowanie orientacji;blokowanie orientacji;blokada "
-"orientacji;lock orientation;odblokuj orientację;odblokowanie orientacji;"
-"unlock orientation;ekran;monitor;wyświetlacz;screen;obrót;obracanie;rotation"
+msgstr "zablokuj orientację;zablokowanie orientacji;blokowanie orientacji;blokada orientacji;lock orientation;odblokuj orientację;odblokowanie orientacji;unlock orientation;ekran;monitor;wyświetlacz;screen;obrót;obracanie;rotation"
 
 #: js/misc/systemActions.js:232
 msgctxt "search-result"
@@ -661,19 +640,21 @@ msgstr "Przed chwilą"
 #, javascript-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
-msgstr[0] "%d minuta temu"
-msgstr[1] "%d minuty temu"
-msgstr[2] "%d minut temu"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: js/misc/util.js:188
 #, javascript-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
-msgstr[0] "%d godzina temu"
-msgstr[1] "%d godziny temu"
-msgstr[2] "%d godzin temu"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: js/misc/util.js:192 js/ui/dateMenu.js:162
+#: js/misc/util.js:192 js/ui/dateMenu.js:163
 msgid "Yesterday"
 msgstr "Wczoraj"
 
@@ -681,33 +662,37 @@ msgstr "Wczoraj"
 #, javascript-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
-msgstr[0] "%d dzień temu"
+msgstr[0] "Wczoraj"
 msgstr[1] "%d dni temu"
 msgstr[2] "%d dni temu"
+msgstr[3] "%d dni temu"
 
 #: js/misc/util.js:198
 #, javascript-format
 msgid "%d week ago"
 msgid_plural "%d weeks ago"
-msgstr[0] "%d tydzień temu"
-msgstr[1] "%d tygodnie temu"
-msgstr[2] "%d tygodni temu"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: js/misc/util.js:202
 #, javascript-format
 msgid "%d month ago"
 msgid_plural "%d months ago"
-msgstr[0] "%d miesiąc temu"
-msgstr[1] "%d miesiące temu"
-msgstr[2] "%d miesięcy temu"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: js/misc/util.js:205
 #, javascript-format
 msgid "%d year ago"
 msgid_plural "%d years ago"
-msgstr[0] "%d rok temu"
-msgstr[1] "%d lata temu"
-msgstr[2] "%d lat temu"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: Time in 24h format
 #: js/misc/util.js:238
@@ -782,38 +767,36 @@ msgid "%B %-d %Y, %l∶%M %p"
 msgstr "%-d %B %Y, %-l∶%M %p"
 
 #. TRANSLATORS: this is the title of the wifi captive portal login window
-#: js/portalHelper/main.js:49
+#: js/portalHelper/main.js:51
 msgid "Hotspot Login"
 msgstr "Logowanie do hotspotu"
 
-#: js/portalHelper/main.js:95
+#: js/portalHelper/main.js:97
 msgid ""
 "Your connection to this hotspot login is not secure. Passwords or other "
 "information you enter on this page can be viewed by people nearby."
-msgstr ""
-"Połączenie z tym hotspotem nie jest bezpieczne. Hasła i inne informacje "
-"wpisywane na tej stronie mogą być widoczne dla osób w pobliżu."
+msgstr "Połączenie z tym hotspotem nie jest bezpieczne. Hasła i inne informacje wpisywane na tej stronie mogą być widoczne dla osób w pobliżu."
 
 #. No support for non-modal system dialogs, so ignore the option
 #. let modal = options['modal'] || true;
-#: js/ui/accessDialog.js:39 js/ui/status/location.js:417
+#: js/ui/accessDialog.js:39 js/ui/status/location.js:416
 msgid "Deny Access"
 msgstr "Odmów dostępu"
 
-#: js/ui/accessDialog.js:40 js/ui/status/location.js:420
+#: js/ui/accessDialog.js:40 js/ui/status/location.js:419
 msgid "Grant Access"
 msgstr "Udziel dostępu"
 
-#: js/ui/appDisplay.js:1846
+#: js/ui/appDisplay.js:1866
 msgid "Unnamed Folder"
 msgstr "Katalog bez nazwy"
 
-#: js/ui/appFavorites.js:164
+#: js/ui/appFavorites.js:169
 #, javascript-format
 msgid "%s has been added to your favorites."
 msgstr "Dodano program „%s” do ulubionych."
 
-#: js/ui/appFavorites.js:197
+#: js/ui/appFavorites.js:202
 #, javascript-format
 msgid "%s has been removed from your favorites."
 msgstr "Usunięto program „%s” z ulubionych."
@@ -831,23 +814,23 @@ msgstr "Nowe okno"
 msgid "Show Details"
 msgstr "Wyświetl szczegóły"
 
-#: js/ui/appMenu.js:96
+#: js/ui/appMenu.js:97
 msgid "Quit"
 msgstr "Zakończ"
 
-#: js/ui/appMenu.js:163 js/ui/dash.js:245
+#: js/ui/appMenu.js:164 js/ui/dash.js:245
 msgid "Remove from Favorites"
 msgstr "Usuń z ulubionych"
 
-#: js/ui/appMenu.js:164
+#: js/ui/appMenu.js:165
 msgid "Add to Favorites"
 msgstr "Dodaj do ulubionych"
 
-#: js/ui/appMenu.js:181
+#: js/ui/appMenu.js:182
 msgid "Launch using Integrated Graphics Card"
 msgstr "Uruchom za pomocą zintegrowanej karty graficznej"
 
-#: js/ui/appMenu.js:182
+#: js/ui/appMenu.js:183
 msgid "Launch using Discrete Graphics Card"
 msgstr "Uruchom za pomocą dedykowanej karty graficznej"
 
@@ -867,7 +850,7 @@ msgstr "Słuchawki"
 msgid "Headset"
 msgstr "Słuchawki z mikrofonem"
 
-#: js/ui/audioDeviceSelection.js:73 js/ui/status/volume.js:277
+#: js/ui/audioDeviceSelection.js:73 js/ui/status/volume.js:278
 msgid "Microphone"
 msgstr "Mikrofon"
 
@@ -883,8 +866,9 @@ msgstr "Ustawienia ekranu"
 msgid "Settings"
 msgstr "Ustawienia"
 
-#. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0" (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
-#: js/ui/calendar.js:36
+#. Translators: Enter 0-6 (Sunday-Saturday) for non-work days. Examples: "0"
+#. (Sunday) "6" (Saturday) "06" (Sunday and Saturday).
+#: js/ui/calendar.js:35
 msgctxt "calendar-no-work"
 msgid "06"
 msgstr "06"
@@ -893,44 +877,43 @@ msgstr "06"
 #. *
 #. * NOTE: These grid abbreviations are always shown together
 #. * and in order, e.g. "S M T W T F S".
-#.
-#: js/ui/calendar.js:65
+#: js/ui/calendar.js:61
 msgctxt "grid sunday"
 msgid "S"
 msgstr "N"
 
 #. Translators: Calendar grid abbreviation for Monday
-#: js/ui/calendar.js:67
+#: js/ui/calendar.js:63
 msgctxt "grid monday"
 msgid "M"
 msgstr "P"
 
 #. Translators: Calendar grid abbreviation for Tuesday
-#: js/ui/calendar.js:69
+#: js/ui/calendar.js:65
 msgctxt "grid tuesday"
 msgid "T"
 msgstr "W"
 
 #. Translators: Calendar grid abbreviation for Wednesday
-#: js/ui/calendar.js:71
+#: js/ui/calendar.js:67
 msgctxt "grid wednesday"
 msgid "W"
 msgstr "Ś"
 
 #. Translators: Calendar grid abbreviation for Thursday
-#: js/ui/calendar.js:73
+#: js/ui/calendar.js:69
 msgctxt "grid thursday"
 msgid "T"
 msgstr "C"
 
 #. Translators: Calendar grid abbreviation for Friday
-#: js/ui/calendar.js:75
+#: js/ui/calendar.js:71
 msgctxt "grid friday"
 msgid "F"
 msgstr "P"
 
 #. Translators: Calendar grid abbreviation for Saturday
-#: js/ui/calendar.js:77
+#: js/ui/calendar.js:73
 msgctxt "grid saturday"
 msgid "S"
 msgstr "S"
@@ -940,8 +923,7 @@ msgstr "S"
 #. * standalone, when this is a month of the current year.
 #. * "%OB" is the new format specifier introduced in glibc 2.27,
 #. * in most cases you should not change it.
-#.
-#: js/ui/calendar.js:392
+#: js/ui/calendar.js:400
 msgid "%OB"
 msgstr "%OB"
 
@@ -953,38 +935,37 @@ msgstr "%OB"
 #. * "%OB" is the new format specifier introduced in glibc 2.27,
 #. * in most cases you should not use the old "%B" here unless you
 #. * absolutely know what you are doing.
-#.
-#: js/ui/calendar.js:402
+#: js/ui/calendar.js:410
 msgid "%OB %Y"
 msgstr "%OB %Y"
 
-#: js/ui/calendar.js:461
+#: js/ui/calendar.js:469
 msgid "Previous month"
 msgstr "Poprzedni miesiąc"
 
-#: js/ui/calendar.js:476
+#: js/ui/calendar.js:484
 msgid "Next month"
 msgstr "Następny miesiąc"
 
-#: js/ui/calendar.js:626
+#: js/ui/calendar.js:632
 #, no-javascript-format
 msgctxt "date day number format"
 msgid "%d"
 msgstr "%d"
 
-#: js/ui/calendar.js:682
+#: js/ui/calendar.js:688
 msgid "Week %V"
 msgstr "%V. tydzień"
 
-#: js/ui/calendar.js:896
+#: js/ui/calendar.js:902
 msgid "No Notifications"
 msgstr "Brak powiadomień"
 
-#: js/ui/calendar.js:950
+#: js/ui/calendar.js:956
 msgid "Do Not Disturb"
 msgstr "Nie przeszkadzać"
 
-#: js/ui/calendar.js:971
+#: js/ui/calendar.js:977
 msgid "Clear"
 msgstr "Wyczyść"
 
@@ -1029,94 +1010,100 @@ msgstr "Zainstalowana wersja usługi udisks nie obsługuje ustawienia PIM"
 msgid "Open with %s"
 msgstr "Otwórz za pomocą „%s”"
 
-#: js/ui/components/networkAgent.js:92
+#: js/ui/components/networkAgent.js:121
 msgid ""
 "Alternatively you can connect by pushing the “WPS” button on your router."
 msgstr "Można także połączyć naciskając przycisk „WPS” na routerze."
 
-#: js/ui/components/networkAgent.js:104 js/ui/status/network.js:258
+#: js/ui/components/networkAgent.js:133 js/ui/status/network.js:258
 #: js/ui/status/network.js:349 js/ui/status/network.js:981
 msgid "Connect"
 msgstr "Połącz"
 
-#: js/ui/components/networkAgent.js:215
+#: js/ui/components/networkAgent.js:156
+msgid "Limited data plan connection"
+msgstr ""
+
+#: js/ui/components/networkAgent.js:162
+msgid "Select if your connection has data limits or can incur charges."
+msgstr ""
+
+#: js/ui/components/networkAgent.js:343
 msgid "Key"
 msgstr "Klucz"
 
-#: js/ui/components/networkAgent.js:253 js/ui/components/networkAgent.js:276
+#: js/ui/components/networkAgent.js:381 js/ui/components/networkAgent.js:404
 msgid "Private key password"
 msgstr "Hasło klucza prywatnego"
 
-#: js/ui/components/networkAgent.js:274
+#: js/ui/components/networkAgent.js:402
 msgid "Identity"
 msgstr "Tożsamość"
 
-#: js/ui/components/networkAgent.js:288
+#: js/ui/components/networkAgent.js:416
 msgid "Service"
 msgstr "Usługa"
 
-#: js/ui/components/networkAgent.js:317 js/ui/components/networkAgent.js:345
-#: js/ui/components/networkAgent.js:679 js/ui/components/networkAgent.js:700
+#: js/ui/components/networkAgent.js:445 js/ui/components/networkAgent.js:473
+#: js/ui/components/networkAgent.js:816 js/ui/components/networkAgent.js:837
 msgid "Authentication required"
 msgstr "Wymagane jest uwierzytelnienie"
 
-#: js/ui/components/networkAgent.js:318 js/ui/components/networkAgent.js:680
+#: js/ui/components/networkAgent.js:446 js/ui/components/networkAgent.js:817
 #, javascript-format
 msgid ""
 "Passwords or encryption keys are required to access the wireless network "
 "“%s”."
-msgstr ""
-"Do uzyskania dostępu do sieci bezprzewodowej „%s” wymagane jest hasło lub "
-"klucze szyfrowania."
+msgstr "Do uzyskania dostępu do sieci bezprzewodowej „%s” wymagane jest hasło lub klucze szyfrowania."
 
-#: js/ui/components/networkAgent.js:322 js/ui/components/networkAgent.js:684
+#: js/ui/components/networkAgent.js:450 js/ui/components/networkAgent.js:821
 msgid "Wired 802.1X authentication"
 msgstr "Uwierzytelnianie przewodowe 802.1X"
 
-#: js/ui/components/networkAgent.js:324
+#: js/ui/components/networkAgent.js:452
 msgid "Network name"
 msgstr "Nazwa sieci"
 
-#: js/ui/components/networkAgent.js:329 js/ui/components/networkAgent.js:688
+#: js/ui/components/networkAgent.js:457 js/ui/components/networkAgent.js:825
 msgid "DSL authentication"
 msgstr "Uwierzytelnienie DSL"
 
-#: js/ui/components/networkAgent.js:336 js/ui/components/networkAgent.js:693
+#: js/ui/components/networkAgent.js:464 js/ui/components/networkAgent.js:830
 msgid "PIN code required"
 msgstr "Wymagany jest kod PIN"
 
-#: js/ui/components/networkAgent.js:337 js/ui/components/networkAgent.js:694
+#: js/ui/components/networkAgent.js:465 js/ui/components/networkAgent.js:831
 msgid "PIN code is needed for the mobile broadband device"
 msgstr "Do korzystania z urządzenia komórkowego wymagane jest podanie kodu PIN"
 
-#: js/ui/components/networkAgent.js:338
+#: js/ui/components/networkAgent.js:466
 msgid "PIN"
 msgstr "Kod PIN"
 
-#: js/ui/components/networkAgent.js:346 js/ui/components/networkAgent.js:685
-#: js/ui/components/networkAgent.js:689 js/ui/components/networkAgent.js:701
-#: js/ui/components/networkAgent.js:705
+#: js/ui/components/networkAgent.js:474 js/ui/components/networkAgent.js:822
+#: js/ui/components/networkAgent.js:826 js/ui/components/networkAgent.js:838
+#: js/ui/components/networkAgent.js:842
 #, javascript-format
 msgid "A password is required to connect to “%s”."
 msgstr "Do połączenia z siecią „%s” wymagane jest hasło."
 
-#: js/ui/components/networkAgent.js:668 js/ui/status/network.js:1789
+#: js/ui/components/networkAgent.js:805 js/ui/status/network.js:1794
 msgid "Network Manager"
 msgstr "Menedżer sieci"
 
-#: js/ui/components/networkAgent.js:704
+#: js/ui/components/networkAgent.js:841
 msgid "VPN password"
 msgstr "Hasło sieci VPN"
 
-#: js/ui/components/polkitAgent.js:39
+#: js/ui/components/polkitAgent.js:41
 msgid "Authentication Required"
 msgstr "Wymagane jest uwierzytelnienie"
 
-#: js/ui/components/polkitAgent.js:79
+#: js/ui/components/polkitAgent.js:81
 msgid "Administrator"
 msgstr "Administrator"
 
-#: js/ui/components/polkitAgent.js:141
+#: js/ui/components/polkitAgent.js:160
 msgid "Authenticate"
 msgstr "Uwierzytelnij"
 
@@ -1124,11 +1111,12 @@ msgstr "Uwierzytelnij"
 #. * requested authentication was not gained; this can happen
 #. * because of an authentication error (like invalid password),
 #. * for instance.
-#: js/ui/components/polkitAgent.js:252 js/ui/shellMountOperation.js:402
+#: js/ui/components/polkitAgent.js:271 js/ui/shellMountOperation.js:413
 msgid "Sorry, that didn’t work. Please try again."
 msgstr "To nie zadziałało. Proszę spróbować ponownie."
 
-#. Translators: this is the other person changing their old IM name to their new
+#. Translators: this is the other person changing their old IM name to their
+#. new
 #. IM name.
 #: js/ui/components/telepathyClient.js:822
 #, javascript-format
@@ -1153,7 +1141,6 @@ msgstr "Ulubione"
 #. * shown - it is shown just below the time in the top bar (e.g.,
 #. * "Tue 9:29 AM").  The string itself should become a full date, e.g.,
 #. * "February 17 2015".
-#.
 #: js/ui/dateMenu.js:79
 msgid "%B %-d %Y"
 msgstr "%-d %B %Y"
@@ -1161,68 +1148,68 @@ msgstr "%-d %B %Y"
 #. Translators: This is the accessible name of the date button shown
 #. * below the time in the shell; it should combine the weekday and the
 #. * date, e.g. "Tuesday February 17 2015".
-#.
 #: js/ui/dateMenu.js:86
 msgid "%A %B %e %Y"
 msgstr "%A, %-d %B %Y"
 
-#. Translators: Shown on calendar heading when selected day occurs on current year
-#: js/ui/dateMenu.js:151
+#. Translators: Shown on calendar heading when selected day occurs on current
+#. year
+#: js/ui/dateMenu.js:152
 msgctxt "calendar heading"
 msgid "%B %-d"
 msgstr "%-d %B"
 
-#. Translators: Shown on calendar heading when selected day occurs on different year
-#: js/ui/dateMenu.js:154
+#. Translators: Shown on calendar heading when selected day occurs on
+#. different year
+#: js/ui/dateMenu.js:155
 msgctxt "calendar heading"
 msgid "%B %-d %Y"
 msgstr "%-d %B %Y"
 
-#: js/ui/dateMenu.js:160
+#: js/ui/dateMenu.js:161
 msgid "Today"
 msgstr "Dzisiaj"
 
-#: js/ui/dateMenu.js:164
+#: js/ui/dateMenu.js:165
 msgid "Tomorrow"
 msgstr "Jutro"
 
 #. Translators: Shown in calendar event list for all day events
 #. * Keep it short, best if you can use less then 10 characters
-#.
-#: js/ui/dateMenu.js:180
+#: js/ui/dateMenu.js:181
 msgctxt "event list time"
 msgid "All Day"
 msgstr "Cały dzień"
 
-#: js/ui/dateMenu.js:231
+#: js/ui/dateMenu.js:232
 msgid "No Events"
 msgstr "Brak wydarzeń"
 
-#: js/ui/dateMenu.js:348
+#: js/ui/dateMenu.js:349
 msgid "Add world clocks…"
 msgstr "Dodaj zegar światowy…"
 
-#: js/ui/dateMenu.js:349
+#: js/ui/dateMenu.js:350
 msgid "World Clocks"
 msgstr "Zegar światowy"
 
-#: js/ui/dateMenu.js:629
+#: js/ui/dateMenu.js:634
 msgid "Loading…"
 msgstr "Wczytywanie…"
 
-#: js/ui/dateMenu.js:639
+#: js/ui/dateMenu.js:644
 msgid "Go online for weather information"
 msgstr "Prognoza pogody wymaga połączenia z Internetem"
 
-#: js/ui/dateMenu.js:641
+#: js/ui/dateMenu.js:646
 msgid "Weather information is currently unavailable"
 msgstr "Prognoza pogody jest obecnie niedostępna"
 
-#: js/ui/dateMenu.js:651
+#: js/ui/dateMenu.js:656
 msgid "Weather"
 msgstr "Pogoda"
 
-#: js/ui/dateMenu.js:653
+#: js/ui/dateMenu.js:658
 msgid "Select weather location…"
 msgstr "Wybierz położenie pogody…"
 
@@ -1241,17 +1228,19 @@ msgstr "Wylogowanie"
 #, javascript-format
 msgid "%s will be logged out automatically in %d second."
 msgid_plural "%s will be logged out automatically in %d seconds."
-msgstr[0] "Użytkownik %s zostanie wylogowany za %d sekundę."
-msgstr[1] "Użytkownik %s zostanie wylogowany za %d sekundy."
-msgstr[2] "Użytkownik %s zostanie wylogowany za %d sekund."
+msgstr[0] "Użytkownik %s zostanie wylogowany za %d sekundę."
+msgstr[1] "Użytkownik %s zostanie wylogowany za %d sekundy."
+msgstr[2] "Użytkownik %s zostanie wylogowany za %d sekund."
+msgstr[3] "Użytkownik %s zostanie wylogowany za %d sekund."
 
 #: js/ui/endSessionDialog.js:49
 #, javascript-format
 msgid "You will be logged out automatically in %d second."
 msgid_plural "You will be logged out automatically in %d seconds."
-msgstr[0] "Wylogowanie nastąpi za %d sekundę."
-msgstr[1] "Wylogowanie nastąpi za %d sekundy."
-msgstr[2] "Wylogowanie nastąpi za %d sekund."
+msgstr[0] "Wylogowanie nastąpi za %d sekundę."
+msgstr[1] "Wylogowanie nastąpi za %d sekundy."
+msgstr[2] "Wylogowanie nastąpi za %d sekund."
+msgstr[3] "Wylogowanie nastąpi za %d sekund."
 
 #: js/ui/endSessionDialog.js:56
 msgctxt "button"
@@ -1272,9 +1261,10 @@ msgstr "Instalacja aktualizacji i wyłączenie komputera"
 #, javascript-format
 msgid "The system will power off automatically in %d second."
 msgid_plural "The system will power off automatically in %d seconds."
-msgstr[0] "Wyłączenie komputera nastąpi za %d sekundę."
-msgstr[1] "Wyłączenie komputera nastąpi za %d sekundy."
-msgstr[2] "Wyłączenie komputera nastąpi za %d sekund."
+msgstr[0] "Wyłączenie komputera nastąpi za %d sekundę."
+msgstr[1] "Wyłączenie komputera nastąpi za %d sekundy."
+msgstr[2] "Wyłączenie komputera nastąpi za %d sekund."
+msgstr[3] "Wyłączenie komputera nastąpi za %d sekund."
 
 #: js/ui/endSessionDialog.js:70 js/ui/endSessionDialog.js:89
 msgctxt "checkbox"
@@ -1300,9 +1290,10 @@ msgstr "Instalacja aktualizacji i ponowne uruchomienie"
 #, javascript-format
 msgid "The system will restart automatically in %d second."
 msgid_plural "The system will restart automatically in %d seconds."
-msgstr[0] "Ponowne uruchomienie komputera nastąpi za %d sekundę."
-msgstr[1] "Ponowne uruchomienie komputera nastąpi za %d sekundy."
-msgstr[2] "Ponowne uruchomienie komputera nastąpi za %d sekund."
+msgstr[0] "Ponowne uruchomienie systemu nastąpi za %d sekundę."
+msgstr[1] "Ponowne uruchomienie systemu nastąpi za %d sekundy."
+msgstr[2] "Ponowne uruchomienie systemu nastąpi za %d sekund."
+msgstr[3] "Ponowne uruchomienie systemu nastąpi za %d sekund."
 
 #: js/ui/endSessionDialog.js:93
 msgctxt "button"
@@ -1316,18 +1307,14 @@ msgstr "Ponowne uruchomienie i instalacja aktualizacji"
 
 #: js/ui/endSessionDialog.js:104
 #, javascript-format
-msgid "The system will automatically restart and install updates in %d second."
+msgid ""
+"The system will automatically restart and install updates in %d second."
 msgid_plural ""
 "The system will automatically restart and install updates in %d seconds."
 msgstr[0] ""
-"Ponowne uruchomienie komputera i instalacja aktualizacji nastąpi za "
-"%d sekundę."
 msgstr[1] ""
-"Ponowne uruchomienie komputera i instalacja aktualizacji nastąpi za "
-"%d sekundy."
 msgstr[2] ""
-"Ponowne uruchomienie komputera i instalacja aktualizacji nastąpi za "
-"%d sekund."
+msgstr[3] ""
 
 #: js/ui/endSessionDialog.js:111 js/ui/endSessionDialog.js:132
 msgctxt "button"
@@ -1357,16 +1344,11 @@ msgstr "Ponowne uruchomienie i instalacja aktualizacji"
 msgid ""
 "%s %s will be installed after restart. Upgrade installation can take a long "
 "time: ensure that you have backed up and that the computer is plugged in."
-msgstr ""
-"System %s %s zostanie zainstalowany po ponownym uruchomieniu. Instalacja "
-"aktualizacji może zająć dużo czasu. Proszę się upewnić, że wykonano kopię "
-"zapasową danych i podłączono komputer do prądu."
+msgstr "System %s %s zostanie zainstalowany po ponownym uruchomieniu. Instalacja aktualizacji może zająć dużo czasu. Proszę się upewnić, że wykonano kopię zapasową danych i podłączono komputer do prądu."
 
 #: js/ui/endSessionDialog.js:284
 msgid "Low battery power: please plug in before installing updates."
-msgstr ""
-"Niski poziom naładowania akumulatora: proszę podłączyć komputer do prądu "
-"przed instalowaniem aktualizacji."
+msgstr "Niski poziom naładowania akumulatora: proszę podłączyć komputer do prądu przed instalowaniem aktualizacji."
 
 #: js/ui/endSessionDialog.js:293
 msgid "Some applications are busy or have unsaved work"
@@ -1393,25 +1375,35 @@ msgstr "%s (zdalnie)"
 msgid "%s (console)"
 msgstr "%s (konsola)"
 
-#: js/ui/extensionDownloader.js:232
+#: js/ui/extensionDownloader.js:41
+#, javascript-format
+msgid "Can't install “%s”:"
+msgstr ""
+
+#: js/ui/extensionDownloader.js:42
+msgid ""
+"This is an extension enabled by your current mode, you can't install "
+"manually any update in that session."
+msgstr ""
+
+#: js/ui/extensionDownloader.js:244
 msgid "Install"
 msgstr "Zainstaluj"
 
-#: js/ui/extensionDownloader.js:238
+#: js/ui/extensionDownloader.js:250
 msgid "Install Extension"
 msgstr "Instalacja rozszerzenia"
 
-#: js/ui/extensionDownloader.js:239
+#: js/ui/extensionDownloader.js:251
 #, javascript-format
 msgid "Download and install “%s” from extensions.gnome.org?"
-msgstr ""
-"Pobrać i zainstalować rozszerzenie „%s” z witryny extensions.gnome.org?"
+msgstr "Pobrać i zainstalować rozszerzenie „%s” z witryny extensions.gnome.org?"
 
-#: js/ui/extensionSystem.js:252
+#: js/ui/extensionSystem.js:255
 msgid "Extension Updates Available"
 msgstr "Dostępne są aktualizacje rozszerzeń"
 
-#: js/ui/extensionSystem.js:253
+#: js/ui/extensionSystem.js:256
 msgid "Extension updates are ready to be installed."
 msgstr "Aktualizacje rozszerzeń są gotowe do zainstalowania."
 
@@ -1453,11 +1445,9 @@ msgstr "Wyłączono powolne klawisze"
 
 #: js/ui/kbdA11yDialog.js:34
 msgid ""
-"You just held down the Shift key for 8 seconds. This is the shortcut for the "
-"Slow Keys feature, which affects the way your keyboard works."
-msgstr ""
-"Przytrzymano klawisz Shift przez osiem sekund. Jest to skrót klawiszowy dla "
-"funkcji powolnych klawiszy, która wpływa na sposób pracy klawiatury."
+"You just held down the Shift key for 8 seconds. This is the shortcut for the"
+" Slow Keys feature, which affects the way your keyboard works."
+msgstr "Przytrzymano klawisz Shift przez osiem sekund. Jest to skrót klawiszowy dla funkcji powolnych klawiszy, która wpływa na sposób pracy klawiatury."
 
 #: js/ui/kbdA11yDialog.js:40
 msgid "Sticky Keys Turned On"
@@ -1471,32 +1461,27 @@ msgstr "Wyłączono trwałe klawisze"
 msgid ""
 "You just pressed the Shift key 5 times in a row. This is the shortcut for "
 "the Sticky Keys feature, which affects the way your keyboard works."
-msgstr ""
-"Przyciśnięto klawisz Shift pięć razy z rzędu. Jest to skrót klawiszowy dla "
-"funkcji trwałych klawiszy, która wpływa na sposób pracy klawiatury."
+msgstr "Przyciśnięto klawisz Shift pięć razy z rzędu. Jest to skrót klawiszowy dla funkcji trwałych klawiszy, która wpływa na sposób pracy klawiatury."
 
 #: js/ui/kbdA11yDialog.js:45
 msgid ""
 "You just pressed two keys at once, or pressed the Shift key 5 times in a "
 "row. This turns off the Sticky Keys feature, which affects the way your "
 "keyboard works."
-msgstr ""
-"Przyciśnięto dwa klawisze naraz lub przyciśnięto klawisz Shift pięć razy "
-"z rzędu. Wyłącza to funkcję trwałych klawiszy, która wpływa na sposób pracy "
-"klawiatury."
+msgstr "Przyciśnięto dwa klawisze naraz lub przyciśnięto klawisz Shift pięć razy z rzędu. Wyłącza to funkcję trwałych klawiszy, która wpływa na sposób pracy klawiatury."
 
 #: js/ui/kbdA11yDialog.js:54
 msgid "Leave On"
 msgstr "Pozostaw włączone"
 
 #: js/ui/kbdA11yDialog.js:54 js/ui/status/bluetooth.js:156
-#: js/ui/status/network.js:1377
+#: js/ui/status/network.js:1382
 msgid "Turn On"
 msgstr "Włącz"
 
 #: js/ui/kbdA11yDialog.js:62 js/ui/status/bluetooth.js:156
 #: js/ui/status/network.js:166 js/ui/status/network.js:350
-#: js/ui/status/network.js:1377 js/ui/status/network.js:1489
+#: js/ui/status/network.js:1382 js/ui/status/network.js:1494
 #: js/ui/status/nightLight.js:41 js/ui/status/rfkill.js:81
 #: js/ui/status/rfkill.js:110
 msgid "Turn Off"
@@ -1506,7 +1491,7 @@ msgstr "Wyłącz"
 msgid "Leave Off"
 msgstr "Pozostaw wyłączone"
 
-#: js/ui/keyboard.js:226
+#: js/ui/keyboard.js:231
 msgid "Region & Language Settings"
 msgstr "Ustawienia regionu i języka"
 
@@ -1559,27 +1544,25 @@ msgstr "Wyświetl źródło"
 msgid "Web Page"
 msgstr "Strona WWW"
 
-#: js/ui/main.js:290
+#: js/ui/main.js:311
 msgid "Logged in as a privileged user"
 msgstr "Zalogowano jako uprawniony użytkownik"
 
-#: js/ui/main.js:291
+#: js/ui/main.js:312
 msgid ""
 "Running a session as a privileged user should be avoided for security "
 "reasons. If possible, you should log in as a normal user."
-msgstr ""
-"Należy unikać działania jako uprawniony użytkownik z powodów bezpieczeństwa. "
-"Jeśli to możliwe, należy zalogować się jako zwykły użytkownik."
+msgstr "Należy unikać działania jako uprawniony użytkownik z powodów bezpieczeństwa. Jeśli to możliwe, należy zalogować się jako zwykły użytkownik."
 
-#: js/ui/main.js:340
+#: js/ui/main.js:361
 msgid "Screen Lock disabled"
 msgstr "Blokada ekranu jest wyłączona"
 
-#: js/ui/main.js:341
+#: js/ui/main.js:362
 msgid "Screen Locking requires the GNOME display manager."
 msgstr "Blokowanie ekranu wymaga menedżera wyświetlania GNOME."
 
-#: js/ui/messageTray.js:1443
+#: js/ui/messageTray.js:1446
 msgid "System Information"
 msgstr "Informacje systemowe"
 
@@ -1663,14 +1646,224 @@ msgstr "Naciśnięcie dowolnego przycisku zakończy"
 msgid "Activities"
 msgstr "Podgląd"
 
-#: js/ui/panel.js:556
+#: js/ui/panel.js:557
 msgctxt "System menu in the top bar"
 msgid "System"
 msgstr "Menu systemowe"
 
-#: js/ui/panel.js:674
+#: js/ui/panel.js:680
 msgid "Top Bar"
 msgstr "Górny pasek"
+
+#: js/ui/paygUnlockDialog.js:94
+msgid "Your Pay As You Go usage credit has expired."
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:118
+#, javascript-format
+msgid "Enter a new keycode (%s character) to unlock your computer:"
+msgid_plural "Enter a new keycode (%s characters) to unlock your computer:"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/paygUnlockDialog.js:143
+msgid "Don’t have an unlock keycode? That’s OK!"
+msgstr ""
+
+#. The second possible override is to use the template text below
+#. with the contact's name and phone number, if BOTH are present.
+#: js/ui/paygUnlockDialog.js:164
+#, javascript-format
+msgid ""
+"Talk to your sales representative to purchase a new keycode. Call or text %s"
+" at %s"
+msgstr ""
+
+#. No overrides present, default to fallback text.
+#: js/ui/paygUnlockDialog.js:168
+msgid "Talk to your sales representative to purchase a new keycode."
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:192
+#, javascript-format
+msgid "Pay As You Go Account ID: %s"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:202
+msgid "Unlock Machine"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:291 js/ui/shellMountOperation.js:391
+msgid "Unlock"
+msgstr "Odblokuj"
+
+#: js/ui/paygUnlockDialog.js:398
+msgid "Success!"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:422
+msgid "Remaining time cleared!"
+msgstr ""
+
+#: js/ui/paygUnlockDialog.js:423
+msgid "OK!"
+msgstr ""
+
+#: js/ui/payg.js:232
+#, javascript-format
+msgid "Too many attempts. Try again in %s minute."
+msgid_plural "Too many attempts. Try again in %s minutes."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:236
+msgid "Too many attempts. Try again in a few seconds."
+msgstr ""
+
+#: js/ui/payg.js:257
+msgid "Invalid keycode. Please try again."
+msgstr ""
+
+#: js/ui/payg.js:259
+msgid "Keycode already used. Please enter a new keycode."
+msgstr ""
+
+#: js/ui/payg.js:261
+msgid "Time exceeded while verifying the keycode"
+msgstr ""
+
+#: js/ui/payg.js:263
+#, javascript-format
+msgid "Your Pay As You Go Account ID is: %s"
+msgstr ""
+
+#. We don't consider any other error here (and we don't consider DISABLED
+#. explicitly,
+#. since that should not happen), but still we need to show something to the
+#. user.
+#: js/ui/payg.js:267
+msgid "Unknown error"
+msgstr "Nieznany błąd"
+
+#: js/ui/payg.js:447
+msgid "Apply Keycode"
+msgstr ""
+
+#: js/ui/payg.js:638
+#, javascript-format
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:642 js/ui/payg.js:652
+#, javascript-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:646 js/ui/payg.js:663
+#, javascript-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:657
+#, javascript-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:673
+#, javascript-format
+msgid "%s second has been added to your Pay As You Go credit."
+msgid_plural "%s seconds have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:681
+#, javascript-format
+msgid "%s minute has been added to your Pay As You Go credit."
+msgid_plural "%s minutes have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:689
+#, javascript-format
+msgid "%s hour has been added to your Pay As You Go credit."
+msgid_plural "%s hours have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:697
+#, javascript-format
+msgid "%s day has been added to your Pay As You Go credit."
+msgid_plural "%s days have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:705
+#, javascript-format
+msgid "%s month has been added to your Pay As You Go credit."
+msgid_plural "%s months have been added to your Pay As You Go credit."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:713
+msgid "1 year has been added to your Pay As You Go credit."
+msgstr ""
+
+#. Unlock permanently message
+#: js/ui/payg.js:716
+msgid "You have successfully unlocked your Endless Machine"
+msgstr ""
+
+#: js/ui/payg.js:741
+#, javascript-format
+msgid ""
+"Enter a new keycode (%s character) to extend the time before your credit "
+"expires."
+msgid_plural ""
+"Enter a new keycode (%s characters) to extend the time before your credit "
+"expires."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: js/ui/payg.js:750
+#, javascript-format
+msgid "Subscription expires in %s."
+msgstr ""
+
+#: js/ui/payg.js:758
+msgid "Pay As You Go"
+msgstr ""
 
 #: js/ui/runDialog.js:58
 msgid "Run a Command"
@@ -1688,7 +1881,7 @@ msgstr "Ponowne uruchamianie jest niedostępne w technologii Wayland"
 msgid "Restarting…"
 msgstr "Ponowne uruchamianie…"
 
-#: js/ui/screenShield.js:224
+#: js/ui/screenShield.js:278
 msgid "GNOME needs to lock the screen"
 msgstr "Środowisko GNOME musi zablokować ekran"
 
@@ -1696,14 +1889,13 @@ msgstr "Środowisko GNOME musi zablokować ekran"
 #. screenshield. The user is probably very upset at this
 #. point, but any application using global grabs is broken
 #. Just tell him to stop using this app
-#.
 #. XXX: another option is to kick the user into the gdm login
 #. screen, where we're not affected by grabs
-#: js/ui/screenShield.js:264 js/ui/screenShield.js:634
+#: js/ui/screenShield.js:318 js/ui/screenShield.js:722
 msgid "Unable to lock"
 msgstr "Nie można zablokować"
 
-#: js/ui/screenShield.js:265 js/ui/screenShield.js:635
+#: js/ui/screenShield.js:319 js/ui/screenShield.js:723
 msgid "Lock was blocked by an application"
 msgstr "Blokowanie zostało zablokowane przez program"
 
@@ -1723,9 +1915,10 @@ msgstr "Brak wyników."
 #, javascript-format
 msgid "%d more"
 msgid_plural "%d more"
-msgstr[0] "%d więcej"
-msgstr[1] "%d więcej"
-msgstr[2] "%d więcej"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: js/ui/searchController.js:87
 msgid "Search"
@@ -1751,57 +1944,51 @@ msgstr "Ukryj tekst"
 msgid "Caps lock is on."
 msgstr "Klawisz Caps Lock jest włączony."
 
-#: js/ui/shellMountOperation.js:285
+#: js/ui/shellMountOperation.js:287
 msgid "Hidden Volume"
 msgstr "Ukryty wolumin"
 
-#: js/ui/shellMountOperation.js:288
+#: js/ui/shellMountOperation.js:290
 msgid "Windows System Volume"
 msgstr "Systemowy wolumin Windows"
 
-#: js/ui/shellMountOperation.js:291
+#: js/ui/shellMountOperation.js:293
 msgid "Uses Keyfiles"
 msgstr "Używa plików kluczy"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:298
+#: js/ui/shellMountOperation.js:300
 #, javascript-format
 msgid ""
 "To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead."
-msgstr ""
-"Do odblokowania woluminu używającego plików kluczy należy użyć narzędzia <i>"
-"%s</i>."
+msgstr "Do odblokowania woluminu używającego plików kluczy należy użyć narzędzia <i>%s</i>."
 
-#: js/ui/shellMountOperation.js:306
+#: js/ui/shellMountOperation.js:308
 msgid "PIM Number"
 msgstr "Numer PIM"
 
-#: js/ui/shellMountOperation.js:365
+#: js/ui/shellMountOperation.js:376
 msgid "Remember Password"
 msgstr "Zapamiętanie hasła"
 
-#: js/ui/shellMountOperation.js:380
-msgid "Unlock"
-msgstr "Odblokuj"
-
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:391
+#: js/ui/shellMountOperation.js:402
 #, javascript-format
 msgid "Open %s"
 msgstr "Otwórz program %s"
 
-#: js/ui/shellMountOperation.js:423
+#: js/ui/shellMountOperation.js:436
 msgid "The PIM must be a number or empty."
 msgstr "PIM musi być numerem lub być pusty."
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:465
+#: js/ui/shellMountOperation.js:478
 #, javascript-format
 msgid "Unable to start %s"
 msgstr "Nie można uruchomić programu %s"
 
 #. Translators: %s is the Disks application
-#: js/ui/shellMountOperation.js:467
+#: js/ui/shellMountOperation.js:480
 #, javascript-format
 msgid "Couldn’t find the %s application"
 msgstr "Nie można odnaleźć programu %s"
@@ -1863,9 +2050,10 @@ msgstr "Ustawienia Bluetooth"
 #, javascript-format
 msgid "%d Connected"
 msgid_plural "%d Connected"
-msgstr[0] "%d połączone urządzenie"
-msgstr[1] "%d połączone urządzenia"
-msgstr[2] "%d połączonych urządzeń"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: js/ui/status/bluetooth.js:152
 msgid "Bluetooth Off"
@@ -1899,59 +2087,58 @@ msgstr "Kliknięcie pomocnicze"
 msgid "Dwell Click"
 msgstr "Kliknięcie spoczynkowe"
 
-#: js/ui/status/keyboard.js:829
+#: js/ui/status/keyboard.js:881
 msgid "Keyboard"
 msgstr "Klawiatura"
 
-#: js/ui/status/keyboard.js:846
+#: js/ui/status/keyboard.js:900
 msgid "Show Keyboard Layout"
 msgstr "Wyświetl układ klawiatury"
 
-#: js/ui/status/location.js:234 js/ui/status/location.js:267
+#: js/ui/status/location.js:234 js/ui/status/location.js:266
 msgid "Location Enabled"
 msgstr "Włączono ustalanie położenia"
 
-#: js/ui/status/location.js:235 js/ui/status/location.js:268
+#: js/ui/status/location.js:235 js/ui/status/location.js:267
 msgid "Disable"
 msgstr "Wyłącz"
 
-#: js/ui/status/location.js:236
+#: js/ui/status/location.js:237
 msgid "Privacy Settings"
 msgstr "Ustawienia prywatności"
 
-#: js/ui/status/location.js:266
+#: js/ui/status/location.js:265
 msgid "Location In Use"
 msgstr "Ustalanie położenia jest używane"
 
-#: js/ui/status/location.js:270
+#: js/ui/status/location.js:269
 msgid "Location Disabled"
 msgstr "Wyłączono ustalanie położenia"
 
-#: js/ui/status/location.js:271
+#: js/ui/status/location.js:270
 msgid "Enable"
 msgstr "Włącz"
 
-#: js/ui/status/location.js:398
+#: js/ui/status/location.js:397
 msgid "Allow location access"
 msgstr "Zezwolenie na dostęp do położenia"
 
 #. Translators: %s is an application name
-#: js/ui/status/location.js:400
+#: js/ui/status/location.js:399
 #, javascript-format
 msgid "The app %s wants to access your location"
 msgstr "Program „%s” prosi o dostęp do położenia użytkownika"
 
-#: js/ui/status/location.js:410
+#: js/ui/status/location.js:409
 msgid "Location access can be changed at any time from the privacy settings."
-msgstr ""
-"W każdej chwili można zmienić dostęp do położenia w ustawieniach prywatności."
+msgstr "W każdej chwili można zmienić dostęp do położenia w ustawieniach prywatności."
 
 #: js/ui/status/network.js:72
 msgid "<unknown>"
 msgstr "<nieznane>"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:455 js/ui/status/network.js:1406
+#: js/ui/status/network.js:455 js/ui/status/network.js:1411
 #, javascript-format
 msgid "%s Off"
 msgstr "Wyłączono sieć %s"
@@ -1962,7 +2149,8 @@ msgstr "Wyłączono sieć %s"
 msgid "%s Connected"
 msgstr "Połączono z siecią %s"
 
-#. Translators: this is for network devices that are physically present but are not
+#. Translators: this is for network devices that are physically present but
+#. are not
 #. under NetworkManager's control (and thus cannot be used in the menu);
 #. %s is a network identifier
 #: js/ui/status/network.js:463
@@ -1977,25 +2165,28 @@ msgid "%s Disconnecting"
 msgstr "Rozłączanie z sieci %s"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:473 js/ui/status/network.js:1398
+#: js/ui/status/network.js:473 js/ui/status/network.js:1403
 #, javascript-format
 msgid "%s Connecting"
 msgstr "Łączenie z siecią %s"
 
-#. Translators: this is for network connections that require some kind of key or password; %s is a network identifier
+#. Translators: this is for network connections that require some kind of key
+#. or password; %s is a network identifier
 #: js/ui/status/network.js:476
 #, javascript-format
 msgid "%s Requires Authentication"
 msgstr "Sieć %s wymaga uwierzytelnienia"
 
-#. Translators: this is for devices that require some kind of firmware or kernel
+#. Translators: this is for devices that require some kind of firmware or
+#. kernel
 #. module, which is missing; %s is a network identifier
 #: js/ui/status/network.js:484
 #, javascript-format
 msgid "Firmware Missing For %s"
 msgstr "Brak oprogramowania sprzętowego dla sieci %s"
 
-#. Translators: this is for a network device that cannot be activated (for example it
+#. Translators: this is for a network device that cannot be activated (for
+#. example it
 #. is disabled by rfkill, or it has no coverage; %s is a network identifier
 #: js/ui/status/network.js:488
 #, javascript-format
@@ -2017,7 +2208,7 @@ msgid "Mobile Broadband Settings"
 msgstr "Ustawienia sieci komórkowej"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:619 js/ui/status/network.js:1403
+#: js/ui/status/network.js:619 js/ui/status/network.js:1408
 #, javascript-format
 msgid "%s Hardware Disabled"
 msgstr "Wyłączono sprzęt dla sieci %s"
@@ -2073,84 +2264,88 @@ msgstr "Brak sieci"
 msgid "Use hardware switch to turn off"
 msgstr "Należy użyć przełącznika sprzętowego, aby wyłączyć"
 
-#: js/ui/status/network.js:1267
+#: js/ui/status/network.js:1272
 msgid "Select Network"
 msgstr "Wybierz sieć"
 
-#: js/ui/status/network.js:1273
+#: js/ui/status/network.js:1278
 msgid "Wi-Fi Settings"
 msgstr "Ustawienia sieci Wi-Fi"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:1394
+#: js/ui/status/network.js:1399
 #, javascript-format
 msgid "%s Hotspot Active"
 msgstr "Hotspot %s jest włączony"
 
 #. Translators: %s is a network identifier
-#: js/ui/status/network.js:1409
+#: js/ui/status/network.js:1414
 #, javascript-format
 msgid "%s Not Connected"
 msgstr "Nie połączono z siecią %s"
 
-#: js/ui/status/network.js:1506
+#: js/ui/status/network.js:1511
 msgid "connecting…"
 msgstr "łączenie…"
 
-#. Translators: this is for network connections that require some kind of key or password
-#: js/ui/status/network.js:1509
+#. Translators: this is for network connections that require some kind of key
+#. or password
+#: js/ui/status/network.js:1514
 msgid "authentication required"
 msgstr "wymagane jest uwierzytelnienie"
 
-#: js/ui/status/network.js:1511
+#: js/ui/status/network.js:1516
 msgid "connection failed"
 msgstr "połączenie się nie powiodło"
 
-#: js/ui/status/network.js:1562
+#: js/ui/status/network.js:1567
 msgid "VPN Settings"
 msgstr "Ustawienia sieci VPN"
 
-#: js/ui/status/network.js:1579
+#: js/ui/status/network.js:1584
 msgid "VPN"
 msgstr "VPN"
 
-#: js/ui/status/network.js:1589
+#: js/ui/status/network.js:1594
 msgid "VPN Off"
 msgstr "Wyłączono sieć VPN"
 
-#: js/ui/status/network.js:1650 js/ui/status/rfkill.js:84
+#: js/ui/status/network.js:1655 js/ui/status/rfkill.js:84
 msgid "Network Settings"
 msgstr "Ustawienia sieci"
 
-#: js/ui/status/network.js:1678
+#: js/ui/status/network.js:1683
 #, javascript-format
 msgid "%s Wired Connection"
 msgid_plural "%s Wired Connections"
-msgstr[0] "%s połączenie przewodowe"
-msgstr[1] "%s połączenia przewodowe"
-msgstr[2] "%s połączeń przewodowych"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: js/ui/status/network.js:1682
+#: js/ui/status/network.js:1687
 #, javascript-format
 msgid "%s Wi-Fi Connection"
 msgid_plural "%s Wi-Fi Connections"
-msgstr[0] "%s połączenie Wi-Fi"
-msgstr[1] "%s połączenia Wi-Fi"
-msgstr[2] "%s połączeń Wi-Fi"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: js/ui/status/network.js:1686
+#: js/ui/status/network.js:1691
 #, javascript-format
 msgid "%s Modem Connection"
 msgid_plural "%s Modem Connections"
-msgstr[0] "%s połączenie modemowe"
-msgstr[1] "%s połączenia modemowe"
-msgstr[2] "%s połączeń modemowych"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: js/ui/status/network.js:1830
+#: js/ui/status/network.js:1835
 msgid "Connection failed"
 msgstr "Połączenie się nie powiodło"
 
-#: js/ui/status/network.js:1831
+#: js/ui/status/network.js:1836
 msgid "Activation of network connection failed"
 msgstr "Włączenie połączenia sieciowego się nie powiodło"
 
@@ -2169,6 +2364,27 @@ msgstr "Włącz"
 #: js/ui/status/nightLight.js:67
 msgid "Disable Until Tomorrow"
 msgstr "Wyłącz do jutra"
+
+#: js/ui/status/payg.js:42
+msgid "Enter unlock code…"
+msgstr ""
+
+#: js/ui/status/payg.js:121
+msgid "Getting time…"
+msgstr ""
+
+#: js/ui/status/payg.js:129
+msgid "Subscription expired"
+msgstr ""
+
+#: js/ui/status/payg.js:131
+msgid "Less than 1 minute"
+msgstr ""
+
+#: js/ui/status/payg.js:153
+#, javascript-format
+msgid "Account ID: %s"
+msgstr ""
 
 #: js/ui/status/power.js:51 js/ui/status/powerProfiles.js:57
 msgid "Power Settings"
@@ -2276,9 +2492,7 @@ msgstr "Nieznane urządzenie Thunderbolt"
 msgid ""
 "New device has been detected while you were away. Please disconnect and "
 "reconnect the device to start using it."
-msgstr ""
-"Podczas nieobecności wykryto nowe urządzenie. Proszę je rozłączyć "
-"i podłączyć ponownie, aby zacząć je używać."
+msgstr "Podczas nieobecności wykryto nowe urządzenie. Proszę je rozłączyć i podłączyć ponownie, aby zacząć je używać."
 
 #: js/ui/status/thunderbolt.js:328
 msgid "Unauthorized Thunderbolt device"
@@ -2287,8 +2501,7 @@ msgstr "Nieupoważnione urządzenie Thunderbolt"
 #: js/ui/status/thunderbolt.js:329
 msgid ""
 "New device has been detected and needs to be authorized by an administrator."
-msgstr ""
-"Wykryto nowe urządzenie, które musi zostać upoważnione przez administratora."
+msgstr "Wykryto nowe urządzenie, które musi zostać upoważnione przez administratora."
 
 #: js/ui/status/thunderbolt.js:335
 msgid "Thunderbolt authorization error"
@@ -2299,79 +2512,73 @@ msgstr "Błąd upoważnienia Thunderbolt"
 msgid "Could not authorize the Thunderbolt device: %s"
 msgstr "Nie można upoważnić urządzenia Thunderbolt: %s"
 
-#: js/ui/status/volume.js:160
+#: js/ui/status/volume.js:161
 msgid "Volume changed"
 msgstr "Zmieniono głośność"
 
-#: js/ui/status/volume.js:222
+#: js/ui/status/volume.js:223
 msgid "Volume"
 msgstr "Głośność"
 
 #. Translators: this is for display mirroring i.e. cloning.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:17
 msgid "Mirror"
 msgstr "Ten sam obraz"
 
 #. Translators: this is for the desktop spanning displays.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:22
 msgid "Join Displays"
 msgstr "Połączone ekrany"
 
 #. Translators: this is for using only an external display.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:27
 msgid "External Only"
 msgstr "Tylko zewnętrzny"
 
 #. Translators: this is for using only the laptop display.
 #. * Try to keep it under around 15 characters.
-#.
 #: js/ui/switchMonitor.js:32
 msgid "Built-in Only"
 msgstr "Tylko wbudowany"
 
 #. Translators: This is a time format for a date in
 #. long format
-#: js/ui/unlockDialog.js:371
+#: js/ui/unlockDialog.js:380
 msgid "%A %B %-d"
 msgstr "%A, %-d %B"
 
-#: js/ui/unlockDialog.js:377
+#: js/ui/unlockDialog.js:386
 msgid "Swipe up to unlock"
 msgstr "Przeciągnięcie w górę odblokuje"
 
-#: js/ui/unlockDialog.js:378
+#: js/ui/unlockDialog.js:387
 msgid "Click or press a key to unlock"
 msgstr "Kliknięcie lub naciśnięcie klawisza odblokuje"
 
-#: js/ui/unlockDialog.js:556
+#: js/ui/unlockDialog.js:565
 msgid "Unlock Window"
 msgstr "Okno odblokowania"
 
-#: js/ui/unlockDialog.js:565
+#: js/ui/unlockDialog.js:574
 msgid "Log in as another user"
 msgstr "Zaloguj jako inny użytkownik"
 
-#: js/ui/welcomeDialog.js:36
-#, javascript-format
-msgid "Welcome to GNOME %s"
-msgstr "Witamy w GNOME %s"
-
 #: js/ui/welcomeDialog.js:37
-msgid "If you want to learn your way around, check out the tour."
+msgid "Welcome to Endless OS 5"
 msgstr ""
-"Przewodnik po środowisku pomoże zacząć pracę i poznać niezbędne funkcje."
 
-#: js/ui/welcomeDialog.js:45
+#: js/ui/welcomeDialog.js:38
+msgid "If you want to learn your way around, check out the tour."
+msgstr "Przewodnik po środowisku pomoże zacząć pracę i poznać niezbędne funkcje."
+
+#: js/ui/welcomeDialog.js:46
 msgid "No Thanks"
 msgstr "Nie, dziękuję"
 
-#: js/ui/welcomeDialog.js:50
+#: js/ui/welcomeDialog.js:51
 msgid "Take Tour"
 msgstr "Rozpocznij przewodnik"
 
@@ -2381,32 +2588,32 @@ msgid "“%s” is ready"
 msgstr "Okno „%s” jest gotowe"
 
 #. Translators: This string should be shorter than 30 characters
-#: js/ui/windowManager.js:63
+#: js/ui/windowManager.js:64
 msgid "Keep these display settings?"
 msgstr "Zachować te ustawienia?"
 
 #. Translators: this and the following message should be limited in length,
 #. to avoid ellipsizing the labels.
-#.
-#: js/ui/windowManager.js:72
+#: js/ui/windowManager.js:73
 msgid "Revert Settings"
 msgstr "Przywróć ustawienia"
 
-#: js/ui/windowManager.js:75
+#: js/ui/windowManager.js:76
 msgid "Keep Changes"
 msgstr "Zachowaj zmiany"
 
-#: js/ui/windowManager.js:94
+#: js/ui/windowManager.js:95
 #, javascript-format
 msgid "Settings changes will revert in %d second"
 msgid_plural "Settings changes will revert in %d seconds"
-msgstr[0] "Zmienione ustawienia zostaną przywrócone za %d sekundę"
-msgstr[1] "Zmienione ustawienia zostaną przywrócone za %d sekundy"
-msgstr[2] "Zmienione ustawienia zostaną przywrócone za %d sekund"
+msgstr[0] "Zmiany ustawień zostaną przywrócone za %d sekundę"
+msgstr[1] "Zmiany ustawień zostaną przywrócone za %d sekundy"
+msgstr[2] "Zmiany ustawień zostaną przywrócone za %d sekund"
+msgstr[3] "Zmiany ustawień zostaną przywrócone za %d sekund"
 
 #. Translators: This represents the size of a window. The first number is
 #. * the width of the window and the second is the height.
-#: js/ui/windowManager.js:550
+#: js/ui/windowManager.js:542
 #, javascript-format
 msgid "%d × %d"
 msgstr "%d×%d"
@@ -2483,7 +2690,7 @@ msgstr "Zamknij"
 msgid "Evolution Calendar"
 msgstr "Kalendarz programu Evolution"
 
-#: src/main.c:419 subprojects/extensions-tool/src/main.c:317
+#: src/main.c:419 subprojects/extensions-tool/src/main.c:321
 msgid "Print version"
 msgstr "Wyświetla wersję"
 
@@ -2499,12 +2706,12 @@ msgstr "Używa podanego trybu, np. „gdm” dla ekranu logowania"
 msgid "List possible modes"
 msgstr "Wyświetla listę możliwych trybów"
 
-#: src/shell-app.c:298
+#: src/shell-app.c:300
 msgctxt "program"
 msgid "Unknown"
 msgstr "Nieznany"
 
-#: src/shell-app.c:549
+#: src/shell-app.c:551
 #, c-format
 msgid "Failed to launch “%s”"
 msgstr "Uruchomienie „%s” się nie powiodło"
@@ -2541,9 +2748,7 @@ msgstr "Projekt GNOME"
 msgid ""
 "GNOME Extensions handles updating extensions, configuring extension "
 "preferences and removing or disabling unwanted extensions."
-msgstr ""
-"Ten program obsługuje aktualizowanie, konfigurowanie preferencji oraz "
-"usuwanie i wyłączanie niechcianych rozszerzeń."
+msgstr "Ten program obsługuje aktualizowanie, konfigurowanie preferencji oraz usuwanie i wyłączanie niechcianych rozszerzeń."
 
 #: subprojects/extensions-app/data/org.gnome.Extensions.desktop.in.in:7
 msgid "Configure GNOME Shell Extensions"
@@ -2563,9 +2768,7 @@ msgstr "Usunąć rozszerzenie „%s”?"
 msgid ""
 "If you remove the extension, you need to return to download it if you want "
 "to enable it again"
-msgstr ""
-"Po usunięciu rozszerzenia jego ponowne włączenie będzie wymagało pobrania od "
-"nowa"
+msgstr "Po usunięciu rozszerzenia jego ponowne włączenie będzie wymagało pobrania od nowa"
 
 #: subprojects/extensions-app/js/main.js:184
 msgid "Remove"
@@ -2573,19 +2776,16 @@ msgstr "Usuń"
 
 #: subprojects/extensions-app/js/main.js:216
 msgid "translator-credits"
-msgstr ""
-"Piotr Drąg <piotrdrag@gmail.com>, 2009-2021\n"
-"Tomasz Dominikowski <dominikowski@gmail.com>, 2009\n"
-"Wojciech Szczęsny <wszczesny@aviary.pl>, 2013\n"
-"Aviary.pl <community-poland@mozilla.org>, 2009-2021"
+msgstr "Piotr Drąg <piotrdrag@gmail.com>, 2009-2021\nTomasz Dominikowski <dominikowski@gmail.com>, 2009\nWojciech Szczęsny <wszczesny@aviary.pl>, 2013\nAviary.pl <community-poland@mozilla.org>, 2009-2021"
 
 #: subprojects/extensions-app/js/main.js:344
 #, javascript-format
 msgid "%d extension will be updated on next login."
 msgid_plural "%d extensions will be updated on next login."
-msgstr[0] "%d rozszerzenie zostanie zaktualizowane po następnym zalogowaniu."
-msgstr[1] "%d rozszerzenia zostaną zaktualizowane po następnym zalogowaniu."
-msgstr[2] "%d rozszerzeń zostanie zaktualizowanych po następnym zalogowaniu."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: subprojects/extensions-app/js/main.js:494
 msgid "The extension is incompatible with the current GNOME version"
@@ -2628,11 +2828,9 @@ msgstr "O programie"
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:27
 msgid ""
-"To find and add extensions, visit <a href=\"https://extensions.gnome.org"
-"\">extensions.gnome.org</a>."
-msgstr ""
-"Witryna <a href=\"https://extensions.gnome.org\">extensions.gnome.org</a> "
-"umożliwia wyszukiwanie i dodawanie rozszerzeń."
+"To find and add extensions, visit <a "
+"href=\"https://extensions.gnome.org\">extensions.gnome.org</a>."
+msgstr "Witryna <a href=\"https://extensions.gnome.org\">extensions.gnome.org</a> umożliwia wyszukiwanie i dodawanie rozszerzeń."
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:34
 msgid "Warning"
@@ -2643,10 +2841,7 @@ msgid ""
 "Extensions can cause system issues, including performance problems. If you "
 "encounter problems with your system, it is recommended to disable all "
 "extensions."
-msgstr ""
-"Rozszerzenia mogą powodować problemy z komputerem, w tym związane "
-"z wydajnością. W przypadku występowania problemów zalecane jest wyłączenie "
-"wszystkich rozszerzeń."
+msgstr "Rozszerzenia mogą powodować problemy z komputerem, w tym związane z wydajnością. W przypadku występowania problemów zalecane jest wyłączenie wszystkich rozszerzeń."
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:150
 msgid "Manually Installed"
@@ -2664,9 +2859,7 @@ msgstr "Brak zainstalowanych rozszerzeń"
 msgid ""
 "We’re very sorry, but it was not possible to get the list of installed "
 "extensions. Make sure you are logged into GNOME and try again."
-msgstr ""
-"Nie można wyświetlić listy zainstalowanych rozszerzeń. Proszę się upewnić, "
-"że zalogowano w środowisku GNOME i spróbować ponownie."
+msgstr "Nie można wyświetlić listy zainstalowanych rozszerzeń. Proszę się upewnić, że zalogowano w środowisku GNOME i spróbować ponownie."
 
 #: subprojects/extensions-app/data/ui/extensions-window.ui:288
 msgid "Extension Updates Ready"
@@ -2687,9 +2880,7 @@ msgstr "Pomyślnie utworzono nowe rozszerzenie w %s.\n"
 msgid ""
 "Name should be a very short (ideally descriptive) string.\n"
 "Examples are: %s"
-msgstr ""
-"Nazwa jest być bardzo krótkim (najlepiej opisowym) napisem.\n"
-"Przykłady: %s"
+msgstr "Nazwa jest być bardzo krótkim (najlepiej opisowym) napisem.\nPrzykłady: %s"
 
 #: subprojects/extensions-tool/src/command-create.c:302
 #: subprojects/extensions-tool/src/main.c:238
@@ -2701,20 +2892,17 @@ msgstr "Nazwa"
 msgid ""
 "Description is a single-sentence explanation of what your extension does.\n"
 "Examples are: %s"
-msgstr ""
-"Opis jest jednozdaniowym wyjaśnieniem działania rozszerzenia.\n"
-"Przykłady: %s"
+msgstr "Opis jest jednozdaniowym wyjaśnieniem działania rozszerzenia.\nPrzykłady: %s"
 
 #: subprojects/extensions-tool/src/command-create.c:336
+#, c-format
 msgid ""
 "UUID is a globally-unique identifier for your extension.\n"
-"This should be in the format of an email address (clicktofocus@janedoe."
-"example.com)\n"
-msgstr ""
-"UUID to globalnie unikalny identyfikator rozszerzenia.\n"
-"Musi być w formacie adresu e-mail (kliknięcie-aktywuje@alicja.example.com)\n"
+"This should be in the format of an email address (clicktofocus@janedoe.example.com)\n"
+msgstr "UUID to globalnie unikalny identyfikator rozszerzenia.\nMusi być w formacie adresu e-mail (kliknięcie-aktywuje@alicja.example.com)\n"
 
 #: subprojects/extensions-tool/src/command-create.c:363
+#, c-format
 msgid "Choose one of the available templates:\n"
 msgstr "Proszę wybrać jeden z dostępnych szablonów:\n"
 
@@ -2772,6 +2960,7 @@ msgstr "UUID, nazwa i opis są wymagane"
 #: subprojects/extensions-tool/src/command-info.c:50
 #: subprojects/extensions-tool/src/command-list.c:64
 #: subprojects/extensions-tool/src/main.c:146
+#, c-format
 msgid "Failed to connect to GNOME Shell\n"
 msgstr "Połączenie z powłoką GNOME się nie powiodło\n"
 
@@ -2941,6 +3130,7 @@ msgid "Reset an extension"
 msgstr "Przywraca rozszerzenie"
 
 #: subprojects/extensions-tool/src/command-uninstall.c:49
+#, c-format
 msgid "Cannot uninstall system extensions\n"
 msgstr "Nie można odinstalować rozszerzeń systemowych\n"
 
@@ -2973,78 +3163,78 @@ msgstr "Oryginalny autor"
 msgid "State"
 msgstr "Stan"
 
-#: subprojects/extensions-tool/src/main.c:290
+#: subprojects/extensions-tool/src/main.c:294
 msgid "“version” takes no arguments"
 msgstr "Opcja „version” nie przyjmuje parametrów"
 
-#: subprojects/extensions-tool/src/main.c:292
-#: subprojects/extensions-tool/src/main.c:312
+#: subprojects/extensions-tool/src/main.c:296
+#: subprojects/extensions-tool/src/main.c:316
 msgid "Usage:"
 msgstr "Użycie:"
 
-#: subprojects/extensions-tool/src/main.c:295
+#: subprojects/extensions-tool/src/main.c:299
 msgid "Print version information and exit."
 msgstr "Wyświetla informacje o wersji i kończy działanie."
 
-#: subprojects/extensions-tool/src/main.c:310
-#: subprojects/extensions-tool/src/main.c:313
+#: subprojects/extensions-tool/src/main.c:314
+#: subprojects/extensions-tool/src/main.c:317
 msgid "COMMAND"
 msgstr "POLECENIE"
 
-#: subprojects/extensions-tool/src/main.c:313
+#: subprojects/extensions-tool/src/main.c:317
 msgid "[ARGS…]"
 msgstr "[PARAMETRY…]"
 
-#: subprojects/extensions-tool/src/main.c:315
+#: subprojects/extensions-tool/src/main.c:319
 msgid "Commands:"
 msgstr "Polecenia:"
 
-#: subprojects/extensions-tool/src/main.c:316
+#: subprojects/extensions-tool/src/main.c:320
 msgid "Print help"
 msgstr "Wyświetla pomoc"
 
-#: subprojects/extensions-tool/src/main.c:318
+#: subprojects/extensions-tool/src/main.c:322
 msgid "Enable extension"
 msgstr "Włącza rozszerzenie"
 
-#: subprojects/extensions-tool/src/main.c:319
+#: subprojects/extensions-tool/src/main.c:323
 msgid "Disable extension"
 msgstr "Wyłącza rozszerzenie"
 
-#: subprojects/extensions-tool/src/main.c:320
+#: subprojects/extensions-tool/src/main.c:324
 msgid "Reset extension"
 msgstr "Przywraca rozszerzenie"
 
-#: subprojects/extensions-tool/src/main.c:321
+#: subprojects/extensions-tool/src/main.c:325
 msgid "Uninstall extension"
 msgstr "Odinstalowuje rozszerzenie"
 
-#: subprojects/extensions-tool/src/main.c:322
+#: subprojects/extensions-tool/src/main.c:326
 msgid "List extensions"
 msgstr "Wyświetla listę rozszerzeń"
 
-#: subprojects/extensions-tool/src/main.c:323
-#: subprojects/extensions-tool/src/main.c:324
+#: subprojects/extensions-tool/src/main.c:327
+#: subprojects/extensions-tool/src/main.c:328
 msgid "Show extension info"
 msgstr "Wyświetla informacje o rozszerzeniu"
 
-#: subprojects/extensions-tool/src/main.c:325
+#: subprojects/extensions-tool/src/main.c:329
 msgid "Open extension preferences"
 msgstr "Otwiera preferencje rozszerzenia"
 
-#: subprojects/extensions-tool/src/main.c:326
+#: subprojects/extensions-tool/src/main.c:330
 msgid "Create extension"
 msgstr "Tworzy rozszerzenie"
 
-#: subprojects/extensions-tool/src/main.c:327
+#: subprojects/extensions-tool/src/main.c:331
 msgid "Package extension"
 msgstr "Tworzy pakiet z rozszerzeniem"
 
-#: subprojects/extensions-tool/src/main.c:328
+#: subprojects/extensions-tool/src/main.c:332
 msgid "Install extension bundle"
 msgstr "Instaluje pakiet rozszerzenia"
 
-#: subprojects/extensions-tool/src/main.c:330
+#: subprojects/extensions-tool/src/main.c:334
 #, c-format
 msgid "Use “%s” to get detailed help.\n"
 msgstr "Polecenie „%s” wyświetli szczegółową pomoc.\n"
@@ -3074,6 +3264,7 @@ msgid_plural "%u Outputs"
 msgstr[0] "%u wyjście"
 msgstr[1] "%u wyjścia"
 msgstr[2] "%u wyjść"
+msgstr[3] "%u wyjść"
 
 #. translators:
 #. * The number of sound inputs on a particular device
@@ -3084,6 +3275,7 @@ msgid_plural "%u Inputs"
 msgstr[0] "%u wejście"
 msgstr[1] "%u wejścia"
 msgstr[2] "%u wejść"
+msgstr[3] "%u wejść"
 
 #: subprojects/gvc/gvc-mixer-control.c:2867
 msgid "System Sounds"
