@@ -622,6 +622,9 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
          * so we need to disable destroyOnClose */
         super._init({ styleClass: 'payg-add-credit-dialog',
                       destroyOnClose: false });
+
+        this.verificationStatus = UnlockStatus.NOT_VERIFYING;
+
         this._buildLayout();
     }
 
@@ -641,6 +644,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             x_expand: true,
         });
         this._codeEntry.clutter_text.connect('activate', this._apply.bind(this));
+        this._codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
         this._codeEntry.setEnabled(true);
         this._content.add_child(this._codeEntry);
 
@@ -657,9 +661,24 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             action: () => {
                 this._apply();
             }});
+        this.updateApplyButtonSensitivity();
 
         /* we want key focus to be in the entry field when this dialog is shown */
         this.setInitialKeyFocus(this._codeEntry);
+    }
+
+    validateCurrentCode(partial=true) {
+        return Main.paygManager.validateCode(this._codeEntry.get_text(), partial);
+    }
+
+    updateApplyButtonSensitivity() {
+        const sensitive = this.validateCurrentCode(false) &&
+            this.verificationStatus !== UnlockStatus.VERIFYING &&
+            this.verificationStatus !== UnlockStatus.SUCCEEDED &&
+            this.verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
+
+        this._applyButton.reactive = sensitive;
+        this._applyButton.can_focus = sensitive;
     }
 
     _apply() {
