@@ -645,6 +645,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         });
         this._codeEntry.clutter_text.connect('activate', this._apply.bind(this));
         this._codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
+        super.connect('closed', this._codeEntry.reset.bind(this._codeEntry));
         this._codeEntry.setEnabled(true);
         this._content.add_child(this._codeEntry);
 
