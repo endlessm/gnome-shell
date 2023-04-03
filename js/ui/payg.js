@@ -638,6 +638,21 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         this._content = new Dialog.MessageDialogContent({ title, description });
 
+        /* This box will contain the code prefix, entry field and suffix */
+        this._codeEntryBox = new St.BoxLayout({
+            x_expand: false,
+        });
+
+        /* Add code prefix label, if needed */
+        if (Main.paygManager.codeFormatPrefix !== '') {
+            const prefix = new St.Label({
+                style_class: 'notification-payg-code-entry',
+                text: Main.paygManager.codeFormatPrefix,
+                x_align: Clutter.ActorAlign.CENTER,
+            });
+            this._codeEntryBox.add_child(prefix);
+        }
+
         this._codeEntry = new PaygUnlockCodeEntry({
             style_class: 'notification-payg-entry',
             can_focus: true,
@@ -647,8 +662,20 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
         super.connect('closed', this._codeEntry.reset.bind(this._codeEntry));
         this._codeEntry.setEnabled(true);
-        this._content.add_child(this._codeEntry);
+        this._codeEntryBox.add_child(this._codeEntry);
 
+        /* Add code suffix label, if needed */
+        if (Main.paygManager.codeFormatSuffix !== '') {
+            const suffix = new St.Label({
+                style_class: 'notification-payg-code-entry',
+                text: Main.paygManager.codeFormatSuffix,
+                x_align: Clutter.ActorAlign.CENTER,
+            });
+
+            this._codeEntryBox.add_child(suffix);
+        }
+
+        this._content.add_child(this._codeEntryBox);
         this.contentLayout.add_child(this._content);
 
         /* Add buttons */
