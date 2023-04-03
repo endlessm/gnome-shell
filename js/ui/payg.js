@@ -407,10 +407,15 @@ var PaygUnlockWidget = GObject.registerClass({
         global.focus_manager.add_group(this._widgetBox);
         this._widgetBox.add_child(entrySpinnerBox);
 
+        this._buttonBox = new St.BoxLayout({
+            style_class: 'notification-actions',
+            x_expand: false,
+        });
         this._applyButton = this._createApplyButton();
         this._applyButton.connect('clicked', this.startVerifyingCode.bind(this));
-        this._widgetBox.add_child(this._applyButton);
-
+        this._buttonBox.add_child(this._applyButton);
+        this._cancelButton = this._createCancelButton();
+        this._buttonBox.add_child(this._cancelButton);
         this.updateSensitivity();
     }
 
@@ -443,6 +448,16 @@ var PaygUnlockWidget = GObject.registerClass({
             button_mask: St.ButtonMask.ONE,
             style_class: 'modal-dialog-linked-button',
             label: _('Apply Keycode'),
+        });
+        return button;
+    }
+
+    _createCancelButton() {
+        const button = new St.Button({
+            x_expand: true,
+            button_mask: St.ButtonMask.ONE,
+            style_class: 'modal-dialog-linked-button',
+            label: _('Cancel'),
         });
         return button;
     }
