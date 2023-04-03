@@ -709,9 +709,59 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._applyButton.can_focus = sensitive;
     }
 
-    _apply() {
-        this.close();
+    updateSensitivity() {
+        const shouldEnableEntry =
+            this.verificationStatus !== UnlockStatus.VERIFYING &&
+            this.verificationStatus !== UnlockStatus.SUCCEEDED &&
+            this.verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
+
+        this.updateApplyButtonSensitivity();
+        this._codeEntry.setEnabled(shouldEnableEntry);
     }
+
+    startVerifyingCode() {
+        if (!this.validateCurrentCode(false))
+            return;
+
+        this.verificationStatus = UnlockStatus.VERIFYING;
+        this.updateSensitivity();
+        this.cancelled = false;
+
+        const code = '%s%s%s'.format(
+            Main.paygManager.codeFormatPrefix,
+            this._codeEntry.get_text(),
+            Main.paygManager.codeFormatSuffix);
+
+        Main.paygManager.addCode(code, error => {
+            /* we don't care about the result if we're closing the dialog */
+            if (this.cancelled) {
+                this.verificationStatus = UnlockStatus.NOT_VERIFYING;
+                return;
+            }
+
+            if (error) {
+// TODO: implement error handling
+//                this.processError(error);
+//            } else if (Main.paygManager.lastTimeAdded <= 0) {
+//                this.processReset();
+            } else {
+                this.verificationStatus = UnlockStatus.SUCCEEDED;
+                this.onCodeAdded();
+            }
+
+            this.reset();
+        });
+    }
+
+    _apply() {
+        this.startVerifyingCode();
+    }
+
+    reset() {
+        this._codeEntry.reset();
+        this.updateSensitivity();
+    }
+
 });
 
 // Takes a number of seconds and returns a string
