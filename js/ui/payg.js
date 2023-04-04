@@ -614,8 +614,12 @@ var ApplyCodeNotification = GObject.registerClass({
     }
 });
 
-var PaygAddCreditDialog = GObject.registerClass(
-class PaygAddCreditDialog extends ModalDialog.ModalDialog {
+var PaygAddCreditDialog = GObject.registerClass({
+    Signals: {
+        'code-rejected': { param_types: [GObject.TYPE_STRING] },
+        'code-reset': {},
+    },
+}, class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     _init() {
         /* We want to be able to open the dialog multiple times per session
          * without making the caller instatiate a new object before every call,
@@ -720,6 +724,72 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._codeEntry.setEnabled(shouldEnableEntry);
     }
 
+    setErrorMessage(message) {
+        this.emit('code-rejected', message);
+    }
+
+    processError(error) {
+        logError(error, 'Error adding PAYG code');
+
+        /* The 'too many errors' case is a bit special, and sets a different state. */
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
+            const currentTime = Shell.util_get_boottime() / GLib.USEC_PER_SEC;
+            const secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
+            if (secondsLeft > 30) {
+                const minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60));
+                this.setErrorMessage(
+                    Gettext.ngettext(
+                        'Too many attempts. Try again in %s minute.',
+                        'Too many attempts. Try again in %s minutes.', minutesLeft)
+                        .format(minutesLeft));
+            } else {
+                this.setErrorMessage(_('Too many attempts. Try again in a few seconds.'));
+            }
+
+            /* Make sure to clean the status once the time is up (if this dialog is still alive)
+             * and make sure that we install this callback at some point in the future (+1 sec).
+             */
+            this._clearTooManyAttemptsId = GLib.timeout_add_seconds(
+                GLib.PRIORITY_DEFAULT,
+                Math.max(1, secondsLeft),
+                () => {
+                    this._verificationStatus = UnlockStatus.NOT_VERIFYING;
+                    this._clearError();
+                    this._updateSensitivity();
+                    return GLib.SOURCE_REMOVE;
+                });
+
+            this.verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
+            return;
+        }
+
+        /* Common errors after this point. */
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
+            this.setErrorMessage(_('Invalid keycode. Please try again.'));
+        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
+            this.setErrorMessage(_('Keycode already used. Please enter a new keycode.'));
+        } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
+            this.setErrorMessage(_('Time exceeded while verifying the keycode'));
+        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.SHOW_ACCOUNT_ID)) {
+            this.setErrorMessage(_('Your Pay As You Go Account ID is: %s').format(Main.paygManager.accountID));
+        } else {
+            /* We don't consider any other error here (and we don't consider DISABLED explicitly,
+             * since that should not happen), but still we need to show something to the user.
+             */
+            this.setErrorMessage(_('Unknown error'));
+        }
+
+        this.verificationStatus = UnlockStatus.FAILED;
+    }
+
+    processReset() {
+        /* If time has been removed entirely, we show the user the according message
+         * that the time has been reset to zero.
+         */
+        this.emit('code-reset');
+        this.verificationStatus = UnlockStatus.FAILED;
+    }
+
     startVerifyingCode() {
         if (!this.validateCurrentCode(false))
             return;
@@ -741,10 +811,9 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             }
 
             if (error) {
-// TODO: implement error handling
-//                this.processError(error);
-//            } else if (Main.paygManager.lastTimeAdded <= 0) {
-//                this.processReset();
+                this.processError(error);
+            } else if (Main.paygManager.lastTimeAdded <= 0) {
+                this.processReset();
             } else {
                 this.verificationStatus = UnlockStatus.SUCCEEDED;
                 this.onCodeAdded();
