@@ -636,6 +636,8 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             'Enter a new keycode (%s characters) to extend the time before your credit expires.',
             codeLength).format(codeLength);
 
+        super.connect('closed', this.reset.bind(this));
+
         this._content = new Dialog.MessageDialogContent({ title, description });
 
         /* This box will contain the code prefix, entry field and suffix */
@@ -660,7 +662,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         });
         this._codeEntry.clutter_text.connect('activate', this._apply.bind(this));
         this._codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
-        super.connect('closed', this._codeEntry.reset.bind(this._codeEntry));
         this._codeEntry.setEnabled(true);
         this._codeEntryBox.add_child(this._codeEntry);
 
