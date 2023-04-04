@@ -616,6 +616,7 @@ var ApplyCodeNotification = GObject.registerClass({
 
 var PaygAddCreditDialog = GObject.registerClass({
     Signals: {
+        'code-added': {},
         'code-rejected': { param_types: [GObject.TYPE_STRING] },
         'code-reset': {},
     },
@@ -780,6 +781,10 @@ var PaygAddCreditDialog = GObject.registerClass({
         }
 
         this.verificationStatus = UnlockStatus.FAILED;
+    }
+
+    onCodeAdded() {
+        this.emit('code-added');
     }
 
     processReset() {
