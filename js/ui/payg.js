@@ -618,7 +618,6 @@ var PaygAddCreditDialog = GObject.registerClass({
     Signals: {
         'code-added': {},
         'code-rejected': { param_types: [GObject.TYPE_STRING] },
-        'code-reset': {},
     },
 }, class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     _init() {
@@ -787,14 +786,6 @@ var PaygAddCreditDialog = GObject.registerClass({
         this.emit('code-added');
     }
 
-    processReset() {
-        /* If time has been removed entirely, we show the user the according message
-         * that the time has been reset to zero.
-         */
-        this.emit('code-reset');
-        this.verificationStatus = UnlockStatus.FAILED;
-    }
-
     startVerifyingCode() {
         if (!this.validateCurrentCode(false))
             return;
@@ -818,7 +809,7 @@ var PaygAddCreditDialog = GObject.registerClass({
             if (error) {
                 this.processError(error);
             } else if (Main.paygManager.lastTimeAdded <= 0) {
-                this.processReset();
+                this.verificationStatus = UnlockStatus.FAILED;
             } else {
                 this.verificationStatus = UnlockStatus.SUCCEEDED;
                 this.onCodeAdded();
