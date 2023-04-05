@@ -614,12 +614,8 @@ var ApplyCodeNotification = GObject.registerClass({
     }
 });
 
-var PaygAddCreditDialog = GObject.registerClass({
-    Signals: {
-        'code-added': {},
-        'code-rejected': { param_types: [GObject.TYPE_STRING] },
-    },
-}, class PaygAddCreditDialog extends ModalDialog.ModalDialog {
+var PaygAddCreditDialog = GObject.registerClass(
+class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     _init() {
         /* We want to be able to open the dialog multiple times per session
          * without making the caller instatiate a new object before every call,
@@ -724,8 +720,12 @@ var PaygAddCreditDialog = GObject.registerClass({
         this._codeEntry.setEnabled(shouldEnableEntry);
     }
 
+    _setMessage(message) {
+        log(message);
+    }
+
     setErrorMessage(message) {
-        this.emit('code-rejected', message);
+        this._setMessage(message);
     }
 
     processError(error) {
@@ -782,8 +782,8 @@ var PaygAddCreditDialog = GObject.registerClass({
         this.verificationStatus = UnlockStatus.FAILED;
     }
 
-    onCodeAdded() {
-        this.emit('code-added');
+    _onCodeAdded() {
+        this._setMessage(successMessage());
     }
 
     startVerifyingCode() {
@@ -812,7 +812,7 @@ var PaygAddCreditDialog = GObject.registerClass({
                 this.verificationStatus = UnlockStatus.FAILED;
             } else {
                 this.verificationStatus = UnlockStatus.SUCCEEDED;
-                this.onCodeAdded();
+                this._onCodeAdded();
             }
 
             this.reset();
