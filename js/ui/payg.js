@@ -634,7 +634,7 @@ var PaygAddCreditDialog = GObject.registerClass({
     }
 
     _buildLayout() {
-        const title = _('Pay As You Go');
+        const title = _('Enter your unlock code');
         let codeLength = Main.paygManager.codeLength;
         let description = Gettext.ngettext(
             'Enter a new keycode (%s character) to extend the time before your credit expires.',
@@ -691,7 +691,7 @@ var PaygAddCreditDialog = GObject.registerClass({
             },
             key: Clutter.KEY_Escape });
 
-        this._applyButton = this.addButton({ label: _('Apply Keycode'),
+        this._applyButton = this.addButton({ label: _('Add Credit'),
             action: () => {
                 this._apply();
             }});
