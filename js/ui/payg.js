@@ -671,12 +671,11 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             codeLength).format(codeLength);
         this._promptLayout = new Dialog.MessageDialogContent({ title, description });
 
-        /* This box will contain the code prefix, entry field and suffix */
+        /* This layout contains the code prefix, entry field and suffix */
         this._codeEntryLayout = new St.BoxLayout({
             x_expand: false,
         });
 
-        /* Add code prefix label, if needed */
         if (Main.paygManager.codeFormatPrefix !== '') {
             const prefix = new St.Label({
                 style_class: 'notification-payg-code-entry',
@@ -696,7 +695,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._codeEntry.setEnabled(true);
         this._codeEntryLayout.add_child(this._codeEntry);
 
-        /* Add code suffix label, if needed */
         if (Main.paygManager.codeFormatSuffix !== '') {
             const suffix = new St.Label({
                 style_class: 'notification-payg-code-entry',
