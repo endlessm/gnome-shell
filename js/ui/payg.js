@@ -22,7 +22,7 @@
      PaygAddCreditDialog, ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
      successMessage */
 
-const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Pango, Shell, St } = imports.gi;
 
 const Animation = imports.ui.animation;
 const Dialog = imports.ui.dialog;
@@ -31,6 +31,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
 const PaygManager = imports.misc.paygManager;
+const Util = imports.misc.util;
 
 const SUCCESS_DELAY_SECONDS = 3;
 
@@ -637,6 +638,10 @@ var ApplyCodeNotification = GObject.registerClass({
  * ┃ ││  *  │                                                     │  #      ││ ┃
  * ┃ ││     └─────────────────────────────────────────────────────┘         ││ ┃
  * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
+ * ┃ │PaygAddCreditDialog._resultsLayout                                     │ ┃
+ * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
+ * ┃ ││             30 days have been added to your PAYG credit.            ││ ┃
+ * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
  * ┃ └───────────────────────────────────────────────────────────────────────┘ ┃
  * ┃ ModalDialog.buttonLayout                                                  ┃
  * ┃ ┌───────────────────────────────────┬───────────────────────────────────┐ ┃
@@ -709,6 +714,34 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         this.contentLayout.add_child(this._codeEntryLayout);
 
+        /* This layout contains the labels reporting results to the user */
+        this._resultsLayout = new St.BoxLayout({ vertical: true });
+
+        this._errorMessageLabel = new St.Label({
+            style_class: 'prompt-dialog-error-label',
+            visible: false,
+        });
+        this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._errorMessageLabel.clutter_text.line_wrap = true;
+        this._resultsLayout.add_child(this._errorMessageLabel);
+
+        this._infoMessageLabel = new St.Label({
+            style_class: 'prompt-dialog-info-label',
+            visible: false,
+        });
+        this._infoMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._infoMessageLabel.clutter_text.line_wrap = true;
+        this._resultsLayout.add_child(this._infoMessageLabel);
+
+        this._nullMessageLabel = new St.Label({
+            style_class: 'prompt-dialog-null-label',
+        });
+        this._nullMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._nullMessageLabel.clutter_text.line_wrap = true;
+        this._resultsLayout.add_child(this._nullMessageLabel);
+
+        this.contentLayout.add_child(this._resultsLayout);
+
         /* Add buttons */
         this._closeButton = this.addButton({ label: _('Close'),
             action: () => {
@@ -751,11 +784,18 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 
     _setMessage(message) {
-        log(message);
+        this._infoMessageLabel.set_text(message);
+        this._infoMessageLabel.show();
+        this._errorMessageLabel.hide();
+        this._nullMessageLabel.hide();
     }
 
     setErrorMessage(message) {
-        this._setMessage(message);
+        this._errorMessageLabel.set_text(message);
+        this._errorMessageLabel.show();
+        this._infoMessageLabel.hide();
+        this._nullMessageLabel.hide();
+        Util.wiggle(this._codeEntry);
     }
 
     processError(error) {
@@ -850,6 +890,11 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 
     _apply() {
+        /* Dismiss already shown info and error texts, if any */
+        this._errorMessageLabel.hide();
+        this._infoMessageLabel.hide();
+        this._nullMessageLabel.show();
+
         this.startVerifyingCode();
     }
 
@@ -858,6 +903,13 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this.updateSensitivity();
     }
 
+    close() {
+        /* Dismiss already shown info and error texts, if any */
+        this._errorMessageLabel.hide();
+        this._infoMessageLabel.hide();
+        this._nullMessageLabel.show();
+        super.close()
+    }
 });
 
 // Takes a number of seconds and returns a string
