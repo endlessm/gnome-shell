@@ -614,6 +614,38 @@ var ApplyCodeNotification = GObject.registerClass({
     }
 });
 
+/* ModalDialog -> PaygAddCreditDialog
+ *
+ * A modal dialog for entering a code while the computer is unlocked.
+ *
+ * ModalDialog.dialogLayout._dialog (vertical)
+ * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+ * ┃                                                                           ┃
+ * ┃ ModalDialog.contentLayout (vertical)                                      ┃
+ * ┃ ┌───────────────────────────────────────────────────────────────────────┐ ┃
+ * ┃ │PaygAddCreditDialog._promptLayout (Dialog.MessageDialogContent)        │ ┃
+ * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
+ * ┃ ││                       Enter your unlock code                        ││ ┃
+ * ┃ ││                                                                     ││ ┃
+ * ┃ ││       Enter a new keycode (14 characteres) to extend the time       ││ ┃
+ * ┃ ││                     before your credit expires.                     ││ ┃
+ * ┃ ││                                                                     ││ ┃
+ * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
+ * ┃ │PaygAddCreditDialog._codeEntryLayout                                   │ ┃
+ * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
+ * ┃ ││     ┌─────────────────────────────────────────────────────┐         ││ ┃
+ * ┃ ││  *  │                                                     │  #      ││ ┃
+ * ┃ ││     └─────────────────────────────────────────────────────┘         ││ ┃
+ * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
+ * ┃ └───────────────────────────────────────────────────────────────────────┘ ┃
+ * ┃ ModalDialog.buttonLayout                                                  ┃
+ * ┃ ┌───────────────────────────────────┬───────────────────────────────────┐ ┃
+ * ┃ │                                   │                                   │ ┃
+ * ┃ │              Cancel               │            Add Credit             │ ┃
+ * ┃ │                                   │                                   │ ┃
+ * ┃ └───────────────────────────────────┴───────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ */
 var PaygAddCreditDialog = GObject.registerClass(
 class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     _init() {
