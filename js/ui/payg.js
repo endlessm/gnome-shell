@@ -676,8 +676,8 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             this._codeEntryBox.add_child(suffix);
         }
 
-        this._content.add_child(this._codeEntryBox);
         this.contentLayout.add_child(this._content);
+        this.contentLayout.add_child(this._codeEntryBox);
 
         /* Add buttons */
         this._cancelButton = this.addButton({ label: _('Cancel'),
