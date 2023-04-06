@@ -661,15 +661,14 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 
     _buildLayout() {
+        super.connect('closed', this.reset.bind(this));
+
         const title = _('Enter your unlock code');
         let codeLength = Main.paygManager.codeLength;
         let description = Gettext.ngettext(
             'Enter a new keycode (%s character) to extend the time before your credit expires.',
             'Enter a new keycode (%s characters) to extend the time before your credit expires.',
             codeLength).format(codeLength);
-
-        super.connect('closed', this.reset.bind(this));
-
         this._promptLayout = new Dialog.MessageDialogContent({ title, description });
 
         /* This box will contain the code prefix, entry field and suffix */
