@@ -638,7 +638,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         super.connect('closed', this.reset.bind(this));
 
-        this._content = new Dialog.MessageDialogContent({ title, description });
+        this._promptLayout = new Dialog.MessageDialogContent({ title, description });
 
         /* This box will contain the code prefix, entry field and suffix */
         this._codeEntryBox = new St.BoxLayout({
@@ -676,7 +676,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             this._codeEntryBox.add_child(suffix);
         }
 
-        this.contentLayout.add_child(this._content);
+        this.contentLayout.add_child(this._promptLayout);
         this.contentLayout.add_child(this._codeEntryBox);
 
         /* Add buttons */
