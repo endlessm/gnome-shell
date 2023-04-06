@@ -641,7 +641,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._promptLayout = new Dialog.MessageDialogContent({ title, description });
 
         /* This box will contain the code prefix, entry field and suffix */
-        this._codeEntryBox = new St.BoxLayout({
+        this._codeEntryLayout = new St.BoxLayout({
             x_expand: false,
         });
 
@@ -652,7 +652,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
                 text: Main.paygManager.codeFormatPrefix,
                 x_align: Clutter.ActorAlign.CENTER,
             });
-            this._codeEntryBox.add_child(prefix);
+            this._codeEntryLayout.add_child(prefix);
         }
 
         this._codeEntry = new PaygUnlockCodeEntry({
@@ -663,7 +663,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._codeEntry.clutter_text.connect('activate', this._apply.bind(this));
         this._codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
         this._codeEntry.setEnabled(true);
-        this._codeEntryBox.add_child(this._codeEntry);
+        this._codeEntryLayout.add_child(this._codeEntry);
 
         /* Add code suffix label, if needed */
         if (Main.paygManager.codeFormatSuffix !== '') {
@@ -673,11 +673,11 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
                 x_align: Clutter.ActorAlign.CENTER,
             });
 
-            this._codeEntryBox.add_child(suffix);
+            this._codeEntryLayout.add_child(suffix);
         }
 
         this.contentLayout.add_child(this._promptLayout);
-        this.contentLayout.add_child(this._codeEntryBox);
+        this.contentLayout.add_child(this._codeEntryLayout);
 
         /* Add buttons */
         this._cancelButton = this.addButton({ label: _('Cancel'),
