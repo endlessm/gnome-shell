@@ -631,9 +631,6 @@ var ApplyCodeNotification = GObject.registerClass({
  * ┃ ││       Enter a new keycode (14 characteres) to extend the time       ││ ┃
  * ┃ ││                     before your credit expires.                     ││ ┃
  * ┃ ││                                                                     ││ ┃
- * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
- * ┃ │PaygAddCreditDialog._resultsLayout                                     │ ┃
- * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
  * ┃ ││             30 days have been added to your PAYG credit.            ││ ┃
  * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
  * ┃ │PaygAddCreditDialog._codeEntryLayout                                   │ ┃
@@ -668,7 +665,8 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     _buildLayout() {
         super.connect('closed', this.reset.bind(this));
 
-        /* This layout contains the prompt presented to the user */
+        /* This layout contains the prompt presented to the user and the labels
+         * reporting results to the user */
         const title = _('Enter your unlock code');
         let codeLength = Main.paygManager.codeLength;
         let description = Gettext.ngettext(
@@ -676,10 +674,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             'Enter a new keycode (%s characters) to extend the time before your credit expires.',
             codeLength).format(codeLength);
         this._promptLayout = new Dialog.MessageDialogContent({ title, description });
-        this.contentLayout.add_child(this._promptLayout);
-
-        /* This layout contains the labels reporting results to the user */
-        this._resultsLayout = new St.BoxLayout({ vertical: true });
 
         this._errorMessageLabel = new St.Label({
             style_class: 'prompt-dialog-error-label',
@@ -687,7 +681,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         });
         this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._errorMessageLabel.clutter_text.line_wrap = true;
-        this._resultsLayout.add_child(this._errorMessageLabel);
+        this._promptLayout.add_child(this._errorMessageLabel);
 
         this._infoMessageLabel = new St.Label({
             style_class: 'prompt-dialog-info-label',
@@ -695,16 +689,16 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         });
         this._infoMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._infoMessageLabel.clutter_text.line_wrap = true;
-        this._resultsLayout.add_child(this._infoMessageLabel);
+        this._promptLayout.add_child(this._infoMessageLabel);
 
         this._nullMessageLabel = new St.Label({
             style_class: 'prompt-dialog-null-label',
         });
         this._nullMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._nullMessageLabel.clutter_text.line_wrap = true;
-        this._resultsLayout.add_child(this._nullMessageLabel);
+        this._promptLayout.add_child(this._nullMessageLabel);
 
-        this.contentLayout.add_child(this._resultsLayout);
+        this.contentLayout.add_child(this._promptLayout);
 
         /* This layout contains the code prefix, entry field and suffix */
         this._codeEntryLayout = new St.BoxLayout({
