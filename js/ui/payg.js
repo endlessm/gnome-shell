@@ -738,10 +738,10 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             action: () => {
                 this._apply();
             }});
-        this.updateApplyButtonSensitivity();
 
         /* we want key focus to be in the entry field when this dialog is shown */
         this.setInitialKeyFocus(this._codeEntry);
+        this.updateSensitivity();
     }
 
     validateCurrentCode(partial=true) {
