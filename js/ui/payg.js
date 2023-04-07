@@ -19,7 +19,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 /* exported PaygUnlockCodeEntry, PaygUnlockUi, PaygUnlockWidget, PaygNotifier,
-     PaygAddCreditDialog, ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
+     PaygAddCreditDialog, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
      successMessage */
 
 const { Clutter, Gio, GLib, GObject, Pango, Shell, St } = imports.gi;
@@ -515,106 +515,6 @@ var PaygUnlockWidget = GObject.registerClass({
 
 });
 
-var ApplyCodeNotification = GObject.registerClass({
-    Signals: {
-        'done-displaying': {},
-    },
-}, class ApplyCodeNotification extends MessageTray.Notification {
-    _init(source, title, banner) {
-        super._init(source, title, banner);
-
-        this._titleOrig = title;
-
-        // Note: "banner" is actually the string displayed in the banner, not a
-        // banner object. This variable name simply follows the convention of
-        // the parent class.
-        this._bannerOrig = banner;
-        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
-
-        this._codeAddedId = 0;
-        this._codeRejectedId = 0;
-        this._doneId = 0;
-
-        this.connect('destroy', this._onDestroy.bind(this));
-    }
-
-    _onDestroy() {
-        if (this._codeAddedId > 0) {
-            this._unlockWidget.disconnect(this._codeAddedId);
-            this._codeAddedId = 0;
-        }
-
-        if (this._codeRejectedId > 0) {
-            this._unlockWidget.disconnect(this._codeRejectedId);
-            this._codeRejectedId = 0;
-        }
-
-        if (this._doneId > 0) {
-            GLib.source_remove(this._doneId);
-            this._doneId = 0;
-        }
-    }
-
-    createBanner() {
-        if (this._codeAddedId > 0) {
-            this._unlockWidget.disconnect(this._codeAddedId);
-            this._codeAddedId = 0;
-        }
-
-        if (this._codeRejectedId > 0) {
-            this._unlockWidget.disconnect(this._codeRejectedId);
-            this._codeRejectedId = 0;
-        }
-
-        this._banner = new MessageTray.NotificationBanner(this);
-        this._unlockWidget = new PaygUnlockWidget();
-        this._codeAddedId = this._unlockWidget.connect('code-added', this._onCodeAdded.bind(this));
-        this._codeRejectedId = this._unlockWidget.connect('code-rejected', this._onCodeRejected.bind(this));
-        this._banner.setActionArea(this._unlockWidget.buttonBox);
-
-        return this._banner;
-    }
-
-    _onCodeAdded() {
-        this._setMessage(successMessage());
-
-        if (this._doneId > 0) {
-            GLib.source_remove(this._doneId);
-            this._doneId = 0;
-        }
-
-        this._doneId = GLib.timeout_add_seconds(
-            GLib.PRIORITY_DEFAULT,
-            SUCCESS_DELAY_SECONDS,
-            () => {
-                this.emit('done-displaying');
-                this.destroy();
-
-                return GLib.SOURCE_REMOVE;
-            });
-    }
-
-    // if errorMessage is unspecified, a default message will be populated based
-    // on whether time remains
-    _onCodeRejected(unlockWidget, errorMessage) {
-        this._setMessage(errorMessage ? errorMessage : this._bannerOrig);
-    }
-
-    _setMessage(message) {
-        this.update(this._titleOrig, message);
-    }
-
-    activate() {
-        // We get here if the Apply button is inactive when we try to click it.
-        // Unless we're already done, exit early so we don't destroy the
-        // notification)
-        if (this._verificationStatus !== UnlockStatus.SUCCEEDED)
-            return;
-
-        super.activate();
-    }
-});
-
 /* ModalDialog -> PaygAddCreditDialog
  *
  * A modal dialog for entering a code while the computer is unlocked.
@@ -1002,40 +902,18 @@ class PaygNotifier extends GObject.Object {
         const source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
 
-        // by default, this notification is for early entry of an unlock keycode
-        let codeLength = Main.paygManager.codeLength;
-        let messageText = Gettext.ngettext(
-            'Enter a new keycode (%s character) to extend the time before your credit expires.',
-            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
-            codeLength).format(codeLength);
-        let urgency = MessageTray.Urgency.NORMAL;
-        let userInitiated = false;
+        const timeLeft = timeToString(secondsLeft);
+        let messageText = _('Subscription expires in %s.').format(timeLeft);
+        urgency = MessageTray.Urgency.HIGH;
 
-        // in case this is a "only X time left" warning notification
-        if (secondsLeft >= 0) {
-            const timeLeft = timeToString(secondsLeft);
-            messageText = _('Subscription expires in %s.').format(timeLeft);
-            urgency = MessageTray.Urgency.HIGH;
-        } else {
-            userInitiated = true;
-        }
-
-        this._notification = new ApplyCodeNotification(
+        this._notification = new MessageTray.Notification(
             source,
             _('Pay As You Go'),
             messageText);
 
-        if (userInitiated)
-            this._notification.setResident(true);
-
         this._notification.setTransient(false);
         this._notification.setUrgency(urgency);
         source.showNotification(this._notification);
-
-        // if the user triggered this notification, immediately expand so the
-        // user sees the input field
-        if (userInitiated)
-            Main.messageTray._expandActiveNotification();
 
         this._notification.connect('destroy', () => {
             this._notification = null;
