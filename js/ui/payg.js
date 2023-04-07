@@ -654,14 +654,9 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
          * so we need to disable destroyOnClose */
         super._init({ styleClass: 'payg-add-credit-dialog',
                       destroyOnClose: false });
+        super.connect('closed', this._onClosed.bind(this));
 
         this.verificationStatus = UnlockStatus.NOT_VERIFYING;
-
-        this._buildLayout();
-    }
-
-    _buildLayout() {
-        super.connect('closed', this._onClosed.bind(this));
 
         /* This layout contains the prompt presented to the user and the labels
          * reporting results to the user */
