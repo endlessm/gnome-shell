@@ -661,7 +661,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 
     _buildLayout() {
-        super.connect('closed', this.reset.bind(this));
+        super.connect('closed', this._onClosed.bind(this));
 
         /* This layout contains the prompt presented to the user and the labels
          * reporting results to the user */
@@ -876,12 +876,12 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this.updateSensitivity();
     }
 
-    close() {
+    _onClosed() {
         /* Dismiss already shown info and error texts, if any */
         this._errorMessageLabel.hide();
         this._infoMessageLabel.hide();
         this._promptLayout._description.show();
-        super.close()
+        this.reset()
     }
 });
 
