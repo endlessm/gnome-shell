@@ -843,7 +843,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         this.verificationStatus = UnlockStatus.VERIFYING;
         this.updateSensitivity();
-        this.cancelled = false;
 
         const code = '%s%s%s'.format(
             Main.paygManager.codeFormatPrefix,
@@ -851,12 +850,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             Main.paygManager.codeFormatSuffix);
 
         Main.paygManager.addCode(code, error => {
-            /* we don't care about the result if we're closing the dialog */
-            if (this.cancelled) {
-                this.verificationStatus = UnlockStatus.NOT_VERIFYING;
-                return;
-            }
-
             if (error) {
                 this.processError(error);
             } else if (Main.paygManager.lastTimeAdded <= 0) {
@@ -865,7 +858,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
                 this.verificationStatus = UnlockStatus.SUCCEEDED;
                 this._setMessage(successMessage());
             }
-
             this.reset();
         });
     }
