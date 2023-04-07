@@ -632,15 +632,15 @@ var ApplyCodeNotification = GObject.registerClass({
  * ┃ ││                     before your credit expires.                     ││ ┃
  * ┃ ││                                                                     ││ ┃
  * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
+ * ┃ │PaygAddCreditDialog._resultsLayout                                     │ ┃
+ * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
+ * ┃ ││             30 days have been added to your PAYG credit.            ││ ┃
+ * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
  * ┃ │PaygAddCreditDialog._codeEntryLayout                                   │ ┃
  * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
  * ┃ ││     ┌─────────────────────────────────────────────────────┐         ││ ┃
  * ┃ ││  *  │                                                     │  #      ││ ┃
  * ┃ ││     └─────────────────────────────────────────────────────┘         ││ ┃
- * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
- * ┃ │PaygAddCreditDialog._resultsLayout                                     │ ┃
- * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
- * ┃ ││             30 days have been added to your PAYG credit.            ││ ┃
  * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
  * ┃ └───────────────────────────────────────────────────────────────────────┘ ┃
  * ┃ ModalDialog.buttonLayout                                                  ┃
@@ -678,6 +678,34 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._promptLayout = new Dialog.MessageDialogContent({ title, description });
         this.contentLayout.add_child(this._promptLayout);
 
+        /* This layout contains the labels reporting results to the user */
+        this._resultsLayout = new St.BoxLayout({ vertical: true });
+
+        this._errorMessageLabel = new St.Label({
+            style_class: 'prompt-dialog-error-label',
+            visible: false,
+        });
+        this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._errorMessageLabel.clutter_text.line_wrap = true;
+        this._resultsLayout.add_child(this._errorMessageLabel);
+
+        this._infoMessageLabel = new St.Label({
+            style_class: 'prompt-dialog-info-label',
+            visible: false,
+        });
+        this._infoMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._infoMessageLabel.clutter_text.line_wrap = true;
+        this._resultsLayout.add_child(this._infoMessageLabel);
+
+        this._nullMessageLabel = new St.Label({
+            style_class: 'prompt-dialog-null-label',
+        });
+        this._nullMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._nullMessageLabel.clutter_text.line_wrap = true;
+        this._resultsLayout.add_child(this._nullMessageLabel);
+
+        this.contentLayout.add_child(this._resultsLayout);
+
         /* This layout contains the code prefix, entry field and suffix */
         this._codeEntryLayout = new St.BoxLayout({
             x_expand: false,
@@ -713,34 +741,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         }
 
         this.contentLayout.add_child(this._codeEntryLayout);
-
-        /* This layout contains the labels reporting results to the user */
-        this._resultsLayout = new St.BoxLayout({ vertical: true });
-
-        this._errorMessageLabel = new St.Label({
-            style_class: 'prompt-dialog-error-label',
-            visible: false,
-        });
-        this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._errorMessageLabel.clutter_text.line_wrap = true;
-        this._resultsLayout.add_child(this._errorMessageLabel);
-
-        this._infoMessageLabel = new St.Label({
-            style_class: 'prompt-dialog-info-label',
-            visible: false,
-        });
-        this._infoMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._infoMessageLabel.clutter_text.line_wrap = true;
-        this._resultsLayout.add_child(this._infoMessageLabel);
-
-        this._nullMessageLabel = new St.Label({
-            style_class: 'prompt-dialog-null-label',
-        });
-        this._nullMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._nullMessageLabel.clutter_text.line_wrap = true;
-        this._resultsLayout.add_child(this._nullMessageLabel);
-
-        this.contentLayout.add_child(this._resultsLayout);
 
         /* Add buttons */
         this._closeButton = this.addButton({ label: _('Close'),
