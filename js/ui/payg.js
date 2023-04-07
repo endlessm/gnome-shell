@@ -619,17 +619,17 @@ var ApplyCodeNotification = GObject.registerClass({
  *
  * A modal dialog for entering a code while the computer is unlocked.
  *
- * ModalDialog.dialogLayout._dialog (vertical)
+ * ModalDialog.dialogLayout._dialog
  * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
  * ┃                                                                           ┃
- * ┃ ModalDialog.contentLayout (vertical)                                      ┃
+ * ┃ ModalDialog.contentLayout                                                 ┃
  * ┃ ┌───────────────────────────────────────────────────────────────────────┐ ┃
  * ┃ │PaygAddCreditDialog._promptLayout (Dialog.MessageDialogContent)        │ ┃
  * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
  * ┃ ││                       Enter your unlock code                        ││ ┃
  * ┃ ││                                                                     ││ ┃
- * ┃ ││       Label that either prompts the user for action or shows        ││ ┃
- * ┃ ││                               results.                              ││ ┃
+ * ┃ ││          Text label that either prompts the user for action         ││ ┃
+ * ┃ ││                          or shows results.                          ││ ┃
  * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
  * ┃ │PaygAddCreditDialog._codeEntryLayout                                   │ ┃
  * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
