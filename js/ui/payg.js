@@ -628,10 +628,8 @@ var ApplyCodeNotification = GObject.registerClass({
  * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
  * ┃ ││                       Enter your unlock code                        ││ ┃
  * ┃ ││                                                                     ││ ┃
- * ┃ ││       Enter a new keycode (14 characteres) to extend the time       ││ ┃
- * ┃ ││                     before your credit expires.                     ││ ┃
- * ┃ ││                                                                     ││ ┃
- * ┃ ││             30 days have been added to your PAYG credit.            ││ ┃
+ * ┃ ││       Label that either prompts the user for action or shows        ││ ┃
+ * ┃ ││                               results.                              ││ ┃
  * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
  * ┃ │PaygAddCreditDialog._codeEntryLayout                                   │ ┃
  * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
@@ -690,13 +688,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._infoMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._infoMessageLabel.clutter_text.line_wrap = true;
         this._promptLayout.add_child(this._infoMessageLabel);
-
-        this._nullMessageLabel = new St.Label({
-            style_class: 'prompt-dialog-null-label',
-        });
-        this._nullMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._nullMessageLabel.clutter_text.line_wrap = true;
-        this._promptLayout.add_child(this._nullMessageLabel);
 
         this.contentLayout.add_child(this._promptLayout);
 
@@ -781,14 +772,14 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._infoMessageLabel.set_text(message);
         this._infoMessageLabel.show();
         this._errorMessageLabel.hide();
-        this._nullMessageLabel.hide();
+        this._promptLayout._description.hide();
     }
 
     setErrorMessage(message) {
         this._errorMessageLabel.set_text(message);
         this._errorMessageLabel.show();
         this._infoMessageLabel.hide();
-        this._nullMessageLabel.hide();
+        this._promptLayout._description.hide();
         Util.wiggle(this._codeEntry);
     }
 
@@ -887,7 +878,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         /* Dismiss already shown info and error texts, if any */
         this._errorMessageLabel.hide();
         this._infoMessageLabel.hide();
-        this._nullMessageLabel.show();
+        this._promptLayout._description.show();
 
         this.startVerifyingCode();
     }
@@ -901,7 +892,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         /* Dismiss already shown info and error texts, if any */
         this._errorMessageLabel.hide();
         this._infoMessageLabel.hide();
-        this._nullMessageLabel.show();
+        this._promptLayout._description.show();
         super.close()
     }
 });
