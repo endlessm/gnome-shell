@@ -558,7 +558,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         });
         super.connect('closed', this._onClosed.bind(this));
 
-        this.verificationStatus = UnlockStatus.NOT_VERIFYING;
+        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
 
         /* This layout contains the prompt presented to the user and the labels
          * reporting results to the user */
@@ -647,9 +647,9 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
     updateApplyButtonSensitivity() {
         const sensitive = this.validateCurrentCode(false) &&
-            this.verificationStatus !== UnlockStatus.VERIFYING &&
-            this.verificationStatus !== UnlockStatus.SUCCEEDED &&
-            this.verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
+            this._verificationStatus !== UnlockStatus.VERIFYING &&
+            this._verificationStatus !== UnlockStatus.SUCCEEDED &&
+            this._verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
 
         this._applyButton.reactive = sensitive;
         this._applyButton.can_focus = sensitive;
@@ -657,9 +657,9 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
     updateSensitivity() {
         const shouldEnableEntry =
-            this.verificationStatus !== UnlockStatus.VERIFYING &&
-            this.verificationStatus !== UnlockStatus.SUCCEEDED &&
-            this.verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
+            this._verificationStatus !== UnlockStatus.VERIFYING &&
+            this._verificationStatus !== UnlockStatus.SUCCEEDED &&
+            this._verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
 
         this.updateApplyButtonSensitivity();
         this._codeEntry.setEnabled(shouldEnableEntry);
@@ -711,7 +711,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
                     return GLib.SOURCE_REMOVE;
                 });
 
-            this.verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
+            this._verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
             return;
         }
 
@@ -731,14 +731,14 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             this.setErrorMessage(_('Unknown error'));
         }
 
-        this.verificationStatus = UnlockStatus.FAILED;
+        this._verificationStatus = UnlockStatus.FAILED;
     }
 
     startVerifyingCode() {
         if (!this.validateCurrentCode(false))
             return;
 
-        this.verificationStatus = UnlockStatus.VERIFYING;
+        this._verificationStatus = UnlockStatus.VERIFYING;
         this.updateSensitivity();
 
         const code = '%s%s%s'.format(
@@ -750,9 +750,9 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             if (error) {
                 this.processError(error);
             } else if (Main.paygManager.lastTimeAdded <= 0) {
-                this.verificationStatus = UnlockStatus.FAILED;
+                this._verificationStatus = UnlockStatus.FAILED;
             } else {
-                this.verificationStatus = UnlockStatus.SUCCEEDED;
+                this._verificationStatus = UnlockStatus.SUCCEEDED;
                 this._setMessage(successMessage());
             }
             this.reset();
