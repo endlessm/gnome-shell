@@ -639,12 +639,12 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this.updateSensitivity();
     }
 
-    validateCurrentCode(partial=true) {
+    _validateCurrentCode(partial=true) {
         return Main.paygManager.validateCode(this._codeEntry.get_text(), partial);
     }
 
     updateApplyButtonSensitivity() {
-        const sensitive = this.validateCurrentCode(false) &&
+        const sensitive = this._validateCurrentCode(false) &&
             this._verificationStatus !== UnlockStatus.VERIFYING &&
             this._verificationStatus !== UnlockStatus.SUCCEEDED &&
             this._verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
@@ -733,7 +733,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 
     startVerifyingCode() {
-        if (!this.validateCurrentCode(false))
+        if (!this._validateCurrentCode(false))
             return;
 
         this._verificationStatus = UnlockStatus.VERIFYING;
