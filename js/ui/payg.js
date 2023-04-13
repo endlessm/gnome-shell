@@ -678,7 +678,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         Util.wiggle(this._codeEntry);
     }
 
-    processError(error) {
+    _processError(error) {
         logError(error, 'Error adding PAYG code');
 
         /* The 'too many errors' case is a bit special, and sets a different state. */
@@ -746,7 +746,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         Main.paygManager.addCode(code, error => {
             if (error) {
-                this.processError(error);
+                this._processError(error);
             } else if (Main.paygManager.lastTimeAdded <= 0) {
                 this._verificationStatus = UnlockStatus.FAILED;
             } else {
