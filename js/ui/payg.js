@@ -623,16 +623,16 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this.contentLayout.add_child(this._codeEntryLayout);
 
         /* Add buttons */
-        this._closeButton = this.addButton({ label: _('Close'),
-            action: () => {
-                this.close();
-            },
-            key: Clutter.KEY_Escape });
+        this._closeButton = this.addButton({
+            label: _('Close'),
+            key: Clutter.KEY_Escape,
+            action: () => this.close(),
+        });
 
-        this._applyButton = this.addButton({ label: _('Add Credit'),
-            action: () => {
-                this._apply();
-            }});
+        this._applyButton = this.addButton({
+            label: _('Add Credit'),
+            action: () => this._apply(),
+        });
 
         /* we want key focus to be in the entry field when this dialog is shown */
         this.setInitialKeyFocus(this._codeEntry);
