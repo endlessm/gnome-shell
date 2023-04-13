@@ -636,7 +636,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         /* we want key focus to be in the entry field when this dialog is shown */
         this.setInitialKeyFocus(this._codeEntry);
-        this.updateSensitivity();
+        this._updateSensitivity();
     }
 
     _validateCurrentCode(partial=true) {
@@ -653,7 +653,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._applyButton.can_focus = sensitive;
     }
 
-    updateSensitivity() {
+    _updateSensitivity() {
         const shouldEnableEntry =
             this._verificationStatus !== UnlockStatus.VERIFYING &&
             this._verificationStatus !== UnlockStatus.SUCCEEDED &&
@@ -737,7 +737,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             return;
 
         this._verificationStatus = UnlockStatus.VERIFYING;
-        this.updateSensitivity();
+        this._updateSensitivity();
 
         const code = '%s%s%s'.format(
             Main.paygManager.codeFormatPrefix,
@@ -768,7 +768,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
     reset() {
         this._codeEntry.reset();
-        this.updateSensitivity();
+        this._updateSensitivity();
     }
 
     _onClosed() {
