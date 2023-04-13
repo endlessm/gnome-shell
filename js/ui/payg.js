@@ -732,7 +732,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._verificationStatus = UnlockStatus.FAILED;
     }
 
-    startVerifyingCode() {
+    _startVerifyingCode() {
         if (!this._validateCurrentCode(false))
             return;
 
@@ -763,7 +763,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._infoMessageLabel.hide();
         this._promptLayout._description.show();
 
-        this.startVerifyingCode();
+        this._startVerifyingCode();
     }
 
     reset() {
