@@ -589,9 +589,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this.contentLayout.add_child(this._promptLayout);
 
         /* This layout contains the code prefix, entry field and suffix */
-        this._codeEntryLayout = new St.BoxLayout({
-            x_expand: false,
-        });
+        this._codeEntryLayout = new St.BoxLayout({ x_expand: false });
 
         if (Main.paygManager.codeFormatPrefix !== '') {
             const prefix = new St.Label({
