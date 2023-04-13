@@ -606,7 +606,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             x_expand: true,
         });
         this._codeEntry.clutter_text.connect('activate', this._apply.bind(this));
-        this._codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
+        this._codeEntry.clutter_text.connect('text-changed', this._updateApplyButtonSensitivity.bind(this));
         this._codeEntry.setEnabled(true);
         this._codeEntryLayout.add_child(this._codeEntry);
 
@@ -643,7 +643,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         return Main.paygManager.validateCode(this._codeEntry.get_text(), partial);
     }
 
-    updateApplyButtonSensitivity() {
+    _updateApplyButtonSensitivity() {
         const sensitive = this._validateCurrentCode(false) &&
             this._verificationStatus !== UnlockStatus.VERIFYING &&
             this._verificationStatus !== UnlockStatus.SUCCEEDED &&
@@ -659,7 +659,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             this._verificationStatus !== UnlockStatus.SUCCEEDED &&
             this._verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
 
-        this.updateApplyButtonSensitivity();
+        this._updateApplyButtonSensitivity();
         this._codeEntry.setEnabled(shouldEnableEntry);
     }
 
