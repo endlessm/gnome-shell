@@ -670,7 +670,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._promptLayout._description.hide();
     }
 
-    setErrorMessage(message) {
+    _setErrorMessage(message) {
         this._errorMessageLabel.set_text(message);
         this._errorMessageLabel.show();
         this._infoMessageLabel.hide();
@@ -687,13 +687,13 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             const secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
             if (secondsLeft > 30) {
                 const minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60));
-                this.setErrorMessage(
+                this._setErrorMessage(
                     Gettext.ngettext(
                         'Too many attempts. Try again in %s minute.',
                         'Too many attempts. Try again in %s minutes.', minutesLeft)
                         .format(minutesLeft));
             } else {
-                this.setErrorMessage(_('Too many attempts. Try again in a few seconds.'));
+                this._setErrorMessage(_('Too many attempts. Try again in a few seconds.'));
             }
 
             /* Make sure to clean the status once the time is up (if this dialog is still alive)
@@ -715,18 +715,18 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
 
         /* Common errors after this point. */
         if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
-            this.setErrorMessage(_('Invalid keycode. Please try again.'));
+            this._setErrorMessage(_('Invalid keycode. Please try again.'));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
-            this.setErrorMessage(_('Keycode already used. Please enter a new keycode.'));
+            this._setErrorMessage(_('Keycode already used. Please enter a new keycode.'));
         } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
-            this.setErrorMessage(_('Time exceeded while verifying the keycode'));
+            this._setErrorMessage(_('Time exceeded while verifying the keycode'));
         } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.SHOW_ACCOUNT_ID)) {
-            this.setErrorMessage(_('Your Pay As You Go Account ID is: %s').format(Main.paygManager.accountID));
+            this._setErrorMessage(_('Your Pay As You Go Account ID is: %s').format(Main.paygManager.accountID));
         } else {
             /* We don't consider any other error here (and we don't consider DISABLED explicitly,
              * since that should not happen), but still we need to show something to the user.
              */
-            this.setErrorMessage(_('Unknown error'));
+            this._setErrorMessage(_('Unknown error'));
         }
 
         this._verificationStatus = UnlockStatus.FAILED;
