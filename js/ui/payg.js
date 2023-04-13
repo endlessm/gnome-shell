@@ -663,7 +663,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         this._codeEntry.setEnabled(shouldEnableEntry);
     }
 
-    _setMessage(message) {
+    _setSuccessMessage(message) {
         this._infoMessageLabel.set_text(message);
         this._infoMessageLabel.show();
         this._errorMessageLabel.hide();
@@ -751,7 +751,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
                 this._verificationStatus = UnlockStatus.FAILED;
             } else {
                 this._verificationStatus = UnlockStatus.SUCCEEDED;
-                this._setMessage(successMessage());
+                this._setSuccessMessage(successMessage());
             }
             this._reset();
         });
