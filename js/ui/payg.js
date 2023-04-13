@@ -767,6 +767,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 
     _reset() {
+        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
         this._codeEntry.reset();
         this._updateSensitivity();
     }
