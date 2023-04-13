@@ -748,7 +748,10 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             if (error) {
                 this._processError(error);
             } else if (Main.paygManager.lastTimeAdded <= 0) {
+                /* Close the dialog when a reset code is entered: we don't want
+                 * the dialog to remain over the lock screen shield. */
                 this._verificationStatus = UnlockStatus.FAILED;
+                this.close();
             } else {
                 this._verificationStatus = UnlockStatus.SUCCEEDED;
                 this._setSuccessMessage(successMessage());
