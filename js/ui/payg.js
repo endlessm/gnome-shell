@@ -552,8 +552,10 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
         /* We want to be able to open the dialog multiple times per session
          * without making the caller instatiate a new object before every call,
          * so we need to disable destroyOnClose */
-        super._init({ styleClass: 'payg-add-credit-dialog',
-                      destroyOnClose: false });
+        super._init({
+            styleClass: 'payg-add-credit-dialog',
+            destroyOnClose: false
+        });
         super.connect('closed', this._onClosed.bind(this));
 
         this.verificationStatus = UnlockStatus.NOT_VERIFYING;
