@@ -515,9 +515,7 @@ var PaygUnlockWidget = GObject.registerClass({
 
 });
 
-/* ModalDialog -> PaygAddCreditDialog
- *
- * A modal dialog for entering a code while the computer is unlocked.
+/* A modal dialog for entering a code while the computer is unlocked.
  *
  * ModalDialog.dialogLayout._dialog
  * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
