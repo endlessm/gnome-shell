@@ -515,6 +515,39 @@ var PaygUnlockWidget = GObject.registerClass({
 
 });
 
+/* Label that expands when visible and shrinks when hidden.
+ * Inspired by ShellEntry.CapsLockWarning */
+var ExpandableLabel = GObject.registerClass(
+class ExpandableLabel extends St.Label {
+    _init(params) {
+        let defaultParams = {
+            style_class: 'payg-add-credit-dialog-info-label',
+            visible: false,
+        };
+        super._init(Object.assign(defaultParams, params));
+        this.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.clutter_text.line_wrap = true;
+    }
+
+    _sync(animate) {
+        this.remove_all_transitions();
+        const { naturalHeightSet } = this;
+        this.natural_height_set = false;
+        let [, height] = this.get_preferred_height(-1);
+        this.natural_height_set = naturalHeightSet;
+
+        this.ease({
+            height: this.visible ? height : 0,
+            opacity: this.visible ? 255 : 0,
+            duration: 200,
+            onComplete: () => {
+                if (this.visible)
+                    this.height = -1;
+            },
+        });
+    }
+});
+
 /* A modal dialog for entering a code while the computer is unlocked.
  *
  * ModalDialog.dialogLayout._dialog
@@ -568,20 +601,10 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
             codeLength).format(codeLength);
         this._promptLayout = new Dialog.MessageDialogContent({ title, description });
 
-        this._errorMessageLabel = new St.Label({
-            style_class: 'prompt-dialog-error-label',
-            visible: false,
-        });
-        this._errorMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._errorMessageLabel.clutter_text.line_wrap = true;
+        this._errorMessageLabel = new ExpandableLabel({style_class: 'payg-add-credit-dialog-error-label'});
         this._promptLayout.add_child(this._errorMessageLabel);
 
-        this._infoMessageLabel = new St.Label({
-            style_class: 'prompt-dialog-info-label',
-            visible: false,
-        });
-        this._infoMessageLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._infoMessageLabel.clutter_text.line_wrap = true;
+        this._infoMessageLabel = new ExpandableLabel({style_class: 'payg-add-credit-dialog-info-label'});
         this._promptLayout.add_child(this._infoMessageLabel);
 
         this.contentLayout.add_child(this._promptLayout);
