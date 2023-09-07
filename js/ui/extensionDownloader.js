@@ -37,7 +37,7 @@ async function installExtension(uuid, invocation) {
         shell_version: Config.PACKAGE_VERSION,
     };
 
-    if (Desktop.is('endless') && Main.extensionManager.isModeExtension(uuid)) {
+    if ((Desktop.is('endless') || Desktop.is('Endless')) && Main.extensionManager.isModeExtension(uuid)) {
         const title = _("Can't install “%s”:").format(uuid);
         const message = _("This is an extension enabled by your current mode, you can't install manually any update in that session.");
         Main.notifyError(title, message);
@@ -172,7 +172,7 @@ async function checkForUpdates() {
     Main.extensionManager.getUuids().forEach(uuid => {
         let extension = Main.extensionManager.lookup(uuid);
         // don't updates out of repository mode extension
-        if (Desktop.is('endless') && Main.extensionManager.isModeExtension(uuid))
+        if ((Desktop.is('endless') || Desktop.is('Endless')) && Main.extensionManager.isModeExtension(uuid))
             return;
         if (extension.type !== ExtensionUtils.ExtensionType.PER_USER)
             return;
