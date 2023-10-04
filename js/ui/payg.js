@@ -1,6 +1,6 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 //
-// Copyright (C) 2018-2020 Endless OS Foundation LLC
+// Copyright (C) 2018-2023 Endless OS Foundation LLC
 //
 // Licensed under the GNU General Public License Version 2
 //
@@ -19,17 +19,19 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 /* exported PaygUnlockCodeEntry, PaygUnlockUi, PaygUnlockWidget, PaygNotifier,
-     ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
+     PaygAddCreditDialog, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
      successMessage */
 
-const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Pango, Shell, St } = imports.gi;
 
-const PaygManager = imports.misc.paygManager;
-
-const Gettext = imports.gettext;
 const Animation = imports.ui.animation;
+const Dialog = imports.ui.dialog;
+const Gettext = imports.gettext;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const ModalDialog = imports.ui.modalDialog;
+const PaygManager = imports.misc.paygManager;
+const Util = imports.misc.util;
 
 const SUCCESS_DELAY_SECONDS = 3;
 
@@ -513,103 +515,293 @@ var PaygUnlockWidget = GObject.registerClass({
 
 });
 
-var ApplyCodeNotification = GObject.registerClass({
-    Signals: {
-        'done-displaying': {},
-    },
-}, class ApplyCodeNotification extends MessageTray.Notification {
-    _init(source, title, banner) {
-        super._init(source, title, banner);
+/* Label that expands when visible and shrinks when hidden.
+ * Inspired by ShellEntry.CapsLockWarning */
+var ExpandableLabel = GObject.registerClass(
+class ExpandableLabel extends St.Label {
+    _init(params) {
+        let defaultParams = {
+            style_class: 'payg-add-credit-dialog-info-label',
+            visible: false,
+        };
+        super._init(Object.assign(defaultParams, params));
+        this.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.clutter_text.line_wrap = true;
+    }
 
-        this._titleOrig = title;
+    _sync(animate) {
+        this.remove_all_transitions();
+        const { naturalHeightSet } = this;
+        this.natural_height_set = false;
+        let [, height] = this.get_preferred_height(-1);
+        this.natural_height_set = naturalHeightSet;
 
-        // Note: "banner" is actually the string displayed in the banner, not a
-        // banner object. This variable name simply follows the convention of
-        // the parent class.
-        this._bannerOrig = banner;
+        this.ease({
+            height: this.visible ? height : 0,
+            opacity: this.visible ? 255 : 0,
+            duration: 200,
+            onComplete: () => {
+                if (this.visible)
+                    this.height = -1;
+            },
+        });
+    }
+});
+
+/* A modal dialog for entering a code while the computer is unlocked.
+ *
+ * ModalDialog.dialogLayout._dialog
+ * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+ * ┃                                                                           ┃
+ * ┃ ModalDialog.contentLayout                                                 ┃
+ * ┃ ┌───────────────────────────────────────────────────────────────────────┐ ┃
+ * ┃ │PaygAddCreditDialog._promptLayout (Dialog.MessageDialogContent)        │ ┃
+ * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
+ * ┃ ││                       Enter your unlock code                        ││ ┃
+ * ┃ ││                                                                     ││ ┃
+ * ┃ ││          Text label that either prompts the user for action         ││ ┃
+ * ┃ ││                          or shows results.                          ││ ┃
+ * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
+ * ┃ │PaygAddCreditDialog._codeEntryLayout                                   │ ┃
+ * ┃ │┌─────────────────────────────────────────────────────────────────────┐│ ┃
+ * ┃ ││     ┌─────────────────────────────────────────────────────┐         ││ ┃
+ * ┃ ││  *  │                                                     │  #      ││ ┃
+ * ┃ ││     └─────────────────────────────────────────────────────┘         ││ ┃
+ * ┃ │└─────────────────────────────────────────────────────────────────────┘│ ┃
+ * ┃ └───────────────────────────────────────────────────────────────────────┘ ┃
+ * ┃ ModalDialog.buttonLayout                                                  ┃
+ * ┃ ┌───────────────────────────────────┬───────────────────────────────────┐ ┃
+ * ┃ │                                   │                                   │ ┃
+ * ┃ │              Cancel               │            Add Credit             │ ┃
+ * ┃ │                                   │                                   │ ┃
+ * ┃ └───────────────────────────────────┴───────────────────────────────────┘ ┃
+ * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ */
+var PaygAddCreditDialog = GObject.registerClass(
+class PaygAddCreditDialog extends ModalDialog.ModalDialog {
+    _init() {
+        /* We want to be able to open the dialog multiple times per session
+         * without making the caller instatiate a new object before every call,
+         * so we need to disable destroyOnClose */
+        super._init({
+            styleClass: 'payg-add-credit-dialog',
+            destroyOnClose: false
+        });
+        super.connect('closed', this._onClosed.bind(this));
+
         this._verificationStatus = UnlockStatus.NOT_VERIFYING;
 
-        this._codeAddedId = 0;
-        this._codeRejectedId = 0;
-        this._doneId = 0;
+        /* This layout contains the prompt presented to the user and the labels
+         * reporting results to the user */
+        const title = _('Enter your unlock code');
+        const codeLength = Main.paygManager.codeLength;
+        const description = Gettext.ngettext(
+            'Enter a new keycode (%s character) to extend the time before your credit expires.',
+            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
+            codeLength).format(codeLength);
+        this._promptLayout = new Dialog.MessageDialogContent({ title, description });
 
-        this.connect('destroy', this._onDestroy.bind(this));
-    }
+        this._errorMessageLabel = new ExpandableLabel({style_class: 'payg-add-credit-dialog-error-label'});
+        this._promptLayout.add_child(this._errorMessageLabel);
 
-    _onDestroy() {
-        if (this._codeAddedId > 0) {
-            this._unlockWidget.disconnect(this._codeAddedId);
-            this._codeAddedId = 0;
-        }
+        this._infoMessageLabel = new ExpandableLabel({style_class: 'payg-add-credit-dialog-info-label'});
+        this._promptLayout.add_child(this._infoMessageLabel);
 
-        if (this._codeRejectedId > 0) {
-            this._unlockWidget.disconnect(this._codeRejectedId);
-            this._codeRejectedId = 0;
-        }
+        this.contentLayout.add_child(this._promptLayout);
 
-        if (this._doneId > 0) {
-            GLib.source_remove(this._doneId);
-            this._doneId = 0;
-        }
-    }
+        /* This layout contains the code prefix, entry field and suffix */
+        this._codeEntryLayout = new St.BoxLayout({ x_expand: false });
 
-    createBanner() {
-        if (this._codeAddedId > 0) {
-            this._unlockWidget.disconnect(this._codeAddedId);
-            this._codeAddedId = 0;
-        }
-
-        if (this._codeRejectedId > 0) {
-            this._unlockWidget.disconnect(this._codeRejectedId);
-            this._codeRejectedId = 0;
-        }
-
-        this._banner = new MessageTray.NotificationBanner(this);
-        this._unlockWidget = new PaygUnlockWidget();
-        this._codeAddedId = this._unlockWidget.connect('code-added', this._onCodeAdded.bind(this));
-        this._codeRejectedId = this._unlockWidget.connect('code-rejected', this._onCodeRejected.bind(this));
-        this._banner.setActionArea(this._unlockWidget.buttonBox);
-
-        return this._banner;
-    }
-
-    _onCodeAdded() {
-        this._setMessage(successMessage());
-
-        if (this._doneId > 0) {
-            GLib.source_remove(this._doneId);
-            this._doneId = 0;
-        }
-
-        this._doneId = GLib.timeout_add_seconds(
-            GLib.PRIORITY_DEFAULT,
-            SUCCESS_DELAY_SECONDS,
-            () => {
-                this.emit('done-displaying');
-                this.destroy();
-
-                return GLib.SOURCE_REMOVE;
+        if (Main.paygManager.codeFormatPrefix !== '') {
+            const prefix = new St.Label({
+                style_class: 'notification-payg-code-entry',
+                text: Main.paygManager.codeFormatPrefix,
+                x_align: Clutter.ActorAlign.CENTER,
             });
+            this._codeEntryLayout.add_child(prefix);
+        }
+
+        this._codeEntry = new PaygUnlockCodeEntry({
+            style_class: 'notification-payg-entry',
+            can_focus: true,
+            x_expand: true,
+        });
+        this._codeEntry.clutter_text.connect('activate', this._apply.bind(this));
+        this._codeEntry.clutter_text.connect('text-changed', this._updateApplyButtonSensitivity.bind(this));
+        this._codeEntry.setEnabled(true);
+        this._codeEntryLayout.add_child(this._codeEntry);
+
+        if (Main.paygManager.codeFormatSuffix !== '') {
+            const suffix = new St.Label({
+                style_class: 'notification-payg-code-entry',
+                text: Main.paygManager.codeFormatSuffix,
+                x_align: Clutter.ActorAlign.CENTER,
+            });
+
+            this._codeEntryLayout.add_child(suffix);
+        }
+
+        this.contentLayout.add_child(this._codeEntryLayout);
+
+        /* Add buttons */
+        this._closeButton = this.addButton({
+            label: _('Close'),
+            key: Clutter.KEY_Escape,
+            action: () => this.close(),
+        });
+
+        this._applyButton = this.addButton({
+            label: _('Add Credit'),
+            action: () => this._apply(),
+        });
+
+        /* we want key focus to be in the entry field when this dialog is shown */
+        this.setInitialKeyFocus(this._codeEntry);
+        this._updateSensitivity();
     }
 
-    // if errorMessage is unspecified, a default message will be populated based
-    // on whether time remains
-    _onCodeRejected(unlockWidget, errorMessage) {
-        this._setMessage(errorMessage ? errorMessage : this._bannerOrig);
+    _validateCurrentCode(partial=true) {
+        return Main.paygManager.validateCode(this._codeEntry.get_text(), partial);
     }
 
-    _setMessage(message) {
-        this.update(this._titleOrig, message);
+    _updateApplyButtonSensitivity() {
+        const sensitive = this._validateCurrentCode(false) &&
+            this._verificationStatus !== UnlockStatus.VERIFYING &&
+            this._verificationStatus !== UnlockStatus.SUCCEEDED &&
+            this._verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
+
+        this._applyButton.reactive = sensitive;
+        this._applyButton.can_focus = sensitive;
     }
 
-    activate() {
-        // We get here if the Apply button is inactive when we try to click it.
-        // Unless we're already done, exit early so we don't destroy the
-        // notification)
-        if (this._verificationStatus !== UnlockStatus.SUCCEEDED)
+    _updateSensitivity() {
+        const shouldEnableEntry =
+            this._verificationStatus !== UnlockStatus.VERIFYING &&
+            this._verificationStatus !== UnlockStatus.SUCCEEDED &&
+            this._verificationStatus !== UnlockStatus.TOO_MANY_ATTEMPTS;
+
+        this._updateApplyButtonSensitivity();
+        this._codeEntry.setEnabled(shouldEnableEntry);
+    }
+
+    _setSuccessMessage(message) {
+        this._infoMessageLabel.set_text(message);
+        this._infoMessageLabel.show();
+        this._errorMessageLabel.hide();
+        this._promptLayout._description.hide();
+    }
+
+    _setErrorMessage(message) {
+        this._errorMessageLabel.set_text(message);
+        this._errorMessageLabel.show();
+        this._infoMessageLabel.hide();
+        this._promptLayout._description.hide();
+        Util.wiggle(this._codeEntry);
+    }
+
+    _processError(error) {
+        logError(error, 'Error adding PAYG code');
+
+        /* The 'too many errors' case is a bit special, and sets a different state. */
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.TOO_MANY_ATTEMPTS)) {
+            const currentTime = Shell.util_get_boottime() / GLib.USEC_PER_SEC;
+            const secondsLeft = Main.paygManager.rateLimitEndTime - currentTime;
+            if (secondsLeft > 30) {
+                const minutesLeft = Math.max(0, Math.ceil(secondsLeft / 60));
+                this._setErrorMessage(
+                    Gettext.ngettext(
+                        'Too many attempts. Try again in %s minute.',
+                        'Too many attempts. Try again in %s minutes.', minutesLeft)
+                        .format(minutesLeft));
+            } else {
+                this._setErrorMessage(_('Too many attempts. Try again in a few seconds.'));
+            }
+
+            /* Make sure to clean the status once the time is up (if this dialog is still alive)
+             * and make sure that we install this callback at some point in the future (+1 sec).
+             */
+            this._clearTooManyAttemptsId = GLib.timeout_add_seconds(
+                GLib.PRIORITY_DEFAULT,
+                Math.max(1, secondsLeft),
+                () => {
+                    this._verificationStatus = UnlockStatus.NOT_VERIFYING;
+                    this._clearError();
+                    this._updateSensitivity();
+                    return GLib.SOURCE_REMOVE;
+                });
+
+            this._verificationStatus = UnlockStatus.TOO_MANY_ATTEMPTS;
+            return;
+        }
+
+        /* Common errors after this point. */
+        if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.INVALID_CODE)) {
+            this._setErrorMessage(_('Invalid keycode. Please try again.'));
+        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.CODE_ALREADY_USED)) {
+            this._setErrorMessage(_('Keycode already used. Please enter a new keycode.'));
+        } else if (error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.TIMED_OUT)) {
+            this._setErrorMessage(_('Time exceeded while verifying the keycode'));
+        } else if (error.matches(PaygManager.PaygErrorDomain, PaygManager.PaygError.SHOW_ACCOUNT_ID)) {
+            this._setErrorMessage(_('Your Pay As You Go Account ID is: %s').format(Main.paygManager.accountID));
+        } else {
+            /* We don't consider any other error here (and we don't consider DISABLED explicitly,
+             * since that should not happen), but still we need to show something to the user.
+             */
+            this._setErrorMessage(_('Unknown error'));
+        }
+
+        this._verificationStatus = UnlockStatus.FAILED;
+    }
+
+    _startVerifyingCode() {
+        if (!this._validateCurrentCode(false))
             return;
 
-        super.activate();
+        this._verificationStatus = UnlockStatus.VERIFYING;
+        this._updateSensitivity();
+
+        const code = '%s%s%s'.format(
+            Main.paygManager.codeFormatPrefix,
+            this._codeEntry.get_text(),
+            Main.paygManager.codeFormatSuffix);
+
+        Main.paygManager.addCode(code, error => {
+            if (error) {
+                this._processError(error);
+            } else if (Main.paygManager.lastTimeAdded <= 0) {
+                /* Close the dialog when a reset code is entered: we don't want
+                 * the dialog to remain over the lock screen shield. */
+                this._verificationStatus = UnlockStatus.FAILED;
+                this.close();
+            } else {
+                this._verificationStatus = UnlockStatus.SUCCEEDED;
+                this._setSuccessMessage(successMessage());
+            }
+            this._reset();
+        });
+    }
+
+    _apply() {
+        /* Dismiss already shown info and error texts, if any */
+        this._errorMessageLabel.hide();
+        this._infoMessageLabel.hide();
+        this._promptLayout._description.show();
+
+        this._startVerifyingCode();
+    }
+
+    _reset() {
+        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
+        this._codeEntry.reset();
+        this._updateSensitivity();
+    }
+
+    _onClosed() {
+        /* Dismiss already shown info and error texts, if any */
+        this._errorMessageLabel.hide();
+        this._infoMessageLabel.hide();
+        this._promptLayout._description.show();
+        this._reset()
     }
 });
 
@@ -735,40 +927,18 @@ class PaygNotifier extends GObject.Object {
         const source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
 
-        // by default, this notification is for early entry of an unlock keycode
-        let codeLength = Main.paygManager.codeLength;
-        let messageText = Gettext.ngettext(
-            'Enter a new keycode (%s character) to extend the time before your credit expires.',
-            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
-            codeLength).format(codeLength);
-        let urgency = MessageTray.Urgency.NORMAL;
-        let userInitiated = false;
+        const timeLeft = timeToString(secondsLeft);
+        let messageText = _('Subscription expires in %s.').format(timeLeft);
+        let urgency = MessageTray.Urgency.HIGH;
 
-        // in case this is a "only X time left" warning notification
-        if (secondsLeft >= 0) {
-            const timeLeft = timeToString(secondsLeft);
-            messageText = _('Subscription expires in %s.').format(timeLeft);
-            urgency = MessageTray.Urgency.HIGH;
-        } else {
-            userInitiated = true;
-        }
-
-        this._notification = new ApplyCodeNotification(
+        this._notification = new MessageTray.Notification(
             source,
             _('Pay As You Go'),
             messageText);
 
-        if (userInitiated)
-            this._notification.setResident(true);
-
         this._notification.setTransient(false);
         this._notification.setUrgency(urgency);
         source.showNotification(this._notification);
-
-        // if the user triggered this notification, immediately expand so the
-        // user sees the input field
-        if (userInitiated)
-            Main.messageTray._expandActiveNotification();
 
         this._notification.connect('destroy', () => {
             this._notification = null;
