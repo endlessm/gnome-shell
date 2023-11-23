@@ -1,21 +1,494 @@
-gnome-shell (41.2-1endless3) eos; urgency=medium
+gnome-shell (43.9-0+deb12u1) bookworm; urgency=medium
 
-  * Rebase upon 41.9 (T34452)
+  * d/control.in, d/gbp.conf: Use debian/bookworm branch
+  * New upstream stable release 43.8
+    - Allow notifications to be dismissed with backspace key in addition to
+      delete key, for easier use on laptops where the delete key might be
+      missing or hard to reach (gnome-shell#5789)
+    - Update subprojects/gvc subproject to the same version used in 44.4
+      (gnome-shell#6842)
+      + Fix duplicate devices shown when reconnecting to PulseAudio
+      + Fix possible use-after-free crashes on PulseAudio/Pipewire restart
+      + Improve choice of default icons
+      + Performance improvements
+    - Avoid sliders in quick settings (volume, etc.) being reported to
+      accessibility tools as their own parent object (gnome-shell#6686)
+    - Better compatibility with Debian 12's version of ibus
+      (gnome-shell#6405)
+    - Report focus events to ibus when using Wayland (gnome-shell#6415)
+    - In the "looking glass" debug interface, cope with objects that
+      cannot be converted to string
+    - When showing weather, avoid getting meaningless location names like
+      "WiFi" or "GeoIP" from GeoClue >= 2.7
+    - Improve GNOME Shell app grid performance by avoiding repainting
+      monitors other than the one it is displayed on (gnome-shell#6819)
+    - Align scrolled viewports to the pixel grid to avoid jitter visible
+      during scrolling (gnome-shell#6835)
+    - Support translated strings in more files
+    - Upstream CI adjustments not relevant to Debian
+    - All other changes were already in 43.7-1 or 43.7-2
+  * New upstream stable release 43.9
+    - Avoid exposing window previews on lock screen via keyboard shortcuts
+      (CVE-2023-43090, gnome-shell#6990; previously fixed for bookworm via
+      patches in 43.6-1~deb12u2)
+    - Improve handling of latched vs. locked modes in on-screen keyboard
+      (gnome-shell#5763, also fixed in 44.5)
+    - Reverse slider direction in RTL locales
+      (gnome-shell#5107, also fixed in 44.5)
+    - Add missing environment variables required to launch ibus-daemon
+      (gnome-shell#6998, also fixed in 44.5)
+    - Translation updates
+  * d/patches: Drop patches that were included in the new upstream releases
+  * d/patches: Update to upstream gnome-43 branch commit 43.9-1-g3b921ba0c
+    - d/p/overview-Handle-unredirection-in-OverviewShown-state-mach.patch:
+      Improve performance for most full-screen applications by ensuring
+      that a fast-path for them stays enabled when it should be.
+      (mutter#2994 upstream; also fixed in 44.5-2)
 
- -- Jian-Hong Pan <jhp@endlessos.org>  Wed, 22 Feb 2023 18:32:00 +0800
+ -- Simon McVittie <smcv@debian.org>  Tue, 10 Oct 2023 09:50:35 +0100
 
-gnome-shell (41.2-1endless2) eos; urgency=medium
+gnome-shell (43.7-2) unstable; urgency=medium
 
-  * Drop upstream gnome-shell-overrides-migration.sh tool (T34342)
-  * Add downstream gnome-shell-overrides-reset.sh tool (T34300)
+  * Team upload
+  * d/p/main-Leak-the-GJS-context-and-ShellGlobal.patch:
+    Add patch from Fedora to skip final cleanup during exit.
+    This has been implicated in various crashes during exit, which cause
+    gnome-shell to disable extensions during the next startup. Leaking some
+    memory at this point does not matter since the process is exiting anyway.
+    The crashes during exit are believed to have been fixed in 44.beta, but
+    those changes are too intrusive to be suitable for a backport.
+    (Closes: #1038972)
 
- -- Philip Withnall <pwithnall@endlessos.org>  Mon, 23 Jan 2023 17:56:00 +0000
+ -- Simon McVittie <smcv@debian.org>  Thu, 17 Aug 2023 10:46:44 +0100
 
-gnome-shell (41.2-1endless1) eos; urgency=medium
+gnome-shell (43.7-1) unstable; urgency=medium
 
-  * Reapply downstream changes
+  * Team upload
+  * New upstream stable release
+    - Apply hotspot translation to mouse cursor while using magnifier,
+      fixing an offset between the visble pointer position and the actual
+      pointer (gnome-shell#4584, also fixed in 44.3)
+    - Don't log an error when AccountsService signals a change while
+      parental controls are disabled globally
+      (gnome-shell#6749, also fixed in 44.3)
+    - Keep rounded corners on the overview's view of the desktop, even
+      after the background image changes
+      (gnome-shell#4125, also fixed in 44.3)
+  * d/patches: Update to upstream gnome-43 branch commit 43.7-1-g0d51f199e
+    - Translation update: fa
+  * d/gbp.conf, d/control.in: Use debian/trixie branch
 
- -- Georges Basile Stavracas Neto <georges@endlessos.org>  Wed, 29 Dec 2021 13:18:55 -0300
+ -- Simon McVittie <smcv@debian.org>  Thu, 10 Aug 2023 10:33:35 +0100
+
+gnome-shell (43.6-1~deb12u2) bookworm-security; urgency=high
+
+  * Team upload
+  * Avoid exposing window previews on lock screen via keyboard shortcuts
+    (Closes: #1052067, CVE-2023-43090, gnome-shell#6990)
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 17 Sep 2023 17:18:49 +0100
+
+gnome-shell (43.6-1~deb12u1) bookworm; urgency=medium
+
+  * Rebuild for bookworm
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 11 Jun 2023 00:08:43 +0100
+
+gnome-shell (43.6-1) unstable; urgency=medium
+
+  * New upstream stable release 43.5
+    - Fix a regression in 43~beta involving detection of hotplugged media
+      with autorunnable content (gnome-shell!2745)
+    - Make search results fill unused space as intended (gnome-shell#5924)
+    - Improve matching of app StartupWMClass to a .desktop file, giving
+      priority to apps that were not hidden by OnlyShowIn under the current
+      desktop environment, in particular preferring gnome-system-monitor's
+      non-KDE-specific .desktop file while running GNOME (gnome-shell!2721)
+    - Fix assertion failures after a window preview is destroyed
+      (gnome-shell#5512, gnome-shell#6065)
+    - Avoid destroying labels twice, most commonly when using
+      gnome-shell-extension-dash-to-dock (gnome-shell!2739)
+    - Avoid keyboard navigation focus getting stuck on top bar buttons with
+      no associated menu (gnome-shell!2734, might help #1032319)
+    - Fix queued notifications getting into a state where they can no
+      longer be removed (gnome-shell!2736)
+    - Receive notifications of removed objects from D-Bus ObjectManager
+      instances correctly (gnome-shell!2730)
+    - Fix a cursor appearing at 0,0 in screenshots that should not
+      include it (gnome-shell!2702)
+    - Update visibility of workspaces in workspace switcher when required
+      (gnome-shell#6519)
+    - After 60 second timeout in logout/reboot/poweroff confirmation
+      dialog, do the requested action instead of leaving the Shell in a
+      broken state (gnome-shell#6506)
+    - Fix an assertion failure during shutdown (gnome-shell#6512)
+    - Fix an assertion failure if Geoclue isn't D-Bus-activatable
+      (gnome-shell!2689)
+    - Fix a regression in which the cursor would not be included in
+      screenshots since mutter 43.1 (gnome-shell!2710)
+    - Upstream CI fixes not relevant to Debian
+    - Translation update: zh_CN
+  * New upstream stable release 43.6
+    - Fix a crash when a window preview is destroyed (gnome-shell#6570)
+    - When cancelling the polkit agent prompt while using
+      gnome-remote-desktop, don't break subsequent polkit prompts
+      (gnome-shell!2761)
+    - Fix "TypeError: this._dragActor is null" warnings related to
+      drag-and-drop (gnome-shell!2770)
+    - Fix input method popup getting stuck on screen during engine changes
+      (gnome-shell#6717)
+    - Translation update: pt_BR
+  * d/control.in: Build-depend on mutter 43.5, for a newly-public utility
+    function needed by gnome-shell!2710
+  * d/patches: Drop ab translation patch, applied upstream
+
+ -- Simon McVittie <smcv@debian.org>  Sat, 10 Jun 2023 21:17:13 +0100
+
+gnome-shell (43.4-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+    - Fix memory leaks when the list of wireless networks is refreshed
+      (GNOME/gnome-shell!2652)
+    - Stop tracking drag-and-drop source object when destroyed
+      (part of GNOME/gnome-shell!2318)
+    - Translation update: fr
+    - All other changes were included in 43.3-2 and 43.3-3
+  * Drop patches added by 43.3-2 and 43.3-3, included in upstream 43.4
+  * d/patches: Update to gnome-43 branch commit 43.4-1-g3499d2e87
+    - Translation update: ab
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 10 Apr 2023 14:07:38 +0100
+
+gnome-shell (43.3-3) unstable; urgency=medium
+
+  * Team upload
+  * d/p/overview-Don-t-claim-to-be-SHOWN-when-HIDDEN-during-start.patch,
+    d/p/overview-Hide-when-failing-to-take-grab-at-end-of-startup.patch:
+    Fix regression in 43.3 which could cause the shell to become
+    unresponsive, for example if a display is plugged or unplugged during
+    the startup animation. (Closes: #1032497)
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 08 Mar 2023 11:09:54 +0000
+
+gnome-shell (43.3-2) unstable; urgency=medium
+
+  * Team upload
+  * d/patches: Add more translation updates from upstream:
+    de, hu, lt, pl, sl, sr
+    (upstream gnome-43 branch up to commit 43.3-13-g6f7ff15ec)
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 02 Mar 2023 09:14:28 +0000
+
+gnome-shell (43.3-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+    - Don't dereference symlinks when deleting extensions
+      (GNOME/gnome-shell#6182, which can be a data loss bug)
+    - Fix windows disappearing from Alt+Tab if their title changes at
+      just the wrong time (GNOME/gnome-shell#6385)
+    - Log warnings on invalid state transitions (GNOME/gnome-shell#4561)
+    - Fix some memory leaks in gdm (GNOME/gnome-shell#6395)
+    - gnome-extensions tool: Fix the ability to enable and disable
+      extensions while GNOME is installed but not running
+      (GNOME/gnome-shell#6127)
+    - Silence compiler warnings with newer GLib (GNOME/gnome-shell!2625)
+    - Add precondition checks to prevent some crashes
+      (GNOME/gnome-shell!2622)
+    - Provide context to IBus input method when the surrounding text
+      becomes empty (GNOME/gnome-shell#5895)
+    - Avoid warnings with audio streams on a device not corresponding
+      to a sound card, such as network sinks (GNOME/gnome-shell!2616)
+    - Avoid some strings being untranslatable by working around an xgettext
+      bug (GNOME/gnome-shell#5280)
+    - Fix drag-and-drop in the dash when animations are disabled
+      (GNOME/gnome-shell!2604)
+    - Avoid warnings when dragging an app from the dash to the grid
+      (GNOME/gnome-shell#6317)
+    - Save screencasts to home directory if the Videos directory has been
+      deleted, instead of failing to record (GNOME/gnome-shell!2594)
+    - Make Shell less susceptible to the OOM-killer, since it is required
+      for basic functionality of desktops that use it
+      (GNOME/gnome-shell!2582)
+  * d/patches: Drop patches that were applied upstream
+  * d/patches: Add translation updates from upstream:
+    fi, id, ka, pt, sv, tr, uk
+  * d/control.in, d/gbp.conf, d/watch: Set up branches for 43.x in bookworm.
+    This leaves the default branch available for GNOME 44 betas in
+    experimental and Ubuntu.
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 15 Feb 2023 17:02:45 +0000
+
+gnome-shell (43.2-2) unstable; urgency=medium
+
+  * Team upload
+  * d/patches: Sort closest-to-upstream first
+  * d/patches: Update to upstream gnome-43 branch commit 43.2-8-ga1b834297
+    - Ensure that buttons in quick settings menu are aligned to pixel grid
+    - Translation updates: ab, en_GB, ie, ka, ru
+  * Update standards version to 4.6.2 (no changes needed)
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 29 Jan 2023 15:26:02 +0000
+
+gnome-shell (43.2-1) unstable; urgency=medium
+
+  * New upstream release (Closes: #1028972)
+  * Drop patches applied in new release
+  * Cherry-pick fix for screen share window titles
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 17 Jan 2023 11:09:16 -0500
+
+gnome-shell (43.1-2) unstable; urgency=medium
+
+  * Team upload
+  * d/.gitignore: Don't ignore patches, overriding upstream .gitignore
+  * Move patch reverting gcr4 transition into d/patches/debian subdirectory
+  * Add post-release patches from upstream gnome-43 branch
+    - Screencast bug fixes
+    - Update Russian translation
+  * d/control.in: Depend on dbus-daemon instead of dbus for dbus-run-session
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 15 Nov 2022 10:32:15 +0000
+
+gnome-shell (43.1-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Jeremy Bicha ]
+  * debian/source_gnome-shell.py: Don't try to report nonexistent mouse
+    gsettings schema
+
+  [ Alban Browaeys ]
+  * debian/control.in: Bump minimum gnome-bluetooth3 runtime to 42.3,
+    required for AdapterState
+
+  [ Simon McVittie ]
+  * New upstream release
+  * Update URLs in upstream metadata
+  * Update Lintian overrides
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster (oldstable)
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 04 Nov 2022 20:10:13 +0000
+
+gnome-shell (43.0-2) unstable; urgency=medium
+
+  * Release to unstable
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 27 Sep 2022 19:10:41 -0400
+
+gnome-shell (43.0-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream release
+  * d/control.in: Bump minimum mutter version to 43.0 release
+  * d/p/quick-settings-Add-ellipses-to-Log-Out-string.patch:
+    Drop, applied upstream
+  * Standards-Version: 4.6.1 (no changes required)
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 18 Sep 2022 20:02:40 +0100
+
+gnome-shell (43~rc-1) experimental; urgency=medium
+
+  * New upstream release
+  * debian/control.in: Bump minimum mutter to 43~rc
+  * Cherry-pick Log Out… patch
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 06 Sep 2022 14:22:44 -0400
+
+gnome-shell (43~beta-2) experimental; urgency=medium
+
+  * Build with libsoup3
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 05 Sep 2022 17:40:40 -0400
+
+gnome-shell (43~beta-1) experimental; urgency=medium
+
+  * New upstream release
+  * debian/control.in: Bump minimum mutter to 43~beta
+  * debian/control.in: Bump minimum gjs to 1.73.1
+  * Revert switch to gcr4
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 21 Aug 2022 10:53:56 -0400
+
+gnome-shell (42.4-2) unstable; urgency=medium
+
+  * Build with libsoup3
+  * Update Vcs branches since debian/master is tracking 43
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 05 Sep 2022 16:09:52 -0400
+
+gnome-shell (42.4-1) unstable; urgency=medium
+
+  * New upstream release (LP: #1985304):
+    - Fix logging in with realmd (LP: #1985128)
+  * debian/patches: Drop applied patches
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Thu, 11 Aug 2022 23:14:29 +0200
+
+gnome-shell (42.3.1-2) unstable; urgency=medium
+
+  [ Marco Trevisan (Treviño) ]
+  * debian/source_gnome-shell.py: Support gdm name only
+  * debian/control: Recommend gnome-remote-desktop
+
+  [ Jeremy Bicha ]
+  * Cherry-pick patch to allow Extension Manager update feature to work
+    without the older Extensions app installed (LP: #1981952)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 18 Jul 2022 07:36:31 +0200
+
+gnome-shell (42.3.1-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 16 Jul 2022 18:16:17 +0200
+
+gnome-shell (42.2-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 06 Jun 2022 11:05:06 +0100
+
+gnome-shell (42.1-1) unstable; urgency=medium
+
+  * New upstream release (LP: #1973373, LP: #1968911)
+  * Drop all patches except 1 Debian-specific patch: applied in new release
+  * Release to unstable
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 13 May 2022 15:09:47 -0400
+
+gnome-shell (42.0-5) experimental; urgency=medium
+
+  * Team upload
+  * d/patches: Update to upstream git commit 42.0-84-g9ee7af233
+    - Bug fixes targeted for 42.1
+    - Translation updates
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 25 Apr 2022 10:04:11 +0100
+
+gnome-shell (42.0-4) unstable; urgency=medium
+
+  * Team upload
+
+  [ Pablo Mazzini ]
+  * Move evolution-data-server from Depends to Recommends
+    (Closes: #869230)
+
+  [ Simon McVittie ]
+  * Update to upstream git commit 42.0-69-g653697683
+    - Bug fixes targeted for 42.1
+    - Translation updates
+    - Update metadata of patches that were already present
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 19 Apr 2022 12:28:27 +0100
+
+gnome-shell (42.0-3) unstable; urgency=medium
+
+  * Team upload
+
+  [ Jeremy Bicha ]
+  * Move Debian-specific temporary patches to debian/
+  * debian/control.in: Recommend power-profiles-daemon for power mode feature
+
+  [ Simon McVittie ]
+
+  * d/p/Specify-API-versions-for-all-public-GIR-APIs-except-GLib.patch:
+    Add patch to make Shell more robust against GIR API breaks.
+    This avoids future bugs similar to #1008926.
+  * d/patches: Remove compatibility with older gnome-control-center
+  * Bump Recommends to gnome-control-center (>= 1:42)
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 13 Apr 2022 16:47:53 +0100
+
+gnome-shell (42.0-2) unstable; urgency=medium
+
+  [ Marco Trevisan (Treviño) ]
+  * js: Support legacy GNOME Control Center (now Settings) dbus name
+  * debian/patches: Cherry-pick various upstream fixes targeting 42.1
+  * debian/patches: Fix monitor switching configuration (LP: #1964496)
+  * debian/patches: Overview, remove desktop fade logic (LP: #1965072)
+  * shellDBus: Actually make ScreenTransitionAsync async
+
+  [ Jeremy Bicha ]
+  * Use libgweather4 instead of old libgweather
+  * Add patch to work around meson issue (Debian 1008189)
+  * Release to unstable
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 28 Mar 2022 11:14:05 -0400
+
+gnome-shell (42.0-1) experimental; urgency=medium
+
+  * New upstream release
+  * debian/control.in: Bump minimum mutter to 42.0
+  * Add patch to restore Settings item in system menu (LP: #1964136)
+
+ -- Jeremy Bicha <jeremy.bicha@canonical.com>  Mon, 14 Mar 2022 10:37:23 -0400
+
+gnome-shell (42~rc-1) experimental; urgency=medium
+
+  * New upstream release
+  * debian/control.in: Bump minimum mutter to 42~rc
+  * debian/control.in: Switch to gnome-bluetooth3
+  * Drop patches reverting use of gnome-bluetooth3
+  * Drop patches applied in new release
+
+ -- Jeremy Bicha <jeremy.bicha@canonical.com>  Wed, 09 Mar 2022 13:18:51 -0500
+
+gnome-shell (42~beta-1) experimental; urgency=medium
+
+  * New upstream release:
+    - Implement in-shell screenshot and screencast UI
+    - Use libadwaita for extension preferences
+    - Improve presentation of multi-day events in calendar
+    - Implement OSD redesign
+    - Allow extensions to opt-in to running on lock/login screen
+  * debian/patches:
+    - Drop applied upstream
+    - Revert switch to gnome-bluetooth-3
+    - Cherry-pick various upstream fixes
+  * debian: Update runtime-dependencies and use mozjs-91 based gjs
+  * debian/gnome-shell.lintian-overrides: Overrides for new messages
+  * debian/control:
+    - Drop shell dependency on gjs cli tool, add to extensions tool
+    - Explicitly list freedesktop gir dependency
+    - Add runtime dependency on libadwaita via gir1.2-adw-1
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Wed, 23 Feb 2022 07:33:39 +0100
+
+gnome-shell (41.3-2) unstable; urgency=medium
+
+  * Team upload
+  * d/p/environment-Require-GnomeBluetooth-1.0.patch,
+    d/p/environment-Require-gnome-desktop-3.0.patch:
+    Add patches from 42~alpha to avoid a crash with experimental GIR.
+    Previously, gnome-shell would crash if gir1.2-gnomedesktop-4.0 or
+    gir1.2-gnomebluetooth-2.0 were installed.
+  * d/patches: Update to gnome-41 branch commit 41.3-10-g3ca661b73
+    - Don't break extensions that look up a window's app on ::window-added,
+      fixing a regression in 41.3
+    - Translation updates: cs, es, he, is, ja
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 15 Feb 2022 13:11:19 +0000
+
+gnome-shell (41.3-1) unstable; urgency=medium
+
+  * New upstream release:
+    - Speed up a fade animation on older Intel GPUs (Closes: #1000172)
+    - Improve window tracking (LP: #1934458)
+    - Simplify scroll fade shader to work with old hardware
+    - Tweak (un)minimize animations (LP: #1713021)
+    - Don't wake up screen in DND mode
+    - Fix immediately withdrawn notifications getting stuck
+    - Honor XDG SingleMainWindow key in .desktop files
+  * debian/patches:
+    - Drop applied upstream
+    - Do not use positional arguments in i18n.merge_file
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Tue, 25 Jan 2022 16:34:22 +0100
 
 gnome-shell (41.2-1) unstable; urgency=medium
 
@@ -3305,7 +3778,7 @@ gnome-shell (2.28.1~git20091112-1) unstable; urgency=low
 
   * New upstream snapshot
 
- -- Gustavo Noronha Silva <gustavo.noronha@collabora.co.uk>  Mon, 12 Nov 2009 10:43:05 -0200
+ -- Gustavo Noronha Silva <gustavo.noronha@collabora.co.uk>  Thu, 12 Nov 2009 10:43:05 -0200
 
 gnome-shell (2.28.1~git20091028-2) unstable; urgency=low
 

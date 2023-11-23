@@ -11,7 +11,7 @@ CONFFLAGS =
 ifeq ($(DEB_HOST_ARCH_OS),linux)
 CONFFLAGS += \
 	-Dnetworkmanager=true \
-	-Dsoup2=true \
+	-Dsoup2=false \
 	-Dsystemd=true
 endif
 
