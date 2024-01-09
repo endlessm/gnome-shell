@@ -23,10 +23,15 @@ ShellApp       *shell_app_system_lookup_startup_wmclass       (ShellAppSystem *s
                                                                const char     *wmclass);
 ShellApp       *shell_app_system_lookup_desktop_wmclass       (ShellAppSystem *system,
                                                                const char     *wmclass);
+ShellApp       *shell_app_system_lookup_alias                 (ShellAppSystem  *system,
+                                                               const char      *alias);
 
 GSList         *shell_app_system_get_running               (ShellAppSystem  *self);
 char         ***shell_app_system_search                    (const char *search_string);
 
 GList          *shell_app_system_get_installed             (ShellAppSystem  *self);
+
+gboolean        shell_app_system_app_info_equal            (GDesktopAppInfo *one,
+                                                            GDesktopAppInfo *two);
 
 #endif /* __SHELL_APP_SYSTEM_H__ */

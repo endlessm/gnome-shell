@@ -30,6 +30,18 @@
  */
 #define DAILY_APP_USAGE_EVENT "49d0451a-f706-4f50-81d2-70cc0ec923a4"
 
+/* Additional key listing 0 or more previous names for an application. This is
+ * added by flatpak-builder when the manifest contains a rename-desktop-file
+ * key, and by Endless-specific tools to migrate from an app in our eos-apps
+ * repository to the same app with a different ID on Flathub. For example,
+ * org.inkscape.Inkscape.desktop contains:
+ *
+ *   X-Flatpak-RenamedFrom=inkscape.desktop;
+ *
+ * (with the .desktop suffix).
+ */
+#define X_FLATPAK_RENAMED_FROM_KEY "X-Flatpak-RenamedFrom"
+
 /* Vendor prefixes are something that can be preprended to a .desktop
  * file name.  Undo this.
  */
@@ -70,6 +82,8 @@ struct _ShellAppSystemPrivate {
 
   guint rescan_icons_timeout_id;
   guint n_rescan_retries;
+
+  GHashTable *alias_to_id;
 };
 
 static void shell_app_system_finalize (GObject *object);
@@ -115,6 +129,39 @@ startup_wm_class_is_exact_match (const char *id,
     return TRUE;
 
   return g_str_equal (id + wm_class_len, ".desktop");
+}
+
+static void
+add_aliases (ShellAppSystem  *self,
+             GDesktopAppInfo *info)
+{
+  ShellAppSystemPrivate *priv = self->priv;
+  const char *id = g_app_info_get_id (G_APP_INFO (info));
+  g_autofree char **renamed_from_list = NULL;
+  size_t i;
+
+  renamed_from_list = g_desktop_app_info_get_string_list (info, X_FLATPAK_RENAMED_FROM_KEY, NULL);
+  for (i = 0; renamed_from_list != NULL && renamed_from_list[i] != NULL; i++)
+    {
+      g_hash_table_insert (priv->alias_to_id,
+                           g_steal_pointer (&renamed_from_list[i]),
+                           g_strdup (id));
+    }
+}
+
+static void
+scan_alias_to_id (ShellAppSystem *self)
+{
+  ShellAppSystemPrivate *priv = self->priv;
+  GList *apps, *l;
+
+  g_hash_table_remove_all (priv->alias_to_id);
+
+  apps = g_app_info_get_all ();
+  for (l = apps; l != NULL; l = l->next)
+    add_aliases (self, G_DESKTOP_APP_INFO (l->data));
+
+  g_list_free_full (apps, g_object_unref);
 }
 
 static void
@@ -164,11 +211,53 @@ scan_startup_wm_class_to_id (ShellAppSystem *self)
     }
 }
 
+/**
+ * shell_app_system_app_info_equal:
+ * @one: (transfer none): a #GDesktopAppInfo
+ * @two: (transfer none): a possibly-different #GDesktopAppInfo
+ *
+ * Returns %TRUE if @one and @two can be treated as equal. Compared to
+ * g_app_info_equal(), which just compares app IDs, this function also compares
+ * fields of interest to the shell: icon, name, description, executable, and
+ * should_show().
+ *
+ * Returns: %TRUE if @one and @two are equivalent; %FALSE otherwise
+ */
+gboolean
+shell_app_system_app_info_equal (GDesktopAppInfo *one,
+                                 GDesktopAppInfo *two)
+{
+  GAppInfo *one_info, *two_info;
+
+  g_return_val_if_fail (G_IS_DESKTOP_APP_INFO (one), FALSE);
+  g_return_val_if_fail (G_IS_DESKTOP_APP_INFO (two), FALSE);
+
+  one_info = G_APP_INFO (one);
+  two_info = G_APP_INFO (two);
+
+  return
+    g_app_info_equal (one_info, two_info) &&
+    g_app_info_should_show (one_info) == g_app_info_should_show (two_info) &&
+    g_strcmp0 (g_desktop_app_info_get_filename (one),
+               g_desktop_app_info_get_filename (two)) == 0 &&
+    g_strcmp0 (g_app_info_get_executable (one_info),
+               g_app_info_get_executable (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_commandline (one_info),
+               g_app_info_get_commandline (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_name (one_info),
+               g_app_info_get_name (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_description (one_info),
+               g_app_info_get_description (two_info)) == 0 &&
+    g_strcmp0 (g_app_info_get_display_name (one_info),
+               g_app_info_get_display_name (two_info)) == 0 &&
+    g_icon_equal (g_app_info_get_icon (one_info),
+                  g_app_info_get_icon (two_info));
+}
+
 static gboolean
 app_is_stale (ShellApp *app)
 {
   GDesktopAppInfo *info, *old;
-  GAppInfo *old_info, *new_info;
   gboolean is_unchanged;
 
   if (shell_app_is_window_backed (app))
@@ -180,25 +269,8 @@ app_is_stale (ShellApp *app)
     return TRUE;
 
   old = shell_app_get_app_info (app);
-  old_info = G_APP_INFO (old);
-  new_info = G_APP_INFO (info);
 
-  is_unchanged =
-    g_app_info_should_show (old_info) == g_app_info_should_show (new_info) &&
-    strcmp (g_desktop_app_info_get_filename (old),
-            g_desktop_app_info_get_filename (info)) == 0 &&
-    g_strcmp0 (g_app_info_get_executable (old_info),
-               g_app_info_get_executable (new_info)) == 0 &&
-    g_strcmp0 (g_app_info_get_commandline (old_info),
-               g_app_info_get_commandline (new_info)) == 0 &&
-    strcmp (g_app_info_get_name (old_info),
-            g_app_info_get_name (new_info)) == 0 &&
-    g_strcmp0 (g_app_info_get_description (old_info),
-               g_app_info_get_description (new_info)) == 0 &&
-    strcmp (g_app_info_get_display_name (old_info),
-            g_app_info_get_display_name (new_info)) == 0 &&
-    g_icon_equal (g_app_info_get_icon (old_info),
-                  g_app_info_get_icon (new_info));
+  is_unchanged = shell_app_system_app_info_equal (old, info);
 
   return !is_unchanged;
 }
@@ -296,6 +368,8 @@ installed_changed (ShellAppCache  *cache,
   GPtrArray *windows = g_ptr_array_new ();
 
   rescan_icon_theme (self);
+  scan_alias_to_id (self);
+
   scan_startup_wm_class_to_id (self);
 
   g_hash_table_foreach_remove (self->priv->id_to_app, stale_app_remove_func, NULL);
@@ -321,6 +395,7 @@ shell_app_system_init (ShellAppSystem *self)
                                            (GDestroyNotify)g_object_unref);
 
   priv->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  priv->alias_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   priv->aggregate_timers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   cache = shell_app_cache_get_default ();
@@ -340,6 +415,7 @@ shell_app_system_finalize (GObject *object)
   g_hash_table_destroy (priv->aggregate_timers);
   g_list_free_full (priv->installed_apps, g_object_unref);
   g_clear_handle_id (&priv->rescan_icons_timeout_id, g_source_remove);
+  g_hash_table_destroy (priv->alias_to_id);
 
   G_OBJECT_CLASS (shell_app_system_parent_class)->finalize (object);
 }
@@ -385,6 +461,7 @@ shell_app_system_lookup_app (ShellAppSystem   *self,
 
   app = _shell_app_new (info);
   g_hash_table_insert (priv->id_to_app, (char *) shell_app_get_id (app), app);
+
   return app;
 }
 
@@ -420,6 +497,38 @@ shell_app_system_lookup_heuristic_basename (ShellAppSystem *system,
     }
 
   return NULL;
+}
+
+/**
+ * shell_app_system_lookup_alias:
+ * @system: a #ShellAppSystem
+ * @alias: alternative application id
+ *
+ * Find a valid application corresponding to a given
+ * alias string, or %NULL if none.
+ *
+ * Returns: (transfer none): A #ShellApp for @alias
+ */
+ShellApp *
+shell_app_system_lookup_alias (ShellAppSystem *system,
+                               const char     *alias)
+{
+  ShellApp *result;
+  const char *id;
+
+  g_return_val_if_fail (alias != NULL, NULL);
+
+  result = shell_app_system_lookup_app (system, alias);
+  if (result != NULL)
+    return result;
+
+  id = g_hash_table_lookup (system->priv->alias_to_id, alias);
+  if (id == NULL)
+    return NULL;
+
+  result = shell_app_system_lookup_app (system, id);
+
+  return result;
 }
 
 /**
