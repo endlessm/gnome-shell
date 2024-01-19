@@ -390,8 +390,6 @@ class QuickSettings extends PanelMenu.Button {
         this._addItems(this._system.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
         this._addItems(this._volume.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
         this._addItems(this._brightness.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
-        if (this._payg)
-            this._addItems(this._payg.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
 
         this._addItems(this._remoteAccess.quickSettingsItems);
         this._addItems(this._thunderbolt.quickSettingsItems);
@@ -406,6 +404,9 @@ class QuickSettings extends PanelMenu.Button {
         this._addItems(this._rfkill.quickSettingsItems);
         this._addItems(this._autoRotate.quickSettingsItems);
         this._addItems(this._unsafeMode.quickSettingsItems);
+
+        if (this._payg)
+            this._addItems(this._payg.quickSettingsItems, N_QUICK_SETTINGS_COLUMNS);
     }
 
     _addItems(items, colSpan = 1) {

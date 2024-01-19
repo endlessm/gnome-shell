@@ -20,33 +20,147 @@
 
 /* exported Indicator */
 
-const { Gio, GLib, GObject } = imports.gi;
+const { Atk, Clutter, Gio, GLib, GObject, Pango, St } = imports.gi;
 
 const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
 const Payg = imports.ui.payg;
-const PopupMenu = imports.ui.popupMenu;
-const PaygManager = imports.misc.paygManager;
+
+const {SystemIndicator, QuickSettingsItem, QuickToggle} = imports.ui.quickSettings;
 
 const REFRESH_TIME_SECS = 60;
 
-var Indicator = GObject.registerClass(
-class PaygIndicator extends PanelMenu.SystemIndicator {
+function _getNormalGIcon() {
+    let iconUri = 'resource:///org/gnome/shell/theme/payg-normal-symbolic.svg';
+    return new Gio.FileIcon({ file: Gio.File.new_for_uri(iconUri) });
+}
+
+function _getNearExpirationGIcon() {
+    let iconUri = 'resource:///org/gnome/shell/theme/payg-near-expiration-symbolic.svg';
+    return new Gio.FileIcon({ file: Gio.File.new_for_uri(iconUri) });
+}
+
+/**
+ * An alternative QuickToggle with a "subtitle" property. This can be removed
+ * in GNOME Shell 44+, where QuickToggle has the same functionality.
+ */
+const QuickToggleWithSubtitle = GObject.registerClass({
+    Properties: {
+        'title': GObject.ParamSpec.string('title', '', '',
+            GObject.ParamFlags.READWRITE,
+            null),
+        'subtitle': GObject.ParamSpec.string('subtitle', '', '',
+            GObject.ParamFlags.READWRITE,
+            null),
+        'icon-name': GObject.ParamSpec.override('icon-name', St.Button),
+        'gicon': GObject.ParamSpec.object('gicon', '', '',
+            GObject.ParamFlags.READWRITE,
+            Gio.Icon),
+    },
+}, class QuickToggleWithSubtitle extends QuickSettingsItem {
+    _init(params) {
+        // We'll add the quick-toggle and button class here, as in QuickToggle,
+        // because this widget has a similar structure. In GNOME Shell 45+, it
+        // should be possible to subclass QuickToggle directly and use its
+        // existing subtitle property.
+
+        super._init({
+            style_class: 'quick-toggle quick-toggle-with-subtitle button',
+            accessible_role: Atk.Role.TOGGLE_BUTTON,
+            can_focus: true,
+            ...params
+        });
+
+        this._box = new St.BoxLayout();
+        this.set_child(this._box);
+
+        const iconProps = {};
+        if (this.gicon)
+            iconProps['gicon'] = this.gicon;
+        if (this.iconName)
+            iconProps['icon-name'] = this.iconName;
+
+        this._icon = new St.Icon({
+            style_class: 'quick-toggle-icon',
+            x_expand: false,
+            ...iconProps,
+        });
+        this._box.add_child(this._icon);
+
+        // bindings are in the "wrong" direction, so we
+        // pick up StIcon's linking of the two properties
+        this._icon.bind_property('icon-name',
+            this, 'icon-name',
+            GObject.BindingFlags.SYNC_CREATE |
+            GObject.BindingFlags.BIDIRECTIONAL);
+        this._icon.bind_property('gicon',
+            this, 'gicon',
+            GObject.BindingFlags.SYNC_CREATE |
+            GObject.BindingFlags.BIDIRECTIONAL);
+
+        this._title = new St.Label({
+            style_class: 'quick-toggle-label',
+            y_align: Clutter.ActorAlign.CENTER,
+            x_align: Clutter.ActorAlign.START,
+            x_expand: true,
+        });
+
+        this._subtitle = new St.Label({
+            style_class: 'quick-toggle-subtitle',
+            y_align: Clutter.ActorAlign.CENTER,
+            x_align: Clutter.ActorAlign.START,
+            x_expand: true,
+        });
+
+        const titleBox = new St.BoxLayout({
+            y_align: Clutter.ActorAlign.CENTER,
+            x_align: Clutter.ActorAlign.START,
+            x_expand: true,
+            vertical: true,
+        });
+        titleBox.add_child(this._title);
+        titleBox.add_child(this._subtitle);
+        this._box.add_child(titleBox);
+
+        this._title.clutter_text.ellipsize = Pango.EllipsizeMode.END;
+
+        this.bind_property('title',
+            this._title, 'text',
+            GObject.BindingFlags.SYNC_CREATE);
+
+        this.bind_property('subtitle',
+            this._subtitle, 'text',
+            GObject.BindingFlags.SYNC_CREATE);
+        this.bind_property_full('subtitle',
+            this._subtitle, 'visible',
+            GObject.BindingFlags.SYNC_CREATE,
+            (bind, source) => [true, source !== null],
+            null);
+    }
+});
+
+const PaygAccountInfo = GObject.registerClass({
+    Properties: {
+        'account-id': GObject.ParamSpec.string('account-id', '', '',
+            GObject.ParamFlags.READWRITE,
+            null),
+        'can-unlock': GObject.ParamSpec.boolean('can-unlock', '', '',
+            GObject.ParamFlags.READWRITE,
+            Gio.Icon),
+        'enabled': GObject.ParamSpec.boolean('enabled', '', '',
+            GObject.ParamFlags.READWRITE,
+            Gio.Icon),
+        'status-gicon': GObject.ParamSpec.object('status-gicon', '', '',
+            GObject.ParamFlags.READWRITE,
+            Gio.Icon),
+        'time-remaining': GObject.ParamSpec.string('time-remaining', '', '',
+            GObject.ParamFlags.READWRITE,
+            null),
+    }
+}, class PaygAccountInfo extends GObject.Object {
     _init() {
         super._init();
 
         this._paygManager = Main.paygManager;
-        this._indicator = this._addIndicator();
-        this._item = new PopupMenu.PopupSubMenuMenuItem('', true);
-        this._paygNotifier = new Payg.PaygNotifier();
-        this._item.menu.addAction(_('Enter unlock code…'), () => {
-            this._paygNotifier.notify(-1);
-        });
-        this.menu.addMenuItem(this._item);
-
-        this._paygItem = new PopupMenu.PopupSubMenuMenuItem('', true);
-        this._paygItem.setSensitive(false);
-        this.menu.addMenuItem(this._paygItem);
 
         this._paygManagerInitializedId = 0;
         if (!this._paygManager.initialized) {
@@ -74,12 +188,10 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
         this._sessionModeUpdatedId = Main.sessionMode.connect('updated',
             this._sync.bind(this));
 
-        this.connect('destroy', this._onDestroy.bind(this));
-
         this._sync();
     }
 
-    _onDestroy() {
+    destroy() {
         if (this._paygManagerInitializedId > 0) {
             this._paygManager.disconnect(this._paygManagerInitializedId);
             this._paygManagerInitializedId = 0;
@@ -101,17 +213,29 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
         }
     }
 
-    _getMenuGicon() {
+    _timeoutRefresh() {
+        this._sync();
+        return GLib.SOURCE_CONTINUE;
+    }
+
+    _sync() {
+        this.enabled = this._paygManager.enabled;
+        this.can_unlock = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter && this.enabled;
+        this.time_remaining = this._getTimeRemainingString();
+        this.account_id = this._paygManager.accountID;
+        this.status_gicon = this._getStatusGicon();
+    }
+
+    _getStatusGicon() {
         const URGENT_EXPIRATION_S = 15 * 60;
         const timeLeftSeconds = this._paygManager.timeRemainingSecs();
 
-        let iconUri = 'resource:///org/gnome/shell/theme/payg-normal-symbolic.svg';
         // if time left <= 0, we haven't yet determined it, so fall back to
         // "normal" icon
         if (timeLeftSeconds >= 0 && timeLeftSeconds <= URGENT_EXPIRATION_S)
-            iconUri = 'resource:///org/gnome/shell/theme/payg-near-expiration-symbolic.svg';
+            return _getNearExpirationGIcon();
 
-        return new Gio.FileIcon({ file: Gio.File.new_for_uri(iconUri) });
+        return _getNormalGIcon();
     }
 
     _getTimeRemainingString() {
@@ -132,29 +256,86 @@ class PaygIndicator extends PanelMenu.SystemIndicator {
 
         return Payg.timeToString(seconds);
     }
+});
 
-    _timeoutRefresh() {
-        this._sync();
-        return GLib.SOURCE_CONTINUE;
+const PaygAccountToggle = GObject.registerClass({
+    Properties: {
+        'time-remaining': GObject.ParamSpec.string('time-remaining', '', '',
+            GObject.ParamFlags.READWRITE,
+            null),
+    },
+}, class PaygAccountToggle extends QuickToggleWithSubtitle {
+    _init() {
+        super._init({
+            visible: false,
+            hasMenu: true,
+            reactive: true,
+        });
+
+        this.add_style_class_name('payg-account-settings-item');
+
+        this._menuIcon = new St.Icon({
+            icon_name: 'go-next-symbolic',
+            style_class: 'quick-toggle-arrow',
+        });
+        this._box.add_child(this._menuIcon);
+
+        this.connect('clicked', () => {
+            this.menu.open()
+        });
+        this.connect('popup-menu', () => {
+            this.menu.open();
+        });
+
+        this.menu.setHeader(_getNormalGIcon(), _('Pay As You Go'));
+
+        this._paygNotifier = new Payg.PaygNotifier();
+        this._unlockMenuItem = this.menu.addAction('Enter unlock code…', () => {
+            Main.panel.closeQuickSettings();
+            this._paygNotifier.notify(-1);
+        });
+    }
+});
+
+var Indicator = GObject.registerClass(
+class PaygIndicator extends SystemIndicator {
+    _init() {
+        super._init({
+            visible: false,
+        });
     }
 
-    _sync() {
-        const sensitive = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter && this._paygManager.enabled;
-        this.menu.setSensitive(sensitive);
+    _init() {
+        super._init();
 
-        this._item.actor.visible = this._indicator.visible = this._paygManager.enabled;
-        this._item.label.text = this._getTimeRemainingString();
-        this._item.icon.gicon = this._getMenuGicon();
-        this._indicator.gicon = this._item.icon.gicon;
+        let paygInfo = new PaygAccountInfo();
 
-        // Differently from the remaining time counter, we just want to show the account ID
-        // when the backend properly supports it.
-        this._paygItem.actor.visible = this._paygManager.enabled && this._verifyValidAccountID();
-        this._paygItem.label.text = _('Account ID: %s').format(this._paygManager.accountID);
-        this._paygItem.icon.gicon = this._item.icon.gicon;
-    }
+        let paygAccountToggle = new PaygAccountToggle();
+        this.quickSettingsItems.push(paygAccountToggle);
+        paygInfo.bind_property('enabled',
+            paygAccountToggle, 'visible',
+            GObject.BindingFlags.SYNC_CREATE);
+        paygInfo.bind_property('status-gicon',
+            paygAccountToggle, 'gicon',
+            GObject.BindingFlags.SYNC_CREATE);
+        paygInfo.bind_property('can-unlock',
+            paygAccountToggle, 'reactive',
+            GObject.BindingFlags.SYNC_CREATE);
+        paygInfo.bind_property('time-remaining',
+            paygAccountToggle, 'title',
+            GObject.BindingFlags.SYNC_CREATE);
+        paygInfo.bind_property_full('account-id',
+            paygAccountToggle, 'subtitle',
+            GObject.BindingFlags.SYNC_CREATE,
+            (bind, source) => [true, _('Account ID: %s').format(source)],
+            null);
 
-    _verifyValidAccountID() {
-        return Main.paygManager.accountID !== '0';
+        let indicator = this._addIndicator();
+        paygInfo.bind_property('enabled',
+            indicator, 'visible',
+            GObject.BindingFlags.SYNC_CREATE);
+        paygInfo.bind_property('status-gicon',
+            indicator, 'gicon',
+            GObject.BindingFlags.SYNC_CREATE);
     }
 });
