@@ -87,7 +87,7 @@ const _modes = {
         panel: {
             left: [],
             center: [],
-            right: ['a11y', 'keyboard', 'aggregateMenu'],
+            right: ['dwellClick', 'a11y', 'keyboard', 'quickSettings'],
         },
     },
 
