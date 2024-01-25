@@ -519,12 +519,17 @@ var PaygUnlockDialog = GObject.registerClass({
         if (this._isModal)
             return true;
 
-        if (!Main.pushModal(this, {
+        let modalParams = {
             timestamp,
             actionMode: Shell.ActionMode.UNLOCK_SCREEN,
-        }))
+        };
+        let grab = Main.pushModal(Main.uiGroup, modalParams);
+        if (grab.get_seat_state() !== Clutter.GrabState.ALL) {
+            Main.popModal(grab);
             return false;
+        }
 
+        this._grab = grab;
         this._isModal = true;
 
         this._entry.grab_key_focus();
@@ -534,7 +539,8 @@ var PaygUnlockDialog = GObject.registerClass({
 
     popModal(timestamp) {
         if (this._isModal) {
-            Main.popModal(this, timestamp);
+            Main.popModal(this._grab, timestamp);
+            this._grab = null;
             this._isModal = false;
         }
     }
