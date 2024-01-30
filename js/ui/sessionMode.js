@@ -64,9 +64,14 @@ const _modes = {
         panelStyle: 'login-screen',
     },
 
+    'gdm-unlock-dialog-payg': {
+        parentMode: 'gdm',
+        unlockDialog: imports.ui.paygUnlockDialog.PaygUnlockDialog,
+    },
+
     'unlock-dialog': {
         isLocked: true,
-        unlockDialog: undefined,
+        unlockDialog: imports.ui.unlockDialog.UnlockDialog,
         components: ['polkitAgent', 'telepathyClient'],
         panel: {
             left: [],
@@ -74,6 +79,16 @@ const _modes = {
             right: ['dwellClick', 'a11y', 'keyboard', 'quickSettings'],
         },
         panelStyle: 'unlock-screen',
+    },
+
+    'unlock-dialog-payg': {
+        parentMode: 'unlock-dialog',
+        unlockDialog: imports.ui.paygUnlockDialog.PaygUnlockDialog,
+        panel: {
+            left: [],
+            center: [],
+            right: ['dwellClick', 'a11y', 'keyboard', 'quickSettings'],
+        },
     },
 
     'user': {
