@@ -1,7 +1,7 @@
 // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
 /* exported WelcomeDialog */
 
-const { Clutter, GObject, Shell, St } = imports.gi;
+const { Clutter, GLib, GObject, Shell, St } = imports.gi;
 
 const Config = imports.misc.config;
 const Dialog = imports.ui.dialog;
@@ -32,7 +32,8 @@ class WelcomeDialog extends ModalDialog.ModalDialog {
     }
 
     _buildLayout() {
-        const title = _('Welcome to Endless OS 5');
+        const [majorVersion] = GLib.get_os_info('PRETTY_NAME').split('.');
+        const title = _('Welcome to %s').format(majorVersion);
         const description = _('If you want to learn your way around, check out the tour.');
         const content = new Dialog.MessageDialogContent({ title, description });
 
