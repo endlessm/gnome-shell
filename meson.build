@@ -99,6 +99,9 @@ glycin_dep = dependency('glycin-2', version: glycin_req)
 # Endless-specific: Metrics
 eosmetrics_dep = dependency('eosmetrics-0')
 
+# Endless-specific: Required to determine whether layouts can enter Latin characters
+xkbcommon_dep = dependency('xkbcommon')
+
 have_fonts = mutter_dep.get_variable('have_fonts') == 'true'
 have_xwayland = mutter_dep.get_variable('have_xwayland') == 'true'
 if have_xwayland
