@@ -96,6 +96,9 @@ gnome_desktop_dep = dependency('gnome-desktop-3.0', version: gnome_desktop_req)
 # Endless-specific: Metrics
 eosmetrics_dep = dependency('eosmetrics-0')
 
+# Endless-specific: Required to determine whether layouts can enter Latin characters
+xkbcommon_dep = dependency('xkbcommon')
+
 nm_deps = []
 if get_option('networkmanager')
   nm_deps += dependency('libnm', version: nm_req)
