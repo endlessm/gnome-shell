@@ -591,6 +591,7 @@ export class InputSourceManager extends Signals.EventEmitter {
         this._ibusSources = {};
 
         let infosList = [];
+        let hasLatinLayout = false;
         for (let i = 0; i < nSources; i++) {
             let displayName;
             let shortName;
@@ -601,6 +602,7 @@ export class InputSourceManager extends Signals.EventEmitter {
             if (type === INPUT_SOURCE_TYPE_XKB) {
                 [exists, displayName, shortName] =
                     this._xkbInfo.get_layout_info(id);
+                hasLatinLayout ||= this._keyboardManager.isLatinLayout(id);
             } else if (type === INPUT_SOURCE_TYPE_IBUS) {
                 if (this._disableIBus)
                     continue;
@@ -619,6 +621,7 @@ export class InputSourceManager extends Signals.EventEmitter {
 
             if (exists)
                 infosList.push({type, id, displayName, shortName});
+            /* TODO: update hasLatinLayout if this engine can enter Latin characters */
         }
 
         if (infosList.length === 0) {
