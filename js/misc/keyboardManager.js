@@ -1,6 +1,7 @@
 import GLib from 'gi://GLib';
 import GnomeDesktop from 'gi://GnomeDesktop';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
 import * as Signals from './signals.js';
 
@@ -277,6 +278,16 @@ class KeyboardManager extends Signals.EventEmitter {
     _buildOptionsString() {
         const options = this._xkbOptions.join(',');
         return options;
+    }
+
+    isLatinLayout(id) {
+        const info = this._layoutInfos[id];
+        if (!info)
+            return false;
+        const options = this._buildOptionsString();
+        const [, variants] = this._buildGroupStrings(info.group);
+        const [, , , layout, _variant] = this._xkbInfo.get_layout_info(id);
+        return !Shell.util_needs_secondary_layout(layout, variants, options);
     }
 
     get currentLayout() {
