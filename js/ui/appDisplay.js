@@ -1102,7 +1102,11 @@ var BaseAppView = GObject.registerClass({
             if (addedApps.includes(icon))
                 this._addItem(icon, page, position);
             else if (page !== -1 && position !== -1)
-                this._moveItem(icon, page, position);
+                try {
+                    this._moveItem(icon, page, position);
+                } catch (error) {
+                    log(`Error moving app icon: ${error.message}`);
+                }
         });
 
         this.emit('view-loaded');
