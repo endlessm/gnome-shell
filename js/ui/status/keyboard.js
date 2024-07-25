@@ -2,6 +2,7 @@
 /* exported InputSourceIndicator */
 
 const { Clutter, Gio, GLib, GObject, IBus, Meta, Shell, St } = imports.gi;
+const { EosMetrics } = imports.gi;
 const Gettext = imports.gettext;
 const Signals = imports.misc.signals;
 
@@ -848,6 +849,7 @@ class InputSourceIndicator extends PanelMenu.Button {
 
         this._menuItems = {};
         this._indicatorLabels = {};
+        this._timer = null;
 
         this._container = new InputSourceIndicatorContainer({ style_class: 'system-status-icon' });
         this.add_child(this._container);
@@ -873,6 +875,11 @@ class InputSourceIndicator extends PanelMenu.Button {
 
     _onDestroy() {
         this._inputSourceManager = null;
+
+        if (this._timer) {
+            this._timer.stop();
+            this._timer = null;
+        }
     }
 
     _sessionUpdated() {
@@ -923,6 +930,18 @@ class InputSourceIndicator extends PanelMenu.Button {
         if (oldSource) {
             this._menuItems[oldSource.index].setOrnament(PopupMenu.Ornament.NONE);
             this._indicatorLabels[oldSource.index].hide();
+        }
+
+        if (this._timer) {
+            this._timer.stop();
+            this._timer = null;
+        }
+
+        if (newSource) {
+            this._timer = EosMetrics.EventRecorder.get_default().start_aggregate_timer(
+                '79b03c6a-71b9-48f9-8c31-3d8891b53618',
+                new GLib.Variant('(ss)', [newSource.type, newSource.id])
+            )
         }
 
         if (!newSource || (nVisibleSources < 2 && !newSource.properties)) {
