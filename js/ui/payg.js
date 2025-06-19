@@ -758,11 +758,10 @@ class PaygNotifier extends GObject.Object {
             _('Pay As You Go'),
             messageText);
 
+        this._notification.setUrgency(urgency);
         if (userInitiated)
             this._notification.setResident(true);
-
         this._notification.setTransient(false);
-        this._notification.setUrgency(urgency);
         source.showNotification(this._notification);
 
         // if the user triggered this notification, immediately expand so the
