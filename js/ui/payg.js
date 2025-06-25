@@ -18,16 +18,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-/* exported PaygUnlockCodeEntry, PaygUnlockUi, PaygUnlockWidget, PaygNotifier,
-     ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS, UnlockStatus, timeToString,
-     successMessage */
+/* exported PaygUnlockCodeEntry, PaygUnlockUi, PaygNotificationButton,
+     PaygNotifier, ApplyCodeNotification, SPINNER_ICON_SIZE_PIXELS,
+     UnlockStatus, timeToString, successMessage */
 
 const { Clutter, Gio, GLib, GObject, Shell, St } = imports.gi;
 
 const PaygManager = imports.misc.paygManager;
 
 const Gettext = imports.gettext;
-const Animation = imports.ui.animation;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 
@@ -360,43 +359,10 @@ var PaygUnlockUi = GObject.registerClass({
     }
 });
 
-var PaygUnlockWidget = GObject.registerClass({
-    Signals: {
-        'code-added': {},
-        'code-rejected': { param_types: [GObject.TYPE_STRING] },
-    },
-}, class PaygUnlockWidget extends PaygUnlockUi {
+var PaygNotificationButton = GObject.registerClass(
+class PaygNotificationButton extends St.Widget {
     _init() {
         super._init();
-
-        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
-        this._codeEntry = this._createCodeEntry();
-        this._spinner = this._createSpinner();
-        const entrySpinnerBox = new St.BoxLayout({
-            style_class: 'notification-actions',
-            x_expand: false,
-        });
-        if (Main.paygManager.codeFormatPrefix !== '') {
-            const prefix = new St.Label({
-                style_class: 'notification-payg-code-entry',
-                text: Main.paygManager.codeFormatPrefix,
-                x_align: Clutter.ActorAlign.CENTER,
-            });
-
-            entrySpinnerBox.add_child(prefix);
-        }
-        entrySpinnerBox.add_child(this._codeEntry);
-        entrySpinnerBox.add_child(this._spinner);
-
-        if (Main.paygManager.codeFormatSuffix !== '') {
-            const suffix = new St.Label({
-                style_class: 'notification-payg-code-entry',
-                text: Main.paygManager.codeFormatSuffix,
-                x_align: Clutter.ActorAlign.CENTER,
-            });
-
-            entrySpinnerBox.add_child(suffix);
-        }
 
         this._buttonBox = new St.BoxLayout({
             style_class: 'notification-actions',
@@ -404,36 +370,9 @@ var PaygUnlockWidget = GObject.registerClass({
             vertical: true,
         });
         global.focus_manager.add_group(this._buttonBox);
-        this._buttonBox.add_child(entrySpinnerBox);
 
         this._applyButton = this._createApplyButton();
-        this._applyButton.connect('clicked', this.startVerifyingCode.bind(this));
         this._buttonBox.add_child(this._applyButton);
-
-        this.updateSensitivity();
-    }
-
-    _createCodeEntry() {
-        const codeEntry = new PaygUnlockCodeEntry({
-            style_class: 'notification-payg-entry',
-            x_expand: true,
-            can_focus: true,
-        });
-        codeEntry.clutter_text.connect('activate', this.startVerifyingCode.bind(this));
-        codeEntry.clutter_text.connect('text-changed', this.updateApplyButtonSensitivity.bind(this));
-        codeEntry._enabled = true;
-
-        return codeEntry;
-    }
-
-    _createSpinner() {
-        // We make the most of the spacer to show the spinner while verifying the code.
-        const spinnerIcon = Gio.File.new_for_uri('resource:///org/gnome/shell/theme/process-working.svg');
-        const spinner = new Animation.AnimatedIcon(spinnerIcon, SPINNER_ICON_SIZE_PIXELS);
-        spinner.opacity = 0;
-        spinner.hide();
-
-        return spinner;
     }
 
     _createApplyButton() {
@@ -459,54 +398,6 @@ var PaygUnlockWidget = GObject.registerClass({
         return button;
     }
 
-    setErrorMessage(message) {
-        this.emit('code-rejected', message);
-    }
-
-    _onEntryChanged() {
-        this.updateApplyButtonSensitivity();
-    }
-
-    onCodeAdded() {
-        this.emit('code-added');
-    }
-
-    entryReset() {
-        this._codeEntry.set_text('');
-    }
-
-    entrySetEnabled(enabled) {
-        if (this._codeEntry._enabled === enabled)
-            return;
-
-        this._codeEntry._enabled = enabled;
-        this._codeEntry.reactive = enabled;
-        this._codeEntry.can_focus = enabled;
-        this._codeEntry.clutter_text.reactive = enabled;
-        this._codeEntry.clutter_text.editable = enabled;
-        this._codeEntry.clutter_text.cursor_visible = enabled;
-    }
-
-    get entryCode() {
-        return this._codeEntry.get_text();
-    }
-
-    get verificationStatus() {
-        return this._verificationStatus;
-    }
-
-    set verificationStatus(value) {
-        this._verificationStatus = value;
-    }
-
-    get spinner() {
-        return this._spinner;
-    }
-
-    get applyButton() {
-        return this._applyButton;
-    }
-
     get buttonBox() {
         return this._buttonBox;
     }
@@ -527,75 +418,14 @@ var ApplyCodeNotification = GObject.registerClass({
         // banner object. This variable name simply follows the convention of
         // the parent class.
         this._bannerOrig = banner;
-        this._verificationStatus = UnlockStatus.NOT_VERIFYING;
-
-        this._codeAddedId = 0;
-        this._codeRejectedId = 0;
-        this._doneId = 0;
-
-        this.connect('destroy', this._onDestroy.bind(this));
-    }
-
-    _onDestroy() {
-        if (this._codeAddedId > 0) {
-            this._unlockWidget.disconnect(this._codeAddedId);
-            this._codeAddedId = 0;
-        }
-
-        if (this._codeRejectedId > 0) {
-            this._unlockWidget.disconnect(this._codeRejectedId);
-            this._codeRejectedId = 0;
-        }
-
-        if (this._doneId > 0) {
-            GLib.source_remove(this._doneId);
-            this._doneId = 0;
-        }
     }
 
     createBanner() {
-        if (this._codeAddedId > 0) {
-            this._unlockWidget.disconnect(this._codeAddedId);
-            this._codeAddedId = 0;
-        }
-
-        if (this._codeRejectedId > 0) {
-            this._unlockWidget.disconnect(this._codeRejectedId);
-            this._codeRejectedId = 0;
-        }
-
         this._banner = new MessageTray.NotificationBanner(this);
-        this._unlockWidget = new PaygUnlockWidget();
-        this._codeAddedId = this._unlockWidget.connect('code-added', this._onCodeAdded.bind(this));
-        this._codeRejectedId = this._unlockWidget.connect('code-rejected', this._onCodeRejected.bind(this));
-        this._banner.setActionArea(this._unlockWidget.buttonBox);
+        this._notificationButton = new PaygNotificationButton();
+        this._banner.setActionArea(this._notificationButton.buttonBox);
 
         return this._banner;
-    }
-
-    _onCodeAdded() {
-        this._setMessage(successMessage());
-
-        if (this._doneId > 0) {
-            GLib.source_remove(this._doneId);
-            this._doneId = 0;
-        }
-
-        this._doneId = GLib.timeout_add_seconds(
-            GLib.PRIORITY_DEFAULT,
-            SUCCESS_DELAY_SECONDS,
-            () => {
-                this.emit('done-displaying');
-                this.destroy();
-
-                return GLib.SOURCE_REMOVE;
-            });
-    }
-
-    // if errorMessage is unspecified, a default message will be populated based
-    // on whether time remains
-    _onCodeRejected(unlockWidget, errorMessage) {
-        this._setMessage(errorMessage ? errorMessage : this._bannerOrig);
     }
 
     _setMessage(message) {
@@ -603,12 +433,6 @@ var ApplyCodeNotification = GObject.registerClass({
     }
 
     activate() {
-        // We get here if the Apply button is inactive when we try to click it.
-        // Unless we're already done, exit early so we don't destroy the
-        // notification)
-        if (this._verificationStatus !== UnlockStatus.SUCCEEDED)
-            return;
-
         super.activate();
     }
 });
