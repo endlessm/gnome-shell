@@ -856,40 +856,17 @@ class PaygNotifier extends GObject.Object {
         const source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
 
-        // by default, this notification is for early entry of an unlock keycode
-        let codeLength = Main.paygManager.codeLength;
-        let messageText = Gettext.ngettext(
-            'Enter a new keycode (%s character) to extend the time before your credit expires.',
-            'Enter a new keycode (%s characters) to extend the time before your credit expires.',
-            codeLength).format(codeLength);
-        let urgency = MessageTray.Urgency.NORMAL;
-        let userInitiated = false;
-
-        // in case this is a "only X time left" warning notification
-        if (secondsLeft >= 0) {
-            const timeLeft = timeToString(secondsLeft);
-            messageText = _('Subscription expires in %s.').format(timeLeft);
-            urgency = MessageTray.Urgency.HIGH;
-        } else {
-            userInitiated = true;
-        }
+        const timeLeft = timeToString(secondsLeft);
+        const messageText = _('Subscription expires in %s.').format(timeLeft);
 
         this._notification = new ApplyCodeNotification(
             source,
             _('Pay As You Go'),
             messageText);
 
-        if (userInitiated)
-            this._notification.setResident(true);
-
         this._notification.setTransient(false);
-        this._notification.setUrgency(urgency);
+        this._notification.setUrgency(MessageTray.Urgency.HIGH);
         source.showNotification(this._notification);
-
-        // if the user triggered this notification, immediately expand so the
-        // user sees the input field
-        if (userInitiated)
-            Main.messageTray._expandActiveNotification();
 
         this._notification.connect('destroy', () => {
             this._notification = null;
