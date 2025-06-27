@@ -289,10 +289,10 @@ const PaygAccountToggle = GObject.registerClass({
 
         this.menu.setHeader(_getNormalGIcon(), _('Pay As You Go'));
 
-        this._paygNotifier = new Payg.PaygNotifier();
         this._unlockMenuItem = this.menu.addAction(_('Enter unlock code…'), () => {
             Main.panel.closeQuickSettings();
-            this._paygNotifier.notify(-1);
+            this._paygAddCreditDialog = new Payg.PaygAddCreditDialog();
+            this._paygAddCreditDialog.open();
         });
     }
 });

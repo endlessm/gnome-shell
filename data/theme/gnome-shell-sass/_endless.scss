@@ -144,3 +144,21 @@ $success_time_payg_color: #02b842;
   padding-right: 12px;
   margin-top: 6px;
 }
+
+.payg-add-credit-dialog {
+  min-width: 400px;
+  max-width: 400px;
+}
+
+/* These are a mix of prompt-dialog-*-label
+ * with caps-lock-warning-label */
+.payg-add-credit-dialog-error-label,
+.payg-add-credit-dialog-info-label {
+  text-align: center;
+  padding-bottom: 8px;
+  @include fontsize($base_font_size - 1);
+}
+
+.payg-add-credit-dialog-error-label {
+  color: $warning_color;
+}
