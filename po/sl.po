@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-16 10:45+0000\n"
+"POT-Creation-Date: 2025-07-02 02:56+0000\n"
 "PO-Revision-Date: 2013-11-02 06:45+0000\n"
 "Last-Translator: Shaddai, 2019-2020,2022-2023\n"
 "Language-Team: Slovenian (http://app.transifex.com/endless-os/gnome-shell/language/sl/)\n"
@@ -1745,7 +1745,7 @@ msgstr "Preostali čas je očiščen!"
 msgid "OK!"
 msgstr "OK!"
 
-#: js/ui/payg.js:232
+#: js/ui/payg.js:234 js/ui/payg.js:560
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
@@ -1754,23 +1754,23 @@ msgstr[1] "Preveč poskusov. Poskusite znova čez %s minuti."
 msgstr[2] "Preveč poskusov. Poskusite znova čez %s minut."
 msgstr[3] "Preveč poskusov. Poskusite znova čez %s minut."
 
-#: js/ui/payg.js:236
+#: js/ui/payg.js:238 js/ui/payg.js:564
 msgid "Too many attempts. Try again in a few seconds."
 msgstr "Preveč poskusov. Poskusite znova čez nekaj sekund."
 
-#: js/ui/payg.js:257
+#: js/ui/payg.js:259 js/ui/payg.js:586
 msgid "Invalid keycode. Please try again."
 msgstr "Napačno koda ključa, poskusite znova."
 
-#: js/ui/payg.js:259
+#: js/ui/payg.js:261 js/ui/payg.js:588
 msgid "Keycode already used. Please enter a new keycode."
 msgstr "Koda ključa je že v uporabi. Vnesite novo kodo ključa."
 
-#: js/ui/payg.js:261
+#: js/ui/payg.js:263 js/ui/payg.js:590
 msgid "Time exceeded while verifying the keycode"
 msgstr "Med preverjanjem kode za ključ je čas potekel"
 
-#: js/ui/payg.js:263
+#: js/ui/payg.js:265 js/ui/payg.js:592
 #, javascript-format
 msgid "Your Pay As You Go Account ID is: %s"
 msgstr "Vaš Pay As You Go ID Račun: %s"
@@ -1779,105 +1779,21 @@ msgstr "Vaš Pay As You Go ID Račun: %s"
 #. explicitly,
 #. since that should not happen), but still we need to show something to the
 #. user.
-#: js/ui/payg.js:267
+#. We don't consider any other error here (and we don't consider DISABLED
+#. explicitly,
+#. * since that should not happen), but still we need to show something to the
+#. user.
+#: js/ui/payg.js:269 js/ui/payg.js:597
 msgid "Unknown error"
 msgstr "Neznana napaka"
 
-#: js/ui/payg.js:447
-msgid "Apply Keycode"
-msgstr "Vpiši kodo ključa"
+#. This layout contains the prompt presented to the user and the labels
+#. * reporting results to the user
+#: js/ui/payg.js:441
+msgid "Enter your unlock code"
+msgstr ""
 
-#: js/ui/payg.js:638
-#, javascript-format
-msgid "%s second"
-msgid_plural "%s seconds"
-msgstr[0] "%s sekund"
-msgstr[1] "%s sekund"
-msgstr[2] "%s sekund"
-msgstr[3] "%s sekund"
-
-#: js/ui/payg.js:642 js/ui/payg.js:652
-#, javascript-format
-msgid "%s minute"
-msgid_plural "%s minutes"
-msgstr[0] "%s minut"
-msgstr[1] "%s minut"
-msgstr[2] "%s minut"
-msgstr[3] "%s minut"
-
-#: js/ui/payg.js:646 js/ui/payg.js:663
-#, javascript-format
-msgid "%s hour"
-msgid_plural "%s hours"
-msgstr[0] "%s ura"
-msgstr[1] "%s ur"
-msgstr[2] "%s ur"
-msgstr[3] "%s ur"
-
-#: js/ui/payg.js:657
-#, javascript-format
-msgid "%s day"
-msgid_plural "%s days"
-msgstr[0] "%s dan"
-msgstr[1] "%s dni"
-msgstr[2] "%s dni"
-msgstr[3] "%s dni"
-
-#: js/ui/payg.js:673
-#, javascript-format
-msgid "%s second has been added to your Pay As You Go credit."
-msgid_plural "%s seconds have been added to your Pay As You Go credit."
-msgstr[0] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
-msgstr[1] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
-msgstr[2] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
-msgstr[3] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
-
-#: js/ui/payg.js:681
-#, javascript-format
-msgid "%s minute has been added to your Pay As You Go credit."
-msgid_plural "%s minutes have been added to your Pay As You Go credit."
-msgstr[0] "%s minuta je bilo dodana vašemu dobroimetju Pay As You Go."
-msgstr[1] "%s minuti sta bili dodani vašemu dobroimetju Pay As You Go."
-msgstr[2] "%s minut je bilo dodano vašemu dobroimetju Pay As You Go."
-msgstr[3] "%s minut je bilo dodano vašemu dobroimetju Pay As You Go."
-
-#: js/ui/payg.js:689
-#, javascript-format
-msgid "%s hour has been added to your Pay As You Go credit."
-msgid_plural "%s hours have been added to your Pay As You Go credit."
-msgstr[0] "%s ura je bilo dodana vašem dobroimetju Pay As You Go."
-msgstr[1] "%s uri sta bili dodani vašemu dobroimetju Pay As You Go."
-msgstr[2] "%sure so bile dodane vašemu dobroimetju Pay As You Go."
-msgstr[3] "%s ur je bilo dodanih vašemu dobroimetju Pay As You Go."
-
-#: js/ui/payg.js:697
-#, javascript-format
-msgid "%s day has been added to your Pay As You Go credit."
-msgid_plural "%s days have been added to your Pay As You Go credit."
-msgstr[0] "%s dan je bili dodan vašemu dobroimetju Pay As You Go."
-msgstr[1] "%s dneva sta bila dodana vašemu dobroimetju Pay As You Go."
-msgstr[2] "%s dni je bilo dodanih vašemu dobroimetju Pay As You Go."
-msgstr[3] "%sdni je bilo dodanih vašemu dobroimetju Pay As You Go."
-
-#: js/ui/payg.js:705
-#, javascript-format
-msgid "%s month has been added to your Pay As You Go credit."
-msgid_plural "%s months have been added to your Pay As You Go credit."
-msgstr[0] "%s mesec je bil dodani vašemu dobroimetju Pay As You Go."
-msgstr[1] "%smeseca sta bila dodana vašemu dobroimetju Pay As You Go."
-msgstr[2] "%s meseci so bili dodanih vašemu dobroimetju Pay As You Go."
-msgstr[3] "%s mesecev je bilo dodanih vašemu dobroimetju Pay As You Go."
-
-#: js/ui/payg.js:713
-msgid "1 year has been added to your Pay As You Go credit."
-msgstr "Kreditu Pay As You Go je dodano 1 leto."
-
-#. Unlock permanently message
-#: js/ui/payg.js:716
-msgid "You have successfully unlocked your Endless Machine"
-msgstr "Uspešno ste odklenili svoj Endless Računalnik"
-
-#: js/ui/payg.js:741
+#: js/ui/payg.js:444
 #, javascript-format
 msgid ""
 "Enter a new keycode (%s character) to extend the time before your credit "
@@ -1890,12 +1806,114 @@ msgstr[1] "Vnesite novo kodo ključa (%s znak), da podaljšate čas pred potekom
 msgstr[2] "Vnesite novo kodo ključa (%s znak), da podaljšate čas pred potekom kredita."
 msgstr[3] "Vnesite novo kodo ključa (%s znak), da podaljšate čas pred potekom kredita."
 
-#: js/ui/payg.js:750
+#: js/ui/payg.js:493 js/ui/windowMenu.js:181
+msgid "Close"
+msgstr "Zapri"
+
+#: js/ui/payg.js:499
+msgid "Add Credit"
+msgstr ""
+
+#: js/ui/payg.js:683 js/ui/status/payg.js:292
+msgid "Enter unlock code…"
+msgstr "Vnesite kodo za odklepanje…"
+
+#: js/ui/payg.js:759
+#, javascript-format
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] "%s sekund"
+msgstr[1] "%s sekund"
+msgstr[2] "%s sekund"
+msgstr[3] "%s sekund"
+
+#: js/ui/payg.js:763 js/ui/payg.js:773
+#, javascript-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "%s minut"
+msgstr[1] "%s minut"
+msgstr[2] "%s minut"
+msgstr[3] "%s minut"
+
+#: js/ui/payg.js:767 js/ui/payg.js:784
+#, javascript-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] "%s ura"
+msgstr[1] "%s ur"
+msgstr[2] "%s ur"
+msgstr[3] "%s ur"
+
+#: js/ui/payg.js:778
+#, javascript-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s dan"
+msgstr[1] "%s dni"
+msgstr[2] "%s dni"
+msgstr[3] "%s dni"
+
+#: js/ui/payg.js:794
+#, javascript-format
+msgid "%s second has been added to your Pay As You Go credit."
+msgid_plural "%s seconds have been added to your Pay As You Go credit."
+msgstr[0] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
+msgstr[1] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
+msgstr[2] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
+msgstr[3] "%s sekund je bilo dodanih vašemu dobroimetju Pay As You Go."
+
+#: js/ui/payg.js:802
+#, javascript-format
+msgid "%s minute has been added to your Pay As You Go credit."
+msgid_plural "%s minutes have been added to your Pay As You Go credit."
+msgstr[0] "%s minuta je bilo dodana vašemu dobroimetju Pay As You Go."
+msgstr[1] "%s minuti sta bili dodani vašemu dobroimetju Pay As You Go."
+msgstr[2] "%s minut je bilo dodano vašemu dobroimetju Pay As You Go."
+msgstr[3] "%s minut je bilo dodano vašemu dobroimetju Pay As You Go."
+
+#: js/ui/payg.js:810
+#, javascript-format
+msgid "%s hour has been added to your Pay As You Go credit."
+msgid_plural "%s hours have been added to your Pay As You Go credit."
+msgstr[0] "%s ura je bilo dodana vašem dobroimetju Pay As You Go."
+msgstr[1] "%s uri sta bili dodani vašemu dobroimetju Pay As You Go."
+msgstr[2] "%sure so bile dodane vašemu dobroimetju Pay As You Go."
+msgstr[3] "%s ur je bilo dodanih vašemu dobroimetju Pay As You Go."
+
+#: js/ui/payg.js:818
+#, javascript-format
+msgid "%s day has been added to your Pay As You Go credit."
+msgid_plural "%s days have been added to your Pay As You Go credit."
+msgstr[0] "%s dan je bili dodan vašemu dobroimetju Pay As You Go."
+msgstr[1] "%s dneva sta bila dodana vašemu dobroimetju Pay As You Go."
+msgstr[2] "%s dni je bilo dodanih vašemu dobroimetju Pay As You Go."
+msgstr[3] "%sdni je bilo dodanih vašemu dobroimetju Pay As You Go."
+
+#: js/ui/payg.js:826
+#, javascript-format
+msgid "%s month has been added to your Pay As You Go credit."
+msgid_plural "%s months have been added to your Pay As You Go credit."
+msgstr[0] "%s mesec je bil dodani vašemu dobroimetju Pay As You Go."
+msgstr[1] "%smeseca sta bila dodana vašemu dobroimetju Pay As You Go."
+msgstr[2] "%s meseci so bili dodanih vašemu dobroimetju Pay As You Go."
+msgstr[3] "%s mesecev je bilo dodanih vašemu dobroimetju Pay As You Go."
+
+#: js/ui/payg.js:834
+msgid "1 year has been added to your Pay As You Go credit."
+msgstr "Kreditu Pay As You Go je dodano 1 leto."
+
+#. Unlock permanently message
+#: js/ui/payg.js:837
+msgid "You have successfully unlocked your Endless Machine"
+msgstr "Uspešno ste odklenili svoj Endless Računalnik"
+
+#: js/ui/payg.js:860
 #, javascript-format
 msgid "Subscription expires in %s."
 msgstr "Naročnina potekla bo v %s."
 
-#: js/ui/payg.js:758 js/ui/status/payg.js:290
+#: js/ui/payg.js:864 js/ui/status/payg.js:290
 msgid "Pay As You Go"
 msgstr "Pay As You Go"
 
@@ -2299,10 +2317,6 @@ msgstr "Naročnina je potekla"
 msgid "Less than 1 minute"
 msgstr "Manj kot 1 minuto nazaj"
 
-#: js/ui/status/payg.js:293
-msgid "Enter unlock code…"
-msgstr "Vnesite kodo za odklepanje…"
-
 #: js/ui/status/payg.js:330
 #, javascript-format
 msgid "Account ID: %s"
@@ -2587,10 +2601,6 @@ msgstr "Premakni na zaslon levo"
 #: js/ui/windowMenu.js:173
 msgid "Move to Monitor Right"
 msgstr "Premakni na zaslon desno"
-
-#: js/ui/windowMenu.js:181
-msgid "Close"
-msgstr "Zapri"
 
 #: src/calendar-server/evolution-calendar.desktop.in:3
 msgid "Evolution Calendar"

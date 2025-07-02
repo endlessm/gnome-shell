@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-16 10:45+0000\n"
+"POT-Creation-Date: 2025-07-02 02:56+0000\n"
 "PO-Revision-Date: 2013-11-02 06:45+0000\n"
 "Last-Translator: 凡凡不想平凡 <freddy4212@gmail.com>, 2022\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/endless-os/gnome-shell/language/zh_TW/)\n"
@@ -1712,29 +1712,29 @@ msgstr "剩餘時間已清除！"
 msgid "OK!"
 msgstr "OK!"
 
-#: js/ui/payg.js:232
+#: js/ui/payg.js:234 js/ui/payg.js:560
 #, javascript-format
 msgid "Too many attempts. Try again in %s minute."
 msgid_plural "Too many attempts. Try again in %s minutes."
 msgstr[0] "已嘗試太多次，請在 %s 分鐘後重試。"
 
-#: js/ui/payg.js:236
+#: js/ui/payg.js:238 js/ui/payg.js:564
 msgid "Too many attempts. Try again in a few seconds."
 msgstr "已嘗試太多次，請在幾秒鐘後再試。"
 
-#: js/ui/payg.js:257
+#: js/ui/payg.js:259 js/ui/payg.js:586
 msgid "Invalid keycode. Please try again."
 msgstr ""
 
-#: js/ui/payg.js:259
+#: js/ui/payg.js:261 js/ui/payg.js:588
 msgid "Keycode already used. Please enter a new keycode."
 msgstr ""
 
-#: js/ui/payg.js:261
+#: js/ui/payg.js:263 js/ui/payg.js:590
 msgid "Time exceeded while verifying the keycode"
 msgstr ""
 
-#: js/ui/payg.js:263
+#: js/ui/payg.js:265 js/ui/payg.js:592
 #, javascript-format
 msgid "Your Pay As You Go Account ID is: %s"
 msgstr "您的 Pay As You Go 帳戶 ID 為：%s"
@@ -1743,78 +1743,21 @@ msgstr "您的 Pay As You Go 帳戶 ID 為：%s"
 #. explicitly,
 #. since that should not happen), but still we need to show something to the
 #. user.
-#: js/ui/payg.js:267
+#. We don't consider any other error here (and we don't consider DISABLED
+#. explicitly,
+#. * since that should not happen), but still we need to show something to the
+#. user.
+#: js/ui/payg.js:269 js/ui/payg.js:597
 msgid "Unknown error"
 msgstr "未知錯誤"
 
-#: js/ui/payg.js:447
-msgid "Apply Keycode"
+#. This layout contains the prompt presented to the user and the labels
+#. * reporting results to the user
+#: js/ui/payg.js:441
+msgid "Enter your unlock code"
 msgstr ""
 
-#: js/ui/payg.js:638
-#, javascript-format
-msgid "%s second"
-msgid_plural "%s seconds"
-msgstr[0] "%s 秒"
-
-#: js/ui/payg.js:642 js/ui/payg.js:652
-#, javascript-format
-msgid "%s minute"
-msgid_plural "%s minutes"
-msgstr[0] "%s 分鐘"
-
-#: js/ui/payg.js:646 js/ui/payg.js:663
-#, javascript-format
-msgid "%s hour"
-msgid_plural "%s hours"
-msgstr[0] "%s 小時"
-
-#: js/ui/payg.js:657
-#, javascript-format
-msgid "%s day"
-msgid_plural "%s days"
-msgstr[0] "%s 天"
-
-#: js/ui/payg.js:673
-#, javascript-format
-msgid "%s second has been added to your Pay As You Go credit."
-msgid_plural "%s seconds have been added to your Pay As You Go credit."
-msgstr[0] "您的預付信用已經新增 %s 秒。"
-
-#: js/ui/payg.js:681
-#, javascript-format
-msgid "%s minute has been added to your Pay As You Go credit."
-msgid_plural "%s minutes have been added to your Pay As You Go credit."
-msgstr[0] "您的預付信用已經新增 %s 分鐘。"
-
-#: js/ui/payg.js:689
-#, javascript-format
-msgid "%s hour has been added to your Pay As You Go credit."
-msgid_plural "%s hours have been added to your Pay As You Go credit."
-msgstr[0] "您的預付信用已經新增 %s 小時。"
-
-#: js/ui/payg.js:697
-#, javascript-format
-msgid "%s day has been added to your Pay As You Go credit."
-msgid_plural "%s days have been added to your Pay As You Go credit."
-msgstr[0] "您的預付信用已經新增 %s 天。"
-
-#: js/ui/payg.js:705
-#, javascript-format
-msgid "%s month has been added to your Pay As You Go credit."
-msgid_plural "%s months have been added to your Pay As You Go credit."
-msgstr[0] "您的預付信用已經新增 %s 個月。"
-
-#: js/ui/payg.js:713
-msgid "1 year has been added to your Pay As You Go credit."
-msgstr "您的預付信用已經新增 1 年。"
-
-#. Unlock permanently message
-#: js/ui/payg.js:716
-msgid "You have successfully unlocked your Endless Machine"
-msgstr "您已成功解鎖 Endless Machine"
-
-#: js/ui/payg.js:741
+#: js/ui/payg.js:444
 #, javascript-format
 msgid ""
 "Enter a new keycode (%s character) to extend the time before your credit "
@@ -1824,12 +1767,87 @@ msgid_plural ""
 "expires."
 msgstr[0] ""
 
-#: js/ui/payg.js:750
+#: js/ui/payg.js:493 js/ui/windowMenu.js:181
+msgid "Close"
+msgstr "關閉視窗"
+
+#: js/ui/payg.js:499
+msgid "Add Credit"
+msgstr ""
+
+#: js/ui/payg.js:683 js/ui/status/payg.js:292
+msgid "Enter unlock code…"
+msgstr "輸入解鎖代碼..."
+
+#: js/ui/payg.js:759
+#, javascript-format
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] "%s 秒"
+
+#: js/ui/payg.js:763 js/ui/payg.js:773
+#, javascript-format
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] "%s 分鐘"
+
+#: js/ui/payg.js:767 js/ui/payg.js:784
+#, javascript-format
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] "%s 小時"
+
+#: js/ui/payg.js:778
+#, javascript-format
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] "%s 天"
+
+#: js/ui/payg.js:794
+#, javascript-format
+msgid "%s second has been added to your Pay As You Go credit."
+msgid_plural "%s seconds have been added to your Pay As You Go credit."
+msgstr[0] "您的預付信用已經新增 %s 秒。"
+
+#: js/ui/payg.js:802
+#, javascript-format
+msgid "%s minute has been added to your Pay As You Go credit."
+msgid_plural "%s minutes have been added to your Pay As You Go credit."
+msgstr[0] "您的預付信用已經新增 %s 分鐘。"
+
+#: js/ui/payg.js:810
+#, javascript-format
+msgid "%s hour has been added to your Pay As You Go credit."
+msgid_plural "%s hours have been added to your Pay As You Go credit."
+msgstr[0] "您的預付信用已經新增 %s 小時。"
+
+#: js/ui/payg.js:818
+#, javascript-format
+msgid "%s day has been added to your Pay As You Go credit."
+msgid_plural "%s days have been added to your Pay As You Go credit."
+msgstr[0] "您的預付信用已經新增 %s 天。"
+
+#: js/ui/payg.js:826
+#, javascript-format
+msgid "%s month has been added to your Pay As You Go credit."
+msgid_plural "%s months have been added to your Pay As You Go credit."
+msgstr[0] "您的預付信用已經新增 %s 個月。"
+
+#: js/ui/payg.js:834
+msgid "1 year has been added to your Pay As You Go credit."
+msgstr "您的預付信用已經新增 1 年。"
+
+#. Unlock permanently message
+#: js/ui/payg.js:837
+msgid "You have successfully unlocked your Endless Machine"
+msgstr "您已成功解鎖 Endless Machine"
+
+#: js/ui/payg.js:860
 #, javascript-format
 msgid "Subscription expires in %s."
 msgstr ""
 
-#: js/ui/payg.js:758 js/ui/status/payg.js:290
+#: js/ui/payg.js:864 js/ui/status/payg.js:290
 msgid "Pay As You Go"
 msgstr "預付"
 
@@ -2230,10 +2248,6 @@ msgstr "訂閱已過期"
 msgid "Less than 1 minute"
 msgstr "少於 1 分鐘"
 
-#: js/ui/status/payg.js:293
-msgid "Enter unlock code…"
-msgstr "輸入解鎖代碼..."
-
 #: js/ui/status/payg.js:330
 #, javascript-format
 msgid "Account ID: %s"
@@ -2515,10 +2529,6 @@ msgstr "移至左方顯示器"
 #: js/ui/windowMenu.js:173
 msgid "Move to Monitor Right"
 msgstr "移至右方顯示器"
-
-#: js/ui/windowMenu.js:181
-msgid "Close"
-msgstr "關閉視窗"
 
 #: src/calendar-server/evolution-calendar.desktop.in:3
 msgid "Evolution Calendar"
