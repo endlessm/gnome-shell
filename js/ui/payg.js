@@ -45,7 +45,7 @@ const SPINNER_ANIMATION_DELAY_MSECS = 1000;
 const SPINNER_ANIMATION_TIME_MSECS = 300;
 var SPINNER_ICON_SIZE_PIXELS = 16;
 
-var UnlockStatus = {
+export var UnlockStatus = {
     NOT_VERIFYING: 0,
     VERIFYING: 1,
     FAILED: 2,
