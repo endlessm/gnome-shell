@@ -375,7 +375,7 @@ export const PaygUnlockDialog = GObject.registerClass({
             reactive: true,
             can_focus: true,
             label: buttonLabel,
-            x_align: Clutter.ActorAlign.MIDDLE,
+            x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.END,
         });
 
