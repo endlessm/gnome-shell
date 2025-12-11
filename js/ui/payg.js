@@ -43,7 +43,7 @@ const SUCCESS_DELAY_SECONDS = 3;
 
 const SPINNER_ANIMATION_DELAY_MSECS = 1000;
 const SPINNER_ANIMATION_TIME_MSECS = 300;
-var SPINNER_ICON_SIZE_PIXELS = 16;
+export var SPINNER_ICON_SIZE_PIXELS = 16;
 
 export var UnlockStatus = {
     NOT_VERIFYING: 0,
@@ -658,7 +658,7 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 });
 
-const PaygNotificationButton = GObject.registerClass(
+export const PaygNotificationButton = GObject.registerClass(
 class PaygNotificationButton extends St.Widget {
     _init() {
         super._init();
@@ -707,7 +707,7 @@ class PaygNotificationButton extends St.Widget {
 
 });
 
-const ApplyCodeNotification = GObject.registerClass({
+export const ApplyCodeNotification = GObject.registerClass({
     Signals: {
         'done-displaying': {},
     },
@@ -760,7 +760,7 @@ const ApplyCodeNotification = GObject.registerClass({
 //   - 86400 seconds => "1 day"
 //   - 115200 seconds => "1 day 8 hours"
 //   - 172800 seconds => "2 days"
-function timeToString(seconds) {
+export function timeToString(seconds) {
     if (seconds < 60)
         return Gettext.ngettext('%s second', '%s seconds', seconds).format(Math.floor(seconds));
 
@@ -794,7 +794,7 @@ function timeToString(seconds) {
 // Similar to timeToString, but does not process partial time,
 // since it's meant to be used for expiration time changes, with
 // a wider range of periods
-function successMessage() {
+export function successMessage() {
     const seconds = Main.paygManager.lastTimeAdded;
     if (seconds < 60) {
         return Gettext.ngettext("%s second has been added to your Pay As You Go credit.",
