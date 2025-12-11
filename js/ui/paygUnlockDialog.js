@@ -270,8 +270,8 @@ export const PaygUnlockDialog = GObject.registerClass({
             reactive: true,
             can_focus: true,
             label: _('Cancel'),
-            x_align: St.Align.START,
-            y_align: St.Align.END,
+            x_align: Clutter.ActorAlign.START,
+            y_align: Clutter.ActorAlign.END,
         });
         buttonsBox.add_child(this._cancelButton);
 
@@ -295,8 +295,8 @@ export const PaygUnlockDialog = GObject.registerClass({
             reactive: true,
             can_focus: true,
             label: _('Unlock'),
-            x_align: St.Align.END,
-            y_align: St.Align.END,
+            x_align: Clutter.ActorAlign.END,
+            y_align: Clutter.ActorAlign.END,
         });
         this._nextButton.add_style_pseudo_class('default');
         buttonsBox.add_child(this._nextButton);
@@ -375,8 +375,8 @@ export const PaygUnlockDialog = GObject.registerClass({
             reactive: true,
             can_focus: true,
             label: buttonLabel,
-            x_align: St.Align.MIDDLE,
-            y_align: St.Align.END,
+            x_align: Clutter.ActorAlign.MIDDLE,
+            y_align: Clutter.ActorAlign.END,
         });
 
         this._messageButton.add_style_pseudo_class('default');
