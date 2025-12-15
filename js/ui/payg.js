@@ -658,88 +658,6 @@ class PaygAddCreditDialog extends ModalDialog.ModalDialog {
     }
 });
 
-export const PaygNotificationButton = GObject.registerClass(
-class PaygNotificationButton extends St.Widget {
-    _init() {
-        super._init();
-
-        this._buttonBox = new St.BoxLayout({
-            style_class: 'notification-actions',
-            x_expand: true,
-            vertical: true,
-        });
-        global.focus_manager.add_group(this._buttonBox);
-
-        this._applyButton = this._createApplyButton();
-        this._applyButton.connect('clicked', () => {
-            this._paygAddCreditDialog = new PaygAddCreditDialog();
-            this._paygAddCreditDialog.open();
-        });
-        this._buttonBox.add_child(this._applyButton);
-    }
-
-    _createApplyButton() {
-        const box = new St.BoxLayout();
-
-        const label = new St.Bin({
-            x_expand: true,
-            child: new St.Label({
-                x_expand: true,
-                x_align: Clutter.ActorAlign.CENTER,
-                text: _('Enter unlock code…'),
-            }),
-        });
-        box.add_child(label);
-
-        const button = new St.Button({
-            child: box,
-            x_expand: true,
-            button_mask: St.ButtonMask.ONE,
-            style_class: 'hotplug-notification-item button',
-        });
-
-        return button;
-    }
-
-    get buttonBox() {
-        return this._buttonBox;
-    }
-
-});
-
-export const ApplyCodeNotification = GObject.registerClass({
-    Signals: {
-        'done-displaying': {},
-    },
-}, class ApplyCodeNotification extends MessageTray.Notification {
-    _init(source, title, banner) {
-        super._init(source, title, banner);
-
-        this._titleOrig = title;
-
-        // Note: "banner" is actually the string displayed in the banner, not a
-        // banner object. This variable name simply follows the convention of
-        // the parent class.
-        this._bannerOrig = banner;
-    }
-
-    createBanner() {
-        this._banner = new MessageTray.NotificationBanner(this);
-        this._notificationButton = new PaygNotificationButton();
-        this._banner.setActionArea(this._notificationButton.buttonBox);
-
-        return this._banner;
-    }
-
-    _setMessage(message) {
-        this.update(this._titleOrig, message);
-    }
-
-    activate() {
-        super.activate();
-    }
-});
-
 // Takes a number of seconds and returns a string
 // with a precision level appropriate to show to the user.
 //
@@ -859,24 +777,29 @@ class PaygNotifier extends GObject.Object {
         // Clear previous notification
         this.clearNotification();
 
-        const source = new MessageTray.SystemNotificationSource();
-        Main.messageTray.add(source);
-
+        const source = new MessageTray.getSystemSource();
         const timeLeft = timeToString(secondsLeft);
         const messageText = _('Subscription expires in %s.').format(timeLeft);
 
-        this._notification = new ApplyCodeNotification(
-            source,
-            _('Pay As You Go'),
-            messageText);
-
-        this._notification.setTransient(false);
-        this._notification.setUrgency(MessageTray.Urgency.HIGH);
-        source.showNotification(this._notification);
+        const params = {
+            source: source,
+            title: _('Pay As You Go'),
+            body: messageText,
+            urgency: MessageTray.Urgency.HIGH,
+        };
+        this._notification = new MessageTray.Notification(params);
 
         this._notification.connect('destroy', () => {
             this._notification = null;
         });
+
+        this._notification.addAction(_('Enter unlock code…'), () => {
+            this._paygAddCreditDialog = new PaygAddCreditDialog();
+            this._paygAddCreditDialog.open();
+        });
+
+        // Show the notification
+        source.addNotification(this._notification);
     }
 
     clearNotification() {
